@@ -1,0 +1,14 @@
+{
+  "name": "Orgatool · Theresianum Mainz",
+  "short_name": "Orgatool",
+  "description": "Lern-App für selbstständiges Lernen am Theresianum Mainz: Stundenplan, Lernwege, Aufgaben und Fortschritt an einem Ort.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f6f7f9",
+  "theme_color": "#3b5bdb",
+  "lang": "de",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
