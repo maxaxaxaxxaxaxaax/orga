@@ -43,3 +43,17 @@ export function effektiveSchritte(fachId, thema, ctx) {
     fertig: schrittFertig(fachId, thema.id, idx, s.fertig, ctx),
   }));
 }
+
+// Dynamischer KB-Stand pro Fach für die Stand-Kopfzeile: ein Lernweg gilt als
+// erbrachter Könnensbeweis, wenn alle seine Schritte fertig sind. So bleiben
+// die Zahlen immer konsistent zum echten Lernweg-Modell (kein Hardcoding).
+// Lazy import: vermeidet Zyklus zwischen lib/lernstand und data/wissen.
+export function fachKbStand(fach, ctx) {
+  if (!fach) return { erbracht: 0, gesamt: 0 };
+  let erbracht = 0;
+  for (const t of fach.themen) {
+    const s = effektiveSchritte(fach.id, t, ctx);
+    if (s.length > 0 && s.every((x) => x.fertig)) erbracht++;
+  }
+  return { erbracht, gesamt: fach.themen.length };
+}

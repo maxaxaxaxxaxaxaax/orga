@@ -14,6 +14,6 @@ export const student = {
 // Wichtigster anstehender Könnensbeweis (Theresianum: keine Klassenarbeiten).
 export const naechsterKnb = {
   fach: "Mathematik",
-  titel: "Könnensbeweis: Lineare Funktionen",
+  titel: "Könnensbeweis: Grundlagen negative Zahlen",
   datum: "2026-05-28",
 };

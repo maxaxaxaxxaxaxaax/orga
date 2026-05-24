@@ -23,7 +23,8 @@ function baueIndex() {
     );
   });
   [...new Set(stundenWoche.map((s) => s.fach))].forEach((f) =>
-    items.push({ typ: "Stundenplan", view: "kalender", titel: f, meta: "Fach" })
+    // Stundenplan lebt jetzt als Reiter in Heute, kein eigener View mehr.
+    items.push({ typ: "Stundenplan", view: "heute", titel: f, meta: "Fach" })
   );
   return items;
 }

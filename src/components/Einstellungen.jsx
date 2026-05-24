@@ -1,22 +1,28 @@
 import { useEffect, useRef } from "react";
 
-const KEYS = [
-  "orga.erledigt",
-  "orga.gelesen",
-  "orga.hochgeladen",
-  "orga.lernschritte",
-  "orga.aufgaben",
-  "orga.active",
-  "orga.kacheln",
-  "orga.name",
-  "orga.theme",
-  "orga.wissen.fach",
-  "orga.wissen.ansicht",
-  "orga.wissen.etappe",
-  "orga.wissen.status",
-];
+// Wir sammeln alle Keys mit Präfix "orga.", damit auch dynamisch erzeugte Keys
+// (Etappenplan pro Etappe, Wochenplan pro KW, Tour-Flag usw.) automatisch
+// dabei sind, ohne dass diese Liste gepflegt werden muss.
+function alleOrgaKeys() {
+  const keys = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k && k.startsWith("orga.")) keys.push(k);
+  }
+  return keys;
+}
 
-export default function Einstellungen({ name, setName, theme, setTheme, onClose }) {
+export default function Einstellungen({
+  name,
+  setName,
+  theme,
+  setTheme,
+  coach,
+  setCoach,
+  demoModus,
+  setDemoModus,
+  onClose,
+}) {
   const closeRef = useRef(null);
 
   useEffect(() => {
@@ -28,7 +34,7 @@ export default function Einstellungen({ name, setName, theme, setTheme, onClose 
 
   function exportieren() {
     const daten = {};
-    for (const k of KEYS) {
+    for (const k of alleOrgaKeys()) {
       const v = localStorage.getItem(k);
       if (v != null) daten[k] = v;
     }
@@ -60,10 +66,16 @@ export default function Einstellungen({ name, setName, theme, setTheme, onClose 
   }
 
   function zuruecksetzen() {
-    if (!window.confirm("Wirklich alle Daten zurücksetzen? Das kann nicht rückgängig gemacht werden.")) {
+    if (
+      !window.confirm(
+        "Wirklich alle Daten zurücksetzen? Etappenplan und Wochenplan werden neu abgefragt."
+      )
+    ) {
       return;
     }
-    for (const k of KEYS) localStorage.removeItem(k);
+    for (const k of alleOrgaKeys()) localStorage.removeItem(k);
+    // Onboarding-Banner nach Reset überspringen, damit die Planung sofort kommt.
+    localStorage.setItem("orga.tourGesehen", "true");
     window.location.reload();
   }
 
@@ -105,6 +117,51 @@ export default function Einstellungen({ name, setName, theme, setTheme, onClose 
               onClick={() => setTheme("dunkel")}
             >
               Dunkel
+            </button>
+          </div>
+        </div>
+
+        <div className="einst-feld einst-zeile">
+          <span className="einst-label">
+            Coach-Modus
+            <span className="einst-hint">Zeigt Power-Funktionen (Netz, Wochenplaner, Befehle).</span>
+          </span>
+          <div className="segment">
+            <button
+              className={"segment-btn" + (!coach ? " aktiv" : "")}
+              onClick={() => setCoach(false)}
+            >
+              Aus
+            </button>
+            <button
+              className={"segment-btn" + (coach ? " aktiv" : "")}
+              onClick={() => setCoach(true)}
+            >
+              An
+            </button>
+          </div>
+        </div>
+
+        <div className="einst-feld einst-zeile">
+          <span className="einst-label">
+            Demo-Modus
+            <span className="einst-hint">
+              Startet bei jedem Laden frisch mit dem Etappenplan. Zeigt eine Leiste,
+              mit der du durch Wochen und Tage springen kannst.
+            </span>
+          </span>
+          <div className="segment">
+            <button
+              className={"segment-btn" + (!demoModus ? " aktiv" : "")}
+              onClick={() => setDemoModus(false)}
+            >
+              Aus
+            </button>
+            <button
+              className={"segment-btn" + (demoModus ? " aktiv" : "")}
+              onClick={() => setDemoModus(true)}
+            >
+              An
             </button>
           </div>
         </div>

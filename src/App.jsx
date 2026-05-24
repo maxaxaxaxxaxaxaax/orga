@@ -2,18 +2,21 @@ import { useEffect, useState } from "react";
 import Topbar from "./components/Topbar";
 import Sidebar from "./components/Sidebar";
 import Icon from "./components/Icon";
-import Dashboard from "./views/Dashboard";
 import Heute from "./views/Heute";
-import Kalender from "./views/Kalender";
 import Aufgaben from "./views/Aufgaben";
 import Wissen from "./views/Wissen";
 import Nachrichten from "./views/Nachrichten";
-import Fortschritt from "./views/Fortschritt";
 import Einstellungen from "./components/Einstellungen";
-import { dokumentAusDatei, notizDokument } from "./lib/einsortieren";
+import WochenstartModal from "./components/WochenstartModal";
+import EtappenstartModal from "./components/EtappenstartModal";
+import DemoBar from "./components/DemoBar";
+import { aktuellerEtappenplanStatus, aktuelleWocheStatus } from "./lib/wochenplan";
+import { aktuelleEtappe } from "./data/etappen";
+import { dokumentAusDatei } from "./lib/einsortieren";
 import { startUploads } from "./data/uploads";
 import { faecher } from "./data/wissen";
 import { aufgaben as seedAufgaben } from "./data/aufgaben";
+import { nachrichten } from "./data/nachrichten";
 import { student } from "./data/schule";
 import { tageBis } from "./lib/zeit";
 import "./App.css";
@@ -29,10 +32,18 @@ function laden(key, fallback) {
 }
 
 export default function App() {
-  const [active, setActive] = useState(() => laden("orga.active", "heute"));
-  const [kacheln, setKacheln] = useState(() => laden("orga.kacheln", true));
-  const [jetzt, setJetzt] = useState(new Date());
+  const [active, setActive] = useState(() => {
+    const v = laden("orga.active", "heute");
+    // Alte Werte aus der vorigen IA auf die neuen drei Bereiche umlenken.
+    if (v === "kalender") return "heute";
+    if (v === "kommunikation") return "heute";
+    if (v === "entwicklung") return "wissen";
+    return v;
+  });
   const [aufgabenModus, setAufgabenModus] = useState("liste");
+  // Echtes Jetzt-Datum (alle 30s aktualisiert). jetzt wird unten aus
+  // demoDatum oder echteJetzt berechnet, sobald demoDatum deklariert ist.
+  const [echteJetzt, setEchteJetzt] = useState(new Date());
 
   // Gemeinsamer Zustand (Schnellaktionen + Seiten + Show), reload-fest.
   const [erledigt, setErledigt] = useState(() => laden("orga.erledigt", {}));
@@ -45,14 +56,26 @@ export default function App() {
   // Personalisierung.
   const [name, setName] = useState(() => laden("orga.name", student.name));
   const [theme, setTheme] = useState(() => laden("orga.theme", "hell"));
+  const [coach, setCoach] = useState(() => laden("orga.coach", false));
+  // Demo-Modus: startet jede Sitzung mit frischer Etappenplanung + erlaubt
+  // Time-Travel über die DemoBar.
+  const [demoModus, setDemoModus] = useState(() => laden("orga.demo", false));
+  const [demoDatum, setDemoDatum] = useState(() => laden("orga.demoDatum", null));
+  // jetzt aus demoDatum (Time-Travel) oder echtem Tick.
+  const jetzt = demoDatum ? new Date(demoDatum) : echteJetzt;
   const [einstellungenOffen, setEinstellungenOffen] = useState(false);
+  const [nachrichtenOffen, setNachrichtenOffen] = useState(false);
+  // Deep-Link für Wissen (z. B. aus Aufgaben oder Heute auf einen Lernweg springen).
+  const [wissenInit, setWissenInit] = useState(null);
+  // Pflicht-Planungs-Status (Etappen- + Wochenstart). Bump = neu prüfen.
+  const [planungVersion, setPlanungVersion] = useState(0);
   const [willkommen, setWillkommen] = useState(() => !laden("orga.tourGesehen", false));
 
   // Show Mode (geführte Vorführung).
   const [show, setShow] = useState({ aktiv: false, schritt: 0 });
 
   useEffect(() => {
-    const id = setInterval(() => setJetzt(new Date()), 30000);
+    const id = setInterval(() => setEchteJetzt(new Date()), 30000);
     return () => clearInterval(id);
   }, []);
 
@@ -63,8 +86,46 @@ export default function App() {
   useEffect(() => localStorage.setItem("orga.lernschritte", JSON.stringify(lernschritte)), [lernschritte]);
   useEffect(() => localStorage.setItem("orga.aufgaben", JSON.stringify(aufgabenListe)), [aufgabenListe]);
   useEffect(() => localStorage.setItem("orga.active", JSON.stringify(active)), [active]);
-  useEffect(() => localStorage.setItem("orga.kacheln", JSON.stringify(kacheln)), [kacheln]);
   useEffect(() => localStorage.setItem("orga.name", JSON.stringify(name)), [name]);
+  useEffect(() => localStorage.setItem("orga.coach", JSON.stringify(coach)), [coach]);
+  useEffect(() => localStorage.setItem("orga.demo", JSON.stringify(demoModus)), [demoModus]);
+  useEffect(() => {
+    if (demoDatum) localStorage.setItem("orga.demoDatum", JSON.stringify(demoDatum));
+    else localStorage.removeItem("orga.demoDatum");
+  }, [demoDatum]);
+
+  // Demo-Modus: bei jedem Mount alle Planungsdaten löschen, damit der Etappen-
+  // und Wochenstart-Flow frisch durchlaufen wird. Settings/Theme bleiben.
+  useEffect(() => {
+    if (!demoModus) return;
+    const toRemove = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (
+        k &&
+        (k.startsWith("orga.etappenplan.") ||
+          k.startsWith("orga.wochenplan.") ||
+          k.startsWith("orga.kbFertig."))
+      ) {
+        toRemove.push(k);
+      }
+    }
+    for (const k of toRemove) localStorage.removeItem(k);
+    localStorage.setItem("orga.tourGesehen", "true");
+    // Datum auf den Start der aktuellen Etappe stellen -> immer Woche 1.
+    const etappe = aktuelleEtappe(new Date());
+    const start = new Date(etappe.von + "T08:00:00").toISOString();
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setDemoDatum(start);
+    setPlanungVersion((v) => v + 1);
+    setWillkommen(false);
+  }, [demoModus]);
+  useEffect(() => {
+    if (!nachrichtenOffen) return;
+    const onKey = (e) => e.key === "Escape" && setNachrichtenOffen(false);
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [nachrichtenOffen]);
   useEffect(() => {
     localStorage.setItem("orga.theme", JSON.stringify(theme));
     document.documentElement.classList.toggle("dark", theme === "dunkel");
@@ -74,6 +135,24 @@ export default function App() {
   const offenHeute = aufgabenListe.filter(
     (a) => tageBis(a.faellig, jetzt) <= 0 && !erledigt[a.id]
   ).length;
+  // Ungelesene Nachrichten (für den Glocken-Punkt).
+  const ungeleseneCount = nachrichten.filter((n) => !n.gelesen && !gelesen[n.id]).length;
+
+  // Pflicht-Planung: erst Etappe planen, dann Woche planen, bevor die App
+  // genutzt wird. planungVersion erzwingt Neu-Lesen nach onFertig.
+  const etappenstatus = aktuellerEtappenplanStatus(jetzt);
+  const wochenstatus = aktuelleWocheStatus(jetzt);
+  // Im Show-Mode oder beim Onboarding-Banner kein Blocker, sonst wäre der Ablauf zu hart.
+  const planungBlocker =
+    !show.aktiv && !willkommen
+      ? !etappenstatus.fertig
+        ? "etappe"
+        : !wochenstatus.fertig
+        ? "woche"
+        : null
+      : null;
+  // planungVersion in Effekt-Liste, damit re-Render nach Speichern triggern.
+  void planungVersion;
 
   function addAufgabe(neu) {
     if (neu) setAufgabenListe((l) => [neu, ...l]);
@@ -89,8 +168,7 @@ export default function App() {
     if (show.schritt === 3 && offenHeute === 0) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setShow((s) => ({ ...s, schritt: 4 }));
-      setKacheln(false);
-      setActive("entwicklung");
+      setActive("wissen");
     }
   }, [show.schritt, offenHeute]);
 
@@ -101,21 +179,21 @@ export default function App() {
     setHochgeladen((g) => [...neu, ...g]);
     return neu;
   }
-  function addNotiz(text, zielFach) {
-    const doc = notizDokument(text, zielFach);
-    setHochgeladen((g) => [doc, ...g]);
-    return doc;
-  }
-
   function oeffnen(id) {
+    if (id === "kommunikation") {
+      setNachrichtenOffen(true);
+      return;
+    }
     setActive(id);
-    setKacheln(false);
+  }
+  function oeffneLernweg(fachId, themaId) {
+    setWissenInit({ fachId, themaId });
+    setActive("wissen");
   }
 
   // --- Show-Steuerung ---
   function startShow() {
     setErledigt({});
-    setKacheln(true);
     setActive("heute");
     setAufgabenModus("liste");
     setShow({ aktiv: true, schritt: 1 });
@@ -123,11 +201,9 @@ export default function App() {
   function toastKlick() {
     setAufgabenModus("plan");
     setActive("aufgaben");
-    setKacheln(false);
     setShow((s) => ({ ...s, schritt: 2 }));
   }
   function weiter() {
-    setKacheln(true);
     setActive("heute");
     setShow((s) => ({ ...s, schritt: 3 }));
   }
@@ -146,37 +222,16 @@ export default function App() {
     <div className="shell">
       <Topbar
         jetzt={jetzt}
-        kacheln={kacheln}
-        onToggle={() => setKacheln((k) => !k)}
         onStartShow={startShow}
         onOpen={oeffnen}
         onSettings={() => setEinstellungenOffen(true)}
+        onNachrichten={() => setNachrichtenOffen(true)}
+        ungelesen={ungeleseneCount}
         showSchritt={show.schritt}
+        coach={coach}
       />
-      <Sidebar
-        active={kacheln ? null : active}
-        onSelect={(id) => {
-          setActive(id);
-          setKacheln(false);
-        }}
-      />
+      <Sidebar active={active} onSelect={(id) => setActive(id)} />
       <main className="content">
-        {kacheln ? (
-          <Dashboard
-            jetzt={jetzt}
-            onOpen={oeffnen}
-            erledigt={erledigt}
-            setErledigt={setErledigt}
-            gelesen={gelesen}
-            setGelesen={setGelesen}
-            addDokumente={addDokumente}
-            addNotiz={addNotiz}
-            lernschritte={lernschritte}
-            aufgaben={aufgabenListe}
-            name={name}
-            showSchritt={show.schritt}
-          />
-        ) : (
           <>
             {active === "heute" && (
               <Heute
@@ -184,16 +239,11 @@ export default function App() {
                 erledigt={erledigt}
                 setErledigt={setErledigt}
                 aufgaben={aufgabenListe}
-                name={name}
-              />
-            )}
-            {active === "kalender" && (
-              <Kalender
-                jetzt={jetzt}
-                aufgaben={aufgabenListe}
-                erledigt={erledigt}
                 lernschritte={lernschritte}
+                name={name}
+                coach={coach}
                 onOpen={oeffnen}
+                onOpenLernweg={oeffneLernweg}
               />
             )}
             {active === "aufgaben" && (
@@ -204,6 +254,9 @@ export default function App() {
                 initialModus={aufgabenModus}
                 aufgaben={aufgabenListe}
                 onAdd={addAufgabe}
+                coach={coach}
+                onOpen={oeffnen}
+                onOpenLernweg={oeffneLernweg}
               />
             )}
             {active === "wissen" && (
@@ -214,21 +267,27 @@ export default function App() {
                 erledigt={erledigt}
                 lernschritte={lernschritte}
                 setLernschritte={setLernschritte}
-              />
-            )}
-            {active === "kommunikation" && (
-              <Nachrichten gelesen={gelesen} setGelesen={setGelesen} />
-            )}
-            {active === "entwicklung" && (
-              <Fortschritt
-                erledigt={erledigt}
-                lernschritte={lernschritte}
                 aufgaben={aufgabenListe}
+                coach={coach}
+                init={wissenInit}
+                onInitConsumed={() => setWissenInit(null)}
               />
             )}
           </>
-        )}
       </main>
+
+      {nachrichtenOffen && (
+        <div className="overlay-screen" role="dialog" aria-modal="true" aria-label="Nachrichten">
+          <button
+            className="overlay-close"
+            onClick={() => setNachrichtenOffen(false)}
+            aria-label="Nachrichten schließen"
+          >
+            ×
+          </button>
+          <Nachrichten gelesen={gelesen} setGelesen={setGelesen} />
+        </div>
+      )}
 
       {/* Show: Benachrichtigungs-Toast (Schritt 1) */}
       {show.schritt === 1 && (
@@ -273,7 +332,32 @@ export default function App() {
           setName={setName}
           theme={theme}
           setTheme={setTheme}
+          coach={coach}
+          setCoach={setCoach}
+          demoModus={demoModus}
+          setDemoModus={setDemoModus}
           onClose={() => setEinstellungenOffen(false)}
+        />
+      )}
+
+      {demoModus && (
+        <DemoBar
+          jetzt={jetzt}
+          onSetDatum={setDemoDatum}
+          onReset={() => setDemoDatum(null)}
+        />
+      )}
+
+      {planungBlocker === "etappe" && (
+        <EtappenstartModal
+          etappe={etappenstatus.etappe}
+          onFertig={() => setPlanungVersion((v) => v + 1)}
+        />
+      )}
+      {planungBlocker === "woche" && (
+        <WochenstartModal
+          jetzt={jetzt}
+          onFertig={() => setPlanungVersion((v) => v + 1)}
         />
       )}
     </div>

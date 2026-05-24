@@ -2,15 +2,18 @@
 // Könnensbeweise (erbracht/gesamt) und ein Kompetenzstand je Fach.
 // stand: "sicher" | "aufweg" | "aufbau". trend: "auf" | "stabil" | "ab".
 
-// verlauf = erbrachte Könnensbeweise über die letzten Wochen (für die Mini-Kurve).
+// Qualitative Lerncoach-Einschätzung pro Fach plus verlauf für die Mini-Sparkline.
+// Die Anzahl Könnensbeweise (erbracht/gesamt) wird in der Stand-Kopfzeile NICHT
+// von hier gelesen, sondern dynamisch aus den echten Lernwegen berechnet
+// (lib/lernstand.js -> fachKbStand). erbracht/gesamt sind nur Demo-Seeds für
+// Verlauf/Plausibilität und sollten zur echten KB-Anzahl im Schulplaner passen
+// (Mathe 5, Deutsch 3, Englisch 5, Latein 5, Griechisch 5).
 export const faecherKompetenz = [
-  { fach: "Deutsch", erbracht: 7, gesamt: 8, stand: "sicher", trend: "auf", verlauf: [3, 4, 5, 6, 7, 7] },
-  { fach: "Mathematik", erbracht: 6, gesamt: 9, stand: "aufweg", trend: "auf", verlauf: [2, 3, 3, 4, 5, 6] },
-  { fach: "Englisch", erbracht: 7, gesamt: 8, stand: "sicher", trend: "stabil", verlauf: [5, 6, 6, 7, 7, 7] },
-  { fach: "Latein", erbracht: 4, gesamt: 8, stand: "aufbau", trend: "ab", verlauf: [3, 3, 4, 4, 4, 4] },
-  { fach: "Griechisch", erbracht: 3, gesamt: 6, stand: "aufweg", trend: "auf", verlauf: [1, 1, 2, 2, 3, 3] },
-  { fach: "Biologie", erbracht: 6, gesamt: 7, stand: "sicher", trend: "stabil", verlauf: [4, 5, 5, 6, 6, 6] },
-  { fach: "Geschichte", erbracht: 5, gesamt: 6, stand: "sicher", trend: "auf", verlauf: [2, 3, 4, 4, 5, 5] },
+  { fach: "Deutsch", erbracht: 1, gesamt: 3, stand: "aufweg", trend: "auf", verlauf: [0, 0, 1, 1, 1, 1] },
+  { fach: "Mathematik", erbracht: 2, gesamt: 5, stand: "aufweg", trend: "auf", verlauf: [0, 1, 1, 2, 2, 2] },
+  { fach: "Englisch", erbracht: 3, gesamt: 5, stand: "sicher", trend: "stabil", verlauf: [1, 2, 2, 3, 3, 3] },
+  { fach: "Latein", erbracht: 1, gesamt: 5, stand: "aufbau", trend: "ab", verlauf: [1, 1, 1, 1, 1, 1] },
+  { fach: "Griechisch", erbracht: 0, gesamt: 5, stand: "aufbau", trend: "auf", verlauf: [0, 0, 0, 0, 0, 0] },
 ];
 
 export const standLabel = {

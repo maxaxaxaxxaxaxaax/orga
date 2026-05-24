@@ -2,13 +2,15 @@
 // würde später eine KI übernehmen). Rät Fach, Register, Art und Thema.
 import { faecher } from "../data/wissen";
 
+// Nur Fächer mit Lernwegen im Wissen-Tab. Stundenplan-Fächer ohne Lernweg
+// (z. B. Bio, Geschichte) werden hier bewusst nicht erkannt, sonst landet
+// hochgeladenes Material in einem Fach, das es im Wissen gar nicht gibt.
 const fachSynonyme = {
   Mathematik: ["mathe", "mathematik", "math"],
   Deutsch: ["deutsch"],
+  Englisch: ["englisch", "english"],
   Latein: ["latein", "lat", "lektion", "aci"],
   Griechisch: ["griech", "griechisch"],
-  Biologie: ["bio", "biologie"],
-  Geschichte: ["gesch", "geschichte", "history"],
 };
 
 export function rateFach(dateiname, fallback) {
@@ -39,15 +41,57 @@ export function artVonDatei(dateiname) {
   return "datei";
 }
 
+// Stopwords + Wort-Score, damit „Vokabelliste_L15" auf „Vokabeln L15 / Pronomen"
+// trifft (Stamm-Match) und „7MA1" direkt auf den KB-Lernweg zielt.
+const THEMA_STOPWORDS = new Set([
+  "und", "mit", "die", "der", "das", "von", "im", "in", "auf", "zu", "ist",
+  "wdh", "übung", "übungen",
+]);
+
+function themaScore(label, normalisiert) {
+  const woerter = label
+    .toLowerCase()
+    .replace(/[(),./:&]/g, " ")
+    .split(/\s+/)
+    .filter((w) => w.length > 2 && !THEMA_STOPWORDS.has(w));
+  let score = 0;
+  for (const w of woerter) {
+    if (normalisiert.includes(w)) {
+      score += w.length;
+    } else if (w.length >= 5) {
+      // Stamm: ersten ~70% des Worts. „vokabeln" → „vokabel" -> matched auch „vokabelliste".
+      const stamm = w.slice(0, Math.max(4, Math.ceil(w.length * 0.7)));
+      if (stamm.length >= 4 && normalisiert.includes(stamm)) score += stamm.length / 2;
+    }
+  }
+  return score;
+}
+
 export function rateThema(dateiname, fachName) {
   const fachObj = faecher.find((f) => f.fach === fachName);
   if (!fachObj) return "Eingang";
-  const n = dateiname.toLowerCase();
-  const treffer = fachObj.themen.find((t) => {
-    const wort = t.label.toLowerCase().split(/[ :]/)[0];
-    return wort.length > 2 && n.includes(wort);
-  });
-  return treffer ? treffer.label : "Eingang";
+  // Dateiname normalisieren: Trenner zu Leerzeichen, Lowercase.
+  const n = dateiname.toLowerCase().replace(/[._-]+/g, " ");
+  const kompakt = n.replace(/\s+/g, "");
+  // 1) Direkter KB-Code-Treffer („7MA1" o. „7 MA 1" im Dateinamen) ist eindeutig.
+  for (const t of fachObj.themen) {
+    if (!t.kbId) continue;
+    const kb = t.kbId.toLowerCase();
+    if (kompakt.includes(kb) || n.includes(kb.replace(/(\d)([a-z]+)(\d)/, "$1 $2 $3"))) {
+      return t.label;
+    }
+  }
+  // 2) Wort-Score über das Label, mit Stamm-Match.
+  let bester = null;
+  let besterScore = 0;
+  for (const t of fachObj.themen) {
+    const s = themaScore(t.label, n);
+    if (s > besterScore) {
+      besterScore = s;
+      bester = t.label;
+    }
+  }
+  return besterScore >= 4 ? bester : "Eingang";
 }
 
 // Liefert ein vollständiges Dokument-Objekt für eine Datei.

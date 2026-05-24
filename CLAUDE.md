@@ -27,8 +27,13 @@ zusätzlich im Browser über die preview_* Tools verifizieren (Dev-Server läuft
 
 - **Vite + React 19**, keine zusätzlichen Runtime-Abhängigkeiten (nur react/react-dom).
 - **Kein Router.** Ansichtswechsel über State in `src/App.jsx`:
-  - `active` — aktive Sektion (`heute`/`kalender`/`aufgaben`/`wissen`/`kommunikation`/`entwicklung`)
-  - `kacheln` — Dashboard-Kachelansicht an/aus (Standard: true)
+  - `active` — aktive Sektion (`heute`/`aufgaben`/`wissen`)
+  - `nachrichtenOffen` — Nachrichten-Overlay (öffnet via Glocke in der Topbar)
+  - `einstellungenOffen` — Settings-Modal
+  - `wissenInit` — Deep-Link in einen Lernweg (z. B. aus Aufgaben)
+  - `coach` — Coach-Modus an/aus (Default aus). Im Coach-Modus erscheinen
+    Power-Reiter: in Wissen `Netz` und `Verlauf`, in Aufgaben `Wochenplan`,
+    Filter (Etappe/Status). Schüler-Modus hat nur die Basis-Reiter.
   - `show` — geführter „Show Mode" (Vorführung, Schritte 1–4)
 - **Gehobener gemeinsamer State** lebt in `App.jsx` und wird als Props durchgereicht:
   `erledigt`, `gelesen`, `hochgeladen`, `lernschritte` (abgehakte Lernweg-Schritte),
@@ -43,15 +48,19 @@ zusätzlich im Browser über die preview_* Tools verifizieren (Dev-Server läuft
 
 ## Verzeichnisstruktur
 
-- `src/views/` — Seiten: `Dashboard`, `Heute`, `Kalender`, `Aufgaben`, `Wissen`,
-  `Nachrichten`, `Fortschritt`.
-- `src/components/` — `Topbar`, `Sidebar`, `Icon`, `Label`, `GlobalSuche` (Suche +
-  Command-Palette), `Tagesfokus`, `Einstellungen`, `MaterialVorschau`, `ErrorBoundary`,
+- `src/views/` — drei Schüler-Seiten: `Heute`, `Aufgaben`, `Wissen` (mit Reitern
+  `Lernwege | Ordner | Stand`, im Coach-Modus zusätzlich `Netz | Verlauf`).
+  `Nachrichten` ist Overlay (Glocke). `Fortschritt` und `Kalender` werden nur noch
+  eingebettet gerendert (Fortschritt in Wissen → Stand, Kalender in Heute → Reiter
+  Woche).
+- `src/components/` — `Topbar`, `Sidebar`, `Icon`, `Label`, `Begriff` (Glossar-
+  Tooltip), `JetztKarte` (Hero auf Heute), `GlobalSuche` (Suche + Command-Palette
+  im Coach-Modus), `Einstellungen`, `MaterialVorschau`, `ErrorBoundary`,
   `WissensGraph`, `WissensOrdner`, `Wochenplaner`.
-- `src/data/` — alle Demo-Daten (siehe unten). Single source of truth pro Thema.
-- `src/lib/` — `zeit.js` (Datums-/Zeit-Helfer), `lernstand.js` (Lernweg-Status +
-  `effektiveSchritte`/`schrittFertig`), `empfehlung.js` (Tages-Empfehlung + Risiken),
-  `aufgabeParser.js` (freie Eingabe → Aufgabe), `einsortieren.js` (Auto-Einsortieren).
+- `src/data/` — alle Demo-Daten plus `glossar.js` (acht Theresianum-Begriffe).
+- `src/lib/` — `zeit.js`, `lernstand.js` (`effektiveSchritte`/`schrittFertig`),
+  `empfehlung.js` (Tages-Empfehlung + Risiken, speist `JetztKarte`),
+  `aufgabeParser.js`, `einsortieren.js`.
 - Styles: globale Variablen in `src/index.css`, alles andere in `src/App.css`.
 
 ## Datenmodell (`src/data/`)

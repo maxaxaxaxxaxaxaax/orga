@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { typLabel } from "../data/aufgaben";
+import { faecher } from "../data/wissen";
 import { fachFarbe } from "../data/stundenplanWoche";
 import { tageBis, formatTage } from "../lib/zeit";
 import { parseAufgabe } from "../lib/aufgabeParser";
@@ -27,10 +28,25 @@ export default function Aufgaben({
   initialModus = "liste",
   aufgaben = [],
   onAdd,
+  coach,
+  onOpenLernweg,
 }) {
   const [nurOffen, setNurOffen] = useState(true);
-  const [modus, setModus] = useState(initialModus);
+  const [modus, setModus] = useState(coach ? initialModus : "liste");
   const [neu, setNeu] = useState("");
+
+  // Wenn Coach-Modus ausgeht, immer zurück zur Liste (Cross-Prop-Sync).
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (!coach && modus !== "liste") setModus("liste");
+  }, [coach, modus]);
+
+  // Lernweg-Label aus Aufgabe.lernweg (für klickbare Chips).
+  function lernwegLabel(ref) {
+    const f = faecher.find((x) => x.id === ref.fachId);
+    const t = f?.themen.find((x) => x.id === ref.themaId);
+    return t?.label || "Lernweg";
+  }
 
   function toggle(id) {
     setErledigt((e) => ({ ...e, [id]: !e[id] }));
@@ -60,20 +76,22 @@ export default function Aufgaben({
         </p>
       </header>
 
-      <div className="segment" style={{ marginBottom: "18px" }}>
-        <button
-          className={"segment-btn" + (modus === "liste" ? " aktiv" : "")}
-          onClick={() => setModus("liste")}
-        >
-          Aufgaben
-        </button>
-        <button
-          className={"segment-btn" + (modus === "plan" ? " aktiv" : "")}
-          onClick={() => setModus("plan")}
-        >
-          Wochenplan
-        </button>
-      </div>
+      {coach && (
+        <div className="segment" style={{ marginBottom: "18px" }}>
+          <button
+            className={"segment-btn" + (modus === "liste" ? " aktiv" : "")}
+            onClick={() => setModus("liste")}
+          >
+            Liste
+          </button>
+          <button
+            className={"segment-btn" + (modus === "plan" ? " aktiv" : "")}
+            onClick={() => setModus("plan")}
+          >
+            Wochenplan
+          </button>
+        </div>
+      )}
 
       {modus === "plan" ? (
         <Wochenplaner jetzt={jetzt} />
@@ -133,7 +151,15 @@ export default function Aufgaben({
                       </span>
                       <span className="zeile-vorschau">
                         {typLabel[a.typ]} · ca. {a.dauer} Min
-                        {a.lernweg && <span className="lernweg-tag">↗ Lernweg</span>}
+                        {a.lernweg && (
+                          <button
+                            className="lernweg-tag lernweg-tag-btn"
+                            onClick={() => onOpenLernweg?.(a.lernweg.fachId, a.lernweg.themaId)}
+                            title="Zum Lernweg im Wissen-Tab"
+                          >
+                            ↗ {lernwegLabel(a.lernweg)}
+                          </button>
+                        )}
                       </span>
                     </div>
                     <span className={"frist" + (a.tage <= 0 ? " dringend" : "")}>
