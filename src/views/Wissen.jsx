@@ -6,6 +6,7 @@ import { standLabel } from "../data/fortschritt";
 import WissensGraph from "../components/WissensGraph";
 import WissensOrdner from "../components/WissensOrdner";
 import MaterialVorschau from "../components/MaterialVorschau";
+import TafelSnap from "../components/TafelSnap";
 import Begriff from "../components/Begriff";
 import Label from "../components/Label";
 import Icon from "../components/Icon";
@@ -58,6 +59,7 @@ export default function Wissen({
   const [suche, setSuche] = useState("");
   const [etappe, setEtappe] = useState(() => wLaden("orga.wissen.etappe", null));
   const [statusFilter, setStatusFilter] = useState(() => wLaden("orga.wissen.status", "alle"));
+  const [tafelOffen, setTafelOffen] = useState(false);
   const [vorschau, setVorschau] = useState(null);
   const globalInput = useRef(null);
 
@@ -175,6 +177,45 @@ export default function Wissen({
   const moveDoc = (id, bereich) =>
     setHochgeladen((g) => g.map((d) => (d.id === id ? { ...d, bereich } : d)));
   const deleteDoc = (id) => setHochgeladen((g) => g.filter((d) => d.id !== id));
+
+  // Tafel-Snap: aus einem Demo-Tafelbild wird eine strukturierte Notiz.
+  // Sie landet im Ordner als Material des aktuellen Lernwegs (Bereich Unterricht).
+  function tafelSpeichern(demo) {
+    const ts = Date.now();
+    const eintrag = {
+      id: "tafel-" + ts,
+      fach: demo.fach,
+      bereich:
+        demo.quelle === "arbeitsblatt" ||
+        demo.quelle === "mitschrift" ||
+        demo.quelle === "buchseite"
+          ? "selbstlernen"
+          : "unterricht",
+      thema: demo.thema,
+      titel: demo.titel,
+      art: "tafelnotiz",
+      inhalt: demo.inhalt,
+      quelle: demo.quelle || "tafelbild",
+      ts,
+      datum: new Date(ts).toISOString().slice(0, 10),
+      uploaded: true,
+      fachErkannt: true,
+    };
+    setHochgeladen((g) => [eintrag, ...g]);
+    setHinweis({
+      items: [
+        {
+          titel: eintrag.titel,
+          fach: eintrag.fach,
+          bereich: eintrag.bereich,
+          thema: eintrag.thema,
+        },
+      ],
+    });
+    // Optional: direkt zum Fach des Tafelbilds wechseln, damit Max sieht wo's gelandet ist.
+    const zielFach = faecher.find((f) => f.fach === demo.fach);
+    if (zielFach) setFachId(zielFach.id);
+  }
 
   function oeffneFachOrdner(fachName) {
     const ziel = faecher.find((f) => f.fach === fachName);
@@ -325,27 +366,41 @@ export default function Wissen({
         )}
       </div>
 
-      {/* Universeller Datei-Einwurf: auf jedem Reiter sichtbar, sortiert
-          automatisch in Fach + Register + Lernweg ein. */}
-      <div
-        className={"einwurf" + (ueberGlobal ? " ueber" : "")}
-        onDragOver={(e) => e.preventDefault()}
-        onDragEnter={() => setUeberGlobal(true)}
-        onDragLeave={(e) => {
-          if (!e.currentTarget.contains(e.relatedTarget)) setUeberGlobal(false);
-        }}
-        onDrop={globalDrop}
-        onClick={() => globalInput.current?.click()}
-        role="button"
-        tabIndex={0}
-        aria-label="Dokumente einwerfen, automatisch einsortieren"
-      >
-        <input ref={globalInput} type="file" multiple hidden onChange={globalGewaehlt} />
-        <Icon name="funke" size={18} />
-        <div>
-          <strong>Dokumente einwerfen</strong>
-          <span> · wir erkennen Fach und Lernweg automatisch.</span>
+      {/* Universeller Datei-Einwurf + Tafel-Snap: zwei Wege Material in den
+          Lernweg zu bringen. Einwurf für fertige Dateien, Tafel-Snap für
+          Tafelbild-Fotos, die aufbereitet werden sollen. */}
+      <div className="einwurf-zeile">
+        <div
+          className={"einwurf" + (ueberGlobal ? " ueber" : "")}
+          onDragOver={(e) => e.preventDefault()}
+          onDragEnter={() => setUeberGlobal(true)}
+          onDragLeave={(e) => {
+            if (!e.currentTarget.contains(e.relatedTarget)) setUeberGlobal(false);
+          }}
+          onDrop={globalDrop}
+          onClick={() => globalInput.current?.click()}
+          role="button"
+          tabIndex={0}
+          aria-label="Dokumente einwerfen, automatisch einsortieren"
+        >
+          <input ref={globalInput} type="file" multiple hidden onChange={globalGewaehlt} />
+          <Icon name="funke" size={18} />
+          <div>
+            <strong>Dokumente einwerfen</strong>
+            <span> · wir erkennen Fach und Lernweg automatisch.</span>
+          </div>
         </div>
+        <button
+          className="tafel-snap-btn"
+          onClick={() => setTafelOffen(true)}
+          aria-label="Foto-Snap öffnen: Tafelbild, Arbeitsblatt oder Mitschrift aufbereiten"
+        >
+          <Icon name="kamera" size={18} />
+          <div>
+            <strong>Foto-Snap</strong>
+            <span>Tafelbild, Arbeitsblatt oder Mitschrift wird zur Notiz</span>
+          </div>
+        </button>
       </div>
 
       {hinweis && (
@@ -658,6 +713,7 @@ export default function Wissen({
               onUpload={(files) => addDocs(files, fach.fach)}
               onMove={moveDoc}
               onDelete={deleteDoc}
+              onOeffnen={setVorschau}
             />
           ) : (
             <div className="verlauf">
@@ -710,6 +766,13 @@ export default function Wissen({
 
       {vorschau && (
         <MaterialVorschau material={vorschau} onClose={() => setVorschau(null)} />
+      )}
+
+      {tafelOffen && (
+        <TafelSnap
+          onClose={() => setTafelOffen(false)}
+          onSpeichern={tafelSpeichern}
+        />
       )}
     </div>
   );

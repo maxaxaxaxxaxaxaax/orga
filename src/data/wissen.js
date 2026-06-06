@@ -229,6 +229,7 @@ export const artLabel = {
   bild: "Bild",
   dokument: "Dokument",
   datei: "Datei",
+  tafelnotiz: "Tafel-Notiz",
 };
 
 export const bereichLabel = {

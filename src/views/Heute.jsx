@@ -16,6 +16,7 @@ import { kbFarbe } from "../data/koennensbeweise";
 import { lernwegFuerKb } from "../data/wissen";
 import Begriff from "../components/Begriff";
 import JetztKarte from "../components/JetztKarte";
+import KlassenPuls from "../components/KlassenPuls";
 import Kalender from "./Kalender";
 
 const begriffeArt = { anker: "anker", studierzeit: "studierzeit" };
@@ -38,6 +39,9 @@ export default function Heute({
   onOpenLernweg,
 }) {
   const [planTab, setPlanTab] = useState("tag");
+  // Top-Level Heute-Tab: "mein" zeigt die persönliche Tages-/Wochensicht,
+  // "wir" zeigt den Klassen-Puls (aggregierter Verband, kein Personenvergleich).
+  const [heuteTab, setHeuteTab] = useState("mein");
   // Bump zwingt Heute zu re-rendern, wenn ein KB-Fertig-Status geändert wird
   // (localStorage allein triggert kein React-Re-Render).
   const [kbVersion, setKbVersion] = useState(0);
@@ -104,6 +108,29 @@ export default function Heute({
         </p>
       </header>
 
+      <div className="segment heute-toptab" role="tablist" aria-label="Heute-Ansicht">
+        <button
+          className={"segment-btn" + (heuteTab === "mein" ? " aktiv" : "")}
+          onClick={() => setHeuteTab("mein")}
+          role="tab"
+          aria-selected={heuteTab === "mein"}
+        >
+          Mein Tag
+        </button>
+        <button
+          className={"segment-btn" + (heuteTab === "wir" ? " aktiv" : "")}
+          onClick={() => setHeuteTab("wir")}
+          role="tab"
+          aria-selected={heuteTab === "wir"}
+        >
+          Wir
+        </button>
+      </div>
+
+      {heuteTab === "wir" ? (
+        <KlassenPuls jetzt={jetzt} />
+      ) : (
+      <>
       <JetztKarte
         jetzt={jetzt}
         erledigt={erledigt}
@@ -355,6 +382,8 @@ export default function Heute({
         Nächster <Begriff name="koennensbeweis">Könnensbeweis</Begriff>:{" "}
         <strong>{naechsterKnb.fach}</strong> · {formatTage(knbTage)}
       </p>
+      </>
+      )}
     </div>
   );
 }

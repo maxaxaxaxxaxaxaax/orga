@@ -79,6 +79,12 @@ const paths = {
       <circle cx="16" cy="18" r="2" />
     </>
   ),
+  kamera: (
+    <>
+      <path d="M14.5 4l1.5 2.5h3a2 2 0 0 1 2 2v9.5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8.5a2 2 0 0 1 2-2h3L9.5 4z" />
+      <circle cx="12" cy="13" r="4" />
+    </>
+  ),
 };
 
 export default function Icon({ name, size = 20, className = "" }) {

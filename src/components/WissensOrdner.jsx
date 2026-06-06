@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { artLabel, bereichLabel } from "../data/wissen";
 
-export default function WissensOrdner({ fach, dokumente, onUpload, onMove, onDelete }) {
+export default function WissensOrdner({ fach, dokumente, onUpload, onMove, onDelete, onOeffnen }) {
   const [register, setRegister] = useState("unterricht");
   const [ueber, setUeber] = useState(false);
   const inputRef = useRef(null);
@@ -76,14 +76,21 @@ export default function WissensOrdner({ fach, dokumente, onUpload, onMove, onDel
                 .filter((d) => d.thema === thema)
                 .map((d) => (
                   <li key={d.id} className="material">
-                    <span className={"material-art art-" + d.art}>{artLabel[d.art]}</span>
-                    <span className="material-titel">
-                      {d.titel}
-                      {d.uploaded && <span className="neu-badge">hochgeladen</span>}
-                    </span>
-                    <span className="material-datum">
-                      {new Date(d.datum).toLocaleDateString("de-DE", { day: "numeric", month: "short" })}
-                    </span>
+                    <button
+                      type="button"
+                      className="material-inhalt"
+                      onClick={() => onOeffnen?.(d)}
+                      aria-label={"Material öffnen: " + d.titel}
+                    >
+                      <span className={"material-art art-" + d.art}>{artLabel[d.art]}</span>
+                      <span className="material-titel">
+                        {d.titel}
+                        {d.uploaded && <span className="neu-badge">hochgeladen</span>}
+                      </span>
+                      <span className="material-datum">
+                        {new Date(d.datum).toLocaleDateString("de-DE", { day: "numeric", month: "short" })}
+                      </span>
+                    </button>
                     {d.uploaded && (
                       <span className="material-aktionen">
                         <button

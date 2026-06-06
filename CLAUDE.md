@@ -2,6 +2,16 @@
 
 Leitfaden für die Arbeit an diesem Repo. Kurz halten, beim Ändern aktuell halten.
 
+## Vor konzeptioneller Arbeit IMMER lesen
+
+Bei Feature-Brainstormings, Konzept-Diskussionen, neuen Ideen, Vorschlägen für die App-Richtung:
+
+- **VISION.md** lesen, bevor irgendwas vorgeschlagen wird. Mission, fünf Catch-Haltungen, sechs Bereiche, was bewusst NICHT zur App gehört, Prüf-Fragen am Ende.
+- **APP.md** lesen, damit nichts vorgeschlagen wird, was schon gebaut ist. Inventar mit Status-Markern pro Vision-Bereich plus Code-Referenzen.
+- **SCHULE.md** lesen, damit Begriffe und Schul-Logik korrekt sind. Theresianum-Modell mit KB, Lernweg, Etappe, Cluster, Studierzeit, FREI DAY, ZEuS, Lerncoach.
+
+Wenn ein Vorschlag gegen die VISION verstößt oder doppelt zu APP.md ist, wird er nicht gemacht. Wenn er gegen das Schul-Modell in SCHULE.md verstößt, wird er angepasst.
+
 ## Was ist das
 
 **Orgatool** ist ein Schul-Organisationstool (Konzept/Demo, kein Backend) für das
