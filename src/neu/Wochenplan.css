@@ -142,6 +142,54 @@
   color: var(--text-2);
 }
 
+/* Wochen-Umschaltung: vorausplanen, ohne die laufende Woche zu verlassen. */
+.wp-wochen {
+  flex-shrink: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.wp-woche-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 13px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-2);
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+.wp-woche-tab:hover {
+  border-color: var(--line-strong);
+}
+.wp-woche-tab.aktiv {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent-strong);
+}
+.wp-woche-tab-jetzt {
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--on-accent);
+}
+.wp-woche-tab-haken {
+  color: var(--ok-text);
+  font-weight: 700;
+}
+
 /* Vorrat */
 .wp-vorrat {
   flex-shrink: 0;

@@ -73,6 +73,9 @@ export default function Wochenplan({ onZurueck, onWeiter, woche = 0 }) {
   const [gewaehltId, setGewaehltId] = useState(null); // angetippter Chip (Touch)
   const [hinweis, setHinweis] = useState(null); // kurze Rueckmeldung (Toast)
   const [resetConfirm, setResetConfirm] = useState(false); // Reset-Sicherheitsfrage
+  // Angezeigte Woche: startet auf der laufenden Woche, lässt sich aber auf andere
+  // Wochen der Etappe umstellen, um vorauszuplanen. "woche" bleibt die laufende.
+  const [aktiveWoche, setAktiveWoche] = useState(woche);
 
   useEffect(() => {
     localStorage.setItem(STUNDEN_KEY, JSON.stringify(stunden));
@@ -87,10 +90,27 @@ export default function Wochenplan({ onZurueck, onWeiter, woche = 0 }) {
   }, [hinweis]);
 
   const wocheKbs = koennensbeweise.filter(
-    (k) => wochenZuordnung[k.id] === woche
+    (k) => wochenZuordnung[k.id] === aktiveWoche
   );
   // Wie viele Uhren eines Ziels sind noch nicht auf eine Stunde gelegt?
   const restVon = (k) => k.cluster - (stunden[k.id]?.length || 0);
+  // Alle Wochen der Etappe mit mindestens einem Ziel: das sind die planbaren
+  // Wochen (für die Wochen-Umschaltung).
+  const wochenMitKbs = [
+    ...new Set(
+      koennensbeweise
+        .map((k) => wochenZuordnung[k.id])
+        .filter((w) => w != null)
+    ),
+  ].sort((a, b) => a - b);
+  // Ist eine ganze Woche fertig verteilt (alle Uhren auf Stunden)?
+  const wocheVollstaendig = (w) => {
+    const kbs = koennensbeweise.filter((k) => wochenZuordnung[k.id] === w);
+    return (
+      kbs.length > 0 &&
+      kbs.every((k) => k.cluster - (stunden[k.id]?.length || 0) <= 0)
+    );
+  };
   // Schon erledigte Lernweg-Schritte eines Ziels: zeigt beim Planen, was
   // bereits angefangen wurde (duenne Leiste am Chip).
   const schrittFortschritt = (kbId) => {
@@ -105,6 +125,13 @@ export default function Wochenplan({ onZurueck, onWeiter, woche = 0 }) {
   };
   const vorrat = wocheKbs.filter((k) => restVon(k) > 0);
   const wocheFertig = wocheKbs.length > 0 && vorrat.length === 0;
+  const wocheHatPlatziert = wocheKbs.some(
+    (k) => (stunden[k.id] || []).length > 0
+  );
+  // Das "Weiter" hängt an der LAUFENDEN Woche (woche), nicht an der gerade
+  // angezeigten: vorausplanen ist freiwillig, starten kann man, sobald diese
+  // Woche steht.
+  const aktuelleWocheFertig = wocheVollstaendig(woche);
   // Gesamte Uhren-Last dieser Woche (aus dem Etappenplan) im Vergleich zum
   // Wochenziel: macht eine Ueberplanung sichtbar, ohne zu bevormunden.
   const wochenLast = wocheKbs.reduce((s, k) => s + k.cluster, 0);
@@ -114,7 +141,7 @@ export default function Wochenplan({ onZurueck, onWeiter, woche = 0 }) {
       : wochenLast > wochenZielCluster
         ? "knapp"
         : "ok";
-  const montag = wochenStart(ETAPPE, woche);
+  const montag = wochenStart(ETAPPE, aktiveWoche);
 
   const proTag = TAGE.map((name, i) => {
     const stundenDesTages = stundenWoche
@@ -212,13 +239,17 @@ export default function Wochenplan({ onZurueck, onWeiter, woche = 0 }) {
     setHinweis("Ausgewogen auf die Stunden verteilt. Du kannst frei anpassen.");
   }
 
-  // Stunden-Zuordnung verwerfen: alle Uhren zurueck in den Vorrat. Lernstand und
-  // Wochen-Zuordnung bleiben unangetastet.
+  // Stunden-Zuordnung der angezeigten Woche verwerfen: ihre Uhren zurueck in den
+  // Vorrat. Andere Wochen, Lernstand und Wochen-Zuordnung bleiben unangetastet.
   function planZuruecksetzen() {
-    setStunden({});
+    setStunden((prev) => {
+      const next = { ...prev };
+      for (const k of wocheKbs) delete next[k.id];
+      return next;
+    });
     setGewaehltId(null);
     setResetConfirm(false);
-    setHinweis("Stunden zurückgesetzt. Dein Lernstand bleibt erhalten.");
+    setHinweis("Stunden dieser Woche zurückgesetzt. Dein Lernstand bleibt.");
   }
 
   // KB-Chip einer einzelnen Uhr in einer Stunde (zurücklegbar per Tippen/Ziehen).
@@ -244,8 +275,10 @@ export default function Wochenplan({ onZurueck, onWeiter, woche = 0 }) {
           <p className="wp-eyebrow">Woche planen</p>
           <h1 className="wp-titel">Plane deine Woche</h1>
           <p className="wp-sub">
-            Woche {woche + 1} · {bereichText(montag)} · leg jede Uhr auf eine
-            Hauptfach-Stunde. Größere Ziele gehen über mehrere Stunden.
+            Woche {aktiveWoche + 1}
+            {aktiveWoche === woche ? " (diese Woche)" : ""} ·{" "}
+            {bereichText(montag)} · leg jede Uhr auf eine Hauptfach-Stunde.
+            Größere Ziele gehen über mehrere Stunden.
           </p>
         </div>
         <div className="wp-kopf-aktion">
@@ -284,8 +317,8 @@ export default function Wochenplan({ onZurueck, onWeiter, woche = 0 }) {
                 type="button"
                 className="ep-reset"
                 onClick={() => setResetConfirm(true)}
-                disabled={Object.keys(stunden).length === 0}
-                title="Alle Stunden-Zuordnungen löschen und neu verteilen (dein Lernstand bleibt)"
+                disabled={!wocheHatPlatziert}
+                title="Die Stunden dieser Woche löschen und neu verteilen (dein Lernstand bleibt)"
               >
                 Zurücksetzen
               </button>
@@ -303,11 +336,11 @@ export default function Wochenplan({ onZurueck, onWeiter, woche = 0 }) {
               type="button"
               className="wp-weiter"
               onClick={onWeiter}
-              disabled={!wocheFertig}
+              disabled={!aktuelleWocheFertig}
               title={
-                wocheFertig
+                aktuelleWocheFertig
                   ? "Weiter zur Heute-Seite"
-                  : "Erst alle Uhren dieser Woche auf Stunden verteilen"
+                  : "Erst alle Uhren der laufenden Woche auf Stunden verteilen"
               }
             >
               Weiter →
@@ -315,6 +348,40 @@ export default function Wochenplan({ onZurueck, onWeiter, woche = 0 }) {
           </div>
         </div>
       </header>
+
+      {/* Wochen der Etappe: vorausplanen, ohne die laufende Woche zu verlassen */}
+      {wochenMitKbs.length > 1 && (
+        <div className="wp-wochen" role="tablist" aria-label="Woche wählen">
+          {wochenMitKbs.map((w) => (
+            <button
+              key={w}
+              type="button"
+              role="tab"
+              aria-selected={w === aktiveWoche}
+              className={
+                "wp-woche-tab" +
+                (w === aktiveWoche ? " aktiv" : "") +
+                (wocheVollstaendig(w) ? " fertig" : "")
+              }
+              onClick={() => {
+                setAktiveWoche(w);
+                setGewaehltId(null);
+              }}
+              title={
+                w === woche ? "Diese (laufende) Woche" : `Woche ${w + 1} vorausplanen`
+              }
+            >
+              <span className="wp-woche-tab-name">Woche {w + 1}</span>
+              {w === woche && <span className="wp-woche-tab-jetzt">jetzt</span>}
+              {wocheVollstaendig(w) && (
+                <span className="wp-woche-tab-haken" aria-hidden="true">
+                  ✓
+                </span>
+              )}
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* Vorrat: Ziele dieser Woche mit noch offenen Uhren */}
       <div
