@@ -197,51 +197,6 @@
   color: var(--muted);
 }
 
-/* Fertig-Zustand */
-.mb-fertig {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 8px;
-  padding: 14px;
-  border: 1px solid color-mix(in srgb, var(--ok-text) 35%, var(--line));
-  border-radius: var(--r-md, 12px);
-  background: var(--ok-bg);
-}
-.mb-fertig-haken {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: var(--ok-text);
-  color: var(--on-accent);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.4rem;
-  font-weight: 700;
-}
-.mb-fertig-text {
-  margin: 0;
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: var(--text);
-}
-.mb-neu {
-  border: 1px solid var(--line-strong);
-  background: var(--card);
-  color: var(--text);
-  font-size: 0.86rem;
-  font-weight: 600;
-  padding: 8px 16px;
-  border-radius: 999px;
-  cursor: pointer;
-}
-.mb-neu:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-}
-
 .mb-leer {
   margin: 0;
   font-size: 0.9rem;

@@ -156,43 +156,6 @@
   background: var(--accent-strong);
 }
 
-.zs-fertig {
-  align-items: center;
-  text-align: center;
-  padding: 16px 0;
-}
-.zs-fertig-haken {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  background: var(--ok-text);
-  color: var(--on-accent);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.8rem;
-  font-weight: 700;
-  margin-bottom: 4px;
-}
-.zs-fertig-text {
-  margin: 0 0 4px;
-  font-size: 1.05rem;
-  font-weight: 600;
-}
-.zs-neu {
-  border: 1px solid var(--line-strong);
-  background: var(--card);
-  color: var(--text);
-  font-size: 0.9rem;
-  font-weight: 600;
-  padding: 9px 18px;
-  border-radius: 999px;
-  cursor: pointer;
-}
-.zs-neu:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-}
 .zs-leer {
   margin: 0;
   font-size: 0.9rem;
