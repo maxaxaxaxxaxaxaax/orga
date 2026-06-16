@@ -353,37 +353,67 @@ export const AUSWAHLQUIZ = {
     fragen: [
       {
         frage: "Wie viel ist −7 + 12?",
-        optionen: ["−5", "5", "19", "−19"],
+        optionen: [
+          { text: "−5", erklaerung: "Fast: 12 ist größer als 7, also wird das Ergebnis positiv." },
+          "5",
+          { text: "19", erklaerung: "Das wäre 7 + 12. Hier ist die 7 aber negativ." },
+          { text: "−19", erklaerung: "Das wäre −(7 + 12). Nur eine der Zahlen ist negativ." },
+        ],
         richtig: 1,
         erklaerung: "−7 + 12 = 12 − 7 = 5.",
       },
       {
         frage: "Wie viel ist 4 − 9?",
-        optionen: ["−5", "5", "−13", "13"],
+        optionen: [
+          "−5",
+          { text: "5", erklaerung: "Das wäre 9 − 4. Hier steht die 4 zuerst, es geht unter null." },
+          { text: "−13", erklaerung: "Hier wird subtrahiert, nicht 4 + 9 gerechnet." },
+          { text: "13", erklaerung: "Das wäre 4 + 9. Gefragt ist aber 4 − 9." },
+        ],
         richtig: 0,
         erklaerung: "4 − 9 geht über die Null hinaus: −5.",
       },
       {
         frage: "Wie viel ist −3 · (−5)?",
-        optionen: ["−15", "8", "15", "−8"],
+        optionen: [
+          { text: "−15", erklaerung: "Minus mal Minus ergibt Plus, nicht Minus." },
+          { text: "8", erklaerung: "Das wäre 3 + 5. Hier wird mal gerechnet." },
+          "15",
+          { text: "−8", erklaerung: "Das wäre −(3 + 5). Hier wird multipliziert." },
+        ],
         richtig: 2,
         erklaerung: "Minus mal Minus ergibt Plus: 3 · 5 = 15.",
       },
       {
         frage: "Wie viel ist −20 : 4?",
-        optionen: ["−5", "5", "−16", "−24"],
+        optionen: [
+          "−5",
+          { text: "5", erklaerung: "Minus geteilt durch Plus bleibt minus." },
+          { text: "−16", erklaerung: "Das wäre 20 − 4. Hier wird geteilt." },
+          { text: "−24", erklaerung: "Das wäre −20 − 4. Hier wird geteilt." },
+        ],
         richtig: 0,
         erklaerung: "Minus geteilt durch Plus ergibt Minus: 20 : 4 = 5, also −5.",
       },
       {
         frage: "Wie viel ist 5 − (−3)?",
-        optionen: ["2", "−2", "8", "−8"],
+        optionen: [
+          { text: "2", erklaerung: "Das wäre 5 − 3. Minus und Minus werden hier zu Plus." },
+          { text: "−2", erklaerung: "Minus und Minus werden zu Plus, nicht zu Minus." },
+          "8",
+          { text: "−8", erklaerung: "Das wäre −(5 + 3). Die 5 bleibt positiv." },
+        ],
         richtig: 2,
         erklaerung: "Minus und Minus wird Plus: 5 + 3 = 8.",
       },
       {
         frage: "Was rechnest du bei 2 + 3 · 4 zuerst?",
-        optionen: ["2 + 3", "von links nach rechts", "3 · 4", "egal"],
+        optionen: [
+          { text: "2 + 3", erklaerung: "Punkt vor Strich: das Mal kommt zuerst." },
+          { text: "von links nach rechts", erklaerung: "Das gilt nur bei gleichen Rechenarten." },
+          "3 · 4",
+          { text: "egal", erklaerung: "Die Reihenfolge zählt: Punkt vor Strich." },
+        ],
         richtig: 2,
         erklaerung: "Punkt vor Strich: erst 3 · 4 = 12, dann 2 + 12 = 14.",
       },

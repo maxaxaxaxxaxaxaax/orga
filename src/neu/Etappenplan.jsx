@@ -189,9 +189,9 @@ export default function Etappenplan({ onWeiter }) {
           <p className="ep-kopf-eyebrow">Etappe planen</p>
           <h1 className="ep-kopf-titel">{ETAPPE.kurz}</h1>
           <p className="ep-kopf-sub">
-            {zeitraum(ETAPPE)} · {koennensbeweise.length}{" "}
-            <Begriff name="koennensbeweis">Könnensbeweise</Begriff> · tippe oder
-            zieh sie in die Wochen
+            {zeitraum(ETAPPE)} · verteile deine {koennensbeweise.length}{" "}
+            <Begriff name="koennensbeweis">Könnensbeweise</Begriff> von oben auf
+            die Wochen darunter (tippen oder ziehen)
           </p>
         </div>
         <div className="ep-kopf-aktion">

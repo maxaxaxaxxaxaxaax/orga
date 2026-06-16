@@ -80,24 +80,41 @@ export default function Auswahlquiz({ daten }) {
 
       <div className="aq-optionen">
         {frage.optionen.map((opt, i) => {
+          // Option ist entweder ein String oder { text, erklaerung }.
+          const text = typeof opt === "string" ? opt : opt.text;
+          const erkl = typeof opt === "string" ? null : opt.erklaerung;
           let status = "";
           if (beantwortet) {
             if (i === frage.richtig) status = "ok";
             else if (i === gewaehlt) status = "no";
           }
+          // Erklaerung der richtigen Option immer zeigen, der eben falsch
+          // gewaehlten auch (damit man versteht, warum nicht).
+          const zeigeErkl =
+            beantwortet && erkl && (i === frage.richtig || i === gewaehlt);
           return (
-            <button
-              key={i}
-              type="button"
-              className={"aq-option" + (status ? " " + status : "")}
-              onClick={() => waehle(i)}
-              disabled={beantwortet}
-            >
-              <span className="aq-marke" aria-hidden="true">
-                {status === "ok" ? "✓" : status === "no" ? "✕" : ""}
-              </span>
-              <span className="aq-option-text">{opt}</span>
-            </button>
+            <div className="aq-option-zeile" key={i}>
+              <button
+                type="button"
+                className={"aq-option" + (status ? " " + status : "")}
+                onClick={() => waehle(i)}
+                disabled={beantwortet}
+              >
+                <span className="aq-marke" aria-hidden="true">
+                  {status === "ok" ? "✓" : status === "no" ? "✕" : ""}
+                </span>
+                <span className="aq-option-text">{text}</span>
+              </button>
+              {zeigeErkl && (
+                <p
+                  className={
+                    "aq-option-erkl" + (status === "ok" ? " ok" : " no")
+                  }
+                >
+                  {erkl}
+                </p>
+              )}
+            </div>
           );
         })}
       </div>

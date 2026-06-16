@@ -84,6 +84,24 @@
 .aq-option-text {
   flex: 1;
 }
+/* Eine Option samt optionaler Inline-Erklaerung (warum richtig / warum nicht). */
+.aq-option-zeile {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.aq-option-erkl {
+  margin: 0;
+  padding: 2px 14px 0;
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+.aq-option-erkl.ok {
+  color: var(--ok-text);
+}
+.aq-option-erkl.no {
+  color: var(--danger-text);
+}
 
 .aq-erklaerung {
   margin: 0;
