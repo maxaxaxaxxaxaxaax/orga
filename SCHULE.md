@@ -80,6 +80,14 @@ eigenständigen Arbeiten (kein 45-Minuten-Takt).
 - Wochenziel: **10 Clusterstunden** pro Schüler:in
 - Eine Etappe umfasst typischerweise 6 Wochen, also rund 60 Clusterstunden gesamt
 
+Im echten Theresianum wird der Aufwand pro Lernweg in **"Uhren"** angegeben (1 Uhr = 45
+Min, eine Lehrkraft-Schätzung). Die App abstrahiert das als Clusterstunde. **Wichtiger
+Research-Befund**: diese Lehrer-Schätzungen weichen oft stark von der individuellen
+Schüler-Realität ab, was zu Frust und ungeplanter Nacharbeit zu Hause führt (Schmerzpunkt
+von Persona Lina). Daraus folgt ein App-Hebel: **datenbasierte, realistische
+Zeiteinschätzungen** aus tatsächlich gemessener Bearbeitungszeit statt reiner
+Lehrer-Vorgabe.
+
 ### Lernweg
 
 Ein Lernweg ist die konkrete Treppe zum KB: eine geordnete Folge von **Schritten**, an
@@ -339,12 +347,18 @@ Die Lerncoach-Einschätzung ist Teil der dokumentierten Entwicklung (siehe Berei
 
 Das didaktische Modell spiegelt sich in der **Architektur** des Theresianums wider.
 Der Schulraum ist als **offene Lernlandschaft** konzipiert, kein klassisches
-Flur-Klassenzimmer-Prinzip. Statt geschlossener Räume gibt es fließende Übergänge
-zwischen:
+Flur-Klassenzimmer-Prinzip. Jede Jahrgangsstufe hat ein eigenes **Stockwerk**, das in
+Zonen gegliedert ist:
 
-- **Cluster-Bereichen** für individualisiertes Arbeiten
-- **Kooperativen Sektionen** für ZEuS- und FREI DAY-Projekte
-- **Dezidierten Stillarbeitszonen** für hochkonzentriertes Arbeiten
+- **Äußerer Ring**: fachspezifische Räume, das **Silentium** für hochkonzentrierte
+  Stillarbeit und ein dezidierter Raum fürs Ablegen der **Könnensbeweise**.
+- **Zentrum**: das **Auditorium**, eine offene Fläche, primär für kollaboratives Arbeiten
+  (ZEuS, FREI DAY, gegenseitige Hilfe).
+
+Ein Stockwerk wird auch **Cluster** genannt (vgl. "Cluster 7" oben): in einem Cluster
+arbeiten rund **120 Schüler:innen aus vier Klassen** gleichzeitig, betreut von je einer
+Fachlehrkraft pro Klasse. (Achtung Begriffs-Überladung: "Cluster" meint hier das
+Stockwerk, die Zeiteinheit heißt "Clusterstunde".)
 
 Konsequenz für die App:
 - Schüler entscheiden physisch wo sie arbeiten. Die App muss überall benutzbar
@@ -356,6 +370,28 @@ Konsequenz für die App:
   jedes Einzelnen schauen**. Das verschärft das Kontroll- und Hilfe-Problem
   (Cluster 3 und 6) und ist der konkrete Grund für die Vision-Forderung nach
   einer punktuellen Lehrer-Brücke (siehe VISION.md).
+
+### Das Stempelsystem: gestufte räumliche Freigabe
+
+Weil nicht alle Schüler:innen von Beginn an ihre Freiheit im offenen Raum strukturieren
+können, steuert ein **wöchentliches, tutorienbasiertes Stempelsystem** die räumliche
+Freigabe. Es soll verhindern, dass die Leistungsschere auseinandergeht. Drei Stempel, vom
+meisten Gerüst zur meisten Autonomie:
+
+- **Tisch**: ausschließlich das **Silentium** als Arbeitsort. Für leicht ablenkbare
+  Schüler:innen, die inhaltlich zurückfallen oder noch viel Begleitung bei der
+  Eigenorganisation brauchen (vgl. Persona Nico in PERSONAS.md).
+- **Sofa**: der reguläre Rahmen. Bis zu fünfmal pro Woche je eine Stunde im kollaborativen
+  **Auditorium**, die restliche Zeit im strukturierten Silentium.
+- **Haus**: freie Wahl des Arbeitsplatzes im ganzen Stockwerk (inkl. Fachräume und Flure),
+  ohne Tutoren-Unterschrift. Für hohe Selbstregulation (vgl. Persona Lina).
+
+Das Stempelsystem übergibt Verantwortung in dem Maß, in dem der Schüler sie tragen kann,
+ein Gerüst, das sich selbst überflüssig machen soll. Heute wird es **händisch und
+fehleranfällig** im analogen Schulplaner nachgehalten (ein dokumentierter Schmerzpunkt).
+Genau diese Logik (Unterstützung sinkt mit wachsender Selbstständigkeit) übernimmt die App
+als Leitplanke „das verblassende Gerüst" (siehe VISION.md). Die **digitale Verwaltung des
+Stempelsystems** ist zugleich ein Lehrer-Bedarf (vgl. Persona Herr Müller).
 
 ## Infrastruktur: digitales Lernen, analoge Organisation
 

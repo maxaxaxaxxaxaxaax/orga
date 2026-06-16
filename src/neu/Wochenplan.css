@@ -1,0 +1,390 @@
+/* Wochenplanung: KBs einer Woche auf die Wochentage verteilen.
+   Gleiche Sprache wie der Etappenplan, ohne Scrollen. */
+
+.wp-screen {
+  height: 100vh;
+  width: 100%;
+  box-sizing: border-box;
+  /* Oben Platz für die "Mein Weg"-Leiste, unten für die Nav. */
+  padding: 70px 40px 78px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+}
+@media (max-width: 560px) {
+  .wp-screen {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+}
+
+.wp-zurueck {
+  border: 1px solid var(--line);
+  background: var(--card);
+  color: var(--text-2);
+  font-size: 0.86rem;
+  font-weight: 600;
+  padding: 8px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.wp-zurueck:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+/* Sekundär: offene Ziele ausgewogen auf die Tage vorschlagen. */
+.wp-vorschlag {
+  border: 1px solid var(--line-strong);
+  background: var(--card);
+  color: var(--text);
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 9px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: border-color 0.12s ease, color 0.12s ease;
+}
+.wp-vorschlag:not(:disabled):hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.wp-vorschlag:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.wp-fortschritt {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+.wp-fortschritt.fertig {
+  color: var(--ok-text);
+}
+.wp-weiter {
+  border: none;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 11px 22px;
+  border-radius: 999px;
+  cursor: pointer;
+  box-shadow: 0 4px 14px -4px var(--accent-shadow);
+  transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.12s ease;
+}
+.wp-weiter:not(:disabled):hover {
+  background: var(--accent-strong);
+  box-shadow: 0 7px 20px -5px var(--accent-shadow);
+}
+.wp-weiter:not(:disabled):active {
+  transform: scale(0.97);
+}
+.wp-weiter:disabled {
+  background: var(--line-strong);
+  color: var(--muted);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* Kopf: Text links, Aktionen rechts (gleiche Anatomie wie der Etappenplan) */
+.wp-kopf {
+  flex-shrink: 0;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+}
+.wp-kopf-aktion {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.wp-kopf-buttons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.wp-eyebrow {
+  margin: 0 0 4px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.wp-titel {
+  margin: 0;
+  font-size: 1.9rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+.wp-sub {
+  margin: 5px 0 0;
+  font-size: 0.92rem;
+  color: var(--text-2);
+}
+
+/* Vorrat */
+.wp-vorrat {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-height: 48px;
+  padding: 10px 12px;
+  margin-bottom: 16px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md, 12px);
+}
+.wp-vorrat.ueber {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+.wp-vorrat-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  margin-right: 4px;
+}
+.wp-vorrat-leer {
+  font-size: 0.84rem;
+  color: var(--muted);
+  font-style: italic;
+}
+
+/* Wochentage */
+.wp-tage {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 14px;
+}
+.wp-tag {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md, 12px);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.wp-tag-kopf {
+  flex-shrink: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  padding-bottom: 10px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--line);
+}
+.wp-tag-titel {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.wp-tag-name {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.wp-tag-datum {
+  font-size: 0.72rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.wp-tag-summe {
+  flex-shrink: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Die Stunden eines Tages: belegbare Slots und gesperrte Kontext-Zeilen. */
+.wp-tag-stunden {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow-y: auto;
+}
+
+/* Gemeinsame Mikro-Bausteine einer Stundenzeile. */
+.wp-stunde-zeit {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+  font-size: 0.72rem;
+}
+.wp-stunde-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.wp-stunde-fach {
+  color: var(--text-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.72rem;
+}
+
+/* Gesperrt: Nebenfach, reiner Unterricht, Projekt. Ruhig, nicht interaktiv. */
+.wp-stunde-zu {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px;
+  line-height: 1.25;
+  opacity: 0.55;
+}
+
+/* Belegbare Lern-Stunde: Drop-Ziel für KBs. */
+.wp-slot {
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--r-sm, 8px);
+  padding: 7px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.wp-slot-kopf {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.wp-slot-fach {
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+}
+.wp-slot-art {
+  flex-shrink: 0;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  padding: 1px 7px;
+  border-radius: 999px;
+  color: var(--text-2);
+  background: color-mix(in srgb, var(--text) 8%, transparent);
+}
+.wp-art-anker {
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+.wp-art-selbst {
+  color: var(--ok-text);
+  background: var(--ok-bg);
+}
+.wp-art-studierzeit {
+  color: var(--warn-text);
+  background: var(--warn-bg);
+}
+.wp-slot-kbs {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.wp-slot-leer {
+  font-size: 0.74rem;
+  color: var(--muted);
+  font-style: italic;
+  padding: 1px 2px;
+}
+.wp-slot.ueber {
+  border-style: solid;
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+.wp-slot.ueber .wp-slot-leer {
+  color: var(--accent);
+  font-style: normal;
+  font-weight: 600;
+}
+.wp-slot.tippbar {
+  border-style: solid;
+  border-color: color-mix(in srgb, var(--accent) 42%, var(--line-strong));
+  cursor: pointer;
+}
+.wp-slot.tippbar:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+.wp-slot.tippbar .wp-slot-leer {
+  color: var(--accent);
+  font-style: normal;
+  font-weight: 600;
+}
+
+/* Ohne feste Stunde: auf den Tag gelegt, aber keiner Lern-Stunde zugeordnet. */
+.wp-tag-lose {
+  flex-shrink: 0;
+  margin-top: 8px;
+  padding: 7px 8px;
+  border: 1px dashed var(--line);
+  border-radius: var(--r-sm, 8px);
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.wp-tag-lose-label {
+  font-size: 0.64rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+.wp-tag-lose-kbs {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.wp-tag-lose.ueber {
+  border-style: solid;
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+.wp-tag-lose.ueber .wp-slot-leer {
+  color: var(--accent);
+  font-style: normal;
+  font-weight: 600;
+}
+.wp-tag-lose.tippbar {
+  border-style: solid;
+  border-color: color-mix(in srgb, var(--accent) 42%, var(--line));
+  cursor: pointer;
+}
+.wp-tag-lose.tippbar:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+@media (max-width: 760px) {
+  .wp-screen {
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
+    padding: 64px 16px 20px;
+  }
+  .wp-tage {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

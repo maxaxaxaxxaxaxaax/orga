@@ -22,6 +22,25 @@ kognitive Kapazität für das eigentliche Lernen frei wird. Sie ist explizit
 
 Wie können wir Schüler:innen dabei unterstützen, sich weniger auf Organisation und mehr auf das eigentliche Lernen zu konzentrieren?
 
+## Die App im hybriden Ökosystem
+
+Die Gesamt-Lösung der Thesis ist ein **hybrides Ökosystem** aus drei verwobenen Räumen.
+Diese App ist der **digitale** davon und bewusst kein Alleskönner:
+
+- **Digitaler Raum (diese App)**: trägt die kognitive Last der Strukturierung
+  (KI-Wochenplanung, KB-Erinnerungen, Fortschritts-Tracking, alle To-Dos an einem Ort).
+- **Physischer Raum (smarter Tisch im Silentium)**: schlägt die Brücke zur analogen
+  Arbeit. Eine verbaute Kamera scannt Hefte, Skizzen und Könnensbeweise ohne manuellen
+  Aufwand in den digitalen Raum (plus Strom, Ablagefläche, Ergonomie).
+- **Sozialer Raum (Verhalten)**: Status-LEDs am Tisch signalisieren nonverbal Fokus
+  (bitte nicht stören) oder Hilfebedarf (Lehrkraft wird gerufen) und senken die
+  Hemmschwelle, zu fragen.
+
+Konsequenz für den Bau: Die **Foto- und Kamera-Funktionen** der App (Material scannen,
+Fragen zum Bild stellen) sind die Software-Seite genau dieser Kamera-Brücke. Die Hardware
+(Tisch, LEDs) ist nicht Teil dieser Demo, ihre Datenpunkte (Standort, Hilferuf) werden
+aber konzeptionell mitgedacht und folgen den Leitplanken weiter unten.
+
 ## Der Catch (fünf konsequente Haltungen)
 
 Das Differenzierende ist nicht ein einzelnes Feature, sondern eine Haltung, die sich durch alles zieht.
@@ -45,6 +64,52 @@ Mitschriften, Arbeitsblätter und Erklärungen landen automatisch beim richtigen
 
 ### 5. KI als Lern-Coach, nicht als Antwortmaschine
 Stellt Rückfragen statt Lösungen zu liefern. Schlägt nächste Schritte vor, erinnert an Schwächen aus früheren Themen. Schützt das selbstständige Lernen aktiv, ersetzt es nicht.
+
+## Gestaltungsprinzipien: Selbstbestimmung als Leitplanke
+
+Die App erzeugt Daten (Fortschritt, Aufenthaltsort, Hilfebedarf), und genau diese
+Daten sind, über Minderjährige im Schulraum erhoben, hochsensibel. Das pädagogische
+Ziel der Studierzeit ist aber **Selbstregulation, nicht Kontrolle** (siehe das
+Stempelsystem in SCHULE.md). Ein Werkzeug, das dauerhaft beobachtet und an die
+Lehrkraft meldet, erzöge zur Anpassung an eine beobachtende Instanz statt zur
+Selbstständigkeit. Darum behandeln wir Autonomie und Privatsphäre nach dem **Value
+Sensitive Design** als Eingangsgröße der Konzeption, nicht als Datenschutz-Korrektiv
+am Ende. Vier Leitplanken, an denen sich jede Funktion messen lassen muss:
+
+### Spiegeln statt Überwachen
+Wir bauen nur Funktionen, bei denen die Schülerin selbst ein Signal sendet (ein
+Hilferuf ist eine Einladung, sie behält die Handlungsmacht), nie eine, die das System
+eigenständig über sie erhebt (z. B. automatische Ablenkungs-Erkennung). Die Lehrkraft
+bekommt keinen verborgenen Beobachtungsmonitor, sondern einen Spiegel der Daten, die
+die Schülerin ohnehin selbst erzeugt und einsieht.
+
+### Das verblassende Gerüst
+Die Intensität der Unterstützung ist an den erreichten Grad der Selbstständigkeit
+gekoppelt, analog zum Stempelsystem. Wer viel Struktur braucht, bekommt klare Etappen
+und sanfte Erinnerungen; wer selbstständig arbeitet, bekommt nahezu kein Monitoring,
+nur Werkzeuge nach eigenem Ermessen. Das System nimmt sich mit wachsender Kompetenz
+selbst zurück: ein temporäres Trainingsrad für Selbstregulation, das verschwindet,
+wenn es seine Aufgabe erfüllt hat.
+
+### Datenhoheit und Reziprozität
+Die Hoheit über die Daten liegt bei den Lernenden. Per Default sehen sie alles, was
+über sie erfasst wird, und sie steuern, was nach oben sichtbar wird. Es gibt keinen
+Auswertungsblick der Lehrkraft, den die Schülerin nicht ebenso einsehen kann. Diese
+Symmetrie ist der bewusste Gegenentwurf zur Disziplinierung durch bloßes
+Beobachtetwerden.
+
+### Verdichtung vor Einzelbild
+Auf Lehrerseite hat Aggregation Vorrang vor der Einzelbeobachtung. Der Lerncoach
+braucht nicht „Schüler X schweift ab", sondern das Muster „dieser Lernweg überfordert
+die Kohorte zeitlich". Erhoben wird nur das Nötigste: selbstberichteter Fortschritt
+und ein freiwilliger Standort, der allein dem Zustellen einer Hilfeanfrage dient und
+nicht dauerhaft gespeichert wird. Verhaltens- oder Aufmerksamkeitsdaten erfasst die
+App nicht (Datenminimierung und Zweckbindung nach DSGVO, besonders für die geschützten
+Daten Minderjähriger).
+
+Diese Leitplanken schränken den Funktionsumfang bewusst ein. Genau darin liegt ihre
+Stärke: Sie stellen sicher, dass die App die Selbstbestimmung, die das Theresianum
+mühsam aufbaut, nicht im Hintergrund wieder einkassiert.
 
 ## Die sechs Bereiche der App
 
@@ -105,6 +170,14 @@ Jeder Vorschlag, der in eine dieser Kategorien fällt, wird abgelehnt.
 Die Bachelor-Thesis "Lernen lernen im Zeitalter KI" untersucht, wie KI als
 organisatorischer Entlastungspartner für Schüler:innen funktionieren kann.
 
+**Ausgangslage**: Das starre, synchrone Schulmodell stößt messbar an Grenzen (PISA 2022:
+Leistungsrückgang in Mathematik um 15 Punkte, schon vor der Pandemie einsetzend; weniger
+als die Hälfte der Schüler:innen lernt, Wissen proaktiv zu verknüpfen). Der Paradigmen-
+wechsel geht zu offenen, individualisierten Lernlandschaften, in denen die Lehrkraft vom
+Wissenssender zum Lerncoach wird. Gleichzeitig ein Paradox: laut OECD nutzen 94 % der
+Befragten in Deutschland KI, aber nur 20 % für organisatorische Zwecke. Genau in diese
+Lücke (KI als Orga-Partner in der neuen Freiheit) positioniert sich die App.
+
 Der Argumentationsstrang in vier Schritten:
 
 **1. Phase 2 trägt das Modell.**
@@ -128,6 +201,25 @@ im Hintergrund.
 **4. Also: KI stabilisiert die Phase, die das Modell trägt.**
 Wenn die ersten drei Schritte stimmen, entlastet die App nicht beliebig irgendwo,
 sondern genau dort, wo der pädagogische Hebel am größten ist.
+
+### Der strategische Pivot: der Domino-Effekt
+
+Nach der Zwischenpräsentation wurde der Fokus bewusst **von der Lehrkraft weg zur
+Schülerschaft** verschoben. Drei Gründe:
+
+- **Scope**: Ein Redesign des Moodle-Backends oder ein Authoring-Tool für Lehrkräfte ist
+  primär ein fachdidaktisches Problem (die Verlage arbeiten selbst daran), nicht unser
+  gestalterischer Hebel.
+- **Frequenz**: Lehrkräfte leiden punktuell (bei der Kurserstellung), Schüler:innen
+  **täglich und stündlich** an der Selbstverwaltung im Raum. Dort ist der Design-Hebel am
+  größten.
+- **Domino-Effekt**: Die Transparenz-Lücke der Lehrkraft ist nur ein **Symptom** der
+  chaotischen Schüler-Organisation. Lösen wir die Schüler-Seite (ein System, in dem er
+  gern und automatisch seinen Fortschritt dokumentiert), entsteht im Hintergrund eine
+  saubere Datenlage, die der Lehrkraft gespiegelt werden kann.
+
+Indem wir den Schülern helfen, helfen wir passiv den Lehrkräften. Die Lehrkraft ist damit
+**sekundärer Konsument**, nicht primärer Nutzer.
 
 ### Die zweite Säule: Sichtbarkeit für den Lerncoach
 

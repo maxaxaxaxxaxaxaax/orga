@@ -1,0 +1,200 @@
+.zs {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.zs-kopf {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+.zs-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+.zs-score {
+  font-size: 0.78rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+.zs-frage {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* Die klickbare Linie: volle Breite, Ticks und Marken absolut positioniert. */
+.zs-linie {
+  position: relative;
+  width: 100%;
+  height: 88px;
+  margin: 8px 0 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+}
+.zs-linie:disabled {
+  cursor: default;
+}
+.zs-achse {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 38px;
+  height: 3px;
+  background: var(--line-strong);
+  border-radius: 2px;
+}
+.zs-tick {
+  position: absolute;
+  top: 30px;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  pointer-events: none;
+}
+.zs-strich {
+  width: 1.5px;
+  height: 12px;
+  background: var(--line-strong);
+}
+.zs-strich.null {
+  background: var(--text-2);
+  width: 2.5px;
+  height: 16px;
+}
+.zs-zahl {
+  font-size: 0.72rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.zs-zahl.null {
+  color: var(--text-2);
+  font-weight: 700;
+}
+/* Marken: Klick des Schülers und (bei Fehler) die richtige Stelle. */
+.zs-marke {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  pointer-events: none;
+}
+.zs-marke-punkt {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid var(--card);
+  box-shadow: var(--shadow-sm);
+}
+.zs-marke-text {
+  font-size: 0.72rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.zs-klick.ok .zs-marke-punkt {
+  background: var(--ok-text);
+}
+.zs-klick.ok .zs-marke-text {
+  color: var(--ok-text);
+}
+.zs-klick.no .zs-marke-punkt {
+  background: var(--warn-text);
+}
+.zs-klick.no .zs-marke-text {
+  color: var(--warn-text);
+}
+.zs-ziel {
+  top: 52px;
+}
+.zs-ziel .zs-marke-punkt {
+  background: transparent;
+  border-color: var(--ok-text);
+}
+.zs-ziel .zs-marke-text {
+  color: var(--ok-text);
+}
+
+.zs-feedback {
+  border-radius: var(--r-sm, 8px);
+  padding: 10px 12px;
+}
+.zs-feedback.ok {
+  background: var(--ok-bg, color-mix(in srgb, var(--ok-text) 14%, transparent));
+}
+.zs-feedback.no {
+  background: var(--warn-bg);
+}
+.zs-feedback-text {
+  margin: 0 0 8px;
+  font-size: 0.9rem;
+  color: var(--text);
+}
+.zs-weiter {
+  border: none;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: 0.88rem;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.zs-weiter:hover {
+  background: var(--accent-strong);
+}
+
+.zs-fertig {
+  align-items: center;
+  text-align: center;
+  padding: 16px 0;
+}
+.zs-fertig-haken {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--ok-text);
+  color: var(--on-accent);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.zs-fertig-text {
+  margin: 0 0 4px;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+.zs-neu {
+  border: 1px solid var(--line-strong);
+  background: var(--card);
+  color: var(--text);
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 9px 18px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.zs-neu:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.zs-leer {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+}

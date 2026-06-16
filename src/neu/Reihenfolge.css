@@ -1,0 +1,190 @@
+.rf {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.rf-kopf {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+.rf-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+}
+.rf-fortschritt {
+  font-size: 0.8rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-2);
+}
+
+.rf-aufgabe {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--text);
+}
+
+.rf-liste {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rf-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  transition: border-color 0.12s ease, background 0.12s ease;
+}
+.rf-item.ok {
+  border-color: var(--ok-text);
+  background: var(--ok-bg);
+}
+.rf-item.no {
+  border-color: var(--danger-text);
+  background: var(--danger-bg);
+}
+
+.rf-nummer {
+  flex: 0 0 auto;
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-2);
+  background: var(--accent-soft);
+  border-radius: 50%;
+}
+.rf-item.ok .rf-nummer {
+  color: var(--ok-text);
+  background: transparent;
+}
+.rf-item.no .rf-nummer {
+  color: var(--danger-text);
+  background: transparent;
+}
+
+.rf-text {
+  flex: 1;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  color: var(--text);
+}
+
+.rf-pfeile {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.rf-pfeil {
+  width: 28px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line-strong);
+  background: var(--card);
+  color: var(--text-2);
+  font-size: 0.85rem;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  transition: border-color 0.12s ease, color 0.12s ease;
+}
+.rf-pfeil:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.rf-pfeil:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.rf-pruefen {
+  border: none;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: 0.95rem;
+  font-weight: 700;
+  padding: 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+.rf-pruefen:hover {
+  background: var(--accent-strong);
+}
+
+.rf-hinweis {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-2);
+  text-align: center;
+}
+
+/* Fertig-Zustand */
+.rf-fertig {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 18px 0;
+  gap: 8px;
+}
+.rf-haken {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--ok-text);
+  color: var(--on-accent);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+.rf-fertig-text {
+  margin: 6px 0 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.rf-neu {
+  margin-top: 8px;
+  border: 1px solid var(--line-strong);
+  background: var(--card);
+  color: var(--text);
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 9px 18px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: border-color 0.12s ease, color 0.12s ease;
+}
+.rf-neu:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.rf-leer {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+}

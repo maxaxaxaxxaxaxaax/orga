@@ -1,0 +1,61 @@
+/* Geteilter KB-Chip: ein Etappenziel sieht überall gleich aus. */
+.kbc {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 9px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--c);
+  border-radius: var(--r-sm, 8px);
+  cursor: grab;
+  user-select: none;
+}
+.kbc:active {
+  cursor: grabbing;
+}
+.kbc:hover {
+  border-color: color-mix(in srgb, var(--c) 45%, var(--line));
+  box-shadow: var(--shadow-sm);
+}
+/* Platziert (in Woche/Tag): Klick legt zurück. */
+.kbc-platziert:hover {
+  background: color-mix(in srgb, var(--c) 8%, var(--card));
+}
+/* Ausgewählt (Tippen-zum-Zuordnen): deutlicher Akzent-Ring. */
+.kbc-gewaehlt,
+.kbc-gewaehlt:hover {
+  background: var(--card);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent), var(--shadow-sm);
+}
+.kbc-fach {
+  flex-shrink: 0;
+  font-size: 0.64rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: color-mix(in srgb, var(--c) 75%, var(--text));
+}
+.kbc-titel {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.8rem;
+  line-height: 1.3;
+  color: var(--text);
+}
+.kbc-cluster {
+  flex-shrink: 0;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.74rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: color-mix(in srgb, var(--c) 75%, var(--text));
+  background: color-mix(in srgb, var(--c) 12%, var(--card));
+  border-radius: 999px;
+}

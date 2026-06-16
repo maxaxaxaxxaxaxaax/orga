@@ -1,0 +1,547 @@
+.ab-screen {
+  min-height: 100vh;
+  box-sizing: border-box;
+  /* Oben Platz für die schwebende Nav-Leiste (oben rechts). Unten keine
+     Weg-Leiste auf der Ablage, daher knapp. */
+  padding: 74px 44px 40px;
+  background: var(--bg);
+  color: var(--text);
+}
+@media (max-width: 560px) {
+  .ab-screen {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}
+.ab-kopf {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+/* Werkzeuge gehören zum Inhalt: eine Zeile auf Ordner-Breite, direkt über den
+   Karten. Suche füllt, "+ Material" sitzt rechtsbündig zu den Ordnern. */
+.ab-werkzeuge {
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 1100px;
+}
+.ab-eyebrow {
+  margin: 0 0 4px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.ab-titel {
+  margin: 0;
+  font-size: 2.4rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.ab-zurueck {
+  align-self: flex-start;
+  margin-bottom: 8px;
+  border: none;
+  background: transparent;
+  color: var(--text-2);
+  font-size: 0.86rem;
+  font-weight: 600;
+  padding: 0;
+  cursor: pointer;
+}
+.ab-zurueck:hover {
+  color: var(--accent);
+}
+.ab-hochladen {
+  flex-shrink: 0;
+  margin-left: auto;
+  border: 1px solid var(--line);
+  background: var(--card);
+  color: var(--text-2);
+  font-size: 0.88rem;
+  font-weight: 600;
+  padding: 10px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.ab-hochladen:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Suchfeld: der schnelle Zugang zu allen Lernwegen und Materialien. */
+.ab-suche {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 480px;
+  padding: 10px 16px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+}
+.ab-suche:focus-within {
+  border-color: var(--accent);
+}
+.ab-suche svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  color: var(--muted);
+}
+.ab-suche input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 0.92rem;
+  color: var(--text);
+}
+.ab-suche input::placeholder {
+  color: var(--muted);
+}
+.ab-suche-leeren {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: 999px;
+  background: var(--bg);
+  color: var(--text-2);
+  font-size: 0.7rem;
+  cursor: pointer;
+}
+.ab-suche-leeren:hover {
+  color: var(--text);
+}
+
+/* Treffer: flache Zeilen mit Haarlinien, gruppiert nach Typ. */
+.ab-treffer {
+  margin-top: 20px;
+  max-width: 760px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.ab-treffer-leer {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+  font-style: italic;
+}
+.ab-treffer-label {
+  margin: 0 0 4px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.ab-treffer-liste {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.ab-treffer-zeile {
+  width: 100%;
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 9px 2px;
+  border: none;
+  border-bottom: 1px solid color-mix(in srgb, var(--line) 60%, transparent);
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+}
+.ab-treffer-liste li:last-child .ab-treffer-zeile {
+  border-bottom: none;
+}
+.ab-treffer-zeile:hover .ab-treffer-titel {
+  color: var(--accent);
+}
+.ab-treffer-punkt {
+  flex-shrink: 0;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  align-self: center;
+}
+.ab-treffer-art {
+  flex-shrink: 0;
+  width: 110px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+.ab-treffer-titel {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.9rem;
+  color: var(--text);
+  line-height: 1.3;
+}
+.ab-treffer-info {
+  flex-shrink: 0;
+  max-width: 240px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.76rem;
+  color: var(--muted);
+}
+.ab-treffer-datum {
+  flex-shrink: 0;
+  min-width: 56px;
+  text-align: right;
+  font-size: 0.76rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Schritt 1: Fach-Wahl als ruhiges Karten-Raster. */
+.ab-faecher-grid {
+  margin-top: 24px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 14px;
+  max-width: 1100px;
+}
+.ab-fachkarte {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: left;
+  padding: 20px 18px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-top: 3px solid var(--c);
+  border-radius: var(--r-md, 12px);
+  cursor: pointer;
+  transition: border-color 0.12s ease, box-shadow 0.12s ease,
+    transform 0.08s ease;
+}
+.ab-fachkarte:hover {
+  border-color: color-mix(in srgb, var(--c) 45%, var(--line));
+  box-shadow: var(--shadow-sm);
+  transform: translateY(-1px);
+}
+.ab-fachkarte-name {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: color-mix(in srgb, var(--c) 72%, var(--text));
+}
+.ab-fachkarte-meta {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+/* Schritt 2: Master-Detail. Links die Lernwege, rechts die Detail-Fläche. */
+.ab-spalten {
+  margin-top: 24px;
+  display: grid;
+  grid-template-columns: minmax(230px, 300px) minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+  max-width: 1100px;
+}
+@media (max-width: 860px) {
+  .ab-spalten {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Master-Liste: ruhige Zeilen, ein Aktiv-Zustand, bleibt beim Scrollen stehen. */
+.ab-liste {
+  position: sticky;
+  top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md, 12px);
+}
+@media (max-width: 860px) {
+  .ab-liste {
+    position: static;
+  }
+}
+.ab-zeile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: none;
+  border-radius: var(--r-sm, 8px);
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+}
+.ab-zeile:hover {
+  background: var(--bg);
+}
+.ab-zeile.aktiv {
+  background: color-mix(in srgb, var(--c) 10%, var(--card));
+}
+.ab-zeile.aktiv .ab-zeile-titel {
+  color: color-mix(in srgb, var(--c) 70%, var(--text));
+  font-weight: 700;
+}
+.ab-zeile-status {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1.5px solid var(--line-strong);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: #fff;
+}
+.ab-zeile-status.fertig {
+  background: var(--ok-text);
+  border-color: var(--ok-text);
+}
+.ab-zeile-titel {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.3;
+}
+/* Material-Zähler rechts in der Lernweg-Liste. */
+.ab-zeile-zahl {
+  flex-shrink: 0;
+  font-size: 0.74rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+  background: color-mix(in srgb, var(--text) 8%, transparent);
+  border-radius: 999px;
+  padding: 1px 8px;
+}
+/* Expliziter "Alle Materialien"-Eintrag: kein Status-Punkt, nur ruhiger Spacer. */
+.ab-zeile-alle {
+  margin-bottom: 2px;
+}
+.ab-zeile-alle .ab-zeile-status {
+  border: none;
+  background: transparent;
+}
+/* Detail-Fläche: hier wohnt alles zum gewählten Lernweg. */
+.ab-detail {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-top: 3px solid var(--c);
+  border-radius: var(--r-md, 12px);
+  padding: 20px 22px;
+  min-width: 0;
+}
+.ab-detail-kopf {
+  padding-bottom: 14px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--line);
+}
+.ab-detail-fach {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: color-mix(in srgb, var(--c) 78%, var(--text));
+}
+.ab-detail-titel {
+  margin: 4px 0 0;
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+.ab-detail-fertig {
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--ok-text);
+}
+.ab-detail-meta {
+  margin: 5px 0 0;
+  font-size: 0.82rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.ab-detail-leer {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+  font-style: italic;
+}
+
+/* Material-Übersicht (ohne Auswahl) */
+/* Werkzeugleiste der "Alle Materialien"-Ansicht: Gruppieren + Sortieren. */
+.ab-mat-werkzeuge {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 22px;
+  margin: 0 0 16px;
+}
+.ab-mat-steller {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.ab-mat-steller-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  margin-right: 2px;
+}
+.ab-mat-chip {
+  border: 1px solid var(--line-strong);
+  background: var(--card);
+  color: var(--text-2);
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: border-color 0.12s ease, color 0.12s ease, background 0.12s ease;
+}
+.ab-mat-chip:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.ab-mat-chip.an {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+}
+/* Unterregister-Block: Überschrift mit Anzahl, dann die Materialien. */
+.ab-register {
+  margin-bottom: 18px;
+}
+.ab-register-titel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 8px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+}
+.ab-register-zahl {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+  background: color-mix(in srgb, var(--text) 8%, transparent);
+  border-radius: 999px;
+  padding: 0 7px;
+  font-size: 0.7rem;
+}
+.ab-mats {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.ab-mat {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm, 8px);
+}
+.ab-mat-klick {
+  width: 100%;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.ab-mat-klick:hover {
+  border-color: var(--accent);
+}
+.ab-mat-klick:hover .ab-mat-titel {
+  color: var(--accent);
+}
+.ab-mat-art {
+  flex-shrink: 0;
+  font-size: 0.66rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+  background: var(--accent-soft);
+  padding: 3px 8px;
+  border-radius: 999px;
+}
+.ab-mat-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.ab-mat-titel {
+  font-size: 0.9rem;
+  color: var(--text);
+  line-height: 1.3;
+}
+.ab-mat-sub {
+  font-size: 0.74rem;
+  color: var(--muted);
+}
+/* Aktivitäts-Hinweis: zeigt vorab die Übungsform (Quiz, Karteikarten ...).
+   Sitzt rechts und wird beim Hover der Karte zum Akzent: lädt zum Öffnen ein. */
+.ab-mat-aktiv {
+  flex-shrink: 0;
+  align-self: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border: 1px solid transparent;
+  padding: 3px 9px 3px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.ab-mat-aktiv::before {
+  content: "▸ ";
+}
+.ab-mat-aktiv.lesen {
+  color: var(--muted);
+  background: transparent;
+  border-color: var(--line);
+}
+.ab-mat-klick:hover .ab-mat-aktiv {
+  border-color: var(--accent);
+}
+
+@media (max-width: 760px) {
+  .ab-screen {
+    padding: 24px 18px 110px;
+  }
+  .ab-titel {
+    font-size: 1.9rem;
+  }
+}

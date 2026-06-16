@@ -1,0 +1,542 @@
+.hu-screen {
+  min-height: 100vh;
+  box-sizing: border-box;
+  /* Oben Platz für die "Mein Weg"-Leiste, unten für die Nav. */
+  padding: 74px 44px 110px;
+  background: var(--bg);
+  color: var(--text);
+}
+@media (max-width: 560px) {
+  .hu-screen {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  .hu-titel {
+    font-size: 1.6rem;
+  }
+}
+
+/* Tag geschafft: ruhiger grüner Abschluss-Screen, eine kleine Belohnung ohne
+   Spielerei (siehe VISION: keine Gamification). */
+.hu-fertig {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--ok-text) 26%, var(--bg)) 0%,
+    color-mix(in srgb, var(--ok-text) 13%, var(--bg)) 100%
+  );
+}
+.hu-fertig-karte {
+  max-width: 440px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  animation: hu-fertig-rein 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+@keyframes hu-fertig-rein {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.hu-fertig-haken {
+  width: 86px;
+  height: 86px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--on-accent);
+  background: var(--ok-text);
+  box-shadow: 0 14px 36px -10px color-mix(in srgb, var(--ok-text) 75%, transparent);
+  margin-bottom: 10px;
+  animation: hu-haken-pop 0.55s cubic-bezier(0.2, 1.5, 0.4, 1) both;
+}
+@keyframes hu-haken-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.hu-fertig-eyebrow {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--ok-text) 65%, var(--text));
+}
+.hu-fertig-titel {
+  margin: 0;
+  font-size: 2.6rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+.hu-fertig-text {
+  margin: 4px 0 0;
+  font-size: 1.05rem;
+  line-height: 1.5;
+  color: var(--text-2);
+}
+.hu-fertig-morgen {
+  margin: 2px 0 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+.hu-fertig-ansehen {
+  margin-top: 18px;
+  border: 1px solid var(--line-strong);
+  background: color-mix(in srgb, var(--card) 75%, transparent);
+  color: var(--text);
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 10px 20px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: border-color 0.12s ease, color 0.12s ease;
+}
+.hu-fertig-ansehen:hover {
+  border-color: var(--ok-text);
+  color: var(--ok-text);
+}
+@media (max-width: 560px) {
+  .hu-fertig-titel {
+    font-size: 2.1rem;
+  }
+}
+.hu-kopf {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+.hu-eyebrow {
+  margin: 0 0 4px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.hu-titel {
+  margin: 0;
+  font-size: 2.4rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.hu-sub {
+  margin: 8px 0 0;
+  font-size: 1rem;
+  color: var(--text-2);
+}
+.hu-kopf-text {
+  flex: 1;
+  min-width: 0;
+}
+/* Tag-Navigation: einen Tag vor/zurück (Pfeiltasten oder diese Knöpfe). */
+.hu-tag-nav {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+}
+.hu-tag-pfeil {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid var(--line-strong);
+  background: var(--card);
+  color: var(--text);
+  font-size: 1.3rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color 0.12s ease, color 0.12s ease, opacity 0.12s ease;
+}
+.hu-tag-pfeil:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.hu-tag-pfeil:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+.hu-tag-label {
+  min-width: 36px;
+  text-align: center;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-2);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Zwei Spalten: heute geplant + Stundenplan */
+.hu-spalten {
+  margin-top: 22px;
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 20px;
+  align-items: start;
+}
+@media (max-width: 720px) {
+  .hu-spalten {
+    grid-template-columns: 1fr;
+  }
+}
+/* Rechte Spalte: Stundenplan plus Klassen-Puls gestapelt. */
+.hu-rechts {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+}
+.hu-block {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md, 12px);
+  padding: 18px 20px;
+}
+.hu-block-titel {
+  margin: 0 0 14px;
+  font-size: 1rem;
+  font-weight: 700;
+}
+.hu-leer {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+  font-style: italic;
+}
+/* Alle Tagesziele erledigt: ruhige Bestätigung über der Liste. */
+.hu-geschafft {
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--ok-text);
+  background: var(--ok-bg);
+  border-radius: var(--r-sm, 8px);
+}
+/* Kleiner Ausblick auf morgen, unten im Block. */
+.hu-morgen {
+  margin: 12px 0 0;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+/* Stilles Carry-over: ruhig abgesetzt, kein Schuld-Ton, nur ein leiser Hinweis. */
+.hu-nachzuegler {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+.hu-nachzuegler-titel {
+  margin: 0 0 10px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--muted);
+}
+.hu-nachzuegler-mehr {
+  margin-top: 8px;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-size: 0.82rem;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.hu-nachzuegler-mehr:hover {
+  color: var(--text-2);
+}
+/* Notizzettel: geparkte Gedanken aus dem Fokus, ruhig unter dem Tag. */
+.hu-notizen {
+  margin-top: 20px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md, 12px);
+  padding: 18px 20px;
+}
+.hu-notizen-hinweis {
+  margin: 0 0 12px;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+.hu-notiz-liste {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.hu-notiz {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.hu-notiz-weg {
+  flex-shrink: 0;
+  margin-top: 1px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1.5px solid var(--line-strong);
+  background: var(--card);
+  color: var(--ok-text);
+  font-size: 0.74rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+}
+.hu-notiz-weg:hover {
+  background: var(--ok-text);
+  border-color: var(--ok-text);
+  color: var(--on-accent);
+}
+.hu-notiz-text {
+  font-size: 0.92rem;
+  line-height: 1.4;
+  color: var(--text);
+}
+/* Startpunkt-Marke auf der ersten offenen Karte (nur wenn es eine Wahl gibt:
+   2+ offene Ziele). Ersetzt den früheren Banner, der den Titel doppelte. */
+.hu-kb-start {
+  flex-shrink: 0;
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--on-accent);
+  background: var(--accent);
+  padding: 1px 8px;
+  border-radius: 999px;
+}
+
+/* Heute geplant: KB-Karten */
+.hu-kbs {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.hu-kb {
+  padding: 10px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--c);
+  border-radius: var(--r-sm, 8px);
+}
+.hu-kb-zeile {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.hu-kb-check {
+  flex-shrink: 0;
+  margin-top: 1px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1.5px solid var(--line);
+  background: var(--card);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: #fff;
+  cursor: pointer;
+}
+.hu-kb-check:hover {
+  border-color: var(--ok-text);
+}
+.hu-kb.done .hu-kb-check {
+  background: var(--ok-text);
+  border-color: var(--ok-text);
+}
+.hu-kb-open {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+}
+.hu-kb-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.hu-kb-fokus-cue {
+  flex-shrink: 0;
+  align-self: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 4px 10px;
+  transition: color 0.12s ease, border-color 0.12s ease, background 0.12s ease;
+}
+.hu-kb-open:hover .hu-kb-fokus-cue {
+  color: var(--on-accent);
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.hu-kb-haupt {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.hu-kb-open:hover .hu-kb-titel {
+  color: var(--accent);
+}
+.hu-kb.done .hu-kb-titel {
+  color: var(--muted);
+  text-decoration: line-through;
+}
+.hu-kb-fach {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: color-mix(in srgb, var(--c) 75%, var(--text));
+  flex-shrink: 0;
+}
+.hu-kb-titel {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.3;
+}
+.hu-kb-uebung {
+  flex-shrink: 0;
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+  background: var(--accent-soft);
+  padding: 1px 8px;
+  border-radius: 999px;
+}
+/* KB-Bereitschaft: alle Schritte geschafft, bereit für die Abnahme (grün). */
+.hu-kb-bereit {
+  flex-shrink: 0;
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--on-accent);
+  background: var(--ok-text);
+  padding: 1px 8px;
+  border-radius: 999px;
+}
+.hu-kb-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 0.74rem;
+  color: var(--muted);
+}
+.hu-kb-meta-item {
+  white-space: nowrap;
+}
+.hu-kb-meta-item:not(:first-child)::before {
+  content: "·";
+  margin-right: 6px;
+  color: var(--line-strong);
+}
+/* Geplante Schulstunde aus der Wochenplanung: hebt sich vom Rest ab. */
+.hu-kb-stunde {
+  font-weight: 700;
+  color: var(--accent);
+}
+.hu-kb.done .hu-kb-meta {
+  opacity: 0.6;
+}
+
+/* Stundenplan-Agenda */
+.hu-plan {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+.hu-stunde {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 2px;
+  border-bottom: 1px solid color-mix(in srgb, var(--line) 60%, transparent);
+}
+.hu-stunde:last-child {
+  border-bottom: none;
+}
+.hu-stunde-zeit {
+  font-size: 0.8rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+  min-width: 42px;
+}
+.hu-stunde-strich {
+  width: 3px;
+  align-self: stretch;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+.hu-stunde-fach {
+  flex: 1;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.hu-stunde-raum {
+  font-size: 0.78rem;
+  color: var(--muted);
+  flex-shrink: 0;
+}
+/* Studierzeit/Selbstlernzeit: hier werden die geplanten Ziele bearbeitet. */
+.hu-stunde.lernzeit {
+  background: var(--accent-soft);
+  border-radius: var(--r-sm, 8px);
+  padding-left: 8px;
+  padding-right: 8px;
+  border-bottom: none;
+}
+.hu-stunde-hinweis {
+  flex-shrink: 0;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+}

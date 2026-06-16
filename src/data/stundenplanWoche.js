@@ -26,6 +26,7 @@ export const fachFarbe = {
 
 // Beschriftung der Lernform (Tag im Kalender / in der Agenda).
 export const artLabel = {
+  angeleitet: "Unterricht",
   anker: "Ankerstunde",
   selbst: "selbstreguliert",
   studierzeit: "betreut",
@@ -73,6 +74,29 @@ export const stundenWoche = [
   { tag: 4, von: "13:10", bis: "13:55", fach: "Mittagessen", raum: "Mensa", art: "pause" },
   { tag: 4, von: "14:00", bis: "15:30", fach: "FREI DAY", raum: "Projektraum", art: "projekt" },
 ];
+
+// Hauptfächer (Kernfächer der Schule). In diesen Fächern arbeitet der Schüler an
+// Könnensbeweisen, daher sind alle Hauptfach-Stunden im Wochenplan mit einem KB
+// belegbar, dazu die betreute Studierzeit. Nebenfächer, Projekte (ZEuS/FREI DAY),
+// Neigungsgruppen und Pausen sind nicht belegbar.
+export const hauptfaecher = [
+  "Deutsch",
+  "Mathematik",
+  "Englisch",
+  "Französisch",
+  "Latein",
+  "Griechisch",
+];
+
+export function istBelegbar(stunde) {
+  if (stunde.art === "pause") return false;
+  return stunde.fach === "Studierzeit" || hauptfaecher.includes(stunde.fach);
+}
+
+// Stabile ID einer Stunde im Wochenraster (Tag + Startzeit).
+export function stundenId(stunde) {
+  return stunde.tag + "-" + stunde.von;
+}
 
 // Heutiger Wochentag als Index (Mo=0..Fr=4), -1 am Wochenende.
 export function heuteIndex(d = new Date()) {

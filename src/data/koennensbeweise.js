@@ -6,6 +6,7 @@ export const wochenZielCluster = 10;
 // Die Etappe (Ostern → Pfingsten) umfasst mehrere Wochen, auf die man die KBs verteilt.
 export const etappeWochen = 6;
 
+// Reihenfolge wie auf dem Schulplaner-Blatt.
 export const kbFaecher = ["Latein", "Englisch", "Deutsch", "Mathematik", "Griechisch"];
 
 export const kbFarbe = {

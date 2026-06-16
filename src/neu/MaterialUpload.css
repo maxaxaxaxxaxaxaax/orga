@@ -1,0 +1,149 @@
+.mu-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(17, 20, 26, 0.45);
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  z-index: 60;
+}
+.mu-modal {
+  position: relative;
+  width: min(440px, 100%);
+  background: var(--card);
+  color: var(--text);
+  border-radius: var(--r-lg, 18px);
+  padding: 24px 26px;
+  box-shadow: 0 16px 40px rgba(17, 20, 26, 0.28);
+}
+.mu-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 999px;
+  background: var(--bg);
+  color: var(--text-2);
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+.mu-close:hover {
+  color: var(--text);
+}
+.mu-titel {
+  margin: 0 0 16px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  padding-right: 32px;
+}
+
+/* Datei-Wahl: große, freundliche Fläche. */
+.mu-drop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 36px 20px;
+  border: 2px dashed var(--line-strong);
+  border-radius: var(--r-md, 12px);
+  cursor: pointer;
+  text-align: center;
+}
+.mu-drop:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+.mu-drop input[type="file"] {
+  display: none;
+}
+.mu-drop-gross {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+.mu-drop-klein {
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.mu-datei {
+  margin: 0;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text);
+  word-break: break-all;
+}
+.mu-hinweis {
+  margin: 6px 0 14px;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+.mu-hinweis.ok {
+  color: var(--ok-text);
+  font-weight: 600;
+}
+
+.mu-feld {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 12px;
+}
+.mu-feld span {
+  font-size: 0.74rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+}
+.mu-feld input,
+.mu-feld select {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 9px 12px;
+  font-size: 0.9rem;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm, 8px);
+  outline: none;
+}
+.mu-feld input:focus,
+.mu-feld select:focus {
+  border-color: var(--accent);
+}
+
+.mu-aktionen {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 18px;
+}
+.mu-abbrechen {
+  border: 1px solid var(--line);
+  background: var(--card);
+  color: var(--text-2);
+  font-size: 0.88rem;
+  font-weight: 600;
+  padding: 9px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.mu-abbrechen:hover {
+  color: var(--text);
+}
+.mu-speichern {
+  border: none;
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.88rem;
+  font-weight: 700;
+  padding: 9px 18px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.mu-speichern:hover {
+  background: var(--accent-strong);
+}

@@ -1,0 +1,72 @@
+/* Schwebende Glas-Pille oben mittig, liegt über allen Screens. */
+.nav-leiste {
+  position: fixed;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  display: flex;
+  gap: 4px;
+  padding: 6px;
+  background: color-mix(in srgb, var(--card) 68%, transparent);
+  -webkit-backdrop-filter: blur(18px) saturate(1.6);
+  backdrop-filter: blur(18px) saturate(1.6);
+  border: 1px solid color-mix(in srgb, var(--line-strong) 55%, transparent);
+  border-radius: 999px;
+  box-shadow: var(--shadow-lg);
+  animation: nav-rein 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) 0.12s both;
+}
+@keyframes nav-rein {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -16px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+.nav-punkt {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-2);
+  font-size: 0.88rem;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  cursor: pointer;
+  transition: color 0.18s ease, background 0.18s ease, transform 0.12s ease;
+}
+.nav-punkt:hover {
+  color: var(--text);
+  background: color-mix(in srgb, var(--text) 6%, transparent);
+}
+.nav-punkt:active {
+  transform: scale(0.95);
+}
+/* Aktiv: gefüllte Akzent-Pille mit lesbarem Kontrast in Hell und Dunkel. */
+.nav-punkt.aktiv,
+.nav-punkt.aktiv:hover {
+  background: var(--accent);
+  color: var(--on-accent);
+  box-shadow: 0 4px 12px -2px var(--accent-shadow);
+}
+.nav-punkt svg {
+  width: 17px;
+  height: 17px;
+  flex-shrink: 0;
+}
+
+/* Schmale Screens (Handy): nur Icons, größere Tap-Flächen. */
+@media (max-width: 560px) {
+  .nav-punkt-label {
+    display: none;
+  }
+  .nav-punkt {
+    padding: 12px 15px;
+  }
+}

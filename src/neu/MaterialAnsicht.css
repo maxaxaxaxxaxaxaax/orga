@@ -1,0 +1,87 @@
+.ma-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(17, 20, 26, 0.45);
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  z-index: 60;
+}
+.ma-modal {
+  position: relative;
+  width: min(520px, 100%);
+  max-height: 86vh;
+  overflow-y: auto;
+  background: var(--card);
+  color: var(--text);
+  border-radius: var(--r-lg, 18px);
+  border-top: 4px solid var(--accent);
+  padding: 24px 26px;
+  box-shadow: 0 16px 40px rgba(17, 20, 26, 0.28);
+}
+.ma-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 999px;
+  background: var(--bg);
+  color: var(--text-2);
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+.ma-close:hover {
+  color: var(--text);
+}
+.ma-art {
+  font-size: 0.66rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--accent);
+}
+.ma-titel {
+  margin: 4px 0 16px;
+  font-size: 1.3rem;
+  font-weight: 700;
+  line-height: 1.2;
+  padding-right: 32px;
+}
+.ma-inhalt {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.ma-ueberschrift {
+  margin: 12px 0 2px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+.ma-ueberschrift:first-child {
+  margin-top: 0;
+}
+.ma-punkt {
+  margin: 0;
+  padding-left: 18px;
+  position: relative;
+  font-size: 0.95rem;
+  line-height: 1.45;
+  color: var(--text);
+}
+.ma-punkt::before {
+  content: "•";
+  position: absolute;
+  left: 4px;
+  color: var(--accent);
+}
+.ma-zeile {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--text);
+}

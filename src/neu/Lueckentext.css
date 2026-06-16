@@ -1,0 +1,195 @@
+.lt {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.lt-kopf {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+.lt-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+}
+.lt-fortschritt {
+  font-size: 0.8rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-2);
+}
+
+/* Satz mit eingebetteter Lücke. line-height lässt Eingabefeld ruhig sitzen. */
+.lt-satz {
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.85;
+  color: var(--text);
+}
+
+.lt-luecke {
+  display: inline-block;
+  min-width: 96px;
+  max-width: 100%;
+  padding: 2px 10px;
+  margin: 0 2px;
+  font: inherit;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--card);
+  border: none;
+  border-bottom: 2px solid var(--accent);
+  border-radius: var(--r-sm) var(--r-sm) 0 0;
+  text-align: center;
+}
+.lt-luecke:focus {
+  outline: none;
+  background: var(--accent-soft);
+}
+.lt-luecke::placeholder {
+  color: var(--muted);
+}
+
+/* Feste Lücke nach dem Prüfen: trägt das Ergebnis farblich. */
+.lt-luecke-fest {
+  display: inline-block;
+  padding: 1px 10px;
+  margin: 0 2px;
+  font-weight: 700;
+  border-radius: var(--r-sm);
+}
+.lt-luecke-fest.ok {
+  color: var(--ok-text);
+  background: var(--ok-bg);
+}
+.lt-luecke-fest.no {
+  color: var(--danger-text);
+  background: var(--danger-bg);
+}
+
+.lt-tipp {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--text-2);
+}
+
+.lt-feedback {
+  padding: 10px 12px;
+  border-radius: var(--r-sm);
+}
+.lt-feedback.ok {
+  background: var(--ok-bg);
+}
+.lt-feedback.no {
+  background: var(--danger-bg);
+}
+.lt-feedback-text {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text);
+}
+.lt-feedback.ok .lt-feedback-text {
+  color: var(--ok-text);
+  font-weight: 600;
+}
+.lt-feedback.no .lt-feedback-text strong {
+  color: var(--danger-text);
+}
+
+.lt-aktionen {
+  display: flex;
+}
+.lt-pruefen {
+  flex: 1;
+  border: none;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: 0.95rem;
+  font-weight: 700;
+  padding: 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.12s ease, opacity 0.12s ease;
+}
+.lt-pruefen:hover:not(:disabled) {
+  background: var(--accent-strong);
+}
+.lt-pruefen:disabled {
+  background: var(--line-strong);
+  color: var(--muted);
+  cursor: not-allowed;
+}
+.lt-weiter {
+  flex: 1;
+  border: 1px solid var(--line-strong);
+  background: var(--card);
+  color: var(--text);
+  font-size: 0.95rem;
+  font-weight: 700;
+  padding: 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: border-color 0.12s ease, color 0.12s ease;
+}
+.lt-weiter:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Fertig-Zustand */
+.lt-fertig {
+  align-items: center;
+  text-align: center;
+  padding: 18px 0;
+  gap: 8px;
+}
+.lt-fertig-haken {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--ok-text);
+  color: var(--on-accent);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+.lt-fertig-text {
+  margin: 6px 0 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.lt-fertig-bilanz {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--text-2);
+}
+.lt-neu {
+  margin-top: 8px;
+  border: 1px solid var(--line-strong);
+  background: var(--card);
+  color: var(--text);
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 9px 18px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: border-color 0.12s ease, color 0.12s ease;
+}
+.lt-neu:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.lt-leer {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+}

@@ -1,0 +1,448 @@
+/* Fokus-Modus: ruhiges Vollbild, ein Schritt pro Seite. Liegt über allem. */
+.fokus {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  animation: fokus-rein 0.3s ease both;
+}
+@keyframes fokus-rein {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.fokus-kopf {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 20px;
+}
+.fokus-zu {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: var(--card);
+  color: var(--text-2);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: border-color 0.12s ease, color 0.12s ease;
+}
+.fokus-zu:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.fokus-kb {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--text-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.fokus-zaehler {
+  flex-shrink: 0;
+  font-size: 0.82rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+.fokus-balken {
+  flex-shrink: 0;
+  height: 3px;
+  margin: 0 20px;
+  background: var(--line);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.fokus-balken-fuell {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 2px;
+  transition: width 0.35s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+/* Bühne: zentriert, ruhig, viel Luft. */
+.fokus-buehne {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 32px 24px 48px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.fokus-eyebrow {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.fokus-titel {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 2rem;
+  line-height: 1.12;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+.fokus-info {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--text-2);
+}
+
+.fokus-block {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.fokus-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+}
+.fokus-mats {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.fokus-mat {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 13px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm, 8px);
+  text-align: left;
+  font: inherit;
+}
+.fokus-mat-klick {
+  cursor: pointer;
+  transition: border-color 0.12s ease;
+}
+.fokus-mat-klick:hover {
+  border-color: var(--accent);
+}
+.fokus-mat-art {
+  flex-shrink: 0;
+  font-size: 0.66rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+  background: var(--accent-soft);
+  padding: 3px 8px;
+  border-radius: 999px;
+}
+.fokus-mat-titel {
+  font-size: 0.9rem;
+  color: var(--text);
+}
+/* Aktivitäts-Hinweis rechts: zeigt vorab die Übungsform. */
+.fokus-mat-aktiv {
+  flex-shrink: 0;
+  margin-left: auto;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border: 1px solid transparent;
+  padding: 3px 9px 3px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.fokus-mat-aktiv::before {
+  content: "▸ ";
+}
+.fokus-mat-aktiv.lesen {
+  color: var(--muted);
+  background: transparent;
+  border-color: var(--line);
+}
+.fokus-mat-klick:hover .fokus-mat-aktiv {
+  border-color: var(--accent);
+}
+.fokus-ueben {
+  align-self: flex-start;
+  border: 1px solid var(--line-strong);
+  background: var(--card);
+  color: var(--text);
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 9px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: border-color 0.12s ease, color 0.12s ease;
+}
+.fokus-ueben:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.fokus-quiz {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md, 12px);
+  padding: 14px;
+}
+
+.fokus-fuss {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.fokus-weiter {
+  flex: 1;
+  min-width: 200px;
+  border: none;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 15px 22px;
+  border-radius: 999px;
+  cursor: pointer;
+  box-shadow: 0 6px 18px -6px var(--accent-shadow);
+  transition: background 0.15s ease, transform 0.12s ease;
+}
+.fokus-weiter:hover {
+  background: var(--accent-strong);
+}
+.fokus-weiter:active {
+  transform: scale(0.98);
+}
+.fokus-zurueck,
+.fokus-sekundaer {
+  flex-shrink: 0;
+  border: 1px solid var(--line-strong);
+  background: var(--card);
+  color: var(--text-2);
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 13px 18px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: border-color 0.12s ease, color 0.12s ease;
+}
+.fokus-zurueck:hover,
+.fokus-sekundaer:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.fokus-danach {
+  margin: 0;
+  font-size: 0.84rem;
+  color: var(--muted);
+}
+/* Stille Frage / Hilfe an den Lerncoach: ruhig unten, klappt erst auf Wunsch auf. */
+.fokus-hilfe-bereich {
+  align-self: center;
+  width: 100%;
+  max-width: 440px;
+  margin-top: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.fokus-hilfe {
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-size: 0.84rem;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.fokus-hilfe:hover {
+  color: var(--text-2);
+}
+.fokus-hilfe-panel {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  text-align: left;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md, 12px);
+  padding: 14px;
+}
+.fokus-hilfe-label {
+  font-size: 0.84rem;
+  line-height: 1.4;
+  color: var(--text-2);
+}
+.fokus-hilfe-feld {
+  width: 100%;
+  box-sizing: border-box;
+  resize: vertical;
+  font: inherit;
+  font-size: 0.9rem;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-sm, 8px);
+  padding: 9px 11px;
+}
+.fokus-hilfe-feld:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.fokus-hilfe-aktionen {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.fokus-hilfe-senden {
+  border: none;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: 0.88rem;
+  font-weight: 600;
+  padding: 9px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.fokus-hilfe-senden:hover {
+  background: var(--accent-strong);
+}
+.fokus-hilfe-abbrechen {
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-size: 0.86rem;
+  cursor: pointer;
+}
+.fokus-hilfe-abbrechen:hover {
+  color: var(--text-2);
+}
+.fokus-hilfe-status {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+}
+.fokus-hilfe-info {
+  margin: 0;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--ok-text);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.fokus-hilfe-haken {
+  font-weight: 700;
+}
+.fokus-hilfe-frage {
+  margin: 0;
+  max-width: 100%;
+  font-size: 0.88rem;
+  font-style: italic;
+  line-height: 1.4;
+  color: var(--text-2);
+}
+.fokus-hilfe-zurueck {
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-size: 0.82rem;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.fokus-hilfe-zurueck:hover {
+  color: var(--text-2);
+}
+
+/* Gedanke parken: leiser Zweit-Link, klappt ein kleines Eingabefeld auf. */
+.fokus-park-link {
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-size: 0.84rem;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.fokus-park-link:hover {
+  color: var(--text-2);
+}
+.fokus-park-panel {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.fokus-park-feld {
+  width: 100%;
+  box-sizing: border-box;
+  font: inherit;
+  font-size: 0.9rem;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-sm, 8px);
+  padding: 9px 11px;
+}
+.fokus-park-feld:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.fokus-park-aktionen {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.fokus-park-save {
+  border: none;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 0.86rem;
+  font-weight: 700;
+  padding: 8px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.fokus-park-save:hover {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+.fokus-park-zu {
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-size: 0.86rem;
+  cursor: pointer;
+}
+.fokus-park-zu:hover {
+  color: var(--text-2);
+}
+.fokus-park-zahl {
+  margin-left: auto;
+  font-size: 0.78rem;
+  color: var(--muted);
+}

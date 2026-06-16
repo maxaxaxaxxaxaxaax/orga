@@ -1,0 +1,123 @@
+.lz-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(17, 20, 26, 0.45);
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  z-index: 60;
+}
+.lz-modal {
+  position: relative;
+  width: min(560px, 100%);
+  max-height: 86vh;
+  overflow-y: auto;
+  background: var(--card);
+  color: var(--text);
+  border-radius: var(--r-lg, 18px);
+  padding: 24px 26px;
+  box-shadow: 0 16px 40px rgba(17, 20, 26, 0.28);
+}
+.lz-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 999px;
+  background: var(--bg);
+  color: var(--text-2);
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+.lz-close:hover {
+  color: var(--text);
+}
+.lz-eyebrow {
+  margin: 0 0 16px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+.lz-feld {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 14px;
+}
+.lz-feld span {
+  font-size: 0.74rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+}
+.lz-feld span em {
+  font-style: normal;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--accent);
+  margin-left: 6px;
+}
+.lz-feld input,
+.lz-feld textarea {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 0.92rem;
+  font-family: inherit;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm, 8px);
+  outline: none;
+}
+.lz-feld textarea {
+  resize: vertical;
+  line-height: 1.5;
+}
+.lz-feld input:focus,
+.lz-feld textarea:focus {
+  border-color: var(--accent);
+}
+.lz-aktionen {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 6px;
+}
+.lz-verwerfen {
+  border: 1px solid var(--line);
+  background: var(--card);
+  color: var(--text-2);
+  font-size: 0.88rem;
+  font-weight: 600;
+  padding: 9px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.lz-verwerfen:hover {
+  color: var(--text);
+}
+.lz-heften {
+  border: none;
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.88rem;
+  font-weight: 700;
+  padding: 9px 18px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.lz-heften:not(:disabled):hover {
+  background: var(--accent-strong);
+}
+.lz-heften:disabled {
+  background: var(--line-strong);
+  color: var(--muted);
+  cursor: not-allowed;
+}

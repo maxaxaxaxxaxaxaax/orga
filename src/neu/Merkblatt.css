@@ -1,0 +1,249 @@
+.mb {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mb-kopf {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+.mb-label {
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--text-2);
+}
+.mb-zaehler {
+  font-size: 0.78rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+
+.mb-balken {
+  height: 4px;
+  background: var(--line);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.mb-balken-fuell {
+  height: 100%;
+  background: var(--ok-text);
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+/* Abschnitte als auf-/zuklappbare Karten */
+.mb-liste {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.mb-abschnitt {
+  border: 1px solid var(--line);
+  border-radius: var(--r-md, 12px);
+  background: var(--card);
+  overflow: hidden;
+}
+.mb-titel {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border: none;
+  background: none;
+  text-align: left;
+  padding: 12px 14px;
+  cursor: pointer;
+  color: var(--text);
+}
+.mb-titel-text {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+.mb-pfeil {
+  flex: none;
+  font-size: 1.25rem;
+  line-height: 1;
+  color: var(--muted);
+  transition: transform 0.18s ease;
+}
+.mb-pfeil.auf {
+  transform: rotate(90deg);
+}
+
+.mb-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 0 14px 14px;
+}
+.mb-einleitung {
+  margin: 0;
+  font-size: 0.86rem;
+  color: var(--text-2);
+}
+
+/* Regeln zum Abhaken */
+.mb-regeln {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.mb-regel {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm, 8px);
+  background: var(--card);
+  text-align: left;
+  padding: 10px 12px;
+  cursor: pointer;
+  transition: border-color 0.12s ease, background 0.12s ease;
+}
+.mb-regel:hover {
+  border-color: var(--line-strong);
+}
+.mb-regel.ok {
+  border-color: color-mix(in srgb, var(--ok-text) 45%, var(--line));
+  background: var(--ok-bg);
+}
+.mb-haken {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  margin-top: 1px;
+  border-radius: 50%;
+  border: 1.5px solid var(--line-strong);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--on-accent);
+  background: transparent;
+  transition: background 0.12s ease, border-color 0.12s ease;
+}
+.mb-regel.ok .mb-haken {
+  background: var(--ok-text);
+  border-color: var(--ok-text);
+}
+.mb-regel-inhalt {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.mb-regel-text {
+  font-size: 0.9rem;
+  color: var(--text);
+  line-height: 1.4;
+}
+.mb-regel-bsp {
+  font-size: 0.82rem;
+  color: var(--text-2);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Kleine Tabelle, Zeilen beim Tippen hervorheben */
+.mb-tabelle-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.mb-tabelle {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+.mb-tabelle th {
+  text-align: left;
+  font-weight: 700;
+  color: var(--text-2);
+  padding: 7px 9px;
+  border-bottom: 1.5px solid var(--line-strong);
+  white-space: nowrap;
+}
+.mb-tabelle td {
+  padding: 7px 9px;
+  border-bottom: 1px solid var(--line);
+  color: var(--text);
+  vertical-align: top;
+}
+.mb-tabelle tbody tr {
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+.mb-tabelle tbody tr:hover {
+  background: var(--card-2);
+}
+.mb-tabelle tbody tr.aktiv {
+  background: var(--accent-soft);
+}
+.mb-tabelle tbody tr.aktiv td {
+  color: var(--text);
+  font-weight: 600;
+}
+.mb-tabelle-tipp {
+  margin: 0;
+  font-size: 0.74rem;
+  color: var(--muted);
+}
+
+/* Fertig-Zustand */
+.mb-fertig {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 8px;
+  padding: 14px;
+  border: 1px solid color-mix(in srgb, var(--ok-text) 35%, var(--line));
+  border-radius: var(--r-md, 12px);
+  background: var(--ok-bg);
+}
+.mb-fertig-haken {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--ok-text);
+  color: var(--on-accent);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+.mb-fertig-text {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.mb-neu {
+  border: 1px solid var(--line-strong);
+  background: var(--card);
+  color: var(--text);
+  font-size: 0.86rem;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.mb-neu:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.mb-leer {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+}

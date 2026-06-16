@@ -1,0 +1,85 @@
+.pl-screen {
+  min-height: 100vh;
+  box-sizing: border-box;
+  /* Oben Platz für die "Mein Weg"-Leiste, unten für die Nav. */
+  padding: 74px 44px 110px;
+  background: var(--bg);
+  color: var(--text);
+}
+@media (max-width: 560px) {
+  .pl-screen {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}
+.pl-kopf {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+}
+.pl-eyebrow {
+  margin: 0 0 4px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.pl-titel {
+  margin: 0;
+  font-size: 2.4rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.pl-sub {
+  margin: 8px 0 0;
+  font-size: 1rem;
+  color: var(--text-2);
+}
+.pl-kopf-aktion {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.pl-stand {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+.pl-kopf-buttons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.pl-knopf {
+  border: 1px solid var(--line);
+  background: var(--card);
+  color: var(--text-2);
+  font-size: 0.86rem;
+  font-weight: 600;
+  padding: 8px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.pl-knopf:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+@media (max-width: 760px) {
+  .pl-screen {
+    padding: 66px 18px 110px;
+  }
+  .pl-kopf {
+    flex-direction: column;
+  }
+  .pl-kopf-aktion {
+    align-items: flex-start;
+  }
+  .pl-titel {
+    font-size: 1.9rem;
+  }
+}

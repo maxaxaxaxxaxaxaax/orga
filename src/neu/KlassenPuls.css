@@ -1,0 +1,30 @@
+/* Klassen-Puls: ruhige Karte in der rechten Spalte von Heute. Verbandsgefühl,
+   keine Spielerei, kein Vergleich. */
+.kp {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md, 12px);
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.kp-titel {
+  margin: 0 0 4px;
+  font-size: 1rem;
+  font-weight: 700;
+}
+.kp-zeile {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: var(--text-2);
+}
+.kp-zahl {
+  font-weight: 700;
+  color: var(--accent);
+}
+.kp-leise {
+  font-size: 0.82rem;
+  color: var(--muted);
+}
