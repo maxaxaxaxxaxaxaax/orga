@@ -178,7 +178,9 @@ export default function Heute({ onFokus }) {
             <span className="hu-kb-text">
               <span className="hu-kb-haupt">
                 {istStart && !info.bereit && (
-                  <span className="hu-kb-start">Start hier</span>
+                  <span className="hu-kb-start">
+                    {offeneAnzahl >= 2 ? "Start hier" : "Dein Ziel jetzt"}
+                  </span>
                 )}
                 <span className="hu-kb-fach">{k.fach}</span>
                 <span className="hu-kb-titel">{k.titel}</span>
@@ -209,9 +211,7 @@ export default function Heute({ onFokus }) {
                   <span className="hu-kb-meta-item">
                     {info.fertigeSchritte > 0
                       ? `${info.fertigeSchritte} von ${info.schritte} Schritten`
-                      : `${info.schritte} ${
-                          info.schritte === 1 ? "Schritt" : "Schritte"
-                        }`}
+                      : `→ Schritt 1 von ${info.schritte}`}
                   </span>
                 )}
               </span>
@@ -249,12 +249,28 @@ export default function Heute({ onFokus }) {
   const gruss =
     stunde < 11 ? "Guten Morgen" : stunde < 17 ? "Hallo" : "Guten Abend";
 
-  // Heute geplant: Ziele mit mindestens einer Stunde an diesem Tag.
-  const tagKbs = koennensbeweise.filter(
-    (k) =>
-      wochenZuordnung[k.id] === AKTUELLE_WOCHE &&
-      (stundenZuord[k.id] || []).some((sid) => slotTag(sid) === tag)
-  );
+  // Heute geplant: Ziele mit mindestens einer Stunde an diesem Tag, sortiert
+  // nach der fruehesten Stunde des Tages (folgt dem zeitlichen Tagesrhythmus).
+  const minutenAusZeit = (hhmm) => {
+    const [h, m] = (hhmm || "0:0").split(":").map(Number);
+    return h * 60 + (m || 0);
+  };
+  const fruehesteStundeHeute = (k) => {
+    const zeiten = (stundenZuord[k.id] || [])
+      .filter((sid) => slotTag(sid) === tag)
+      .map((sid) => {
+        const s = stundenWoche.find((st) => stundenId(st) === sid);
+        return s ? minutenAusZeit(s.von) : 9999;
+      });
+    return zeiten.length ? Math.min(...zeiten) : 9999;
+  };
+  const tagKbs = koennensbeweise
+    .filter(
+      (k) =>
+        wochenZuordnung[k.id] === AKTUELLE_WOCHE &&
+        (stundenZuord[k.id] || []).some((sid) => slotTag(sid) === tag)
+    )
+    .sort((a, b) => fruehesteStundeHeute(a) - fruehesteStundeHeute(b));
   const tagStunden = stundenWoche.filter((s) => s.tag === tag);
   // Nachzügler: noch offene Ziele, deren geplante Stunden alle in der
   // Vergangenheit liegen (stilles Carry-over, ohne Schuld-Ton, SCHULE.md 2 + 8).
@@ -387,12 +403,7 @@ export default function Heute({ onFokus }) {
           ) : (
             <div className="hu-kbs">
               {tagKbs.map((k) =>
-                karte(
-                  k,
-                  !erledigt[k.id] &&
-                    offeneAnzahl >= 2 &&
-                    ersterOffen?.id === k.id
-                )
+                karte(k, !erledigt[k.id] && ersterOffen?.id === k.id)
               )}
             </div>
           )}

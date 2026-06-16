@@ -153,7 +153,12 @@ export default function App() {
   return (
     <>
       {!speicherOk && (
-        <div className="speicher-warnung" role="status">
+        <div
+          className="speicher-warnung"
+          role="alert"
+          aria-live="assertive"
+          aria-atomic="true"
+        >
           Änderungen werden gerade nicht gespeichert. Prüfe den Browser-Speicher
           (privater Modus?).
         </div>

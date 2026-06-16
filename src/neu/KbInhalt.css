@@ -56,6 +56,10 @@
   height: 9px;
   border-radius: 50%;
   background: var(--line-strong);
+  transition: background 0.25s ease;
+}
+.ki-bereit-text {
+  transition: color 0.25s ease;
 }
 .ki-bereit[data-stand="unterwegs"] .ki-bereit-punkt {
   background: var(--warn-text);

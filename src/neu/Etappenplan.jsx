@@ -376,7 +376,7 @@ export default function Etappenplan({ onWeiter }) {
       </div>
 
       {hinweis && (
-        <div className="ep-hinweis" role="status">
+        <div className="ep-hinweis" role="status" aria-live="polite" aria-atomic="true">
           {hinweis}
         </div>
       )}
