@@ -1,5 +1,10 @@
 import { useState } from "react";
-import { koennensbeweise, kbFarbe, etappeWochen } from "../data/koennensbeweise";
+import {
+  koennensbeweise,
+  kbFarbe,
+  etappeWochen,
+  wochenZielCluster,
+} from "../data/koennensbeweise";
 import { etappen } from "../data/etappen";
 import "./Etappenziele.css";
 
@@ -30,6 +35,20 @@ export default function Etappenziele({
   const gesamt = koennensbeweise.length;
   const fertig = koennensbeweise.filter((k) => erledigt[k.id]).length;
   const pct = gesamt ? Math.round((fertig / gesamt) * 100) : 0;
+
+  // Zeitbudget der Etappe: noch offene Clusterstunden gegen die verbleibende
+  // Kapazitaet (Rest-Wochen x Wochenziel). Ruhige Orientierung, kein Druck.
+  const offeneCluster = koennensbeweise
+    .filter((k) => !erledigt[k.id])
+    .reduce((s, k) => s + k.cluster, 0);
+  const restWochen = Math.max(1, etappeWochen - aktuelleWoche);
+  const kapazitaet = restWochen * wochenZielCluster;
+  const budgetStand =
+    offeneCluster > kapazitaet
+      ? "viel"
+      : offeneCluster > kapazitaet * 0.85
+        ? "knapp"
+        : "ok";
 
   // Meilensteine: kumulative Ziel-Anzahl bis Ende jeder Woche, als % der Gesamtzahl.
   let kum = 0;
@@ -91,6 +110,17 @@ export default function Etappenziele({
         <p className="ez-hinweis">
           Tippe eine Wochen-Marke an, um ihre Ziele zu sehen.
         </p>
+        {offeneCluster > 0 && (
+          <p className="ez-budget" data-stand={budgetStand}>
+            Noch {offeneCluster} Clusterstunden offen ·{" "}
+            {restWochen} {restWochen === 1 ? "Woche" : "Wochen"} Zeit
+            {budgetStand === "viel"
+              ? " · wird knapp, plane bewusst"
+              : budgetStand === "knapp"
+                ? " · gut im Blick behalten"
+                : " · gut in der Zeit"}
+          </p>
+        )}
       </div>
 
       <div className="ez-woche-panel">

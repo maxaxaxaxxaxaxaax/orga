@@ -103,6 +103,19 @@
   font-size: 0.8rem;
   color: var(--muted);
 }
+/* Zeitbudget der Etappe: ruhig gespiegelt, Farbe nur als sanfter Hinweis. */
+.ez-budget {
+  margin: 6px 0 0;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-2);
+}
+.ez-budget[data-stand="knapp"] {
+  color: var(--warn-text);
+}
+.ez-budget[data-stand="viel"] {
+  color: var(--danger-text);
+}
 
 /* Wochen-Panel: was steht in der gewählten Woche an */
 .ez-woche-panel {
