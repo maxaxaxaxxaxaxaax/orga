@@ -362,6 +362,7 @@
   font-weight: 700;
   color: #fff;
   cursor: pointer;
+  transition: border-color 0.15s ease, background 0.2s ease;
 }
 .hu-kb-check:hover {
   border-color: var(--ok-text);
@@ -369,6 +370,23 @@
 .hu-kb.done .hu-kb-check {
   background: var(--ok-text);
   border-color: var(--ok-text);
+}
+/* Kurzer Bounce beim Abhaken: spuerbare Bestaetigung der haeufigsten Aktion. */
+@media (prefers-reduced-motion: no-preference) {
+  .hu-kb.done .hu-kb-check {
+    animation: hu-check-bounce 0.32s cubic-bezier(0.2, 1.5, 0.4, 1);
+  }
+  @keyframes hu-check-bounce {
+    0% {
+      transform: scale(1);
+    }
+    45% {
+      transform: scale(1.18);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
 }
 .hu-kb-open {
   flex: 1;
@@ -479,6 +497,25 @@
   color: var(--accent);
 }
 .hu-kb.done .hu-kb-meta {
+  opacity: 0.6;
+}
+/* Schmaler Schritt-Fortschrittsbalken: Lina erfasst den Stand auf einen Blick. */
+.hu-kb-balken {
+  display: block;
+  height: 3px;
+  margin-top: 7px;
+  border-radius: 999px;
+  background: var(--line);
+  overflow: hidden;
+}
+.hu-kb-balken-fuell {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--c) 55%, var(--ok-text));
+  transition: width 0.35s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.hu-kb.done .hu-kb-balken {
   opacity: 0.6;
 }
 

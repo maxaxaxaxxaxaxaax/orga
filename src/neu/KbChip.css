@@ -3,13 +3,20 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 7px 9px;
+  padding: 8px 10px;
   background: var(--bg);
   border: 1px solid var(--line);
   border-left: 3px solid var(--c);
   border-radius: var(--r-sm, 8px);
   cursor: grab;
   user-select: none;
+}
+/* Touch-Geraete: groessere Tap-Flaeche, damit man den Chip sicher trifft. */
+@media (pointer: coarse) {
+  .kbc {
+    padding: 11px 12px;
+    gap: 10px;
+  }
 }
 .kbc:active {
   cursor: grabbing;

@@ -215,6 +215,17 @@ export default function Heute({ onFokus }) {
                   </span>
                 )}
               </span>
+              {info.schritte > 0 && !info.bereit && info.fertigeSchritte > 0 && (
+                <span className="hu-kb-balken" aria-hidden="true">
+                  <span
+                    className="hu-kb-balken-fuell"
+                    style={{
+                      width:
+                        (info.fertigeSchritte / info.schritte) * 100 + "%",
+                    }}
+                  />
+                </span>
+              )}
             </span>
             <span className="hu-kb-fokus-cue" aria-hidden="true">
               Fokus →

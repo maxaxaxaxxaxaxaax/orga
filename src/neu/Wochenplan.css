@@ -333,50 +333,6 @@
   font-weight: 600;
 }
 
-/* Ohne feste Stunde: auf den Tag gelegt, aber keiner Lern-Stunde zugeordnet. */
-.wp-tag-lose {
-  flex-shrink: 0;
-  margin-top: 8px;
-  padding: 7px 8px;
-  border: 1px dashed var(--line);
-  border-radius: var(--r-sm, 8px);
-  background: var(--bg);
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-.wp-tag-lose-label {
-  font-size: 0.64rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--muted);
-}
-.wp-tag-lose-kbs {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-.wp-tag-lose.ueber {
-  border-style: solid;
-  border-color: var(--accent);
-  background: var(--accent-soft);
-}
-.wp-tag-lose.ueber .wp-slot-leer {
-  color: var(--accent);
-  font-style: normal;
-  font-weight: 600;
-}
-.wp-tag-lose.tippbar {
-  border-style: solid;
-  border-color: color-mix(in srgb, var(--accent) 42%, var(--line));
-  cursor: pointer;
-}
-.wp-tag-lose.tippbar:hover {
-  border-color: var(--accent);
-  background: var(--accent-soft);
-}
-
 @media (max-width: 760px) {
   .wp-screen {
     height: auto;
@@ -386,5 +342,18 @@
   }
   .wp-tage {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+/* Handy: Tage untereinander statt nebeneinander, damit Slots gross genug zum
+   sicheren Treffen bleiben (Tippen-zum-Zuordnen). */
+@media (max-width: 560px) {
+  .wp-tage {
+    grid-template-columns: 1fr;
+  }
+  .wp-slot {
+    padding: 10px 12px;
+  }
+  .wp-slot-kbs {
+    gap: 8px;
   }
 }

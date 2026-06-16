@@ -142,6 +142,15 @@ h1 {
 button:focus:not(:focus-visible) {
   outline: none;
 }
+/* Eingabefelder setzen teils outline:none fuer den Look. Damit Tastatur-Fokus
+   trotzdem sichtbar bleibt, ein Box-Shadow-Ring (wird von outline:none nicht
+   ueberschrieben). Greift nur bei :focus-visible, also nicht bei Maus/Touch. */
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--card), 0 0 0 4px var(--accent);
+}
 
 ::selection {
   background: var(--accent-soft);
