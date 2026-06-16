@@ -20,9 +20,13 @@
   font-variant-numeric: tabular-nums;
   color: var(--muted);
 }
-/* Richtung umkehren: von der anderen Seite abfragen (aktives Abrufen). */
-.kk-richtung {
-  align-self: flex-start;
+/* Werkzeuge: Richtung umkehren (aktives Abrufen) und Mischen. */
+.kk-werkzeuge {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.kk-werkzeug {
   padding: 4px 11px;
   font-size: 0.76rem;
   font-weight: 600;
@@ -36,10 +40,10 @@
     border-color 0.15s ease,
     color 0.15s ease;
 }
-.kk-richtung:hover {
+.kk-werkzeug:hover {
   border-color: var(--line-strong);
 }
-.kk-richtung.aktiv {
+.kk-werkzeug.aktiv {
   background: var(--accent-soft);
   border-color: var(--accent);
   color: var(--accent-strong);

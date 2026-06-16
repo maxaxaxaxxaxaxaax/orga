@@ -59,6 +59,17 @@ export default function Karteikarten({ daten }) {
     setUmgekehrt((u) => !u);
     setGedreht(false);
   }
+  // Reststapel mischen: gegen das Auswendiglernen der Reihenfolge. Der schon
+  // gezählte Fortschritt bleibt, nur die noch offenen Karten werden gemischt.
+  function mischen() {
+    const arr = [...rest];
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    setRest(arr);
+    setGedreht(false);
+  }
 
   return (
     <div className="kk">
@@ -68,15 +79,27 @@ export default function Karteikarten({ daten }) {
           {gekonnt} / {gesamt} gekonnt
         </span>
       </div>
-      <button
-        type="button"
-        className={"kk-richtung" + (umgekehrt ? " aktiv" : "")}
-        onClick={richtungWechseln}
-        aria-pressed={umgekehrt}
-        title="Von der anderen Seite abfragen"
-      >
-        ⇄ Richtung umkehren
-      </button>
+      <div className="kk-werkzeuge">
+        <button
+          type="button"
+          className={"kk-werkzeug" + (umgekehrt ? " aktiv" : "")}
+          onClick={richtungWechseln}
+          aria-pressed={umgekehrt}
+          title="Von der anderen Seite abfragen"
+        >
+          ⇄ Richtung umkehren
+        </button>
+        {rest.length > 1 && (
+          <button
+            type="button"
+            className="kk-werkzeug"
+            onClick={mischen}
+            title="Reihenfolge der offenen Karten mischen"
+          >
+            ⤮ Mischen
+          </button>
+        )}
+      </div>
       <div className="kk-balken" aria-hidden="true">
         <div
           className="kk-balken-fuell"
