@@ -10,6 +10,7 @@ export default function Karteikarten({ daten }) {
   const [rest, setRest] = useState(karten);
   const [gedreht, setGedreht] = useState(false);
   const [gekonnt, setGekonnt] = useState(0);
+  const [wiederholt, setWiederholt] = useState(0); // wie oft "Nochmal" gedrueckt
 
   const gesamt = karten.length;
   if (gesamt === 0) return <p className="kk-leer">Keine Karten vorhanden.</p>;
@@ -19,10 +20,16 @@ export default function Karteikarten({ daten }) {
       <div className="kk">
         <Fertig
           text={`Alle ${gesamt} Karten geschafft.`}
+          bilanz={
+            wiederholt === 0
+              ? "Alles direkt gekonnt. Stark."
+              : `${wiederholt}-mal wiederholt: die merkst du dir beim nächsten Mal.`
+          }
           nochmalLabel="Nochmal von vorn"
           onNochmal={() => {
             setRest(karten);
             setGekonnt(0);
+            setWiederholt(0);
             setGedreht(false);
           }}
         />
@@ -38,6 +45,7 @@ export default function Karteikarten({ daten }) {
   }
   function nochmal() {
     setRest([...rest.slice(1), karte]);
+    setWiederholt((w) => w + 1);
     setGedreht(false);
   }
 

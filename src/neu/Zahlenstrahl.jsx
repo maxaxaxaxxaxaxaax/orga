@@ -24,7 +24,8 @@ export default function Zahlenstrahl({ daten }) {
     return (
       <div className="zs">
         <Fertig
-          text={`${richtig} von ${aufgaben.length} auf Anhieb getroffen.`}
+          text="Zahlenstrahl geschafft."
+          bilanz={`${richtig} von ${aufgaben.length} auf Anhieb getroffen.`}
           nochmalLabel="Nochmal üben"
           onNochmal={() => {
             setI(0);
