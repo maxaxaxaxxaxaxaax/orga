@@ -124,6 +124,33 @@ export default function KbInhalt({ kb, kompakt = false }) {
       </section>
     ) : null;
 
+  // Bereitschafts-Anzeige (SCHULE.md Cluster 4): spiegelt den eigenen Stand,
+  // ohne zu draengen. Der Schueler entscheidet selbst, wann er sich sicher
+  // fuehlt und sich zur Abnahme meldet. Nur bei vorhandenem Lernweg.
+  const gesamtSchritte = thema?.schritte?.length || 0;
+  const bereit = gesamtSchritte > 0 && fertigeSchritte === gesamtSchritte;
+  const stand = bereit
+    ? "voll"
+    : fertigeSchritte === 0
+      ? "start"
+      : "unterwegs";
+  const bereitBlock =
+    gesamtSchritte > 0 ? (
+      <section className="ki-block ki-bereit" key="bereit" data-stand={stand}>
+        <h4 className="ki-block-titel">
+          <span className="ki-bereit-punkt" aria-hidden="true" />
+          Bereit für die Abnahme?
+        </h4>
+        <p className="ki-bereit-text">
+          {bereit
+            ? "Alle Schritte sind durch. Wenn du dich sicher fühlst, melde dich bei der Lehrkraft zur Abnahme."
+            : fertigeSchritte === 0
+              ? "Starte mit dem ersten Schritt deines Lernwegs."
+              : `Du bist unterwegs: ${fertigeSchritte} von ${gesamtSchritte} Schritten. Mach weiter, bis du dich sicher fühlst.`}
+        </p>
+      </section>
+    ) : null;
+
   const materialBlock = (
     <section className="ki-block" key="material">
       <h4 className="ki-block-titel">Materialien</h4>
@@ -187,8 +214,8 @@ export default function KbInhalt({ kb, kompakt = false }) {
         {gelerntMin >= 1 && <span>bisher {formatMin(gelerntMin)} gelernt</span>}
       </p>
       {kompakt
-        ? [materialBlock, schritteBlock, uebenBlock]
-        : [uebenBlock, schritteBlock, materialBlock]}
+        ? [materialBlock, schritteBlock, uebenBlock, bereitBlock]
+        : [uebenBlock, schritteBlock, materialBlock, bereitBlock]}
       <CoachBruecke kb={kb} />
       {offenesMaterial && (
         <MaterialAnsicht

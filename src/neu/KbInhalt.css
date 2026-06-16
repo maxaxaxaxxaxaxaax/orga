@@ -47,6 +47,31 @@
   letter-spacing: 0;
   color: var(--muted);
 }
+
+/* Bereitschafts-Anzeige: ruhiger Ampel-Punkt + Verdikt, spiegelt den Stand. */
+.ki-bereit-punkt {
+  align-self: center;
+  flex-shrink: 0;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--line-strong);
+}
+.ki-bereit[data-stand="unterwegs"] .ki-bereit-punkt {
+  background: var(--warn-text);
+}
+.ki-bereit[data-stand="voll"] .ki-bereit-punkt {
+  background: var(--ok-text);
+}
+.ki-bereit-text {
+  margin: 0;
+  font-size: 0.86rem;
+  line-height: 1.45;
+  color: var(--text-2);
+}
+.ki-bereit[data-stand="voll"] .ki-bereit-text {
+  color: var(--ok-text);
+}
 /* Kompakt-Modus: Übung startet erst auf Knopfdruck. */
 .ki-ueben-start {
   border: none;
