@@ -103,6 +103,10 @@ export default function Lueckentext({ daten }) {
         {satz.nach}
       </p>
 
+      {!geprueft && eingabe.trim() && (
+        <p className="lt-enter-hinweis">Drücke Enter, um zu prüfen.</p>
+      )}
+
       {satz.tipp && !geprueft && <p className="lt-tipp">Tipp: {satz.tipp}</p>}
 
       {geprueft && (

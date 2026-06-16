@@ -77,6 +77,13 @@
   font-size: 0.82rem;
   color: var(--text-2);
 }
+/* Mobiler Helfer: zeigt den Enter-Shortcut, falls die Tastatur den Knopf verdeckt. */
+.lt-enter-hinweis {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--accent);
+  font-weight: 600;
+}
 
 .lt-feedback {
   padding: 10px 12px;
