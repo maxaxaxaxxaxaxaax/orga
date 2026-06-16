@@ -264,6 +264,11 @@
   font-size: 0.8rem;
   color: var(--muted);
 }
+/* Voller Morgen: nur ein sachlicher Hinweis (kein Alarm), etwas wärmer getönt. */
+.hu-morgen.voll {
+  color: var(--warn-text);
+  font-weight: 600;
+}
 /* Stilles Carry-over: ruhig abgesetzt, kein Schuld-Ton, nur ein leiser Hinweis. */
 .hu-nachzuegler {
   margin-top: 16px;

@@ -303,6 +303,20 @@ export default function Heute({ onFokus }) {
             (stundenZuord[k.id] || []).some((sid) => slotTag(sid) === tag + 1)
         ).length
       : 0;
+  // Wie viele Uhren sind für morgen schon verplant? Nur Fakt, kein Vorwurf:
+  // ein voller Tag früh sehen, damit man heute noch umplanen kann (ohne Druck).
+  const morgenUhren =
+    tag < 4
+      ? koennensbeweise.reduce((sum, k) => {
+          if (wochenZuordnung[k.id] !== AKTUELLE_WOCHE) return sum;
+          return (
+            sum +
+            (stundenZuord[k.id] || []).filter((sid) => slotTag(sid) === tag + 1)
+              .length
+          );
+        }, 0)
+      : 0;
+  const morgenVoll = morgenUhren >= 5;
 
   // Tag geschafft: ruhiger grüner Abschluss als kleine Belohnung, bevor der Tag
   // wieder zur Liste wird.
@@ -408,9 +422,12 @@ export default function Heute({ onFokus }) {
             </div>
           )}
           {morgenAnzahl > 0 && (
-            <p className="hu-morgen">
+            <p className={"hu-morgen" + (morgenVoll ? " voll" : "")}>
               Morgen geplant: {morgenAnzahl}{" "}
               {morgenAnzahl === 1 ? "Ziel" : "Ziele"}
+              {morgenUhren > 0 &&
+                `, ${morgenUhren} ${morgenUhren === 1 ? "Uhr" : "Uhren"}`}
+              {morgenVoll && " · ziemlich voll"}
             </p>
           )}
 
