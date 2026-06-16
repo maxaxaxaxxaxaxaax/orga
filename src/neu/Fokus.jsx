@@ -3,6 +3,7 @@ import { lernwegFuerKb } from "../data/wissen";
 import { ART_LABEL } from "./material";
 import { eigeneFuerThema, speichereEigenes } from "./eigeneMaterialien";
 import { ladeSchritte, speichereSchritte } from "./lernschritte";
+import { addSekunden } from "./zeitmessung";
 import { generatorFuerKb } from "./uebungen";
 import {
   COACH,
@@ -40,6 +41,13 @@ export default function Fokus({ kb, naechste, onFertig, onClose }) {
   const [parkOffen, setParkOffen] = useState(false);
   const [parkEntwurf, setParkEntwurf] = useState("");
   const [parkAnzahl, setParkAnzahl] = useState(() => ladeNotizen().length);
+
+  // Lernzeit im Fokus messen (die Hauptarbeitsumgebung): beim Schliessen die
+  // verstrichene Zeit aufs Ziel buchen. Speist die realistische Zeitschaetzung.
+  useEffect(() => {
+    const start = Date.now();
+    return () => addSekunden(kb.id, (Date.now() - start) / 1000);
+  }, [kb.id]);
 
   // Esc schließt verschachtelt: erst ein offenes Panel (Hilfe/Parken), sonst den
   // Fokus. Liegt eine Material-Ansicht oben, kümmert sie sich selbst um Esc.

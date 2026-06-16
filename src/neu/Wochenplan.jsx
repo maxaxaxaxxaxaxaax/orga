@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { koennensbeweise } from "../data/koennensbeweise";
+import { koennensbeweise, wochenZielCluster } from "../data/koennensbeweise";
 import {
   stundenWoche,
   fachFarbe,
@@ -91,6 +91,15 @@ export default function Wochenplan({ onZurueck, onWeiter, woche = 0 }) {
   const restVon = (k) => k.cluster - (stunden[k.id]?.length || 0);
   const vorrat = wocheKbs.filter((k) => restVon(k) > 0);
   const wocheFertig = wocheKbs.length > 0 && vorrat.length === 0;
+  // Gesamte Uhren-Last dieser Woche (aus dem Etappenplan) im Vergleich zum
+  // Wochenziel: macht eine Ueberplanung sichtbar, ohne zu bevormunden.
+  const wochenLast = wocheKbs.reduce((s, k) => s + k.cluster, 0);
+  const lastStand =
+    wochenLast > wochenZielCluster + 4
+      ? "viel"
+      : wochenLast > wochenZielCluster
+        ? "knapp"
+        : "ok";
   const montag = wochenStart(ETAPPE, woche);
 
   const proTag = TAGE.map((name, i) => {
@@ -195,7 +204,7 @@ export default function Wochenplan({ onZurueck, onWeiter, woche = 0 }) {
     setStunden({});
     setGewaehltId(null);
     setResetConfirm(false);
-    setHinweis("Stunden zurückgesetzt. Verteile die Uhren neu.");
+    setHinweis("Stunden zurückgesetzt. Dein Lernstand bleibt erhalten.");
   }
 
   // KB-Chip einer einzelnen Uhr in einer Stunde (zurücklegbar per Tippen/Ziehen).
@@ -226,6 +235,11 @@ export default function Wochenplan({ onZurueck, onWeiter, woche = 0 }) {
           </p>
         </div>
         <div className="wp-kopf-aktion">
+          {wochenLast > 0 && (
+            <span className="wp-wochenlast" data-stand={lastStand}>
+              {wochenLast} Uhren diese Woche · Ziel {wochenZielCluster}
+            </span>
+          )}
           <span className={"wp-fortschritt" + (wocheFertig ? " fertig" : "")}>
             {wocheFertig ? "Alle Uhren verteilt ✓" : `noch ${vorrat.length} offen`}
           </span>

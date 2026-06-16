@@ -110,6 +110,14 @@
   border-radius: var(--r-sm, 8px);
   outline: none;
 }
+/* Touch-Geraete: groessere Tipp-Ziele in den Feldern. */
+@media (pointer: coarse) {
+  .mu-feld input,
+  .mu-feld select {
+    padding: 12px 14px;
+    font-size: 1rem;
+  }
+}
 .mu-feld input:focus,
 .mu-feld select:focus {
   border-color: var(--accent);

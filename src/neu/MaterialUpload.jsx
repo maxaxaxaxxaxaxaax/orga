@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { faecher } from "../data/wissen";
 import "./MaterialUpload.css";
 
@@ -66,6 +66,15 @@ export default function MaterialUpload({
   const [bereich, setBereich] = useState("selbstlernen");
 
   const fach = faecher.find((f) => f.id === fachId) || faecher[0];
+
+  // Esc schliesst das Modal, wie bei den anderen Overlays.
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
 
   function waehleDatei(e) {
     const f = e.target.files?.[0];
