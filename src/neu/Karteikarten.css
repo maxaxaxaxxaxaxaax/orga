@@ -20,6 +20,30 @@
   font-variant-numeric: tabular-nums;
   color: var(--muted);
 }
+/* Richtung umkehren: von der anderen Seite abfragen (aktives Abrufen). */
+.kk-richtung {
+  align-self: flex-start;
+  padding: 4px 11px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--text-2);
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+.kk-richtung:hover {
+  border-color: var(--line-strong);
+}
+.kk-richtung.aktiv {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent-strong);
+}
 .kk-balken {
   height: 4px;
   background: var(--line);

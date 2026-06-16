@@ -4,11 +4,14 @@ import "./Karteikarten.css";
 
 // Vokabel-Karteikarten: Vorderseite zeigt das Wort, Tippen dreht zur Lösung.
 // "Kann ich" legt die Karte weg, "Nochmal" hängt sie hinten an. Fertig, wenn
-// der Stapel leer ist. Reiner Übungsmodus, kein Tracking nach außen.
+// der Stapel leer ist. Mit "Richtung umkehren" fragt man von der Rückseite ab
+// (z.B. Deutsch -> Latein, das aktive Abrufen ist schwerer und lehrreicher).
+// Reiner Übungsmodus, kein Tracking nach außen.
 export default function Karteikarten({ daten }) {
   const karten = daten?.karten || [];
   const [rest, setRest] = useState(karten);
   const [gedreht, setGedreht] = useState(false);
+  const [umgekehrt, setUmgekehrt] = useState(false); // Rückseite als Frage
   const [gekonnt, setGekonnt] = useState(0);
   const [wiederholt, setWiederholt] = useState(0); // wie oft "Nochmal" gedrueckt
 
@@ -38,6 +41,9 @@ export default function Karteikarten({ daten }) {
   }
 
   const karte = rest[0];
+  // Welche Seite ist gerade die Frage (oben) und welche die Lösung.
+  const vorderseite = umgekehrt ? karte.hinten : karte.vorne;
+  const rueckseite = umgekehrt ? karte.vorne : karte.hinten;
   function kannIch() {
     setRest(rest.slice(1));
     setGekonnt((g) => g + 1);
@@ -46,6 +52,11 @@ export default function Karteikarten({ daten }) {
   function nochmal() {
     setRest([...rest.slice(1), karte]);
     setWiederholt((w) => w + 1);
+    setGedreht(false);
+  }
+  // Richtung wechseln: laufende Karte wieder auf die Frageseite drehen.
+  function richtungWechseln() {
+    setUmgekehrt((u) => !u);
     setGedreht(false);
   }
 
@@ -57,6 +68,15 @@ export default function Karteikarten({ daten }) {
           {gekonnt} / {gesamt} gekonnt
         </span>
       </div>
+      <button
+        type="button"
+        className={"kk-richtung" + (umgekehrt ? " aktiv" : "")}
+        onClick={richtungWechseln}
+        aria-pressed={umgekehrt}
+        title="Von der anderen Seite abfragen"
+      >
+        ⇄ Richtung umkehren
+      </button>
       <div className="kk-balken" aria-hidden="true">
         <div
           className="kk-balken-fuell"
@@ -71,8 +91,8 @@ export default function Karteikarten({ daten }) {
         aria-label={gedreht ? "Karte zurückdrehen" : "Karte umdrehen"}
       >
         <span className={"kk-karte-inner" + (gedreht ? " gedreht" : "")}>
-          <span className="kk-face kk-vorne">{karte.vorne}</span>
-          <span className="kk-face kk-hinten">{karte.hinten}</span>
+          <span className="kk-face kk-vorne">{vorderseite}</span>
+          <span className="kk-face kk-hinten">{rueckseite}</span>
         </span>
       </button>
       <p className="kk-tipp">{gedreht ? "Wusstest du es?" : "Tippen zum Umdrehen"}</p>
