@@ -9,12 +9,27 @@ import "./Auswahlquiz.css";
 // ruhiges Ergebnis mit "nochmal". Selbsttest mit fester Lösung im Material,
 // kein Antwort-Generator (anders als das generatorbasierte Quiz beim Üben).
 
+// Mischt die Optionen einer Frage, ohne die Lösung zu verraten: liefert eine
+// Permutation der Original-Indizes, die Richtig-Markierung bleibt über den
+// Original-Index erhalten. Verhindert, dass man die Position statt des Inhalts lernt.
+function mischeIndizes(n) {
+  const a = Array.from({ length: n }, (_, i) => i);
+  for (let i = n - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
 export default function Auswahlquiz({ daten }) {
   const fragen = (daten && daten.fragen) || [];
   const [index, setIndex] = useState(0);
-  const [gewaehlt, setGewaehlt] = useState(null); // gewählter Options-Index
+  const [gewaehlt, setGewaehlt] = useState(null); // gewählter Options-Index (Original)
   const [punkte, setPunkte] = useState(0);
   const [fertig, setFertig] = useState(false);
+  const [reihenfolgen, setReihenfolgen] = useState(() =>
+    fragen.map((f) => mischeIndizes((f.optionen || []).length))
+  );
 
   if (fragen.length === 0)
     return <p className="aq-leer">Für dieses Quiz gibt es noch keine Fragen.</p>;
@@ -39,6 +54,8 @@ export default function Auswahlquiz({ daten }) {
     setGewaehlt(null);
     setPunkte(0);
     setFertig(false);
+    // Neu mischen, damit die zweite Runde nicht identisch ist.
+    setReihenfolgen(fragen.map((f) => mischeIndizes((f.optionen || []).length)));
   }
 
   if (fertig) {
@@ -73,7 +90,9 @@ export default function Auswahlquiz({ daten }) {
       <p className="aq-frage">{frage.frage}</p>
 
       <div className="aq-optionen">
-        {frage.optionen.map((opt, i) => {
+        {(reihenfolgen[index] || frage.optionen.map((_, i) => i)).map((i) => {
+          // i ist der Original-Index der Option (Reihenfolge gemischt).
+          const opt = frage.optionen[i];
           // Option ist entweder ein String oder { text, erklaerung }.
           const text = typeof opt === "string" ? opt : opt.text;
           const erkl = typeof opt === "string" ? null : opt.erklaerung;
