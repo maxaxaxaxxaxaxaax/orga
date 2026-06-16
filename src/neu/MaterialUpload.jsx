@@ -52,11 +52,16 @@ function erkenneZuordnung(dateiname) {
   return null;
 }
 
-export default function MaterialUpload({ startFachId, onSpeichern, onClose }) {
+export default function MaterialUpload({
+  startFachId,
+  startThema = "",
+  onSpeichern,
+  onClose,
+}) {
   const [datei, setDatei] = useState(null);
   const [erkannt, setErkannt] = useState(false);
   const [fachId, setFachId] = useState(startFachId || faecher[0]?.id);
-  const [thema, setThema] = useState("");
+  const [thema, setThema] = useState(startThema);
   const [titel, setTitel] = useState("");
   const [bereich, setBereich] = useState("selbstlernen");
 

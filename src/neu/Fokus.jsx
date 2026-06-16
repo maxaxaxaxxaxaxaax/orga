@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { lernwegFuerKb } from "../data/wissen";
 import { ART_LABEL } from "./material";
-import { eigeneFuerThema } from "./eigeneMaterialien";
+import { eigeneFuerThema, speichereEigenes } from "./eigeneMaterialien";
 import { ladeSchritte, speichereSchritte } from "./lernschritte";
 import { generatorFuerKb } from "./uebungen";
 import {
@@ -14,6 +14,7 @@ import {
 } from "./coach";
 import Quiz from "./Quiz";
 import MaterialAnsicht from "./MaterialAnsicht";
+import MaterialUpload from "./MaterialUpload";
 import { addNotiz, ladeNotizen } from "./notizen";
 import { istOeffenbar, aktivitaetLabel } from "./interaktiv";
 import "./Fokus.css";
@@ -28,6 +29,7 @@ export default function Fokus({ kb, naechste, onFertig, onClose }) {
   const schritte = thema?.schritte || [];
   const [stand, setStand] = useState(() => ladeSchritte(kb.id));
   const [material, setMaterial] = useState(null);
+  const [uploadOffen, setUploadOffen] = useState(false);
   const [uebenOffen, setUebenOffen] = useState(false);
   const [hilfe, setHilfe] = useState(() => !!ladeHilferufe()[kb.id]);
   const [frage, setFrage] = useState(() => ladeFragen()[kb.id] || "");
@@ -176,9 +178,22 @@ export default function Fokus({ kb, naechste, onFertig, onClose }) {
           </p>
           <h1 className="fokus-titel">{schritte[aktuell].text}</h1>
 
-          {materialien.length > 0 && (
-            <div className="fokus-block">
+          <div className="fokus-block">
+            <div className="fokus-label-zeile">
               <span className="fokus-label">Material dazu</span>
+              <button
+                type="button"
+                className="fokus-mat-add"
+                onClick={() => setUploadOffen(true)}
+              >
+                + anhängen
+              </button>
+            </div>
+            {materialien.length === 0 ? (
+              <p className="fokus-mat-leer">
+                Noch nichts angehängt. Häng ein Foto, PDF oder eine Notiz an.
+              </p>
+            ) : (
               <div className="fokus-mats">
                 {materialien.map((m) => {
                   const aktivitaet = aktivitaetLabel(m);
@@ -216,8 +231,8 @@ export default function Fokus({ kb, naechste, onFertig, onClose }) {
                   );
                 })}
               </div>
-            </div>
-          )}
+            )}
+          </div>
 
           {genKey &&
             (uebenOffen ? (
@@ -359,6 +374,17 @@ export default function Fokus({ kb, naechste, onFertig, onClose }) {
 
       {material && (
         <MaterialAnsicht material={material} onClose={() => setMaterial(null)} />
+      )}
+      {uploadOffen && (
+        <MaterialUpload
+          startFachId={lw?.fachId}
+          startThema={thema?.label || ""}
+          onSpeichern={(m) => {
+            speichereEigenes(m);
+            setUploadOffen(false);
+          }}
+          onClose={() => setUploadOffen(false)}
+        />
       )}
     </div>
   );

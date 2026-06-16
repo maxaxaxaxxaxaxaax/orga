@@ -121,6 +121,34 @@
   letter-spacing: 0.05em;
   color: var(--muted);
 }
+/* Kopfzeile des Material-Blocks: Label links, "anhaengen" rechts. */
+.fokus-label-zeile {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.fokus-mat-add {
+  flex-shrink: 0;
+  border: 1px solid var(--line-strong);
+  background: var(--card);
+  color: var(--text-2);
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: border-color 0.12s ease, color 0.12s ease;
+}
+.fokus-mat-add:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.fokus-mat-leer {
+  margin: 0;
+  font-size: 0.84rem;
+  color: var(--muted);
+}
 .fokus-mats {
   display: flex;
   flex-direction: column;
