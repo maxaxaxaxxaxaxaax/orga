@@ -83,3 +83,73 @@
 .cb-zurueck:hover {
   opacity: 1;
 }
+
+/* Frage fuer den Lerncoach merken: leise, optional, wartet bis zum Termin. */
+.cb-frage-feld {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.cb-frage-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-2);
+}
+.cb-frage-input {
+  width: 100%;
+  box-sizing: border-box;
+  resize: vertical;
+  min-height: 38px;
+  padding: 8px 10px;
+  font: inherit;
+  font-size: 0.86rem;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-sm, 8px);
+}
+.cb-frage-input::placeholder {
+  color: var(--muted);
+}
+.cb-frage-aktionen {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.cb-frage-save {
+  border: 1px solid var(--line-strong);
+  background: var(--card);
+  color: var(--text);
+  font-size: 0.84rem;
+  font-weight: 600;
+  padding: 7px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: border-color 0.12s ease, color 0.12s ease;
+}
+.cb-frage-save:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.cb-frage-save:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.cb-frage-weg {
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.82rem;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+}
+.cb-frage-weg:hover {
+  color: var(--text);
+}
+.cb-frage-gemerkt {
+  font-size: 0.8rem;
+  color: var(--ok-text);
+  font-weight: 600;
+}

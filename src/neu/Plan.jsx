@@ -8,6 +8,7 @@ import {
   meldeAenderung,
 } from "./planung";
 import Etappenziele from "./Etappenziele";
+import CoachFragen from "./CoachFragen";
 import Begriff from "./Begriff";
 import "./Plan.css";
 
@@ -80,6 +81,8 @@ export default function Plan({ onWochePlanen, onEtappeAnpassen }) {
         wochenZuordnung={wochenZuordnung}
         aktuelleWoche={AKTUELLE_WOCHE}
       />
+
+      <CoachFragen />
     </div>
   );
 }

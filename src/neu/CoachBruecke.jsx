@@ -19,24 +19,32 @@ export default function CoachBruecke({ kb }) {
   const [hilfe, setHilfe] = useState(() => !!ladeHilferufe()[kb.id]);
   const [abnahme, setAbnahme] = useState(() => !!ladeAbnahmen()[kb.id]);
   const [frage, setFrage] = useState(() => ladeFragen()[kb.id] || "");
+  const [frageEntwurf, setFrageEntwurf] = useState(() => ladeFragen()[kb.id] || "");
   const erbracht = !!lade(ERLEDIGT_KEY)[kb.id];
 
   // Erbracht: kein Hilfe-/Abnahme-Bedarf mehr, ruhig nichts zeigen.
   if (erbracht) return null;
 
   function toggleHilfe() {
+    // Hilferuf und notierte Frage sind entkoppelt: eine Frage bleibt erhalten,
+    // auch wenn der Hilferuf zurueckgenommen wird (sie wartet bis zum Termin).
     const an = !hilfe;
     setzeHilferuf(kb.id, an);
     setHilfe(an);
-    // Hilferuf zurückgenommen: die notierte Frage gleich mit aufräumen.
-    if (!an) {
-      setzeFrage(kb.id, "");
-      setFrage("");
-    }
   }
   function toggleAbnahme() {
     setzeAbnahme(kb.id, !abnahme);
     setAbnahme((a) => !a);
+  }
+  function frageMerken() {
+    const t = frageEntwurf.trim();
+    setzeFrage(kb.id, t);
+    setFrage(t);
+  }
+  function frageEntfernen() {
+    setzeFrage(kb.id, "");
+    setFrage("");
+    setFrageEntwurf("");
   }
 
   return (
@@ -75,6 +83,42 @@ export default function CoachBruecke({ kb }) {
             Zur Abnahme anmelden
           </button>
         )}
+      </div>
+
+      <div className="cb-frage-feld">
+        <label className="cb-frage-label" htmlFor={"cb-frage-" + kb.id}>
+          Frage für {COACH} merken
+        </label>
+        <textarea
+          id={"cb-frage-" + kb.id}
+          className="cb-frage-input"
+          value={frageEntwurf}
+          onChange={(e) => setFrageEntwurf(e.target.value)}
+          rows={2}
+          placeholder="z. B. Warum steht hier der ACI?"
+        />
+        <div className="cb-frage-aktionen">
+          <button
+            type="button"
+            className="cb-frage-save"
+            onClick={frageMerken}
+            disabled={frageEntwurf.trim() === frage}
+          >
+            {frage ? "Aktualisieren" : "Merken"}
+          </button>
+          {frage && (
+            <button
+              type="button"
+              className="cb-frage-weg"
+              onClick={frageEntfernen}
+            >
+              entfernen
+            </button>
+          )}
+          {frage && frageEntwurf.trim() === frage && (
+            <span className="cb-frage-gemerkt">für {COACH} notiert ✓</span>
+          )}
+        </div>
       </div>
     </section>
   );

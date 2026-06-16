@@ -85,10 +85,9 @@ export default function Fokus({ kb, naechste, onFertig, onClose }) {
     setHilfeOffen(false);
   }
   function hilfeZuruecknehmen() {
+    // Nur den Hilferuf zuruecknehmen: die notierte Frage bleibt erhalten und
+    // wartet in der Sammlung bis zum Tutorentermin (entkoppelt).
     setzeHilferuf(kb.id, false);
-    setzeFrage(kb.id, "");
-    setFrage("");
-    setEntwurf("");
     setHilfe(false);
     setHilfeOffen(false);
   }
