@@ -258,11 +258,16 @@ export default function Heute({ onFokus }) {
   const tagStunden = stundenWoche.filter((s) => s.tag === tag);
   // Nachzügler: noch offene Ziele, deren geplante Stunden alle in der
   // Vergangenheit liegen (stilles Carry-over, ohne Schuld-Ton, SCHULE.md 2 + 8).
-  const nachzueglerList = koennensbeweise.filter((k) => {
-    if (wochenZuordnung[k.id] !== AKTUELLE_WOCHE || erledigt[k.id]) return false;
-    const sids = stundenZuord[k.id] || [];
-    return sids.length > 0 && sids.every((sid) => slotTag(sid) < tag);
-  });
+  const fruehesterTag = (k) =>
+    Math.min(...(stundenZuord[k.id] || []).map(slotTag));
+  const nachzueglerList = koennensbeweise
+    .filter((k) => {
+      if (wochenZuordnung[k.id] !== AKTUELLE_WOCHE || erledigt[k.id]) return false;
+      const sids = stundenZuord[k.id] || [];
+      return sids.length > 0 && sids.every((sid) => slotTag(sid) < tag);
+    })
+    // Aelteste zuerst: was am laengsten liegt, gehoert zuerst wieder angepackt.
+    .sort((a, b) => fruehesterTag(a) - fruehesterTag(b));
   // "Alles geschafft" nur, wenn der Tag wirklich leer ist: die heutigen Ziele
   // erledigt UND kein Nachzügler mehr offen.
   const allesGeschafft =
@@ -306,13 +311,24 @@ export default function Heute({ onFokus }) {
                 } auf dich.`
               : "Genieß deinen Feierabend."}
           </p>
-          <button
-            type="button"
-            className="hu-fertig-ansehen"
-            onClick={() => setTagAnsehen(true)}
-          >
-            Tag ansehen
-          </button>
+          <div className="hu-fertig-aktionen">
+            {tag < 4 && (
+              <button
+                type="button"
+                className="hu-fertig-weiter"
+                onClick={() => springeZuTag(tag + 1)}
+              >
+                Nächster Tag →
+              </button>
+            )}
+            <button
+              type="button"
+              className="hu-fertig-ansehen"
+              onClick={() => setTagAnsehen(true)}
+            >
+              Tag ansehen
+            </button>
+          </div>
         </div>
       </div>
     );

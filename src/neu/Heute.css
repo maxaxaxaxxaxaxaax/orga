@@ -98,8 +98,34 @@
   font-size: 0.9rem;
   color: var(--muted);
 }
-.hu-fertig-ansehen {
+/* Abschluss-Aktionen: Kontinuitaet (naechster Tag) plus ruhiges "Tag ansehen". */
+.hu-fertig-aktionen {
   margin-top: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.hu-fertig-weiter {
+  border: none;
+  background: var(--ok-text);
+  color: var(--on-accent);
+  font-size: 0.92rem;
+  font-weight: 700;
+  padding: 11px 22px;
+  border-radius: 999px;
+  cursor: pointer;
+  box-shadow: var(--shadow-md);
+  transition: transform 0.12s ease, filter 0.12s ease;
+}
+.hu-fertig-weiter:hover {
+  filter: brightness(1.06);
+}
+.hu-fertig-weiter:active {
+  transform: scale(0.97);
+}
+.hu-fertig-ansehen {
   border: 1px solid var(--line-strong);
   background: color-mix(in srgb, var(--card) 75%, transparent);
   color: var(--text);
