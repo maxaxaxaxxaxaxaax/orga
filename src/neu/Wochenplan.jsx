@@ -69,11 +69,20 @@ export default function Wochenplan({ onZurueck, onWeiter, woche = 0 }) {
   const [stunden, setStunden] = useState(ladeStunden); // kbId -> [Slot-IDs]
   const [ueber, setUeber] = useState(null); // aktuelles Drop-Ziel (Hover)
   const [gewaehltId, setGewaehltId] = useState(null); // angetippter Chip (Touch)
+  const [hinweis, setHinweis] = useState(null); // kurze Rueckmeldung (Toast)
+  const [resetConfirm, setResetConfirm] = useState(false); // Reset-Sicherheitsfrage
 
   useEffect(() => {
     localStorage.setItem(STUNDEN_KEY, JSON.stringify(stunden));
     meldeAenderung();
   }, [stunden]);
+
+  // Toast nach kurzer Zeit wieder ausblenden.
+  useEffect(() => {
+    if (!hinweis) return undefined;
+    const t = setTimeout(() => setHinweis(null), 2600);
+    return () => clearTimeout(t);
+  }, [hinweis]);
 
   const wocheKbs = koennensbeweise.filter(
     (k) => wochenZuordnung[k.id] === woche
@@ -177,6 +186,16 @@ export default function Wochenplan({ onZurueck, onWeiter, woche = 0 }) {
       }
       return next;
     });
+    setHinweis("Ausgewogen auf die Stunden verteilt. Du kannst frei anpassen.");
+  }
+
+  // Stunden-Zuordnung verwerfen: alle Uhren zurueck in den Vorrat. Lernstand und
+  // Wochen-Zuordnung bleiben unangetastet.
+  function planZuruecksetzen() {
+    setStunden({});
+    setGewaehltId(null);
+    setResetConfirm(false);
+    setHinweis("Stunden zurückgesetzt. Verteile die Uhren neu.");
   }
 
   // KB-Chip einer einzelnen Uhr in einer Stunde (zurücklegbar per Tippen/Ziehen).
@@ -214,6 +233,35 @@ export default function Wochenplan({ onZurueck, onWeiter, woche = 0 }) {
             <button type="button" className="wp-zurueck" onClick={onZurueck}>
               ← Etappenplan
             </button>
+            {resetConfirm ? (
+              <span className="ep-reset-confirm" role="group">
+                <span className="ep-reset-frage">Stunden neu?</span>
+                <button
+                  type="button"
+                  className="ep-reset-ja"
+                  onClick={planZuruecksetzen}
+                >
+                  Ja, neu
+                </button>
+                <button
+                  type="button"
+                  className="ep-reset-nein"
+                  onClick={() => setResetConfirm(false)}
+                >
+                  Abbrechen
+                </button>
+              </span>
+            ) : (
+              <button
+                type="button"
+                className="ep-reset"
+                onClick={() => setResetConfirm(true)}
+                disabled={Object.keys(stunden).length === 0}
+                title="Alle Stunden-Zuordnungen löschen und neu verteilen (dein Lernstand bleibt)"
+              >
+                Zurücksetzen
+              </button>
+            )}
             <button
               type="button"
               className="wp-vorschlag"
@@ -360,6 +408,12 @@ export default function Wochenplan({ onZurueck, onWeiter, woche = 0 }) {
           </section>
         ))}
       </div>
+
+      {hinweis && (
+        <div className="ep-hinweis" role="status">
+          {hinweis}
+        </div>
+      )}
     </div>
   );
 }

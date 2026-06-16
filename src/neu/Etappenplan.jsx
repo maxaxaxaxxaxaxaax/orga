@@ -67,11 +67,20 @@ export default function Etappenplan({ onWeiter }) {
   const [ueber, setUeber] = useState(null); // Drop-Ziel beim Ziehen ("w0".."w5" | "pool")
   const [gezogenId, setGezogenId] = useState(null); // welcher KB wird gerade gezogen
   const [gewaehltId, setGewaehltId] = useState(null); // angetippter Vorrat-Chip (Touch)
+  const [hinweis, setHinweis] = useState(null); // kurze Rueckmeldung (Toast)
+  const [resetConfirm, setResetConfirm] = useState(false); // Reset-Sicherheitsfrage
 
   useEffect(() => {
     localStorage.setItem(SPEICHER, JSON.stringify(zuordnung));
     meldeAenderung();
   }, [zuordnung]);
+
+  // Toast nach kurzer Zeit wieder ausblenden.
+  useEffect(() => {
+    if (!hinweis) return undefined;
+    const t = setTimeout(() => setHinweis(null), 2600);
+    return () => clearTimeout(t);
+  }, [hinweis]);
 
   const wochen = wochenBereiche(ETAPPE, etappeWochen);
 
@@ -161,6 +170,16 @@ export default function Etappenplan({ onWeiter }) {
       summen[best] += kb.cluster;
     }
     setZuordnung(z);
+    setHinweis("Ausgewogen verteilt: leichteste Woche zuerst. Du kannst frei anpassen.");
+  }
+
+  // Planung verwerfen: alle Wochen-Zuordnungen loeschen, zurueck in den Vorrat.
+  // Der Lernstand (erledigt) bleibt unangetastet.
+  function planZuruecksetzen() {
+    setZuordnung({});
+    setGewaehltId(null);
+    setResetConfirm(false);
+    setHinweis("Plan zurückgesetzt. Verteile deine Ziele neu.");
   }
 
   return (
@@ -180,6 +199,35 @@ export default function Etappenplan({ onWeiter }) {
             {alleZugeordnet ? "Alle verteilt ✓" : `noch ${offen} offen`}
           </span>
           <div className="ep-kopf-buttons">
+            {resetConfirm ? (
+              <span className="ep-reset-confirm" role="group">
+                <span className="ep-reset-frage">Plan neu starten?</span>
+                <button
+                  type="button"
+                  className="ep-reset-ja"
+                  onClick={planZuruecksetzen}
+                >
+                  Ja, neu
+                </button>
+                <button
+                  type="button"
+                  className="ep-reset-nein"
+                  onClick={() => setResetConfirm(false)}
+                >
+                  Abbrechen
+                </button>
+              </span>
+            ) : (
+              <button
+                type="button"
+                className="ep-reset"
+                onClick={() => setResetConfirm(true)}
+                disabled={offen === koennensbeweise.length}
+                title="Alle Wochen-Zuordnungen löschen und neu verteilen (dein Lernstand bleibt)"
+              >
+                Zurücksetzen
+              </button>
+            )}
             <button
               type="button"
               className="ep-vorschlag"
@@ -326,6 +374,12 @@ export default function Etappenplan({ onWeiter }) {
           );
         })}
       </div>
+
+      {hinweis && (
+        <div className="ep-hinweis" role="status">
+          {hinweis}
+        </div>
+      )}
     </div>
   );
 }
