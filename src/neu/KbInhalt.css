@@ -140,6 +140,7 @@
   border-color: var(--ok-text);
 }
 .ki-schritt-text {
+  flex: 1;
   font-size: 0.9rem;
   line-height: 1.35;
   color: var(--text);
@@ -147,6 +148,28 @@
 .ki-schritt.fertig .ki-schritt-text {
   color: var(--muted);
   text-decoration: line-through;
+}
+/* Gespiegelte Selbsteinschätzung des Schritts (im Fokus gesetzt). */
+.ki-schritt-gefuehl {
+  flex-shrink: 0;
+  align-self: center;
+  font-size: 0.66rem;
+  font-weight: 700;
+  padding: 1px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.ki-schritt-gefuehl[data-g="leicht"] {
+  color: var(--ok-text);
+  background: var(--ok-bg);
+}
+.ki-schritt-gefuehl[data-g="ok"] {
+  color: var(--accent-strong);
+  background: var(--accent-soft);
+}
+.ki-schritt-gefuehl[data-g="schwer"] {
+  color: var(--warn-text);
+  background: var(--warn-bg);
 }
 /* Aktueller (erster offener) Schritt: hervorgehoben als "das ist gerade dran". */
 .ki-schritt.aktuell {

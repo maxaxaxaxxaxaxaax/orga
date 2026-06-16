@@ -3,6 +3,12 @@ import { lernwegFuerKb } from "../data/wissen";
 import { ART_LABEL } from "./material";
 import { eigeneFuerThema, speichereEigenes } from "./eigeneMaterialien";
 import { ladeSchritte, speichereSchritte } from "./lernschritte";
+import {
+  GEFUEHLE,
+  GEFUEHL_LABEL,
+  ladeGefuehl,
+  setzeGefuehl,
+} from "./schrittgefuehl";
 import { addSekunden } from "./zeitmessung";
 import { generatorFuerKb } from "./uebungen";
 import {
@@ -29,6 +35,9 @@ export default function Fokus({ kb, naechste, onFertig, onClose }) {
   const thema = lw?.thema || null;
   const schritte = thema?.schritte || [];
   const [stand, setStand] = useState(() => ladeSchritte(kb.id));
+  // Freiwillige Selbsteinschätzung pro Schritt (leicht/ging so/schwer): spiegelt
+  // dem Schüler später, wo es hakte. Kein Coach-Blick, keine Wertung.
+  const [gefuehl, setGefuehl] = useState(() => ladeGefuehl(kb.id));
   const [material, setMaterial] = useState(null);
   const [uploadOffen, setUploadOffen] = useState(false);
   const [uebenOffen, setUebenOffen] = useState(false);
@@ -82,6 +91,18 @@ export default function Fokus({ kb, naechste, onFertig, onClose }) {
     setStand(next);
     speichereSchritte(kb.id, next);
     setUebenOffen(false);
+  }
+  // Gefühl für den aktuellen Schritt setzen. Nochmal dasselbe tippen hebt es auf.
+  function waehleGefuehl(wert) {
+    if (aktuell < 0) return;
+    const neuWert = gefuehl[aktuell] === wert ? null : wert;
+    setzeGefuehl(kb.id, aktuell, neuWert);
+    setGefuehl((g) => {
+      const next = { ...g };
+      if (neuWert == null) delete next[aktuell];
+      else next[aktuell] = neuWert;
+      return next;
+    });
   }
   function hilfeOeffnen() {
     setEntwurf(frage);
@@ -194,6 +215,27 @@ export default function Fokus({ kb, naechste, onFertig, onClose }) {
             Schritt {aktuell + 1} von {schritte.length}
           </p>
           <h1 className="fokus-titel">{schritte[aktuell].text}</h1>
+
+          <div className="fokus-gefuehl">
+            <span className="fokus-gefuehl-frage">Wie läuft dieser Schritt?</span>
+            <div className="fokus-gefuehl-knoepfe" role="group" aria-label="Wie läuft dieser Schritt?">
+              {GEFUEHLE.map((g) => (
+                <button
+                  key={g}
+                  type="button"
+                  className={
+                    "fokus-gefuehl-knopf" +
+                    (gefuehl[aktuell] === g ? " gewaehlt" : "")
+                  }
+                  data-g={g}
+                  onClick={() => waehleGefuehl(g)}
+                  aria-pressed={gefuehl[aktuell] === g}
+                >
+                  {GEFUEHL_LABEL[g]}
+                </button>
+              ))}
+            </div>
+          </div>
 
           <div className="fokus-block">
             <div className="fokus-label-zeile">

@@ -109,6 +109,54 @@
   color: var(--text-2);
 }
 
+/* Selbsteinschätzung des aktuellen Schritts: ruhig, freiwillig, ein Tap. */
+.fokus-gefuehl {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+.fokus-gefuehl-frage {
+  font-size: 0.82rem;
+  color: var(--text-2);
+}
+.fokus-gefuehl-knoepfe {
+  display: inline-flex;
+  gap: 6px;
+}
+.fokus-gefuehl-knopf {
+  padding: 5px 12px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-2);
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+.fokus-gefuehl-knopf:hover {
+  border-color: var(--line-strong);
+}
+.fokus-gefuehl-knopf.gewaehlt[data-g="leicht"] {
+  background: var(--ok-bg);
+  border-color: var(--ok-text);
+  color: var(--ok-text);
+}
+.fokus-gefuehl-knopf.gewaehlt[data-g="ok"] {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent-strong);
+}
+.fokus-gefuehl-knopf.gewaehlt[data-g="schwer"] {
+  background: var(--warn-bg);
+  border-color: var(--warn-line);
+  color: var(--warn-text);
+}
+
 .fokus-block {
   display: flex;
   flex-direction: column;

@@ -5,6 +5,7 @@ import { ART_LABEL } from "./material";
 import { eigeneFuerThema } from "./eigeneMaterialien";
 import { addSekunden, zeitInfo, formatMin } from "./zeitmessung";
 import { ladeSchritte, speichereSchritte } from "./lernschritte";
+import { GEFUEHL_LABEL, ladeGefuehl } from "./schrittgefuehl";
 import { istOeffenbar, aktivitaetLabel } from "./interaktiv";
 import Quiz from "./Quiz";
 import MaterialAnsicht from "./MaterialAnsicht";
@@ -18,6 +19,8 @@ export default function KbInhalt({ kb, kompakt = false }) {
   const [uebenOffen, setUebenOffen] = useState(false);
   const [offenesMaterial, setOffenesMaterial] = useState(null);
   const [schrittStand, setSchrittStand] = useState(() => ladeSchritte(kb.id));
+  // Selbsteinschätzung pro Schritt (im Fokus gesetzt): hier nur gespiegelt.
+  const gefuehl = ladeGefuehl(kb.id);
 
   // Still die Lernzeit messen, solange dieser Inhalt offen ist: beim Schließen
   // (Unmount) die verstrichene Zeit aufs Ziel buchen.
@@ -102,6 +105,15 @@ export default function KbInhalt({ kb, kompakt = false }) {
                     {fertig ? "✓" : ""}
                   </span>
                   <span className="ki-schritt-text">{s.text}</span>
+                  {gefuehl[i] && (
+                    <span
+                      className="ki-schritt-gefuehl"
+                      data-g={gefuehl[i]}
+                      title={`Für dich: ${GEFUEHL_LABEL[gefuehl[i]]}`}
+                    >
+                      {GEFUEHL_LABEL[gefuehl[i]]}
+                    </span>
+                  )}
                 </button>
               </li>
             );
