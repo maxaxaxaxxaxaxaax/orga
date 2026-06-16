@@ -7,6 +7,7 @@ import { addSekunden, zeitInfo, formatMin } from "./zeitmessung";
 import { ladeSchritte, speichereSchritte } from "./lernschritte";
 import { GEFUEHL_LABEL, ladeGefuehl } from "./schrittgefuehl";
 import { ladeZiel, setzeZiel } from "./lernziele";
+import { lade, ERLEDIGT_KEY } from "./planung";
 import { istOeffenbar, aktivitaetLabel } from "./interaktiv";
 import Quiz from "./Quiz";
 import MaterialAnsicht from "./MaterialAnsicht";
@@ -72,6 +73,35 @@ export default function KbInhalt({ kb, kompakt = false }) {
       ]
     : [];
   const genKey = generatorFuerKb(kb.id);
+
+  // Lernpfad-Einordnung: worauf dieses Ziel aufbaut (Vorgänger in der Fach-Kette
+  // aus wissen.js). Hilft, Blockaden als fehlende Grundlage zu erkennen, statt
+  // nur frustriert festzustecken. Nur spiegeln, kein Zwang.
+  const verkn = lw?.fach?.verknuepfungen || [];
+  const vorgaengerKante = thema ? verkn.find((p) => p[1] === thema.id) : null;
+  const vorgaenger = vorgaengerKante
+    ? (lw.fach.themen || []).find((t) => t.id === vorgaengerKante[0])
+    : null;
+  const vorgaengerFertig = vorgaenger
+    ? !!lade(ERLEDIGT_KEY)[vorgaenger.kbId]
+    : false;
+  const vorBlock = vorgaenger ? (
+    <section
+      className="ki-block ki-vor"
+      key="vor"
+      data-stand={vorgaengerFertig ? "ok" : "offen"}
+    >
+      <h4 className="ki-block-titel">Baut auf auf</h4>
+      <p className="ki-vor-text">
+        <span className="ki-vor-name">{vorgaenger.label}</span>
+        <span className="ki-vor-hinweis">
+          {vorgaengerFertig
+            ? "hast du erledigt"
+            : "schau, dass du dich da sicher fühlst"}
+        </span>
+      </p>
+    </section>
+  ) : null;
 
   const uebenBlock = genKey ? (
     <section className="ki-block" key="ueben">
@@ -296,6 +326,7 @@ export default function KbInhalt({ kb, kompakt = false }) {
         {gelerntMin >= 1 && <span>bisher {formatMin(gelerntMin)} gelernt</span>}
       </p>
       {zielBlock}
+      {vorBlock}
       {kompakt
         ? [materialBlock, schritteBlock, uebenBlock, bereitBlock]
         : [uebenBlock, schritteBlock, materialBlock, bereitBlock]}

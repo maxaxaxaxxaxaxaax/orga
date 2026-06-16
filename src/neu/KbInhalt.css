@@ -48,6 +48,30 @@
   color: var(--muted);
 }
 
+/* Lernpfad-Einordnung: worauf dieses Ziel aufbaut. Ruhig, nur ein Hinweis. */
+.ki-vor-text {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+}
+.ki-vor-name {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.ki-vor-hinweis {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+.ki-vor[data-stand="ok"] .ki-vor-hinweis {
+  color: var(--ok-text);
+}
+.ki-vor[data-stand="offen"] .ki-vor-hinweis {
+  color: var(--warn-text);
+}
+
 /* Eigenes Lernziel: vom Schüler selbst gesetzt, ruhig hervorgehoben. */
 .ki-ziel-kopf {
   display: flex;
