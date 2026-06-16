@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Fertig from "./Fertig";
 import "./Auswahlquiz.css";
 
 // Auswahlquiz (Single-Choice) für Materialien: eine Frage nach der anderen, je
@@ -44,22 +45,15 @@ export default function Auswahlquiz({ daten }) {
     const alle = fragen.length;
     return (
       <div className="aq">
-        <div className="aq-fertig">
-          <span className="aq-haken" aria-hidden="true">
-            ✓
-          </span>
-          <p className="aq-fertig-text">
-            {punkte} von {alle} richtig
-          </p>
-          <p className="aq-fertig-bilanz">
-            {punkte === alle
+        <Fertig
+          text={`${punkte} von ${alle} richtig`}
+          bilanz={
+            punkte === alle
               ? "Alles sitzt. Stark."
-              : "Schau dir die offenen Fragen noch einmal an."}
-          </p>
-          <button type="button" className="aq-neu" onClick={nochmal}>
-            Nochmal
-          </button>
-        </div>
+              : "Schau dir die offenen Fragen noch einmal an."
+          }
+          onNochmal={nochmal}
+        />
       </div>
     );
   }

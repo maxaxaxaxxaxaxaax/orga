@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Fertig from "./Fertig";
 import "./Lueckentext.css";
 
 // Lückentext (Cloze): Satz mit einer Lücke zwischen "vor" und "nach". Der Schüler
@@ -39,17 +40,13 @@ export default function Lueckentext({ daten }) {
 
   if (fertig) {
     return (
-      <div className="lt lt-fertig">
-        <div className="lt-fertig-haken" aria-hidden="true">
-          ✓
-        </div>
-        <p className="lt-fertig-text">Alle {gesamt} Sätze geschafft.</p>
-        <p className="lt-fertig-bilanz">
-          {richtig} von {gesamt} auf Anhieb richtig.
-        </p>
-        <button type="button" className="lt-neu" onClick={neuStarten}>
-          Nochmal von vorn
-        </button>
+      <div className="lt">
+        <Fertig
+          text={`Alle ${gesamt} Sätze geschafft.`}
+          bilanz={`${richtig} von ${gesamt} auf Anhieb richtig.`}
+          nochmalLabel="Nochmal von vorn"
+          onNochmal={neuStarten}
+        />
       </div>
     );
   }

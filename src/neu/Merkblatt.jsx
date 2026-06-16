@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import Fertig from "./Fertig";
 import "./Merkblatt.css";
 
 // Interaktives Merk-/Nachschlageblatt: Abschnitte mit Regeln und kleinen
@@ -65,15 +66,11 @@ export default function Merkblatt({ daten }) {
       )}
 
       {alleVerstanden && (
-        <div className="mb-fertig" role="status">
-          <span className="mb-fertig-haken" aria-hidden="true">
-            ✓
-          </span>
-          <p className="mb-fertig-text">Alles markiert. Du kennst die Regeln.</p>
-          <button type="button" className="mb-neu" onClick={zuruecksetzen}>
-            Nochmal durchgehen
-          </button>
-        </div>
+        <Fertig
+          text="Alles markiert. Du kennst die Regeln."
+          nochmalLabel="Nochmal durchgehen"
+          onNochmal={zuruecksetzen}
+        />
       )}
 
       <div className="mb-liste">

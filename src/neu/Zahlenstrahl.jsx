@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import Fertig from "./Fertig";
 import "./Zahlenstrahl.css";
 
 // Interaktiver Zahlenstrahl: eine Aufgabe nennt eine Zahl, der Schüler klickt
@@ -21,24 +22,16 @@ export default function Zahlenstrahl({ daten }) {
 
   if (i >= aufgaben.length) {
     return (
-      <div className="zs zs-fertig">
-        <div className="zs-fertig-haken" aria-hidden="true">
-          ✓
-        </div>
-        <p className="zs-fertig-text">
-          {richtig} von {aufgaben.length} auf Anhieb getroffen.
-        </p>
-        <button
-          type="button"
-          className="zs-neu"
-          onClick={() => {
+      <div className="zs">
+        <Fertig
+          text={`${richtig} von ${aufgaben.length} auf Anhieb getroffen.`}
+          nochmalLabel="Nochmal üben"
+          onNochmal={() => {
             setI(0);
             setKlick(null);
             setRichtig(0);
           }}
-        >
-          Nochmal üben
-        </button>
+        />
       </div>
     );
   }

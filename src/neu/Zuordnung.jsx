@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Fertig from "./Fertig";
 import "./Zuordnung.css";
 
 // Zuordnungs-Übung (Matching): links ein Begriff antippen, dann den passenden
@@ -59,24 +60,7 @@ export default function Zuordnung({ daten }) {
   if (fertig) {
     return (
       <div className="zu">
-        <div className="zu-fertig">
-          <span className="zu-haken" aria-hidden="true">
-            <svg viewBox="0 0 24 24" width="26" height="26">
-              <path
-                d="M5 12.5l4.5 4.5L19 7"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </span>
-          <p className="zu-fertig-text">Alle Paare richtig zugeordnet.</p>
-          <button type="button" className="zu-nochmal" onClick={nochmal}>
-            Nochmal
-          </button>
-        </div>
+        <Fertig text="Alle Paare richtig zugeordnet." onNochmal={nochmal} />
       </div>
     );
   }

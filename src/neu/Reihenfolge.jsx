@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Fertig from "./Fertig";
 import "./Reihenfolge.css";
 
 // Reihenfolge-Übung (Sequencing): Schritte/Stationen in die richtige Ordnung
@@ -54,15 +55,11 @@ export default function Reihenfolge({ daten }) {
   if (geprueft && alleRichtig) {
     return (
       <div className="rf">
-        <div className="rf-fertig">
-          <span className="rf-haken" aria-hidden="true">
-            ✓
-          </span>
-          <p className="rf-fertig-text">Alles in der richtigen Reihenfolge.</p>
-          <button type="button" className="rf-neu" onClick={nochmal}>
-            Nochmal mischen
-          </button>
-        </div>
+        <Fertig
+          text="Alles in der richtigen Reihenfolge."
+          nochmalLabel="Nochmal mischen"
+          onNochmal={nochmal}
+        />
       </div>
     );
   }

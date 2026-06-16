@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Fertig from "./Fertig";
 import "./Karteikarten.css";
 
 // Vokabel-Karteikarten: Vorderseite zeigt das Wort, Tippen dreht zur Lösung.
@@ -15,22 +16,16 @@ export default function Karteikarten({ daten }) {
 
   if (rest.length === 0) {
     return (
-      <div className="kk kk-fertig">
-        <div className="kk-fertig-haken" aria-hidden="true">
-          ✓
-        </div>
-        <p className="kk-fertig-text">Alle {gesamt} Karten geschafft.</p>
-        <button
-          type="button"
-          className="kk-neu"
-          onClick={() => {
+      <div className="kk">
+        <Fertig
+          text={`Alle ${gesamt} Karten geschafft.`}
+          nochmalLabel="Nochmal von vorn"
+          onNochmal={() => {
             setRest(karten);
             setGekonnt(0);
             setGedreht(false);
           }}
-        >
-          Nochmal von vorn
-        </button>
+        />
       </div>
     );
   }
