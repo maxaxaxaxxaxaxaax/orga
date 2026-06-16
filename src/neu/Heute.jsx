@@ -477,7 +477,7 @@ export default function Heute({ onFokus }) {
             Geparkte Gedanken aus dem Fokus. Hak einen ab, wenn er erledigt ist.
           </p>
           <ul className="hu-notiz-liste">
-            {notizen.map((t, i) => (
+            {notizen.map((n, i) => (
               <li className="hu-notiz" key={i}>
                 <button
                   type="button"
@@ -487,7 +487,12 @@ export default function Heute({ onFokus }) {
                 >
                   ✓
                 </button>
-                <span className="hu-notiz-text">{t}</span>
+                <span className="hu-notiz-text">
+                  {n.text}
+                  {n.kontext && (
+                    <span className="hu-notiz-kontext">{n.kontext}</span>
+                  )}
+                </span>
               </li>
             ))}
           </ul>

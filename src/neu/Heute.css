@@ -338,6 +338,13 @@
   line-height: 1.4;
   color: var(--text);
 }
+/* Woher der geparkte Gedanke stammt (Ziel + Schritt), als leise Zweitzeile. */
+.hu-notiz-kontext {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.74rem;
+  color: var(--muted);
+}
 /* Startpunkt-Marke auf der ersten offenen Karte (nur wenn es eine Wahl gibt:
    2+ offene Ziele). Ersetzt den früheren Banner, der den Titel doppelte. */
 .hu-kb-start {

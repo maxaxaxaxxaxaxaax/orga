@@ -104,7 +104,10 @@ export default function Fokus({ kb, naechste, onFertig, onClose }) {
   function park() {
     const t = parkEntwurf.trim();
     if (!t) return;
-    addNotiz(t);
+    // Kontext mitgeben: zu welchem Ziel und Schritt der Gedanke gehoert.
+    const kontext =
+      kb.titel + (aktuell >= 0 ? " · Schritt " + (aktuell + 1) : "");
+    addNotiz(t, kontext);
     setParkEntwurf("");
     setParkAnzahl((n) => n + 1);
   }
