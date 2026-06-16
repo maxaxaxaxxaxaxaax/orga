@@ -15,8 +15,11 @@ export default function KbChip({
   onZurueck,
   onTippen,
   zahl, // überschreibt die Cluster-Zahl: Zahl anzeigen, oder null = ausblenden
+  fortschritt, // optional { fertig, gesamt }: duenne Schritt-Fortschrittsleiste
 }) {
   const zahlWert = zahl === undefined ? k.cluster : zahl;
+  const zeigeFortschritt =
+    fortschritt && fortschritt.gesamt > 0 && fortschritt.fertig > 0;
   const klickbar = !!onTippen || (platziert && !!onZurueck);
   function klick(e) {
     e.stopPropagation();
@@ -49,6 +52,14 @@ export default function KbChip({
       {mitFach && <span className="kbc-fach">{k.fach}</span>}
       <span className="kbc-titel">{k.titel}</span>
       {zahlWert != null && <span className="kbc-cluster">{zahlWert}</span>}
+      {zeigeFortschritt && (
+        <span className="kbc-fortschritt" aria-hidden="true">
+          <span
+            className="kbc-fortschritt-fuell"
+            style={{ width: (fortschritt.fertig / fortschritt.gesamt) * 100 + "%" }}
+          />
+        </span>
+      )}
     </div>
   );
 }

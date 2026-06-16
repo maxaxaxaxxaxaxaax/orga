@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { koennensbeweise, wochenZielCluster } from "../data/koennensbeweise";
+import { lernwegFuerKb } from "../data/wissen";
+import { ladeSchritte } from "./lernschritte";
 import {
   stundenWoche,
   fachFarbe,
@@ -89,6 +91,18 @@ export default function Wochenplan({ onZurueck, onWeiter, woche = 0 }) {
   );
   // Wie viele Uhren eines Ziels sind noch nicht auf eine Stunde gelegt?
   const restVon = (k) => k.cluster - (stunden[k.id]?.length || 0);
+  // Schon erledigte Lernweg-Schritte eines Ziels: zeigt beim Planen, was
+  // bereits angefangen wurde (duenne Leiste am Chip).
+  const schrittFortschritt = (kbId) => {
+    const lw = lernwegFuerKb(kbId);
+    const schritte = lw?.thema?.schritte || [];
+    if (!schritte.length) return null;
+    const stand = ladeSchritte(kbId);
+    const fertig = schritte.filter((st, i) =>
+      stand[i] != null ? stand[i] : !!st.fertig
+    ).length;
+    return { fertig, gesamt: schritte.length };
+  };
   const vorrat = wocheKbs.filter((k) => restVon(k) > 0);
   const wocheFertig = wocheKbs.length > 0 && vorrat.length === 0;
   // Gesamte Uhren-Last dieser Woche (aus dem Etappenplan) im Vergleich zum
@@ -332,6 +346,7 @@ export default function Wochenplan({ onZurueck, onWeiter, woche = 0 }) {
               key={k.id}
               mitFach
               zahl={restVon(k)}
+              fortschritt={schrittFortschritt(k.id)}
               gewaehlt={gewaehltId === k.id}
               onTippen={waehle}
               onDragStart={(e, id) => dragStart(e, id, null)}
