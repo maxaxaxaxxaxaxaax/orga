@@ -284,6 +284,17 @@
   font-size: 0.84rem;
   color: var(--muted);
 }
+/* Ruhiger Hinweis im Abschluss, dass ein offener Hilferuf weiterlaeuft. */
+.fokus-hilfe-laeuft {
+  margin: 0;
+  max-width: 30rem;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: var(--warn-text);
+  background: var(--warn-bg);
+  border-radius: var(--r-sm, 8px);
+  padding: 10px 14px;
+}
 /* Stille Frage / Hilfe an den Lerncoach: ruhig unten, klappt erst auf Wunsch auf. */
 .fokus-hilfe-bereich {
   align-self: center;

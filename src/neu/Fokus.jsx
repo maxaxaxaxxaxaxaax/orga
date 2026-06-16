@@ -151,6 +151,12 @@ export default function Fokus({ kb, naechste, onFertig, onClose }) {
             Wenn du dich sicher fühlst, melde den Könnensbeweis bei {COACH} zur
             Abnahme an. Sonst hakst du ihn nur für heute ab.
           </p>
+          {hilfe && (
+            <p className="fokus-hilfe-laeuft" role="status">
+              Dein Hilferuf an {COACH} läuft noch. {COACH} kümmert sich später
+              darum, du kannst ruhig weitermachen.
+            </p>
+          )}
           <div className="fokus-fuss">
             <button
               type="button"
