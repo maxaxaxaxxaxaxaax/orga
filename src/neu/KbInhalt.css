@@ -48,6 +48,91 @@
   color: var(--muted);
 }
 
+/* Eigenes Lernziel: vom Schüler selbst gesetzt, ruhig hervorgehoben. */
+.ki-ziel-kopf {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+.ki-ziel-aendern {
+  border: none;
+  background: none;
+  padding: 0;
+  font-size: 0.78rem;
+  color: var(--accent);
+  cursor: pointer;
+}
+.ki-ziel-aendern:hover {
+  text-decoration: underline;
+}
+.ki-ziel-text {
+  margin: 0;
+  padding: 10px 12px;
+  font-size: 0.92rem;
+  line-height: 1.45;
+  color: var(--text);
+  background: var(--accent-soft);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--r-sm, 8px);
+}
+.ki-ziel-leer {
+  border: 1px dashed var(--line-strong);
+  background: none;
+  padding: 8px 12px;
+  width: 100%;
+  text-align: left;
+  font-size: 0.88rem;
+  color: var(--text-2);
+  border-radius: var(--r-sm, 8px);
+  cursor: pointer;
+}
+.ki-ziel-leer:hover {
+  border-color: var(--accent);
+  color: var(--accent-strong);
+}
+.ki-ziel-feld {
+  width: 100%;
+  box-sizing: border-box;
+  resize: vertical;
+  padding: 9px 11px;
+  font: inherit;
+  font-size: 0.9rem;
+  color: var(--text);
+  background: var(--card);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-sm, 8px);
+}
+.ki-ziel-feld:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+  border-color: var(--accent);
+}
+.ki-ziel-aktionen {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+.ki-ziel-speichern {
+  border: none;
+  background: var(--accent);
+  color: var(--on-accent);
+  padding: 6px 14px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.ki-ziel-abbrechen {
+  border: 1px solid var(--line);
+  background: var(--card);
+  color: var(--text-2);
+  padding: 6px 14px;
+  font-size: 0.84rem;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
 /* Bereitschafts-Anzeige: ruhiger Ampel-Punkt + Verdikt, spiegelt den Stand. */
 .ki-bereit-punkt {
   align-self: center;

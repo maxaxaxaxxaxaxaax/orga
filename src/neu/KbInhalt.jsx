@@ -6,6 +6,7 @@ import { eigeneFuerThema } from "./eigeneMaterialien";
 import { addSekunden, zeitInfo, formatMin } from "./zeitmessung";
 import { ladeSchritte, speichereSchritte } from "./lernschritte";
 import { GEFUEHL_LABEL, ladeGefuehl } from "./schrittgefuehl";
+import { ladeZiel, setzeZiel } from "./lernziele";
 import { istOeffenbar, aktivitaetLabel } from "./interaktiv";
 import Quiz from "./Quiz";
 import MaterialAnsicht from "./MaterialAnsicht";
@@ -21,6 +22,20 @@ export default function KbInhalt({ kb, kompakt = false }) {
   const [schrittStand, setSchrittStand] = useState(() => ladeSchritte(kb.id));
   // Selbsteinschätzung pro Schritt (im Fokus gesetzt): hier nur gespiegelt.
   const gefuehl = ladeGefuehl(kb.id);
+  // Eigenes Lernziel: was der Schüler selbst mit diesem KB erreichen will.
+  const [ziel, setZiel] = useState(() => ladeZiel(kb.id));
+  const [zielEdit, setZielEdit] = useState(false);
+  const [zielEntwurf, setZielEntwurf] = useState("");
+  function zielBearbeiten() {
+    setZielEntwurf(ziel);
+    setZielEdit(true);
+  }
+  function zielSpeichern() {
+    const t = zielEntwurf.trim();
+    setzeZiel(kb.id, t);
+    setZiel(t);
+    setZielEdit(false);
+  }
 
   // Still die Lernzeit messen, solange dieser Inhalt offen ist: beim Schließen
   // (Unmount) die verstrichene Zeit aufs Ziel buchen.
@@ -212,6 +227,61 @@ export default function KbInhalt({ kb, kompakt = false }) {
     </section>
   );
 
+  const zielBlock = (
+    <section className="ki-block ki-ziel" key="ziel">
+      <div className="ki-ziel-kopf">
+        <h4 className="ki-block-titel">Mein Ziel</h4>
+        {ziel && !zielEdit && (
+          <button
+            type="button"
+            className="ki-ziel-aendern"
+            onClick={zielBearbeiten}
+          >
+            ändern
+          </button>
+        )}
+      </div>
+      {zielEdit ? (
+        <div className="ki-ziel-edit">
+          <textarea
+            className="ki-ziel-feld"
+            rows={2}
+            value={zielEntwurf}
+            onChange={(e) => setZielEntwurf(e.target.value)}
+            placeholder="Was willst du mit diesem Ziel erreichen? Zum Beispiel: sicher genug für die Abnahme, oder alles verstehen, auch die schweren Teile."
+            autoFocus
+          />
+          <div className="ki-ziel-aktionen">
+            <button
+              type="button"
+              className="ki-ziel-speichern"
+              onClick={zielSpeichern}
+            >
+              Speichern
+            </button>
+            <button
+              type="button"
+              className="ki-ziel-abbrechen"
+              onClick={() => setZielEdit(false)}
+            >
+              Abbrechen
+            </button>
+          </div>
+        </div>
+      ) : ziel ? (
+        <p className="ki-ziel-text">{ziel}</p>
+      ) : (
+        <button
+          type="button"
+          className="ki-ziel-leer"
+          onClick={zielBearbeiten}
+        >
+          + Ziel für dich setzen
+        </button>
+      )}
+    </section>
+  );
+
   return (
     <div className="ki">
       <p className="ki-zeit">
@@ -225,6 +295,7 @@ export default function KbInhalt({ kb, kompakt = false }) {
         )}
         {gelerntMin >= 1 && <span>bisher {formatMin(gelerntMin)} gelernt</span>}
       </p>
+      {zielBlock}
       {kompakt
         ? [materialBlock, schritteBlock, uebenBlock, bereitBlock]
         : [uebenBlock, schritteBlock, materialBlock, bereitBlock]}
