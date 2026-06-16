@@ -6,7 +6,10 @@ const KEY = "neu.eigeneMaterialien";
 export function ladeEigene() {
   try {
     const r = localStorage.getItem(KEY);
-    return r ? JSON.parse(r) : [];
+    const v = r ? JSON.parse(r) : [];
+    // Gegen beschaedigte/handeditierte Daten absichern: muss eine Liste sein,
+    // sonst wuerde .filter/.push spaeter abstuerzen (Silent Repair).
+    return Array.isArray(v) ? v : [];
   } catch {
     return [];
   }

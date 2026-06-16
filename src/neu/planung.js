@@ -39,7 +39,9 @@ export function setzeHeuteTag(n) {
 export function lade(key) {
   try {
     const r = localStorage.getItem(key);
-    return r ? JSON.parse(r) : {};
+    const v = r ? JSON.parse(r) : {};
+    // Alle Planungs-Keys sind Objekt-Maps; gegen beschaedigte Daten absichern.
+    return v && typeof v === "object" && !Array.isArray(v) ? v : {};
   } catch {
     return {};
   }

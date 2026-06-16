@@ -6,7 +6,9 @@ const KEY = "neu.lernschritte"; // { [kbId]: { [index]: bool } }
 function ladeAlle() {
   try {
     const r = localStorage.getItem(KEY);
-    return r ? JSON.parse(r) : {};
+    const v = r ? JSON.parse(r) : {};
+    // Muss ein Objekt sein (kein null/Array/String), sonst kracht der Zugriff.
+    return v && typeof v === "object" && !Array.isArray(v) ? v : {};
   } catch {
     return {};
   }

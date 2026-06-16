@@ -157,6 +157,25 @@ select:focus-visible {
   color: var(--text);
 }
 
+/* Ruhiger Hinweis, wenn der lokale Speicher nicht funktioniert (privater Modus,
+   gesperrt). Oben links, damit die zentrierte Nav-Leiste frei bleibt. */
+.speicher-warnung {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 200;
+  max-width: 280px;
+  padding: 8px 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--warn-text);
+  background: var(--warn-bg);
+  border: 1px solid var(--warn-line);
+  border-radius: var(--r-sm);
+  box-shadow: var(--shadow-sm);
+}
+
 /* Sanfter Auftritt jedes Screens beim Wechsel (ruhig, nicht verspielt). */
 @media (prefers-reduced-motion: no-preference) {
   .hu-screen,

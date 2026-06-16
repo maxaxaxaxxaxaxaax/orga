@@ -21,6 +21,21 @@ import { heuteOffeneZiele, nachzuegler } from "./weg";
 
 const INTRO_KEY = "neu.intro.gesehen";
 
+// Funktioniert der lokale Speicher ueberhaupt? Im privaten Modus oder bei
+// gesperrtem Speicher (Schulnetz) schlagen Schreibvorgaenge still fehl, und die
+// Planung waere beim Neuladen weg. Einmal kurz testen, damit wir ehrlich warnen
+// koennen (Datenhoheit: der Schueler soll wissen, wenn nichts gesichert wird).
+function speicherGeht() {
+  try {
+    const k = "neu.speichertest";
+    localStorage.setItem(k, "1");
+    localStorage.removeItem(k);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 // Drei Räume, je ein Job: Heute (der Tag), Plan (die Etappe), Ablage (das
 // Material). Die schwebende Nav-Leiste ist die einzige Navigation. Solange die
 // Planung offen ist, führt "Plan" in den Wizard (Etappenplan -> Wochenplanung),
@@ -29,6 +44,7 @@ const INTRO_KEY = "neu.intro.gesehen";
 export default function App() {
   const [screen, setScreen] = useState(startScreen);
   const [fokusKbId, setFokusKbId] = useState(null); // Ziel im Fokus-Modus (Vollbild)
+  const [speicherOk] = useState(speicherGeht); // einmal beim Start pruefen
   // Erststart-Intro: einmal zeigen, bis es weggeklickt ist.
   const [introOffen, setIntroOffen] = useState(() => {
     try {
@@ -136,6 +152,12 @@ export default function App() {
 
   return (
     <>
+      {!speicherOk && (
+        <div className="speicher-warnung" role="status">
+          Änderungen werden gerade nicht gespeichert. Prüfe den Browser-Speicher
+          (privater Modus?).
+        </div>
+      )}
       {zeigeWeg && <WegLeiste onGo={wegGo} />}
       {inhalt}
       {zeigeNav && <NavLeiste aktiv={bereich} onWechsel={wechsle} />}
