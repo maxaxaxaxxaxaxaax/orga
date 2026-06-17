@@ -121,7 +121,12 @@ export default function Karteikarten({ daten }) {
       >
         <span className={"kk-karte-inner" + (gedreht ? " gedreht" : "")}>
           <span className="kk-face kk-vorne">{vorderseite}</span>
-          <span className="kk-face kk-hinten">{rueckseite}</span>
+          <span className="kk-face kk-hinten">
+            <span className="kk-loesung">{rueckseite}</span>
+            {karte.beispiel && (
+              <span className="kk-beispiel">{karte.beispiel}</span>
+            )}
+          </span>
         </span>
       </button>
       <p className="kk-tipp">{gedreht ? "Wusstest du es?" : "Tippen zum Umdrehen"}</p>

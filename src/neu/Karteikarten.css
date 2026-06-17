@@ -107,6 +107,16 @@
   color: var(--text);
   font-size: 1.2rem;
   transform: rotateY(180deg);
+  flex-direction: column;
+  gap: 10px;
+}
+/* Beispielsatz auf der Rückseite: zeigt die Vokabel im echten Satzkontext. */
+.kk-beispiel {
+  font-size: 0.82rem;
+  font-style: italic;
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--text-2);
 }
 .kk-tipp {
   margin: 0;
