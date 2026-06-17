@@ -587,3 +587,37 @@
   padding: 1px 6px; border-radius: 999px;
   margin-left: 6px;
 }
+
+/* Subkategorie-Ebene: zwischen Kategorie und Lernweg, eingerueckt und leichter. */
+.ab-sub {
+  display: flex;
+  flex-direction: column;
+}
+.ab-sub-kopf {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px 5px 22px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 0.76rem;
+  text-align: left;
+}
+.ab-sub-kopf:hover {
+  color: var(--text-2);
+}
+.ab-sub-name {
+  flex: 1;
+}
+.ab-sub-zahl {
+  color: var(--muted);
+}
+.ab-sub-pfeil {
+  width: 0.9em;
+}
+.ab-sub .ab-zeile {
+  padding-left: 24px;
+}

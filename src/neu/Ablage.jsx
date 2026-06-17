@@ -12,7 +12,7 @@ import MaterialAnsicht from "./MaterialAnsicht";
 import { istOeffenbar, aktivitaetLabel, TYP_LABEL } from "./interaktiv";
 import Begriff from "./Begriff";
 import { pruefeKi, pruefeVision } from "./kiClient";
-import { MATHE_KATEGORIEN } from "../data/matheKategorien";
+import { MATHE_KATEGORIEN, MATHE_SUBKATEGORIEN } from "../data/matheKategorien";
 import "./Ablage.css";
 
 // Merkt sich, wie der Schüler die Ablage zuletzt sortiert/gruppiert hat, damit
@@ -20,6 +20,7 @@ import "./Ablage.css";
 const GRUPPE_KEY = "neu.ablage.gruppe";
 const SORT_KEY = "neu.ablage.sort";
 const KAT_KEY = "neu.ablage.mathe.kategorien";
+const SUB_KEY = "neu.ablage.mathe.subkategorien"; // eingeklappte Subkategorien
 
 function ladeText(key, fallback) {
   try {
@@ -174,6 +175,29 @@ export default function Ablage() {
       else next.add(name);
       try {
         localStorage.setItem(KAT_KEY, JSON.stringify([...next]));
+      } catch {
+        /* localStorage nicht verfuegbar */
+      }
+      return next;
+    });
+  }
+  // Subkategorien sind standardmäßig offen; hier merken wir die EINGEKLAPPTen
+  // (Schlüssel "Kategorie||Subkategorie"), damit der Default ohne Eintrag offen ist.
+  const [subZu, setSubZu] = useState(() => {
+    try {
+      const r = localStorage.getItem(SUB_KEY);
+      return new Set(r ? JSON.parse(r) : []);
+    } catch {
+      return new Set();
+    }
+  });
+  function toggleSub(schluessel) {
+    setSubZu((prev) => {
+      const next = new Set(prev);
+      if (next.has(schluessel)) next.delete(schluessel);
+      else next.add(schluessel);
+      try {
+        localStorage.setItem(SUB_KEY, JSON.stringify([...next]));
       } catch {
         /* localStorage nicht verfuegbar */
       }
@@ -615,6 +639,7 @@ export default function Ablage() {
                     const f = schrittFortschritt(t);
                     return f && f.fertig === f.gesamt;
                   }).length;
+                  const subListe = MATHE_SUBKATEGORIEN[kat] || [];
                   return (
                     <div className="ab-kat" key={kat}>
                       <button
@@ -631,7 +656,35 @@ export default function Ablage() {
                           {erledigteWege} / {wege.length}
                         </span>
                       </button>
-                      {offen && wege.map((t) => lernwegButton(t))}
+                      {offen &&
+                        subListe.map((sub) => {
+                          const subWege = wege.filter(
+                            (t) => t.subkategorie === sub
+                          );
+                          if (!subWege.length) return null;
+                          const schluessel = kat + "||" + sub;
+                          const subOffen = !subZu.has(schluessel);
+                          return (
+                            <div className="ab-sub" key={sub}>
+                              <button
+                                type="button"
+                                className="ab-sub-kopf"
+                                onClick={() => toggleSub(schluessel)}
+                                aria-expanded={subOffen}
+                              >
+                                <span className="ab-sub-pfeil" aria-hidden="true">
+                                  {subOffen ? "▾" : "▸"}
+                                </span>
+                                <span className="ab-sub-name">{sub}</span>
+                                <span className="ab-sub-zahl">
+                                  {subWege.length}
+                                </span>
+                              </button>
+                              {subOffen &&
+                                subWege.map((t) => lernwegButton(t))}
+                            </div>
+                          );
+                        })}
                     </div>
                   );
                 })

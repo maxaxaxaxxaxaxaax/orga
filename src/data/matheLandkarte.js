@@ -2,7 +2,7 @@
 // Reine Struktur (Kapitel als Lernwege, Sub-Themen als Schritte), keine Inhalte.
 // landkarte: true = nicht Teil der aktuellen Etappe, nur zum Ueberblick/Fortschritt.
 export const MATHE_LANDKARTE = [
-  { id: "grd-zahlbereiche", label: "Zahlbereiche", kategorie: "Mathematische Grundlagen", kbId: "MAP-grd-zahlbereiche", landkarte: true, schritte: [
+  { id: "grd-zahlbereiche", label: "Zahlbereiche", kategorie: "Mathematische Grundlagen", subkategorie: "Zahlen und Zahlbereiche", kbId: "MAP-grd-zahlbereiche", landkarte: true, schritte: [
     { text: "Natuerliche Zahlen", fertig: false },
     { text: "Ganze Zahlen", fertig: false },
     { text: "Rationale Zahlen", fertig: false },
@@ -10,27 +10,27 @@ export const MATHE_LANDKARTE = [
     { text: "Reelle Zahlen", fertig: false },
     { text: "Zahlbereiche ordnen und vergleichen", fertig: false },
   ] },
-  { id: "grd-stellenwertsystem", label: "Stellenwertsystem und Zahldarstellung", kategorie: "Mathematische Grundlagen", kbId: "MAP-grd-stellenwertsystem", landkarte: true, schritte: [
+  { id: "grd-stellenwertsystem", label: "Stellenwertsystem und Zahldarstellung", kategorie: "Mathematische Grundlagen", subkategorie: "Zahlen und Zahlbereiche", kbId: "MAP-grd-stellenwertsystem", landkarte: true, schritte: [
     { text: "Zehnersystem und Stellenwerte", fertig: false },
     { text: "Grosse Zahlen lesen und schreiben", fertig: false },
     { text: "Zahlen am Zahlenstrahl", fertig: false },
     { text: "Zahlen vergleichen und ordnen", fertig: false },
   ] },
-  { id: "grd-grundrechenarten", label: "Grundrechenarten", kategorie: "Mathematische Grundlagen", kbId: "MAP-grd-grundrechenarten", landkarte: true, schritte: [
+  { id: "grd-grundrechenarten", label: "Grundrechenarten", kategorie: "Mathematische Grundlagen", subkategorie: "Zahlen und Zahlbereiche", kbId: "MAP-grd-grundrechenarten", landkarte: true, schritte: [
     { text: "Addition und Subtraktion", fertig: false },
     { text: "Multiplikation und Division", fertig: false },
     { text: "Rechenregeln und Klammern", fertig: false },
     { text: "Schriftliche Rechenverfahren", fertig: false },
     { text: "Ueberschlag und Kontrolle", fertig: false },
   ] },
-  { id: "grd-teilbarkeit", label: "Teilbarkeit und Primzahlen", kategorie: "Mathematische Grundlagen", kbId: "MAP-grd-teilbarkeit", landkarte: true, schritte: [
+  { id: "grd-teilbarkeit", label: "Teilbarkeit und Primzahlen", kategorie: "Mathematische Grundlagen", subkategorie: "Zahlen und Zahlbereiche", kbId: "MAP-grd-teilbarkeit", landkarte: true, schritte: [
     { text: "Teiler und Vielfache", fertig: false },
     { text: "Teilbarkeitsregeln", fertig: false },
     { text: "Primzahlen und Primfaktorzerlegung", fertig: false },
     { text: "Groesster gemeinsamer Teiler", fertig: false },
     { text: "Kleinstes gemeinsames Vielfaches", fertig: false },
   ] },
-  { id: "grd-bruchrechnung", label: "Bruchrechnung", kategorie: "Mathematische Grundlagen", kbId: "MAP-grd-bruchrechnung", landkarte: true, schritte: [
+  { id: "grd-bruchrechnung", label: "Bruchrechnung", kategorie: "Mathematische Grundlagen", subkategorie: "Brüche und Dezimalzahlen", kbId: "MAP-grd-bruchrechnung", landkarte: true, schritte: [
     { text: "Brueche verstehen und darstellen", fertig: false },
     { text: "Brueche erweitern und kuerzen", fertig: false },
     { text: "Brueche addieren und subtrahieren", fertig: false },
@@ -38,26 +38,26 @@ export const MATHE_LANDKARTE = [
     { text: "Brueche dividieren", fertig: false },
     { text: "Gemischte Zahlen", fertig: false },
   ] },
-  { id: "grd-dezimalzahlen", label: "Dezimalzahlen", kategorie: "Mathematische Grundlagen", kbId: "MAP-grd-dezimalzahlen", landkarte: true, schritte: [
+  { id: "grd-dezimalzahlen", label: "Dezimalzahlen", kategorie: "Mathematische Grundlagen", subkategorie: "Brüche und Dezimalzahlen", kbId: "MAP-grd-dezimalzahlen", landkarte: true, schritte: [
     { text: "Dezimalzahlen lesen und schreiben", fertig: false },
     { text: "Dezimalzahlen vergleichen und ordnen", fertig: false },
     { text: "Dezimalzahlen addieren und subtrahieren", fertig: false },
     { text: "Dezimalzahlen multiplizieren und dividieren", fertig: false },
     { text: "Periodische Dezimalzahlen", fertig: false },
   ] },
-  { id: "grd-bruch-dezimal-prozent", label: "Umwandeln von Bruch, Dezimalzahl und Prozent", kategorie: "Mathematische Grundlagen", kbId: "MAP-grd-bruch-dezimal-prozent", landkarte: true, schritte: [
+  { id: "grd-bruch-dezimal-prozent", label: "Umwandeln von Bruch, Dezimalzahl und Prozent", kategorie: "Mathematische Grundlagen", subkategorie: "Brüche und Dezimalzahlen", kbId: "MAP-grd-bruch-dezimal-prozent", landkarte: true, schritte: [
     { text: "Bruch in Dezimalzahl umwandeln", fertig: false },
     { text: "Dezimalzahl in Bruch umwandeln", fertig: false },
     { text: "Brueche und Prozente umrechnen", fertig: false },
     { text: "Darstellungen vergleichen", fertig: false },
   ] },
-  { id: "grd-runden", label: "Runden und Ueberschlagsrechnung", kategorie: "Mathematische Grundlagen", kbId: "MAP-grd-runden", landkarte: true, schritte: [
+  { id: "grd-runden", label: "Runden und Ueberschlagsrechnung", kategorie: "Mathematische Grundlagen", subkategorie: "Verhältnisse und Größen", kbId: "MAP-grd-runden", landkarte: true, schritte: [
     { text: "Rundungsregeln", fertig: false },
     { text: "Runden auf Stellen", fertig: false },
     { text: "Ueberschlagsrechnung", fertig: false },
     { text: "Sinnvolles Runden im Alltag", fertig: false },
   ] },
-  { id: "grd-groessen-einheiten", label: "Groessen und Einheiten", kategorie: "Mathematische Grundlagen", kbId: "MAP-grd-groessen-einheiten", landkarte: true, schritte: [
+  { id: "grd-groessen-einheiten", label: "Groessen und Einheiten", kategorie: "Mathematische Grundlagen", subkategorie: "Verhältnisse und Größen", kbId: "MAP-grd-groessen-einheiten", landkarte: true, schritte: [
     { text: "Laengen umrechnen", fertig: false },
     { text: "Gewichte und Massen", fertig: false },
     { text: "Zeitspannen und Uhrzeit", fertig: false },
@@ -65,7 +65,7 @@ export const MATHE_LANDKARTE = [
     { text: "Mit Geld rechnen", fertig: false },
     { text: "Einheiten umwandeln", fertig: false },
   ] },
-  { id: "grd-prozentrechnung", label: "Prozentrechnung", kategorie: "Mathematische Grundlagen", kbId: "MAP-grd-prozentrechnung", landkarte: true, schritte: [
+  { id: "grd-prozentrechnung", label: "Prozentrechnung", kategorie: "Mathematische Grundlagen", subkategorie: "Prozent und Zins", kbId: "MAP-grd-prozentrechnung", landkarte: true, schritte: [
     { text: "Prozentbegriff verstehen", fertig: false },
     { text: "Prozentwert berechnen", fertig: false },
     { text: "Grundwert berechnen", fertig: false },
@@ -73,69 +73,69 @@ export const MATHE_LANDKARTE = [
     { text: "Prozentuale Zunahme und Abnahme", fertig: false },
     { text: "Promille", fertig: false },
   ] },
-  { id: "grd-zinsrechnung", label: "Zinsrechnung", kategorie: "Mathematische Grundlagen", kbId: "MAP-grd-zinsrechnung", landkarte: true, schritte: [
+  { id: "grd-zinsrechnung", label: "Zinsrechnung", kategorie: "Mathematische Grundlagen", subkategorie: "Prozent und Zins", kbId: "MAP-grd-zinsrechnung", landkarte: true, schritte: [
     { text: "Zinsen berechnen", fertig: false },
     { text: "Jahreszins und Zinssatz", fertig: false },
     { text: "Monats- und Tageszinsen", fertig: false },
     { text: "Zinseszins", fertig: false },
     { text: "Kapital und Laufzeit bestimmen", fertig: false },
   ] },
-  { id: "grd-verhaeltnisse-dreisatz", label: "Verhaeltnisse und Dreisatz", kategorie: "Mathematische Grundlagen", kbId: "MAP-grd-verhaeltnisse-dreisatz", landkarte: true, schritte: [
+  { id: "grd-verhaeltnisse-dreisatz", label: "Verhaeltnisse und Dreisatz", kategorie: "Mathematische Grundlagen", subkategorie: "Verhältnisse und Größen", kbId: "MAP-grd-verhaeltnisse-dreisatz", landkarte: true, schritte: [
     { text: "Verhaeltnisse verstehen", fertig: false },
     { text: "Proportionaler Dreisatz", fertig: false },
     { text: "Antiproportionaler Dreisatz", fertig: false },
     { text: "Massstab", fertig: false },
     { text: "Verteilen im Verhaeltnis", fertig: false },
   ] },
-  { id: "grd-potenzen-grundlagen", label: "Potenzen Grundlagen", kategorie: "Mathematische Grundlagen", kbId: "MAP-grd-potenzen-grundlagen", landkarte: true, schritte: [
+  { id: "grd-potenzen-grundlagen", label: "Potenzen Grundlagen", kategorie: "Mathematische Grundlagen", subkategorie: "Potenzen und Wurzeln", kbId: "MAP-grd-potenzen-grundlagen", landkarte: true, schritte: [
     { text: "Potenzen verstehen", fertig: false },
     { text: "Quadrat- und Kubikzahlen", fertig: false },
     { text: "Zehnerpotenzen", fertig: false },
     { text: "Potenzgesetze fuer natuerliche Exponenten", fertig: false },
     { text: "Wissenschaftliche Schreibweise", fertig: false },
   ] },
-  { id: "grd-wurzeln-grundlagen", label: "Wurzeln Grundlagen", kategorie: "Mathematische Grundlagen", kbId: "MAP-grd-wurzeln-grundlagen", landkarte: true, schritte: [
+  { id: "grd-wurzeln-grundlagen", label: "Wurzeln Grundlagen", kategorie: "Mathematische Grundlagen", subkategorie: "Potenzen und Wurzeln", kbId: "MAP-grd-wurzeln-grundlagen", landkarte: true, schritte: [
     { text: "Quadratwurzel verstehen", fertig: false },
     { text: "Wurzeln berechnen und schaetzen", fertig: false },
     { text: "Wurzeln teilweise vereinfachen", fertig: false },
     { text: "Wurzeln und Potenzen im Zusammenhang", fertig: false },
   ] },
-  { id: "grd-rechengesetze", label: "Rechengesetze und Terme", kategorie: "Mathematische Grundlagen", kbId: "MAP-grd-rechengesetze", landkarte: true, schritte: [
+  { id: "grd-rechengesetze", label: "Rechengesetze und Terme", kategorie: "Mathematische Grundlagen", subkategorie: "Zahlen und Zahlbereiche", kbId: "MAP-grd-rechengesetze", landkarte: true, schritte: [
     { text: "Kommutativgesetz", fertig: false },
     { text: "Assoziativgesetz", fertig: false },
     { text: "Distributivgesetz", fertig: false },
     { text: "Vorrangregeln beim Rechnen", fertig: false },
     { text: "Klammern aufloesen", fertig: false },
   ] },
-  { id: "alg-terme-und-termumformungen", label: "Terme und Termumformungen", kategorie: "Algebra", kbId: "MAP-alg-terme-und-termumformungen", landkarte: true, schritte: [
+  { id: "alg-terme-und-termumformungen", label: "Terme und Termumformungen", kategorie: "Algebra", subkategorie: "Terme", kbId: "MAP-alg-terme-und-termumformungen", landkarte: true, schritte: [
     { text: "Variablen und Terme aufstellen", fertig: false },
     { text: "Terme zusammenfassen", fertig: false },
     { text: "Klammern ausmultiplizieren", fertig: false },
     { text: "Distributivgesetz anwenden", fertig: false },
     { text: "Terme vereinfachen", fertig: false },
   ] },
-  { id: "alg-binomische-formeln", label: "Binomische Formeln", kategorie: "Algebra", kbId: "MAP-alg-binomische-formeln", landkarte: true, schritte: [
+  { id: "alg-binomische-formeln", label: "Binomische Formeln", kategorie: "Algebra", subkategorie: "Terme", kbId: "MAP-alg-binomische-formeln", landkarte: true, schritte: [
     { text: "Erste binomische Formel", fertig: false },
     { text: "Zweite binomische Formel", fertig: false },
     { text: "Dritte binomische Formel", fertig: false },
     { text: "Binomische Formeln zum Ausmultiplizieren", fertig: false },
     { text: "Binomische Formeln zum Faktorisieren", fertig: false },
   ] },
-  { id: "alg-faktorisieren", label: "Faktorisieren", kategorie: "Algebra", kbId: "MAP-alg-faktorisieren", landkarte: true, schritte: [
+  { id: "alg-faktorisieren", label: "Faktorisieren", kategorie: "Algebra", subkategorie: "Terme", kbId: "MAP-alg-faktorisieren", landkarte: true, schritte: [
     { text: "Gemeinsame Faktoren ausklammern", fertig: false },
     { text: "Faktorisieren mit binomischen Formeln", fertig: false },
     { text: "Faktorisieren durch Gruppieren", fertig: false },
     { text: "Faktorisieren quadratischer Terme", fertig: false },
     { text: "Satz von Vieta zum Faktorisieren", fertig: false },
   ] },
-  { id: "alg-lineare-gleichungen", label: "Lineare Gleichungen", kategorie: "Algebra", kbId: "MAP-alg-lineare-gleichungen", landkarte: true, schritte: [
+  { id: "alg-lineare-gleichungen", label: "Lineare Gleichungen", kategorie: "Algebra", subkategorie: "Gleichungen und Ungleichungen", kbId: "MAP-alg-lineare-gleichungen", landkarte: true, schritte: [
     { text: "Gleichungen durch Aequivalenzumformung loesen", fertig: false },
     { text: "Gleichungen mit Klammern loesen", fertig: false },
     { text: "Gleichungen mit Bruechen loesen", fertig: false },
     { text: "Variablen auf beiden Seiten", fertig: false },
     { text: "Sonderfaelle und Loesungsmengen", fertig: false },
   ] },
-  { id: "alg-quadratische-gleichungen", label: "Quadratische Gleichungen", kategorie: "Algebra", kbId: "MAP-alg-quadratische-gleichungen", landkarte: true, schritte: [
+  { id: "alg-quadratische-gleichungen", label: "Quadratische Gleichungen", kategorie: "Algebra", subkategorie: "Gleichungen und Ungleichungen", kbId: "MAP-alg-quadratische-gleichungen", landkarte: true, schritte: [
     { text: "Reinquadratische Gleichungen loesen", fertig: false },
     { text: "Quadratische Gleichungen durch Ausklammern", fertig: false },
     { text: "Quadratische Ergaenzung", fertig: false },
@@ -143,28 +143,28 @@ export const MATHE_LANDKARTE = [
     { text: "Satz von Vieta", fertig: false },
     { text: "Anzahl der Loesungen ueber die Diskriminante", fertig: false },
   ] },
-  { id: "alg-ungleichungen", label: "Ungleichungen", kategorie: "Algebra", kbId: "MAP-alg-ungleichungen", landkarte: true, schritte: [
+  { id: "alg-ungleichungen", label: "Ungleichungen", kategorie: "Algebra", subkategorie: "Gleichungen und Ungleichungen", kbId: "MAP-alg-ungleichungen", landkarte: true, schritte: [
     { text: "Lineare Ungleichungen loesen", fertig: false },
     { text: "Umformungsregeln bei Ungleichungen", fertig: false },
     { text: "Quadratische Ungleichungen loesen", fertig: false },
     { text: "Loesungsmengen und Intervalle darstellen", fertig: false },
     { text: "Betragsungleichungen loesen", fertig: false },
   ] },
-  { id: "alg-lineare-gleichungssysteme", label: "Lineare Gleichungssysteme", kategorie: "Algebra", kbId: "MAP-alg-lineare-gleichungssysteme", landkarte: true, schritte: [
+  { id: "alg-lineare-gleichungssysteme", label: "Lineare Gleichungssysteme", kategorie: "Algebra", subkategorie: "Gleichungen und Ungleichungen", kbId: "MAP-alg-lineare-gleichungssysteme", landkarte: true, schritte: [
     { text: "Gleichsetzungsverfahren", fertig: false },
     { text: "Einsetzungsverfahren", fertig: false },
     { text: "Additionsverfahren", fertig: false },
     { text: "Gleichungssysteme mit drei Variablen", fertig: false },
     { text: "Loesbarkeit von Gleichungssystemen", fertig: false },
   ] },
-  { id: "alg-potenzen", label: "Potenzen", kategorie: "Algebra", kbId: "MAP-alg-potenzen", landkarte: true, schritte: [
+  { id: "alg-potenzen", label: "Potenzen", kategorie: "Algebra", subkategorie: "Potenzen, Wurzeln, Logarithmen", kbId: "MAP-alg-potenzen", landkarte: true, schritte: [
     { text: "Potenzen mit natuerlichen Exponenten", fertig: false },
     { text: "Potenzgesetze anwenden", fertig: false },
     { text: "Potenzen mit negativen Exponenten", fertig: false },
     { text: "Potenzen mit rationalen Exponenten", fertig: false },
     { text: "Wissenschaftliche Schreibweise", fertig: false },
   ] },
-  { id: "alg-wurzeln", label: "Wurzeln", kategorie: "Algebra", kbId: "MAP-alg-wurzeln", landkarte: true, schritte: [
+  { id: "alg-wurzeln", label: "Wurzeln", kategorie: "Algebra", subkategorie: "Potenzen, Wurzeln, Logarithmen", kbId: "MAP-alg-wurzeln", landkarte: true, schritte: [
     { text: "Quadratwurzeln berechnen", fertig: false },
     { text: "Wurzelgesetze anwenden", fertig: false },
     { text: "Wurzeln teilweise radizieren", fertig: false },
@@ -172,34 +172,34 @@ export const MATHE_LANDKARTE = [
     { text: "Wurzeln und n-te Wurzeln", fertig: false },
     { text: "Wurzelgleichungen loesen", fertig: false },
   ] },
-  { id: "alg-logarithmen", label: "Logarithmen", kategorie: "Algebra", kbId: "MAP-alg-logarithmen", landkarte: true, schritte: [
+  { id: "alg-logarithmen", label: "Logarithmen", kategorie: "Algebra", subkategorie: "Potenzen, Wurzeln, Logarithmen", kbId: "MAP-alg-logarithmen", landkarte: true, schritte: [
     { text: "Logarithmus als Umkehrung der Potenz", fertig: false },
     { text: "Logarithmengesetze anwenden", fertig: false },
     { text: "Zehnerlogarithmus und natuerlicher Logarithmus", fertig: false },
     { text: "Basiswechsel beim Logarithmus", fertig: false },
     { text: "Exponentialgleichungen mit Logarithmen loesen", fertig: false },
   ] },
-  { id: "alg-bruchterme-und-bruchgleichungen", label: "Bruchterme und Bruchgleichungen", kategorie: "Algebra", kbId: "MAP-alg-bruchterme-und-bruchgleichungen", landkarte: true, schritte: [
+  { id: "alg-bruchterme-und-bruchgleichungen", label: "Bruchterme und Bruchgleichungen", kategorie: "Algebra", subkategorie: "Gleichungen und Ungleichungen", kbId: "MAP-alg-bruchterme-und-bruchgleichungen", landkarte: true, schritte: [
     { text: "Definitionsbereich von Bruchtermen bestimmen", fertig: false },
     { text: "Bruchterme kuerzen und erweitern", fertig: false },
     { text: "Bruchterme addieren und subtrahieren", fertig: false },
     { text: "Bruchterme multiplizieren und dividieren", fertig: false },
     { text: "Bruchgleichungen loesen", fertig: false },
   ] },
-  { id: "alg-betraege", label: "Betraege", kategorie: "Algebra", kbId: "MAP-alg-betraege", landkarte: true, schritte: [
+  { id: "alg-betraege", label: "Betraege", kategorie: "Algebra", subkategorie: "Gleichungen und Ungleichungen", kbId: "MAP-alg-betraege", landkarte: true, schritte: [
     { text: "Betrag einer Zahl bestimmen", fertig: false },
     { text: "Betraege auf dem Zahlenstrahl", fertig: false },
     { text: "Betragsgleichungen loesen", fertig: false },
     { text: "Fallunterscheidung bei Betraegen", fertig: false },
   ] },
-  { id: "alg-polynome", label: "Polynome und Polynomdivision", kategorie: "Algebra", kbId: "MAP-alg-polynome", landkarte: true, schritte: [
+  { id: "alg-polynome", label: "Polynome und Polynomdivision", kategorie: "Algebra", subkategorie: "Terme", kbId: "MAP-alg-polynome", landkarte: true, schritte: [
     { text: "Polynome und ihren Grad bestimmen", fertig: false },
     { text: "Polynome addieren und multiplizieren", fertig: false },
     { text: "Polynomdivision durchfuehren", fertig: false },
     { text: "Nullstellen von Polynomen finden", fertig: false },
     { text: "Linearfaktorzerlegung", fertig: false },
   ] },
-  { id: "fkt-funktionsbegriff-und-darstellung", label: "Funktionsbegriff und Darstellungsformen", kategorie: "Funktionen", kbId: "MAP-fkt-funktionsbegriff-und-darstellung", landkarte: true, schritte: [
+  { id: "fkt-funktionsbegriff-und-darstellung", label: "Funktionsbegriff und Darstellungsformen", kategorie: "Funktionen", subkategorie: "Grundlagen der Funktionen", kbId: "MAP-fkt-funktionsbegriff-und-darstellung", landkarte: true, schritte: [
     { text: "Zuordnungen und der Funktionsbegriff", fertig: false },
     { text: "Definitions- und Wertebereich", fertig: false },
     { text: "Funktionen als Wertetabelle", fertig: false },
@@ -207,14 +207,14 @@ export const MATHE_LANDKARTE = [
     { text: "Funktionen als Term und Funktionsgleichung", fertig: false },
     { text: "Zwischen Darstellungsformen wechseln", fertig: false },
   ] },
-  { id: "fkt-proportionale-funktionen", label: "Proportionale und antiproportionale Zuordnungen", kategorie: "Funktionen", kbId: "MAP-fkt-proportionale-funktionen", landkarte: true, schritte: [
+  { id: "fkt-proportionale-funktionen", label: "Proportionale und antiproportionale Zuordnungen", kategorie: "Funktionen", subkategorie: "Grundlagen der Funktionen", kbId: "MAP-fkt-proportionale-funktionen", landkarte: true, schritte: [
     { text: "Proportionale Zuordnungen erkennen", fertig: false },
     { text: "Proportionalitaetsfaktor bestimmen", fertig: false },
     { text: "Antiproportionale Zuordnungen erkennen", fertig: false },
     { text: "Graphen proportionaler und antiproportionaler Zuordnungen", fertig: false },
     { text: "Dreisatz anwenden", fertig: false },
   ] },
-  { id: "fkt-lineare-funktionen", label: "Lineare Funktionen", kategorie: "Funktionen", kbId: "MAP-fkt-lineare-funktionen", landkarte: true, schritte: [
+  { id: "fkt-lineare-funktionen", label: "Lineare Funktionen", kategorie: "Funktionen", subkategorie: "Elementare Funktionen", kbId: "MAP-fkt-lineare-funktionen", landkarte: true, schritte: [
     { text: "Steigung und y-Achsenabschnitt", fertig: false },
     { text: "Funktionsgleichung aus dem Graphen ablesen", fertig: false },
     { text: "Funktionsgleichung aus zwei Punkten bestimmen", fertig: false },
@@ -222,7 +222,7 @@ export const MATHE_LANDKARTE = [
     { text: "Nullstelle linearer Funktionen", fertig: false },
     { text: "Parallele und senkrechte Geraden", fertig: false },
   ] },
-  { id: "fkt-quadratische-funktionen", label: "Quadratische Funktionen und Parabeln", kategorie: "Funktionen", kbId: "MAP-fkt-quadratische-funktionen", landkarte: true, schritte: [
+  { id: "fkt-quadratische-funktionen", label: "Quadratische Funktionen und Parabeln", kategorie: "Funktionen", subkategorie: "Elementare Funktionen", kbId: "MAP-fkt-quadratische-funktionen", landkarte: true, schritte: [
     { text: "Die Normalparabel", fertig: false },
     { text: "Scheitelpunktform und Verschiebungen", fertig: false },
     { text: "Streckung und Stauchung der Parabel", fertig: false },
@@ -230,20 +230,20 @@ export const MATHE_LANDKARTE = [
     { text: "Scheitelpunkt durch quadratische Ergaenzung", fertig: false },
     { text: "Nullstellen und Schnittpunkte berechnen", fertig: false },
   ] },
-  { id: "fkt-potenzfunktionen", label: "Potenzfunktionen", kategorie: "Funktionen", kbId: "MAP-fkt-potenzfunktionen", landkarte: true, schritte: [
+  { id: "fkt-potenzfunktionen", label: "Potenzfunktionen", kategorie: "Funktionen", subkategorie: "Elementare Funktionen", kbId: "MAP-fkt-potenzfunktionen", landkarte: true, schritte: [
     { text: "Potenzfunktionen mit natuerlichen Exponenten", fertig: false },
     { text: "Graphen bei geraden und ungeraden Exponenten", fertig: false },
     { text: "Potenzfunktionen mit negativen Exponenten", fertig: false },
     { text: "Symmetrie und Verlauf der Graphen", fertig: false },
     { text: "Verschieben und Strecken von Potenzfunktionen", fertig: false },
   ] },
-  { id: "fkt-wurzelfunktionen", label: "Wurzelfunktionen", kategorie: "Funktionen", kbId: "MAP-fkt-wurzelfunktionen", landkarte: true, schritte: [
+  { id: "fkt-wurzelfunktionen", label: "Wurzelfunktionen", kategorie: "Funktionen", subkategorie: "Elementare Funktionen", kbId: "MAP-fkt-wurzelfunktionen", landkarte: true, schritte: [
     { text: "Die Quadratwurzelfunktion", fertig: false },
     { text: "Definitionsbereich der Wurzelfunktion", fertig: false },
     { text: "Graphen von Wurzelfunktionen", fertig: false },
     { text: "Wurzelfunktionen als Umkehrung von Potenzfunktionen", fertig: false },
   ] },
-  { id: "fkt-ganzrationale-funktionen", label: "Ganzrationale Funktionen", kategorie: "Funktionen", kbId: "MAP-fkt-ganzrationale-funktionen", landkarte: true, schritte: [
+  { id: "fkt-ganzrationale-funktionen", label: "Ganzrationale Funktionen", kategorie: "Funktionen", subkategorie: "Elementare Funktionen", kbId: "MAP-fkt-ganzrationale-funktionen", landkarte: true, schritte: [
     { text: "Polynome und ihr Grad", fertig: false },
     { text: "Globalverlauf und Verhalten im Unendlichen", fertig: false },
     { text: "Nullstellen durch Faktorisieren", fertig: false },
@@ -251,14 +251,14 @@ export const MATHE_LANDKARTE = [
     { text: "Symmetrie ganzrationaler Funktionen", fertig: false },
     { text: "Graphen ganzrationaler Funktionen skizzieren", fertig: false },
   ] },
-  { id: "fkt-gebrochenrationale-funktionen", label: "Gebrochenrationale Funktionen", kategorie: "Funktionen", kbId: "MAP-fkt-gebrochenrationale-funktionen", landkarte: true, schritte: [
+  { id: "fkt-gebrochenrationale-funktionen", label: "Gebrochenrationale Funktionen", kategorie: "Funktionen", subkategorie: "Elementare Funktionen", kbId: "MAP-fkt-gebrochenrationale-funktionen", landkarte: true, schritte: [
     { text: "Definitionsluecken bestimmen", fertig: false },
     { text: "Senkrechte Asymptoten und Polstellen", fertig: false },
     { text: "Waagerechte und schiefe Asymptoten", fertig: false },
     { text: "Nullstellen gebrochenrationaler Funktionen", fertig: false },
     { text: "Graphen gebrochenrationaler Funktionen", fertig: false },
   ] },
-  { id: "fkt-exponentialfunktionen", label: "Exponentialfunktionen", kategorie: "Funktionen", kbId: "MAP-fkt-exponentialfunktionen", landkarte: true, schritte: [
+  { id: "fkt-exponentialfunktionen", label: "Exponentialfunktionen", kategorie: "Funktionen", subkategorie: "Exponential- und trigonometrische Funktionen", kbId: "MAP-fkt-exponentialfunktionen", landkarte: true, schritte: [
     { text: "Exponentielles Wachstum und Zerfall", fertig: false },
     { text: "Eigenschaften der Exponentialfunktion", fertig: false },
     { text: "Basis und Wachstumsfaktor", fertig: false },
@@ -266,14 +266,14 @@ export const MATHE_LANDKARTE = [
     { text: "Verschieben und Strecken von Exponentialfunktionen", fertig: false },
     { text: "Anwendungen aus Natur und Alltag", fertig: false },
   ] },
-  { id: "fkt-logarithmusfunktionen", label: "Logarithmusfunktionen", kategorie: "Funktionen", kbId: "MAP-fkt-logarithmusfunktionen", landkarte: true, schritte: [
+  { id: "fkt-logarithmusfunktionen", label: "Logarithmusfunktionen", kategorie: "Funktionen", subkategorie: "Exponential- und trigonometrische Funktionen", kbId: "MAP-fkt-logarithmusfunktionen", landkarte: true, schritte: [
     { text: "Der Logarithmus als Umkehrung", fertig: false },
     { text: "Logarithmusgesetze anwenden", fertig: false },
     { text: "Die Logarithmusfunktion und ihr Graph", fertig: false },
     { text: "Logarithmus zur Basis e und natuerlicher Logarithmus", fertig: false },
     { text: "Exponentialgleichungen mit dem Logarithmus loesen", fertig: false },
   ] },
-  { id: "fkt-trigonometrische-funktionen", label: "Trigonometrische Funktionen", kategorie: "Funktionen", kbId: "MAP-fkt-trigonometrische-funktionen", landkarte: true, schritte: [
+  { id: "fkt-trigonometrische-funktionen", label: "Trigonometrische Funktionen", kategorie: "Funktionen", subkategorie: "Exponential- und trigonometrische Funktionen", kbId: "MAP-fkt-trigonometrische-funktionen", landkarte: true, schritte: [
     { text: "Sinus und Kosinus am Einheitskreis", fertig: false },
     { text: "Bogenmass und Gradmass", fertig: false },
     { text: "Graphen von Sinus und Kosinus", fertig: false },
@@ -281,7 +281,7 @@ export const MATHE_LANDKARTE = [
     { text: "Die Tangensfunktion", fertig: false },
     { text: "Periodische Vorgaenge beschreiben", fertig: false },
   ] },
-  { id: "fkt-funktionseigenschaften", label: "Funktionseigenschaften untersuchen", kategorie: "Funktionen", kbId: "MAP-fkt-funktionseigenschaften", landkarte: true, schritte: [
+  { id: "fkt-funktionseigenschaften", label: "Funktionseigenschaften untersuchen", kategorie: "Funktionen", subkategorie: "Grundlagen der Funktionen", kbId: "MAP-fkt-funktionseigenschaften", landkarte: true, schritte: [
     { text: "Nullstellen und Schnittpunkte mit den Achsen", fertig: false },
     { text: "Achsensymmetrie und Punktsymmetrie", fertig: false },
     { text: "Monotonie und Monotonieverhalten", fertig: false },
@@ -289,20 +289,20 @@ export const MATHE_LANDKARTE = [
     { text: "Grenzverhalten und Asymptoten", fertig: false },
     { text: "Wertebereich und Beschraenktheit", fertig: false },
   ] },
-  { id: "fkt-funktionen-verknuepfen-und-veraendern", label: "Funktionen verknuepfen und veraendern", kategorie: "Funktionen", kbId: "MAP-fkt-funktionen-verknuepfen-und-veraendern", landkarte: true, schritte: [
+  { id: "fkt-funktionen-verknuepfen-und-veraendern", label: "Funktionen verknuepfen und veraendern", kategorie: "Funktionen", subkategorie: "Grundlagen der Funktionen", kbId: "MAP-fkt-funktionen-verknuepfen-und-veraendern", landkarte: true, schritte: [
     { text: "Verschieben in x- und y-Richtung", fertig: false },
     { text: "Strecken und Stauchen von Graphen", fertig: false },
     { text: "Spiegeln an den Achsen", fertig: false },
     { text: "Summen und Produkte von Funktionen", fertig: false },
     { text: "Verkettung von Funktionen", fertig: false },
   ] },
-  { id: "fkt-umkehrfunktion", label: "Umkehrfunktionen", kategorie: "Funktionen", kbId: "MAP-fkt-umkehrfunktion", landkarte: true, schritte: [
+  { id: "fkt-umkehrfunktion", label: "Umkehrfunktionen", kategorie: "Funktionen", subkategorie: "Grundlagen der Funktionen", kbId: "MAP-fkt-umkehrfunktion", landkarte: true, schritte: [
     { text: "Eineindeutigkeit und Umkehrbarkeit", fertig: false },
     { text: "Umkehrfunktion bestimmen", fertig: false },
     { text: "Graph der Umkehrfunktion durch Spiegelung", fertig: false },
     { text: "Definitions- und Wertebereich der Umkehrfunktion", fertig: false },
   ] },
-  { id: "geo-grundbegriffe-und-winkel", label: "Grundbegriffe und Winkel", kategorie: "Geometrie", kbId: "MAP-geo-grundbegriffe-und-winkel", landkarte: true, schritte: [
+  { id: "geo-grundbegriffe-und-winkel", label: "Grundbegriffe und Winkel", kategorie: "Geometrie", subkategorie: "Grundlagen und Figuren", kbId: "MAP-geo-grundbegriffe-und-winkel", landkarte: true, schritte: [
     { text: "Punkt, Gerade, Strecke und Strahl", fertig: false },
     { text: "Parallele und senkrechte Geraden", fertig: false },
     { text: "Winkel messen und zeichnen", fertig: false },
@@ -311,7 +311,7 @@ export const MATHE_LANDKARTE = [
     { text: "Scheitel- und Nebenwinkel", fertig: false },
     { text: "Stufen- und Wechselwinkel", fertig: false },
   ] },
-  { id: "geo-dreiecke-und-kongruenz", label: "Dreiecke und Kongruenz", kategorie: "Geometrie", kbId: "MAP-geo-dreiecke-und-kongruenz", landkarte: true, schritte: [
+  { id: "geo-dreiecke-und-kongruenz", label: "Dreiecke und Kongruenz", kategorie: "Geometrie", subkategorie: "Grundlagen und Figuren", kbId: "MAP-geo-dreiecke-und-kongruenz", landkarte: true, schritte: [
     { text: "Dreiecksarten unterscheiden", fertig: false },
     { text: "Winkelsumme im Dreieck", fertig: false },
     { text: "Besondere Linien im Dreieck", fertig: false },
@@ -319,14 +319,14 @@ export const MATHE_LANDKARTE = [
     { text: "Kongruenzsaetze anwenden", fertig: false },
     { text: "Dreiecke konstruieren", fertig: false },
   ] },
-  { id: "geo-vierecke-und-vielecke", label: "Vierecke und Vielecke", kategorie: "Geometrie", kbId: "MAP-geo-vierecke-und-vielecke", landkarte: true, schritte: [
+  { id: "geo-vierecke-und-vielecke", label: "Vierecke und Vielecke", kategorie: "Geometrie", subkategorie: "Grundlagen und Figuren", kbId: "MAP-geo-vierecke-und-vielecke", landkarte: true, schritte: [
     { text: "Haus der Vierecke", fertig: false },
     { text: "Eigenschaften von Parallelogramm und Raute", fertig: false },
     { text: "Trapez und Drachenviereck", fertig: false },
     { text: "Winkelsumme im Vieleck", fertig: false },
     { text: "Regelmaessige Vielecke", fertig: false },
   ] },
-  { id: "geo-flaecheninhalt-und-umfang", label: "Flaecheninhalt und Umfang", kategorie: "Geometrie", kbId: "MAP-geo-flaecheninhalt-und-umfang", landkarte: true, schritte: [
+  { id: "geo-flaecheninhalt-und-umfang", label: "Flaecheninhalt und Umfang", kategorie: "Geometrie", subkategorie: "Flächen, Körper und Raum", kbId: "MAP-geo-flaecheninhalt-und-umfang", landkarte: true, schritte: [
     { text: "Umfang von Vielecken", fertig: false },
     { text: "Flaecheninhalt von Rechteck und Quadrat", fertig: false },
     { text: "Flaecheninhalt von Dreieck und Parallelogramm", fertig: false },
@@ -334,7 +334,7 @@ export const MATHE_LANDKARTE = [
     { text: "Flaecheninhalt zusammengesetzter Figuren", fertig: false },
     { text: "Flaecheneinheiten umrechnen", fertig: false },
   ] },
-  { id: "geo-kreis-und-kreisteile", label: "Kreis und Kreisteile", kategorie: "Geometrie", kbId: "MAP-geo-kreis-und-kreisteile", landkarte: true, schritte: [
+  { id: "geo-kreis-und-kreisteile", label: "Kreis und Kreisteile", kategorie: "Geometrie", subkategorie: "Dreieck und Kreis", kbId: "MAP-geo-kreis-und-kreisteile", landkarte: true, schritte: [
     { text: "Teile des Kreises benennen", fertig: false },
     { text: "Umfang des Kreises berechnen", fertig: false },
     { text: "Flaecheninhalt des Kreises berechnen", fertig: false },
@@ -342,14 +342,14 @@ export const MATHE_LANDKARTE = [
     { text: "Kreisring berechnen", fertig: false },
     { text: "Satz des Thales", fertig: false },
   ] },
-  { id: "geo-satz-des-pythagoras", label: "Satz des Pythagoras", kategorie: "Geometrie", kbId: "MAP-geo-satz-des-pythagoras", landkarte: true, schritte: [
+  { id: "geo-satz-des-pythagoras", label: "Satz des Pythagoras", kategorie: "Geometrie", subkategorie: "Dreieck und Kreis", kbId: "MAP-geo-satz-des-pythagoras", landkarte: true, schritte: [
     { text: "Benennung am rechtwinkligen Dreieck", fertig: false },
     { text: "Satz des Pythagoras anwenden", fertig: false },
     { text: "Laengen mit dem Satz berechnen", fertig: false },
     { text: "Kathetensatz und Hoehensatz", fertig: false },
     { text: "Anwendungen in Figuren und Koerpern", fertig: false },
   ] },
-  { id: "geo-trigonometrie-am-dreieck", label: "Trigonometrie am Dreieck", kategorie: "Geometrie", kbId: "MAP-geo-trigonometrie-am-dreieck", landkarte: true, schritte: [
+  { id: "geo-trigonometrie-am-dreieck", label: "Trigonometrie am Dreieck", kategorie: "Geometrie", subkategorie: "Dreieck und Kreis", kbId: "MAP-geo-trigonometrie-am-dreieck", landkarte: true, schritte: [
     { text: "Sinus, Kosinus und Tangens am rechtwinkligen Dreieck", fertig: false },
     { text: "Seiten im rechtwinkligen Dreieck berechnen", fertig: false },
     { text: "Winkel im rechtwinkligen Dreieck berechnen", fertig: false },
@@ -357,14 +357,14 @@ export const MATHE_LANDKARTE = [
     { text: "Kosinussatz anwenden", fertig: false },
     { text: "Anwendungsaufgaben loesen", fertig: false },
   ] },
-  { id: "geo-strahlensaetze", label: "Strahlensaetze", kategorie: "Geometrie", kbId: "MAP-geo-strahlensaetze", landkarte: true, schritte: [
+  { id: "geo-strahlensaetze", label: "Strahlensaetze", kategorie: "Geometrie", subkategorie: "Dreieck und Kreis", kbId: "MAP-geo-strahlensaetze", landkarte: true, schritte: [
     { text: "Erster Strahlensatz", fertig: false },
     { text: "Zweiter Strahlensatz", fertig: false },
     { text: "Streckenverhaeltnisse berechnen", fertig: false },
     { text: "Aehnlichkeit von Dreiecken", fertig: false },
     { text: "Anwendungen der Strahlensaetze", fertig: false },
   ] },
-  { id: "geo-koerper-volumen-und-oberflaeche", label: "Koerper, Volumen und Oberflaeche", kategorie: "Geometrie", kbId: "MAP-geo-koerper-volumen-und-oberflaeche", landkarte: true, schritte: [
+  { id: "geo-koerper-volumen-und-oberflaeche", label: "Koerper, Volumen und Oberflaeche", kategorie: "Geometrie", subkategorie: "Flächen, Körper und Raum", kbId: "MAP-geo-koerper-volumen-und-oberflaeche", landkarte: true, schritte: [
     { text: "Koerper erkennen und Netze zeichnen", fertig: false },
     { text: "Quader und Wuerfel berechnen", fertig: false },
     { text: "Prisma und Zylinder berechnen", fertig: false },
@@ -373,7 +373,7 @@ export const MATHE_LANDKARTE = [
     { text: "Zusammengesetzte Koerper", fertig: false },
     { text: "Volumeneinheiten umrechnen", fertig: false },
   ] },
-  { id: "geo-symmetrie-und-abbildungen", label: "Symmetrie und Abbildungen", kategorie: "Geometrie", kbId: "MAP-geo-symmetrie-und-abbildungen", landkarte: true, schritte: [
+  { id: "geo-symmetrie-und-abbildungen", label: "Symmetrie und Abbildungen", kategorie: "Geometrie", subkategorie: "Grundlagen und Figuren", kbId: "MAP-geo-symmetrie-und-abbildungen", landkarte: true, schritte: [
     { text: "Achsensymmetrie erkennen", fertig: false },
     { text: "Punktsymmetrie erkennen", fertig: false },
     { text: "Achsenspiegelung durchfuehren", fertig: false },
@@ -381,7 +381,7 @@ export const MATHE_LANDKARTE = [
     { text: "Verschiebung und Drehung", fertig: false },
     { text: "Zentrische Streckung", fertig: false },
   ] },
-  { id: "geo-vektoren-grundlagen", label: "Vektoren Grundlagen", kategorie: "Geometrie", kbId: "MAP-geo-vektoren-grundlagen", landkarte: true, schritte: [
+  { id: "geo-vektoren-grundlagen", label: "Vektoren Grundlagen", kategorie: "Geometrie", subkategorie: "Analytische Geometrie", kbId: "MAP-geo-vektoren-grundlagen", landkarte: true, schritte: [
     { text: "Vektoren als Pfeile darstellen", fertig: false },
     { text: "Vektoren addieren und subtrahieren", fertig: false },
     { text: "Vektoren mit Skalaren multiplizieren", fertig: false },
@@ -389,7 +389,7 @@ export const MATHE_LANDKARTE = [
     { text: "Ortsvektoren und Punkte", fertig: false },
     { text: "Lineare Abhaengigkeit von Vektoren", fertig: false },
   ] },
-  { id: "geo-analytische-geometrie-im-raum", label: "Analytische Geometrie im Raum", kategorie: "Geometrie", kbId: "MAP-geo-analytische-geometrie-im-raum", landkarte: true, schritte: [
+  { id: "geo-analytische-geometrie-im-raum", label: "Analytische Geometrie im Raum", kategorie: "Geometrie", subkategorie: "Analytische Geometrie", kbId: "MAP-geo-analytische-geometrie-im-raum", landkarte: true, schritte: [
     { text: "Punkte im dreidimensionalen Koordinatensystem", fertig: false },
     { text: "Geradengleichung in Parameterform", fertig: false },
     { text: "Ebenengleichungen aufstellen", fertig: false },
@@ -398,40 +398,40 @@ export const MATHE_LANDKARTE = [
     { text: "Abstaende berechnen", fertig: false },
     { text: "Kreuzprodukt und Normalenvektor", fertig: false },
   ] },
-  { id: "ana-folgen-und-reihen", label: "Folgen und Reihen", kategorie: "Analysis", kbId: "MAP-ana-folgen-und-reihen", landkarte: true, schritte: [
+  { id: "ana-folgen-und-reihen", label: "Folgen und Reihen", kategorie: "Analysis", subkategorie: "Folgen und Grenzwerte", kbId: "MAP-ana-folgen-und-reihen", landkarte: true, schritte: [
     { text: "Zahlenfolgen und Bildungsgesetze", fertig: false },
     { text: "Arithmetische Folgen", fertig: false },
     { text: "Geometrische Folgen", fertig: false },
     { text: "Reihen und Summenbildung", fertig: false },
     { text: "Monotonie und Beschraenktheit von Folgen", fertig: false },
   ] },
-  { id: "ana-grenzwerte-von-folgen", label: "Grenzwerte von Folgen", kategorie: "Analysis", kbId: "MAP-ana-grenzwerte-von-folgen", landkarte: true, schritte: [
+  { id: "ana-grenzwerte-von-folgen", label: "Grenzwerte von Folgen", kategorie: "Analysis", subkategorie: "Folgen und Grenzwerte", kbId: "MAP-ana-grenzwerte-von-folgen", landkarte: true, schritte: [
     { text: "Begriff des Grenzwerts", fertig: false },
     { text: "Konvergenz und Divergenz", fertig: false },
     { text: "Grenzwertsaetze fuer Folgen", fertig: false },
     { text: "Bestimmung von Folgengrenzwerten", fertig: false },
   ] },
-  { id: "ana-grenzwerte-von-funktionen", label: "Grenzwerte von Funktionen", kategorie: "Analysis", kbId: "MAP-ana-grenzwerte-von-funktionen", landkarte: true, schritte: [
+  { id: "ana-grenzwerte-von-funktionen", label: "Grenzwerte von Funktionen", kategorie: "Analysis", subkategorie: "Folgen und Grenzwerte", kbId: "MAP-ana-grenzwerte-von-funktionen", landkarte: true, schritte: [
     { text: "Grenzwert an einer Stelle", fertig: false },
     { text: "Grenzwerte im Unendlichen", fertig: false },
     { text: "Einseitige Grenzwerte", fertig: false },
     { text: "Verhalten an Definitionsluecken", fertig: false },
     { text: "Asymptoten bestimmen", fertig: false },
   ] },
-  { id: "ana-stetigkeit", label: "Stetigkeit", kategorie: "Analysis", kbId: "MAP-ana-stetigkeit", landkarte: true, schritte: [
+  { id: "ana-stetigkeit", label: "Stetigkeit", kategorie: "Analysis", subkategorie: "Folgen und Grenzwerte", kbId: "MAP-ana-stetigkeit", landkarte: true, schritte: [
     { text: "Begriff der Stetigkeit", fertig: false },
     { text: "Stetigkeit an einer Stelle pruefen", fertig: false },
     { text: "Arten von Unstetigkeitsstellen", fertig: false },
     { text: "Zwischenwertsatz", fertig: false },
   ] },
-  { id: "ana-ableitung-und-differenzierbarkeit", label: "Ableitung und Differenzierbarkeit", kategorie: "Analysis", kbId: "MAP-ana-ableitung-und-differenzierbarkeit", landkarte: true, schritte: [
+  { id: "ana-ableitung-und-differenzierbarkeit", label: "Ableitung und Differenzierbarkeit", kategorie: "Analysis", subkategorie: "Differentialrechnung", kbId: "MAP-ana-ableitung-und-differenzierbarkeit", landkarte: true, schritte: [
     { text: "Mittlere und momentane Aenderungsrate", fertig: false },
     { text: "Differenzenquotient und Differentialquotient", fertig: false },
     { text: "Begriff der Ableitung", fertig: false },
     { text: "Tangentensteigung und Tangentengleichung", fertig: false },
     { text: "Differenzierbarkeit pruefen", fertig: false },
   ] },
-  { id: "ana-ableitungsregeln", label: "Ableitungsregeln", kategorie: "Analysis", kbId: "MAP-ana-ableitungsregeln", landkarte: true, schritte: [
+  { id: "ana-ableitungsregeln", label: "Ableitungsregeln", kategorie: "Analysis", subkategorie: "Differentialrechnung", kbId: "MAP-ana-ableitungsregeln", landkarte: true, schritte: [
     { text: "Potenzregel und Faktorregel", fertig: false },
     { text: "Summenregel", fertig: false },
     { text: "Produktregel", fertig: false },
@@ -439,19 +439,19 @@ export const MATHE_LANDKARTE = [
     { text: "Kettenregel", fertig: false },
     { text: "Hoehere Ableitungen", fertig: false },
   ] },
-  { id: "ana-ableitung-spezieller-funktionen", label: "Ableitung spezieller Funktionen", kategorie: "Analysis", kbId: "MAP-ana-ableitung-spezieller-funktionen", landkarte: true, schritte: [
+  { id: "ana-ableitung-spezieller-funktionen", label: "Ableitung spezieller Funktionen", kategorie: "Analysis", subkategorie: "Differentialrechnung", kbId: "MAP-ana-ableitung-spezieller-funktionen", landkarte: true, schritte: [
     { text: "Ableitung von Potenz- und Wurzelfunktionen", fertig: false },
     { text: "Ableitung der e-Funktion", fertig: false },
     { text: "Ableitung der Logarithmusfunktion", fertig: false },
     { text: "Ableitung von Sinus und Kosinus", fertig: false },
   ] },
-  { id: "ana-monotonie-und-kruemmung", label: "Monotonie und Kruemmung", kategorie: "Analysis", kbId: "MAP-ana-monotonie-und-kruemmung", landkarte: true, schritte: [
+  { id: "ana-monotonie-und-kruemmung", label: "Monotonie und Kruemmung", kategorie: "Analysis", subkategorie: "Differentialrechnung", kbId: "MAP-ana-monotonie-und-kruemmung", landkarte: true, schritte: [
     { text: "Monotonie mit der ersten Ableitung", fertig: false },
     { text: "Hoch- und Tiefpunkte bestimmen", fertig: false },
     { text: "Kruemmungsverhalten mit der zweiten Ableitung", fertig: false },
     { text: "Wendepunkte bestimmen", fertig: false },
   ] },
-  { id: "ana-kurvendiskussion", label: "Kurvendiskussion", kategorie: "Analysis", kbId: "MAP-ana-kurvendiskussion", landkarte: true, schritte: [
+  { id: "ana-kurvendiskussion", label: "Kurvendiskussion", kategorie: "Analysis", subkategorie: "Differentialrechnung", kbId: "MAP-ana-kurvendiskussion", landkarte: true, schritte: [
     { text: "Definitionsbereich und Symmetrie", fertig: false },
     { text: "Nullstellen und Achsenschnittpunkte", fertig: false },
     { text: "Verhalten im Unendlichen und Asymptoten", fertig: false },
@@ -459,100 +459,100 @@ export const MATHE_LANDKARTE = [
     { text: "Wendepunkte bestimmen", fertig: false },
     { text: "Graph zeichnen", fertig: false },
   ] },
-  { id: "ana-extremwertprobleme", label: "Extremwertprobleme", kategorie: "Analysis", kbId: "MAP-ana-extremwertprobleme", landkarte: true, schritte: [
+  { id: "ana-extremwertprobleme", label: "Extremwertprobleme", kategorie: "Analysis", subkategorie: "Differentialrechnung", kbId: "MAP-ana-extremwertprobleme", landkarte: true, schritte: [
     { text: "Zielgroesse und Nebenbedingung aufstellen", fertig: false },
     { text: "Zielfunktion in einer Variablen", fertig: false },
     { text: "Extremstellen berechnen", fertig: false },
     { text: "Loesung pruefen und interpretieren", fertig: false },
   ] },
-  { id: "ana-funktionsscharen", label: "Funktionsscharen", kategorie: "Analysis", kbId: "MAP-ana-funktionsscharen", landkarte: true, schritte: [
+  { id: "ana-funktionsscharen", label: "Funktionsscharen", kategorie: "Analysis", subkategorie: "Differentialrechnung", kbId: "MAP-ana-funktionsscharen", landkarte: true, schritte: [
     { text: "Begriff der Funktionsschar", fertig: false },
     { text: "Ableiten mit Parameter", fertig: false },
     { text: "Extrem- und Wendepunkte in Abhaengigkeit vom Parameter", fertig: false },
     { text: "Ortskurven bestimmen", fertig: false },
   ] },
-  { id: "ana-stammfunktion-und-unbestimmtes-integral", label: "Stammfunktion und unbestimmtes Integral", kategorie: "Analysis", kbId: "MAP-ana-stammfunktion-und-unbestimmtes-integral", landkarte: true, schritte: [
+  { id: "ana-stammfunktion-und-unbestimmtes-integral", label: "Stammfunktion und unbestimmtes Integral", kategorie: "Analysis", subkategorie: "Integralrechnung", kbId: "MAP-ana-stammfunktion-und-unbestimmtes-integral", landkarte: true, schritte: [
     { text: "Begriff der Stammfunktion", fertig: false },
     { text: "Grundintegrale", fertig: false },
     { text: "Integrationsregeln fuer Summen und Faktoren", fertig: false },
     { text: "Unbestimmtes Integral bestimmen", fertig: false },
   ] },
-  { id: "ana-bestimmtes-integral", label: "Bestimmtes Integral", kategorie: "Analysis", kbId: "MAP-ana-bestimmtes-integral", landkarte: true, schritte: [
+  { id: "ana-bestimmtes-integral", label: "Bestimmtes Integral", kategorie: "Analysis", subkategorie: "Integralrechnung", kbId: "MAP-ana-bestimmtes-integral", landkarte: true, schritte: [
     { text: "Begriff des bestimmten Integrals", fertig: false },
     { text: "Hauptsatz der Differential- und Integralrechnung", fertig: false },
     { text: "Berechnung bestimmter Integrale", fertig: false },
     { text: "Eigenschaften des Integrals", fertig: false },
   ] },
-  { id: "ana-flaecheninhalt-mit-integralen", label: "Flaecheninhalt mit Integralen", kategorie: "Analysis", kbId: "MAP-ana-flaecheninhalt-mit-integralen", landkarte: true, schritte: [
+  { id: "ana-flaecheninhalt-mit-integralen", label: "Flaecheninhalt mit Integralen", kategorie: "Analysis", subkategorie: "Integralrechnung", kbId: "MAP-ana-flaecheninhalt-mit-integralen", landkarte: true, schritte: [
     { text: "Flaeche zwischen Graph und x-Achse", fertig: false },
     { text: "Flaeche bei Vorzeichenwechsel", fertig: false },
     { text: "Flaeche zwischen zwei Graphen", fertig: false },
     { text: "Uneigentliche Integrale", fertig: false },
   ] },
-  { id: "ana-integrationsverfahren", label: "Integrationsverfahren", kategorie: "Analysis", kbId: "MAP-ana-integrationsverfahren", landkarte: true, schritte: [
+  { id: "ana-integrationsverfahren", label: "Integrationsverfahren", kategorie: "Analysis", subkategorie: "Integralrechnung", kbId: "MAP-ana-integrationsverfahren", landkarte: true, schritte: [
     { text: "Integration durch Substitution", fertig: false },
     { text: "Partielle Integration", fertig: false },
     { text: "Integration spezieller Funktionen", fertig: false },
   ] },
-  { id: "ana-anwendungen-der-analysis", label: "Anwendungen der Analysis", kategorie: "Analysis", kbId: "MAP-ana-anwendungen-der-analysis", landkarte: true, schritte: [
+  { id: "ana-anwendungen-der-analysis", label: "Anwendungen der Analysis", kategorie: "Analysis", subkategorie: "Anwendungen", kbId: "MAP-ana-anwendungen-der-analysis", landkarte: true, schritte: [
     { text: "Wachstums- und Zerfallsprozesse", fertig: false },
     { text: "Rekonstruktion von Bestaenden aus Raten", fertig: false },
     { text: "Mittelwert einer Funktion", fertig: false },
     { text: "Sachbezogene Optimierungsaufgaben", fertig: false },
   ] },
-  { id: "sto-beschreibende-statistik", label: "Beschreibende Statistik", kategorie: "Stochastik", kbId: "MAP-sto-beschreibende-statistik", landkarte: true, schritte: [
+  { id: "sto-beschreibende-statistik", label: "Beschreibende Statistik", kategorie: "Stochastik", subkategorie: "Beschreibende Statistik", kbId: "MAP-sto-beschreibende-statistik", landkarte: true, schritte: [
     { text: "Daten erfassen und in Tabellen ordnen", fertig: false },
     { text: "Absolute und relative Haeufigkeiten", fertig: false },
     { text: "Diagramme lesen und zeichnen", fertig: false },
     { text: "Klasseneinteilung und Histogramm", fertig: false },
   ] },
-  { id: "sto-mittelwerte-und-streuung", label: "Mittelwerte und Streuung", kategorie: "Stochastik", kbId: "MAP-sto-mittelwerte-und-streuung", landkarte: true, schritte: [
+  { id: "sto-mittelwerte-und-streuung", label: "Mittelwerte und Streuung", kategorie: "Stochastik", subkategorie: "Beschreibende Statistik", kbId: "MAP-sto-mittelwerte-und-streuung", landkarte: true, schritte: [
     { text: "Arithmetisches Mittel berechnen", fertig: false },
     { text: "Median und Modalwert bestimmen", fertig: false },
     { text: "Spannweite und Quartile", fertig: false },
     { text: "Boxplot zeichnen und deuten", fertig: false },
     { text: "Varianz und Standardabweichung", fertig: false },
   ] },
-  { id: "sto-zufallsexperimente-und-ereignisse", label: "Zufallsexperimente und Ereignisse", kategorie: "Stochastik", kbId: "MAP-sto-zufallsexperimente-und-ereignisse", landkarte: true, schritte: [
+  { id: "sto-zufallsexperimente-und-ereignisse", label: "Zufallsexperimente und Ereignisse", kategorie: "Stochastik", subkategorie: "Wahrscheinlichkeit", kbId: "MAP-sto-zufallsexperimente-und-ereignisse", landkarte: true, schritte: [
     { text: "Zufallsexperiment und Ergebnismenge", fertig: false },
     { text: "Ereignisse beschreiben", fertig: false },
     { text: "Gegenereignis und unmoegliches Ereignis", fertig: false },
     { text: "Ereignisse verknuepfen mit und und oder", fertig: false },
   ] },
-  { id: "sto-laplace-wahrscheinlichkeit", label: "Laplace-Wahrscheinlichkeit", kategorie: "Stochastik", kbId: "MAP-sto-laplace-wahrscheinlichkeit", landkarte: true, schritte: [
+  { id: "sto-laplace-wahrscheinlichkeit", label: "Laplace-Wahrscheinlichkeit", kategorie: "Stochastik", subkategorie: "Wahrscheinlichkeit", kbId: "MAP-sto-laplace-wahrscheinlichkeit", landkarte: true, schritte: [
     { text: "Wahrscheinlichkeit als relative Haeufigkeit", fertig: false },
     { text: "Laplace-Regel anwenden", fertig: false },
     { text: "Guenstige durch moegliche Ergebnisse", fertig: false },
     { text: "Wahrscheinlichkeit des Gegenereignisses", fertig: false },
   ] },
-  { id: "sto-mehrstufige-zufallsexperimente", label: "Mehrstufige Zufallsexperimente", kategorie: "Stochastik", kbId: "MAP-sto-mehrstufige-zufallsexperimente", landkarte: true, schritte: [
+  { id: "sto-mehrstufige-zufallsexperimente", label: "Mehrstufige Zufallsexperimente", kategorie: "Stochastik", subkategorie: "Wahrscheinlichkeit", kbId: "MAP-sto-mehrstufige-zufallsexperimente", landkarte: true, schritte: [
     { text: "Baumdiagramm erstellen", fertig: false },
     { text: "Erste Pfadregel anwenden", fertig: false },
     { text: "Zweite Pfadregel anwenden", fertig: false },
     { text: "Ziehen mit und ohne Zuruecklegen", fertig: false },
   ] },
-  { id: "sto-bedingte-wahrscheinlichkeit", label: "Bedingte Wahrscheinlichkeit", kategorie: "Stochastik", kbId: "MAP-sto-bedingte-wahrscheinlichkeit", landkarte: true, schritte: [
+  { id: "sto-bedingte-wahrscheinlichkeit", label: "Bedingte Wahrscheinlichkeit", kategorie: "Stochastik", subkategorie: "Wahrscheinlichkeit", kbId: "MAP-sto-bedingte-wahrscheinlichkeit", landkarte: true, schritte: [
     { text: "Bedingte Wahrscheinlichkeit verstehen", fertig: false },
     { text: "Vierfeldertafel aufstellen", fertig: false },
     { text: "Umgekehrtes Baumdiagramm", fertig: false },
     { text: "Satz von Bayes anwenden", fertig: false },
     { text: "Stochastische Unabhaengigkeit pruefen", fertig: false },
   ] },
-  { id: "sto-kombinatorik", label: "Kombinatorik", kategorie: "Stochastik", kbId: "MAP-sto-kombinatorik", landkarte: true, schritte: [
+  { id: "sto-kombinatorik", label: "Kombinatorik", kategorie: "Stochastik", subkategorie: "Wahrscheinlichkeit", kbId: "MAP-sto-kombinatorik", landkarte: true, schritte: [
     { text: "Zaehlprinzip anwenden", fertig: false },
     { text: "Permutationen berechnen", fertig: false },
     { text: "Variationen mit und ohne Wiederholung", fertig: false },
     { text: "Kombinationen und Binomialkoeffizient", fertig: false },
     { text: "Urnenmodelle unterscheiden", fertig: false },
   ] },
-  { id: "sto-zufallsgroessen-und-erwartungswert", label: "Zufallsgroessen und Erwartungswert", kategorie: "Stochastik", kbId: "MAP-sto-zufallsgroessen-und-erwartungswert", landkarte: true, schritte: [
+  { id: "sto-zufallsgroessen-und-erwartungswert", label: "Zufallsgroessen und Erwartungswert", kategorie: "Stochastik", subkategorie: "Verteilungen und Tests", kbId: "MAP-sto-zufallsgroessen-und-erwartungswert", landkarte: true, schritte: [
     { text: "Zufallsgroesse definieren", fertig: false },
     { text: "Wahrscheinlichkeitsverteilung aufstellen", fertig: false },
     { text: "Erwartungswert berechnen", fertig: false },
     { text: "Varianz und Standardabweichung der Zufallsgroesse", fertig: false },
     { text: "Faire Spiele beurteilen", fertig: false },
   ] },
-  { id: "sto-bernoulli-und-binomialverteilung", label: "Bernoulli und Binomialverteilung", kategorie: "Stochastik", kbId: "MAP-sto-bernoulli-und-binomialverteilung", landkarte: true, schritte: [
+  { id: "sto-bernoulli-und-binomialverteilung", label: "Bernoulli und Binomialverteilung", kategorie: "Stochastik", subkategorie: "Verteilungen und Tests", kbId: "MAP-sto-bernoulli-und-binomialverteilung", landkarte: true, schritte: [
     { text: "Bernoulli-Experiment und Bernoulli-Kette", fertig: false },
     { text: "Formel der Binomialverteilung", fertig: false },
     { text: "Wahrscheinlichkeiten mit dem Taschenrechner", fertig: false },
@@ -560,14 +560,14 @@ export const MATHE_LANDKARTE = [
     { text: "Erwartungswert und Standardabweichung", fertig: false },
     { text: "Histogramm der Binomialverteilung", fertig: false },
   ] },
-  { id: "sto-normalverteilung", label: "Normalverteilung", kategorie: "Stochastik", kbId: "MAP-sto-normalverteilung", landkarte: true, schritte: [
+  { id: "sto-normalverteilung", label: "Normalverteilung", kategorie: "Stochastik", subkategorie: "Verteilungen und Tests", kbId: "MAP-sto-normalverteilung", landkarte: true, schritte: [
     { text: "Von der Binomial- zur Normalverteilung", fertig: false },
     { text: "Gauss-Glockenkurve und ihre Kennwerte", fertig: false },
     { text: "Standardnormalverteilung nutzen", fertig: false },
     { text: "Wahrscheinlichkeiten mit Intervallen", fertig: false },
     { text: "Sigma-Regeln anwenden", fertig: false },
   ] },
-  { id: "sto-hypothesentest", label: "Hypothesentest", kategorie: "Stochastik", kbId: "MAP-sto-hypothesentest", landkarte: true, schritte: [
+  { id: "sto-hypothesentest", label: "Hypothesentest", kategorie: "Stochastik", subkategorie: "Verteilungen und Tests", kbId: "MAP-sto-hypothesentest", landkarte: true, schritte: [
     { text: "Null- und Gegenhypothese aufstellen", fertig: false },
     { text: "Ein- und zweiseitiger Test", fertig: false },
     { text: "Ablehnungsbereich bestimmen", fertig: false },
@@ -575,69 +575,69 @@ export const MATHE_LANDKARTE = [
     { text: "Fehler erster und zweiter Art", fertig: false },
     { text: "Testentscheidung treffen", fertig: false },
   ] },
-  { id: "ang-zinseszins", label: "Zinseszins", kategorie: "Angewandte Mathematik", kbId: "MAP-ang-zinseszins", landkarte: true, schritte: [
+  { id: "ang-zinseszins", label: "Zinseszins", kategorie: "Angewandte Mathematik", subkategorie: "Finanzen und Verhältnisse", kbId: "MAP-ang-zinseszins", landkarte: true, schritte: [
     { text: "Idee des Zinseszinses verstehen", fertig: false },
     { text: "Zinseszinsformel anwenden", fertig: false },
     { text: "Endkapital und Laufzeit berechnen", fertig: false },
     { text: "Anfangskapital und Zinssatz bestimmen", fertig: false },
     { text: "Sparplaene und regelmaessige Einzahlungen", fertig: false },
   ] },
-  { id: "ang-exponentielles-wachstum", label: "Exponentielles Wachstum", kategorie: "Angewandte Mathematik", kbId: "MAP-ang-exponentielles-wachstum", landkarte: true, schritte: [
+  { id: "ang-exponentielles-wachstum", label: "Exponentielles Wachstum", kategorie: "Angewandte Mathematik", subkategorie: "Wachstum und Zerfall", kbId: "MAP-ang-exponentielles-wachstum", landkarte: true, schritte: [
     { text: "Lineares und exponentielles Wachstum unterscheiden", fertig: false },
     { text: "Wachstumsfaktor und Wachstumsrate", fertig: false },
     { text: "Wachstumsformel aufstellen und nutzen", fertig: false },
     { text: "Verdopplungszeit berechnen", fertig: false },
     { text: "Wachstumsprozesse modellieren", fertig: false },
   ] },
-  { id: "ang-exponentieller-zerfall", label: "Exponentieller Zerfall", kategorie: "Angewandte Mathematik", kbId: "MAP-ang-exponentieller-zerfall", landkarte: true, schritte: [
+  { id: "ang-exponentieller-zerfall", label: "Exponentieller Zerfall", kategorie: "Angewandte Mathematik", subkategorie: "Wachstum und Zerfall", kbId: "MAP-ang-exponentieller-zerfall", landkarte: true, schritte: [
     { text: "Zerfallsprozesse erkennen", fertig: false },
     { text: "Zerfallsfaktor und Zerfallsrate", fertig: false },
     { text: "Zerfallsformel anwenden", fertig: false },
     { text: "Halbwertszeit berechnen", fertig: false },
     { text: "Anwendungen wie Abkuehlung und Radioaktivitaet", fertig: false },
   ] },
-  { id: "ang-beschraenktes-und-logistisches-wachstum", label: "Beschraenktes und logistisches Wachstum", kategorie: "Angewandte Mathematik", kbId: "MAP-ang-beschraenktes-und-logistisches-wachstum", landkarte: true, schritte: [
+  { id: "ang-beschraenktes-und-logistisches-wachstum", label: "Beschraenktes und logistisches Wachstum", kategorie: "Angewandte Mathematik", subkategorie: "Wachstum und Zerfall", kbId: "MAP-ang-beschraenktes-und-logistisches-wachstum", landkarte: true, schritte: [
     { text: "Grenzen von Wachstumsprozessen erkennen", fertig: false },
     { text: "Beschraenktes Wachstum beschreiben", fertig: false },
     { text: "Logistisches Wachstum verstehen", fertig: false },
     { text: "Saettigungsgrenze bestimmen", fertig: false },
     { text: "Wachstumsmodelle vergleichen", fertig: false },
   ] },
-  { id: "ang-sachaufgaben-und-modellieren", label: "Sachaufgaben und Modellieren", kategorie: "Angewandte Mathematik", kbId: "MAP-ang-sachaufgaben-und-modellieren", landkarte: true, schritte: [
+  { id: "ang-sachaufgaben-und-modellieren", label: "Sachaufgaben und Modellieren", kategorie: "Angewandte Mathematik", subkategorie: "Modellieren und Optimieren", kbId: "MAP-ang-sachaufgaben-und-modellieren", landkarte: true, schritte: [
     { text: "Textaufgaben verstehen und Daten erfassen", fertig: false },
     { text: "Vom Sachverhalt zum Rechenansatz", fertig: false },
     { text: "Mathematisches Modell aufstellen", fertig: false },
     { text: "Loesung berechnen und ueberpruefen", fertig: false },
     { text: "Ergebnis im Sachzusammenhang deuten", fertig: false },
   ] },
-  { id: "ang-diagramme-lesen-und-erstellen", label: "Diagramme lesen und erstellen", kategorie: "Angewandte Mathematik", kbId: "MAP-ang-diagramme-lesen-und-erstellen", landkarte: true, schritte: [
+  { id: "ang-diagramme-lesen-und-erstellen", label: "Diagramme lesen und erstellen", kategorie: "Angewandte Mathematik", subkategorie: "Daten im Alltag", kbId: "MAP-ang-diagramme-lesen-und-erstellen", landkarte: true, schritte: [
     { text: "Saeulen- und Balkendiagramme", fertig: false },
     { text: "Liniendiagramme lesen", fertig: false },
     { text: "Kreisdiagramme erstellen", fertig: false },
     { text: "Daten passend darstellen", fertig: false },
     { text: "Diagramme kritisch beurteilen", fertig: false },
   ] },
-  { id: "ang-daten-und-kennwerte", label: "Daten und Kennwerte", kategorie: "Angewandte Mathematik", kbId: "MAP-ang-daten-und-kennwerte", landkarte: true, schritte: [
+  { id: "ang-daten-und-kennwerte", label: "Daten und Kennwerte", kategorie: "Angewandte Mathematik", subkategorie: "Daten im Alltag", kbId: "MAP-ang-daten-und-kennwerte", landkarte: true, schritte: [
     { text: "Daten sammeln und ordnen", fertig: false },
     { text: "Haeufigkeiten und Haeufigkeitstabellen", fertig: false },
     { text: "Mittelwert, Median und Modalwert", fertig: false },
     { text: "Spannweite und Streuung", fertig: false },
     { text: "Boxplot lesen und zeichnen", fertig: false },
   ] },
-  { id: "ang-massstab-und-karten", label: "Massstab und Karten", kategorie: "Angewandte Mathematik", kbId: "MAP-ang-massstab-und-karten", landkarte: true, schritte: [
+  { id: "ang-massstab-und-karten", label: "Massstab und Karten", kategorie: "Angewandte Mathematik", subkategorie: "Finanzen und Verhältnisse", kbId: "MAP-ang-massstab-und-karten", landkarte: true, schritte: [
     { text: "Massstab verstehen", fertig: false },
     { text: "Vergroessern und Verkleinern", fertig: false },
     { text: "Strecken auf Karten berechnen", fertig: false },
     { text: "Massstab in Plaenen und Modellen anwenden", fertig: false },
   ] },
-  { id: "ang-optimierung-im-alltag", label: "Optimierung im Alltag", kategorie: "Angewandte Mathematik", kbId: "MAP-ang-optimierung-im-alltag", landkarte: true, schritte: [
+  { id: "ang-optimierung-im-alltag", label: "Optimierung im Alltag", kategorie: "Angewandte Mathematik", subkategorie: "Modellieren und Optimieren", kbId: "MAP-ang-optimierung-im-alltag", landkarte: true, schritte: [
     { text: "Optimierungsfragen erkennen", fertig: false },
     { text: "Zielgroesse und Nebenbedingung aufstellen", fertig: false },
     { text: "Zielfunktion bilden", fertig: false },
     { text: "Groesstes oder kleinstes Ergebnis bestimmen", fertig: false },
     { text: "Loesung im Alltag deuten", fertig: false },
   ] },
-  { id: "ang-finanzmathematik-im-alltag", label: "Finanzmathematik im Alltag", kategorie: "Angewandte Mathematik", kbId: "MAP-ang-finanzmathematik-im-alltag", landkarte: true, schritte: [
+  { id: "ang-finanzmathematik-im-alltag", label: "Finanzmathematik im Alltag", kategorie: "Angewandte Mathematik", subkategorie: "Finanzen und Verhältnisse", kbId: "MAP-ang-finanzmathematik-im-alltag", landkarte: true, schritte: [
     { text: "Rabatt, Skonto und Mehrwertsteuer", fertig: false },
     { text: "Preise vergleichen und berechnen", fertig: false },
     { text: "Kredite und Ratenzahlung", fertig: false },

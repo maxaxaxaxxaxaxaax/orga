@@ -14,28 +14,28 @@ export const faecher = [
     fach: "Mathematik",
     farbe: "#3b5bdb",
     themen: [
-      { id: "grundlagen", label: "Grundlagen negative Zahlen", etappe: 4, kbId: "7MA1", kategorie: "Mathematische Grundlagen", schritte: [
+      { id: "grundlagen", label: "Grundlagen negative Zahlen", etappe: 4, kbId: "7MA1", kategorie: "Mathematische Grundlagen", subkategorie: "Negative Zahlen", schritte: [
         { text: "Zahlengerade mit negativen Zahlen verstehen", fertig: false },
         { text: "Vorzeichen erkennen und benennen", fertig: false },
         { text: "Negative Zahlen ordnen und vergleichen", fertig: false },
       ] },
-      { id: "addsub", label: "Addieren & Subtrahieren", etappe: 4, kbId: "7MA2", kategorie: "Mathematische Grundlagen", schritte: [
+      { id: "addsub", label: "Addieren & Subtrahieren", etappe: 4, kbId: "7MA2", kategorie: "Mathematische Grundlagen", subkategorie: "Negative Zahlen", schritte: [
         { text: "Vorzeichenregeln Addition", fertig: false },
         { text: "Vorzeichenregeln Subtraktion", fertig: false },
         { text: "Übungen mit gemischten Aufgaben", fertig: false },
       ] },
-      { id: "muldiv", label: "Multiplikation & Division", etappe: 4, kbId: "7MA3", kategorie: "Mathematische Grundlagen", schritte: [
+      { id: "muldiv", label: "Multiplikation & Division", etappe: 4, kbId: "7MA3", kategorie: "Mathematische Grundlagen", subkategorie: "Negative Zahlen", schritte: [
         { text: "Vorzeichen bei Multiplikation", fertig: false },
         { text: "Vorzeichen bei Division", fertig: false },
         { text: "Sicher mit Punkt- vor Strichrechnung", fertig: false },
       ] },
-      { id: "rechengesetze", label: "Rechengesetze mit Vorzeichen", etappe: 4, kbId: "7MA4", kategorie: "Mathematische Grundlagen", schritte: [
+      { id: "rechengesetze", label: "Rechengesetze mit Vorzeichen", etappe: 4, kbId: "7MA4", kategorie: "Mathematische Grundlagen", subkategorie: "Negative Zahlen", schritte: [
         { text: "Kommutativ- und Assoziativgesetz", fertig: false },
         { text: "Distributivgesetz mit Vorzeichen", fertig: false },
         { text: "Klammern auflösen", fertig: false },
         { text: "Anwendungs-Mix", fertig: false },
       ] },
-      { id: "rechendiplom", label: "Rechendiplom", etappe: 4, kbId: "7MA5", kategorie: "Mathematische Grundlagen", schritte: [
+      { id: "rechendiplom", label: "Rechendiplom", etappe: 4, kbId: "7MA5", kategorie: "Mathematische Grundlagen", subkategorie: "Negative Zahlen", schritte: [
         { text: "Kopfrechnen üben", fertig: false },
         { text: "Geschwindigkeit trainieren", fertig: false },
         { text: "Probediplom durchgehen", fertig: false },
