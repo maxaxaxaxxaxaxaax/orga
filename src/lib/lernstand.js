@@ -51,9 +51,10 @@ export function effektiveSchritte(fachId, thema, ctx) {
 export function fachKbStand(fach, ctx) {
   if (!fach) return { erbracht: 0, gesamt: 0 };
   let erbracht = 0;
-  for (const t of fach.themen) {
+  const aktivThemen = fach.themen.filter((t) => !t.landkarte);
+  for (const t of aktivThemen) {
     const s = effektiveSchritte(fach.id, t, ctx);
     if (s.length > 0 && s.every((x) => x.fertig)) erbracht++;
   }
-  return { erbracht, gesamt: fach.themen.length };
+  return { erbracht, gesamt: aktivThemen.length };
 }

@@ -54,6 +54,7 @@ export function tagesEmpfehlung({ jetzt, erledigt = {}, lernschritte = {}, aufga
   const fachObj = faecher.find((f) => f.fach === naechsterKnb.fach);
   if (fachObj && kbTage >= 0 && kbTage <= 6) {
     const aktiv = fachObj.themen
+      .filter((t) => !t.landkarte)
       .map((t) => {
         const schritte = effektiveSchritte(fachObj.id, t, ctx);
         return { schritte, status: themaStatus({ schritte }) };

@@ -35,6 +35,7 @@ export default function Kalender({ jetzt, aufgaben = [], erledigt = {}, lernschr
   let aktiverLernweg = null;
   if (fachObj) {
     const akt = fachObj.themen
+      .filter((t) => !t.landkarte)
       .map((t) => {
         const schritte = effektiveSchritte(fachObj.id, t, ctx);
         return { t, schritte, status: themaStatus({ schritte }) };

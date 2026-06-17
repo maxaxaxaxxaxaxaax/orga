@@ -89,7 +89,7 @@ export function speichereWochenplan(jetzt, plan, skipped = false) {
 export function vorgeschlageneWochenSchritte(ctx) {
   const ergebnis = [];
   for (const f of faecher) {
-    const mitStatus = f.themen.map((t) => {
+    const mitStatus = f.themen.filter((t) => !t.landkarte).map((t) => {
       const schritte = effektiveSchritte(f.id, t, ctx);
       return { f, t, schritte, status: themaStatus({ schritte }) };
     });
@@ -264,7 +264,7 @@ export function wochenrueckblick(ctx) {
   let fertig = 0;
   let gesamt = 0;
   for (const f of faecher) {
-    for (const t of f.themen) {
+    for (const t of f.themen.filter((t) => !t.landkarte)) {
       for (const s of effektiveSchritte(f.id, t, ctx)) {
         gesamt += 1;
         if (s.fertig) fertig += 1;

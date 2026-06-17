@@ -119,7 +119,7 @@ export default function Wissen({
   const fachFortschritt = (f) => {
     let fertig = 0;
     let gesamt = 0;
-    for (const t of f.themen) {
+    for (const t of f.themen.filter((t) => !t.landkarte)) {
       for (const s of effSchritte(f.id, t)) {
         gesamt += 1;
         if (s.fertig) fertig += 1;
@@ -129,7 +129,7 @@ export default function Wissen({
   };
 
   // Etappenfilter: welche Themen/Materialien sind sichtbar?
-  const themenInEtappe = fach.themen.filter((t) => etappe == null || t.etappe === etappe);
+  const themenInEtappe = fach.themen.filter((t) => !t.landkarte && (etappe == null || t.etappe === etappe));
 
   // Knoten = Lernwege; Status aus den (effektiven) Schritten abgeleitet.
   const alleNodes = themenInEtappe.map((t) => {

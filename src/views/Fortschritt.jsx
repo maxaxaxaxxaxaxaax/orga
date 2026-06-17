@@ -67,7 +67,7 @@ export default function Fortschritt({
     .flatMap((f) => {
       // Im Fach-Filter zeigen wir ALLE Lernwege (current + upcoming + done),
       // damit der Schüler ein vollständiges Bild für dieses Fach hat.
-      const eintraege = f.themen.map((t) => {
+      const eintraege = f.themen.filter((t) => !t.landkarte).map((t) => {
         const schritte = effektiveSchritte(f.id, t, ctx);
         const stand = lernwegStand(schritte);
         const naechster = schritte.find((s) => !s.fertig);
