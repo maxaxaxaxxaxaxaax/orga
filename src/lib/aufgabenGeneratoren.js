@@ -444,19 +444,31 @@ function griechAlphabetGen(vorhandene = []) {
 // Erzeugt Aufgaben wie "(−3) · 4", "(−12) ÷ (−4)" mit klarer Vorzeichen-Regel.
 function negativeMultDivGen(vorhandene = []) {
   const vorhandeneFragen = new Set(vorhandene.map((a) => a.frage));
+  const i = vorhandene.length;
   for (let versuch = 0; versuch < 30; versuch++) {
-    const op = Math.random() < 0.5 ? "·" : "÷";
+    // Progression: Stufe 1 nur Mal mit einer negativen Zahl (Vorzeichenregel
+    // kennenlernen), Stufe 2 Mal und Geteilt gemischt, Stufe 3 das knifflige
+    // Minus mal/geteilt Minus.
+    const op = i <= 1 ? "·" : Math.random() < 0.5 ? "·" : "÷";
     let a, b, ergebnis;
     if (op === "·") {
-      a = zufallsZahl(-9, 9);
-      b = zufallsZahl(-9, 9);
+      if (i <= 1) {
+        a = -zufallsZahl(2, 5);
+        b = zufallsZahl(2, 5);
+      } else if (i <= 3) {
+        a = zufallsZahl(-9, 9);
+        b = zufallsZahl(-9, 9);
+      } else {
+        a = -zufallsZahl(2, 9);
+        b = -zufallsZahl(2, 9);
+      }
       if (a === 0 || b === 0) continue;
       ergebnis = a * b;
     } else {
       // Division: wähle b und ergebnis, berechne a so dass es teilbar ist
       b = zufallsZahl(-9, 9);
       if (b === 0) continue;
-      ergebnis = zufallsZahl(-9, 9);
+      ergebnis = i >= 4 ? -zufallsZahl(2, 9) : zufallsZahl(-9, 9);
       if (ergebnis === 0) continue;
       a = b * ergebnis;
       if (a < -90 || a > 90) continue;
