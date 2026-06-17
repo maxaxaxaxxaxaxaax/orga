@@ -57,6 +57,49 @@ function negativeKontextAufgabe() {
   };
 }
 
+// Mehrschrittige Kontext-Aufgabe (Verlauf ueber mehrere Schritte): trainiert das
+// zuverlaessige Rechnen ueber mehrere Stufen. Endantwort ist eine Zahl; der
+// Hinweis zeigt die Schrittfolge (wird im Feedback sichtbar). Schritte werden
+// berechnet, daher immer korrekt.
+function mehrstufigKontextAufgabe() {
+  const fmt = formatNegativeZahl;
+  const art = Math.floor(Math.random() * 3);
+  if (art === 0) {
+    const t0 = zufallsZahl(-6, 3);
+    const d1 = zufallsZahl(3, 10);
+    const t1 = t0 + d1;
+    const d2 = zufallsZahl(3, 10);
+    const erg = t1 - d2;
+    return {
+      frage: `Morgens zeigt das Thermometer ${fmt(t0)} Grad. Bis Mittag wird es ${d1} Grad wärmer, bis zum Abend ${d2} Grad kälter. Was zeigt es abends?`,
+      loesung: erg,
+      hint: `Schritt für Schritt: ${fmt(t0)} + ${d1} = ${fmt(t1)}, dann ${fmt(t1)} − ${d2} = ${fmt(erg)}.`,
+    };
+  }
+  if (art === 1) {
+    const a = zufallsZahl(-12, -3);
+    const b = zufallsZahl(10, 25);
+    const c = zufallsZahl(8, 20);
+    const s1 = a + b;
+    const erg = s1 - c;
+    return {
+      frage: `Dein Kontostand ist ${fmt(a)} Euro. Du bekommst ${b} Euro, dann gibst du ${c} Euro aus. Wie ist der Endstand?`,
+      loesung: erg,
+      hint: `${fmt(a)} + ${b} = ${fmt(s1)}, dann ${fmt(s1)} − ${c} = ${fmt(erg)} Euro.`,
+    };
+  }
+  const a = zufallsZahl(-4, -2);
+  const up = zufallsZahl(2, 6);
+  const down = zufallsZahl(2, 7);
+  const s1 = a + up;
+  const erg = s1 - down;
+  return {
+    frage: `Ein Aufzug steht im Untergeschoss ${fmt(a)}. Er fährt erst ${up} Stockwerke nach oben, dann ${down} nach unten. Wo hält er?`,
+    loesung: erg,
+    hint: `${fmt(a)} + ${up} = ${fmt(s1)}, dann ${fmt(s1)} − ${down} = ${fmt(erg)}.`,
+  };
+}
+
 // Eine reine Vorzeichen-Rechnung mit passendem Hinweis bauen.
 function baueRechnung(a, b, op) {
   const result = op === "+" ? a + b : a - b;
@@ -82,9 +125,11 @@ function negativeZahlenGen(vorhandene = []) {
   const i = vorhandene.length;
 
   // Spaeter in der Runde die Anwendung im echten Kontext (Temperatur/Geld/Aufzug).
+  // Die letzte Aufgabe ist eine mehrschrittige Anwendung als kroenender Abschluss.
   if (i >= 5 || (i >= 3 && Math.random() < 0.35)) {
+    const mehrstufig = i >= 5;
     for (let v = 0; v < 12; v++) {
-      const k = negativeKontextAufgabe();
+      const k = mehrstufig ? mehrstufigKontextAufgabe() : negativeKontextAufgabe();
       if (!vorhandeneFragen.has(k.frage)) return k;
     }
   }
