@@ -364,6 +364,56 @@ export const REIHENFOLGE = {
 };
 
 export const AUSWAHLQUIZ = {
+  gr7: {
+    fragen: [
+      {
+        frage: "Ὁ ἄνθρωπος λέγει. (Der Mensch spricht.) In welchem Fall steht „ὁ ἄνθρωπος\"?",
+        optionen: ["Nominativ", "Genitiv", "Dativ", "Akkusativ"],
+        richtig: 0,
+        erklaerung: "Wer spricht? Der Mensch ist das Subjekt, also Nominativ.",
+      },
+      {
+        frage: "Ὁ ἄνθρωπος τὴν θάλασσαν ὁρᾷ. (Der Mensch sieht das Meer.) In welchem Fall steht „τὴν θάλασσαν\"?",
+        optionen: [
+          "Akkusativ",
+          { text: "Dativ", erklaerung: "Dativ wäre wem? Hier fragst du wen oder was er sieht, das ist Akkusativ." },
+          "Nominativ",
+          "Genitiv",
+        ],
+        richtig: 0,
+        erklaerung: "Wen oder was sieht er? Das Meer ist das direkte Objekt, also Akkusativ (Endung -ν).",
+      },
+      {
+        frage: "Ὁ λόγος τῷ ἀνθρώπῳ πέμπεται. (Das Wort wird dem Menschen geschickt.) In welchem Fall steht „τῷ ἀνθρώπῳ\"?",
+        optionen: [
+          "Dativ",
+          { text: "Akkusativ", erklaerung: "Akkusativ wäre wen? Hier fragst du wem es geschickt wird, das ist Dativ." },
+          "Nominativ",
+          "Genitiv",
+        ],
+        richtig: 0,
+        erklaerung: "Wem wird es geschickt? Der Empfänger steht im Dativ.",
+      },
+      {
+        frage: "Ἡ ἀρετὴ τοῦ ἀνθρώπου μεγάλη ἐστιν. (Die Tugend des Menschen ist groß.) In welchem Fall steht „τοῦ ἀνθρώπου\"?",
+        optionen: ["Genitiv", "Dativ", "Akkusativ", "Nominativ"],
+        richtig: 0,
+        erklaerung: "Wessen Tugend? Die Zugehörigkeit steht im Genitiv.",
+      },
+      {
+        frage: "Ὁ ἄνθρωπος τὸν λόγον λέγει. (Der Mensch spricht das Wort.) In welchem Fall steht „τὸν λόγον\"?",
+        optionen: ["Nominativ", "Akkusativ", "Genitiv", "Dativ"],
+        richtig: 1,
+        erklaerung: "Was spricht er? Das Wort ist das Objekt, also Akkusativ (Endung -ον).",
+      },
+      {
+        frage: "Ἡ θάλασσα μεγάλη ἐστιν. (Das Meer ist groß.) In welchem Fall steht „ἡ θάλασσα\"?",
+        optionen: ["Dativ", "Genitiv", "Nominativ", "Akkusativ"],
+        richtig: 2,
+        erklaerung: "Was ist groß? Das Meer ist das Subjekt, also Nominativ.",
+      },
+    ],
+  },
   gr6: {
     fragen: [
       {
