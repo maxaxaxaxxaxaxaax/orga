@@ -16,6 +16,17 @@ export const SATZBAU = {
       { woerter: ["If", "you", "study", "hard,", "you", "will", "pass", "the", "exam."], uebersetzung: "Wenn du fleißig lernst, bestehst du die Prüfung." },
     ],
   },
+  // Everyday English: höfliche Fragen und Bitten als Satzbau (passend zu e6).
+  e8: {
+    saetze: [
+      { woerter: ["Excuse", "me,", "where", "is", "the", "museum?"], uebersetzung: "Entschuldigung, wo ist das Museum?" },
+      { woerter: ["Could", "you", "tell", "me", "the", "way", "to", "the", "station?"], uebersetzung: "Könntest du mir den Weg zum Bahnhof sagen?" },
+      { woerter: ["Can", "you", "recommend", "a", "nice", "cafe?"], uebersetzung: "Kannst du ein nettes Café empfehlen?" },
+      { woerter: ["What", "time", "does", "the", "shop", "open?"], uebersetzung: "Wann öffnet der Laden?" },
+      { woerter: ["I", "would", "like", "two", "tickets,", "please."], uebersetzung: "Ich hätte gern zwei Tickets, bitte." },
+      { woerter: ["Thank", "you", "very", "much", "for", "your", "help."], uebersetzung: "Vielen Dank für deine Hilfe." },
+    ],
+  },
 };
 
 export const MERKBLATT = {
