@@ -387,19 +387,34 @@ export const AUSWAHLQUIZ = {
       },
       {
         frage: "Ich sehe die Göttin. In welchem Fall steht die Göttin?",
-        optionen: ["Nominativ", "Dativ", "Genitiv", "Akkusativ"],
+        optionen: [
+          { text: "Nominativ", erklaerung: "Nominativ wäre, wer handelt. Hier handelt aber ich, nicht die Göttin." },
+          { text: "Dativ", erklaerung: "Dativ wäre wem? Hier fragst du wen sehe ich, das ist Akkusativ." },
+          "Genitiv",
+          "Akkusativ",
+        ],
         richtig: 3,
         erklaerung: "Wen sehe ich? Die Göttin ist das direkte Objekt, also Akkusativ.",
       },
       {
         frage: "Das Haus der Göttin. In welchem Fall steht der Göttin?",
-        optionen: ["Genitiv", "Dativ", "Akkusativ", "Nominativ"],
+        optionen: [
+          "Genitiv",
+          { text: "Dativ", erklaerung: "Dativ wäre wem? Hier fragst du wessen Haus, das ist Genitiv." },
+          "Akkusativ",
+          "Nominativ",
+        ],
         richtig: 0,
         erklaerung: "Wessen Haus? Der Göttin steht im Genitiv (Zugehörigkeit).",
       },
       {
         frage: "Ich folge der Göttin. In welchem Fall steht der Göttin?",
-        optionen: ["Akkusativ", "Dativ", "Nominativ", "Genitiv"],
+        optionen: [
+          { text: "Akkusativ", erklaerung: "Vorsicht, Falle: folgen sieht aus wie ein Objekt, steht aber im Dativ. Du fragst wem folge ich." },
+          "Dativ",
+          "Nominativ",
+          "Genitiv",
+        ],
         richtig: 1,
         erklaerung: "Wem folge ich? Der Göttin steht im Dativ (Empfänger).",
       },
