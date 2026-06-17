@@ -1,6 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { ladeStriche, speichereStriche } from "./rechenwegSpeicher";
-import { pruefeVision, analysiereRechenweg } from "./kiClient";
+import {
+  pruefeVision,
+  pruefeKi,
+  lieRechenweg,
+  pruefeRechenwegText,
+} from "./kiClient";
 import "./Rechenweg.css";
 
 // Rechenweg-Schreibfläche: der Schüler hält seinen Mathe-Rechenweg handschriftlich
@@ -20,7 +25,8 @@ export default function Rechenweg({ kb, onClose }) {
   const [striche, setStriche] = useState(() => ladeStriche(kb.id));
   const stricheRef = useRef(striche); // Spiegel für die Zeichen-Routine
   const [visionModell, setVisionModell] = useState(null); // lokales Vision-Modell
-  const [analyse, setAnalyse] = useState(null); // { lauft, text, fehler, hinweis }
+  const [textModell, setTextModell] = useState(null); // lokales Text-Modell (Rechnen)
+  const [analyse, setAnalyse] = useState(null); // { lauft, stufe, transkript, text, fehler, hinweis }
 
   const tinteRef = useRef("#1f2933"); // Tinten-Farbe, folgt dem Theme (--text)
   const BREITE = 2.4;
@@ -113,11 +119,14 @@ export default function Rechenweg({ kb, onClose }) {
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
 
-  // Läuft ein lokales Vision-Modell (für die Rechenweg-Analyse)?
+  // Welche lokalen Modelle laufen? Vision zum Ablesen, Text zum Nachrechnen.
   useEffect(() => {
     let aktiv = true;
     pruefeVision().then((m) => {
       if (aktiv) setVisionModell(m);
+    });
+    pruefeKi().then((m) => {
+      if (aktiv) setTextModell(m);
     });
     return () => {
       aktiv = false;
@@ -181,6 +190,8 @@ export default function Rechenweg({ kb, onClose }) {
     if (!visionModell) {
       setAnalyse({
         lauft: false,
+        stufe: "fehler",
+        transkript: "",
         text: "",
         fehler: true,
         hinweis:
@@ -190,22 +201,27 @@ export default function Rechenweg({ kb, onClose }) {
     }
     const bild = exportiereBild();
     if (!bild) return;
-    setAnalyse({ lauft: true, text: "", fehler: false, hinweis: "" });
+    setAnalyse({ lauft: true, stufe: "lese", transkript: "", text: "", fehler: false, hinweis: "" });
     try {
-      await analysiereRechenweg({
-        bild,
-        modell: visionModell,
+      // Schritt 1: ablesen (Vision). Schritt 2: nachrechnen (Text-Modell, sonst Vision).
+      const transkript = await lieRechenweg({ bild, modell: visionModell });
+      setAnalyse((a) => (a ? { ...a, stufe: "pruefe", transkript } : a));
+      await pruefeRechenwegText({
+        transkript,
+        modell: textModell || visionModell,
         onToken: (st) =>
           setAnalyse((a) => (a ? { ...a, text: a.text + st } : a)),
       });
       setAnalyse((a) => (a ? { ...a, lauft: false } : a));
     } catch {
-      setAnalyse({
+      setAnalyse((a) => ({
         lauft: false,
+        stufe: "fehler",
+        transkript: a ? a.transkript : "",
         text: "",
         fehler: true,
         hinweis: "Die Analyse hat nicht geklappt. Versuch es gleich nochmal.",
-      });
+      }));
     }
   }
 
@@ -352,12 +368,26 @@ export default function Rechenweg({ kb, onClose }) {
                 </button>
               )}
             </div>
-            <p className="rw-coach-text">
-              {analyse.fehler
-                ? analyse.hinweis
-                : analyse.text ||
-                  (analyse.lauft ? "Der Coach schaut sich deinen Rechenweg an …" : "")}
-            </p>
+            {analyse.fehler ? (
+              <p className="rw-coach-text">{analyse.hinweis}</p>
+            ) : (
+              <>
+                {analyse.transkript && (
+                  <p className="rw-coach-gelesen">
+                    Ich lese deinen Weg als:{" "}
+                    <span className="rw-coach-transkript">
+                      {analyse.transkript}
+                    </span>
+                  </p>
+                )}
+                <p className="rw-coach-text">
+                  {analyse.text ||
+                    (analyse.stufe === "lese"
+                      ? "Ich lese deinen Rechenweg …"
+                      : "Ich rechne deinen Weg Schritt für Schritt nach …")}
+                </p>
+              </>
+            )}
           </div>
         )}
         <button
