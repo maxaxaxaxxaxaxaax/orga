@@ -14,10 +14,60 @@ function formatNegativeZahlMitKlammer(n) {
   return n < 0 ? `(−${Math.abs(n)})` : `${n}`;
 }
 
+// Realistische Kontext-Aufgabe zu negativen Zahlen: Temperatur, Kontostand,
+// Aufzug. Echte Anwendungssituationen statt reiner Rechen-Drills, damit das
+// Konzept (unter Null, Schulden, Untergeschoss) begreifbar wird. Antwort ist
+// immer eine Zahl, die Rechnung ist elementar und korrekt.
+function negativeKontextAufgabe() {
+  const art = Math.floor(Math.random() * 3);
+  if (art === 0) {
+    const t0 = zufallsZahl(-8, 5);
+    const d = zufallsZahl(2, 10);
+    const steigt = Math.random() < 0.5;
+    const erg = steigt ? t0 + d : t0 - d;
+    return {
+      frage: `Morgens zeigt das Thermometer ${formatNegativeZahl(t0)} Grad. Bis Mittag ${steigt ? "steigt" : "sinkt"} die Temperatur um ${d} Grad. Was zeigt es mittags?`,
+      loesung: erg,
+      hint: `Start bei ${formatNegativeZahl(t0)}, dann ${steigt ? "+" : "−"} ${d}.`,
+    };
+  }
+  if (art === 1) {
+    const a = zufallsZahl(-9, 7);
+    const b = zufallsZahl(2, 12);
+    const bekommt = Math.random() < 0.5;
+    const erg = bekommt ? a + b : a - b;
+    return {
+      frage: bekommt
+        ? `Dein Kontostand ist ${formatNegativeZahl(a)} Euro. Du bekommst ${b} Euro dazu. Wie ist der neue Stand?`
+        : `Dein Kontostand ist ${formatNegativeZahl(a)} Euro. Du gibst ${b} Euro aus. Wie ist der neue Stand?`,
+      loesung: erg,
+      hint: `Minus heißt Schulden. ${formatNegativeZahl(a)} ${bekommt ? "+" : "−"} ${b}.`,
+    };
+  }
+  const a = zufallsZahl(-4, -1);
+  const b = zufallsZahl(2, 8);
+  const hoch = Math.random() < 0.5;
+  const erg = hoch ? a + b : a - b;
+  return {
+    frage: hoch
+      ? `Ein Aufzug steht im Untergeschoss ${formatNegativeZahl(a)} (Erdgeschoss ist 0). Er fährt ${b} Stockwerke nach oben. In welchem Stockwerk hält er?`
+      : `Ein Aufzug steht im Stockwerk ${formatNegativeZahl(a)}. Er fährt ${b} Stockwerke nach unten. Wo hält er?`,
+    loesung: erg,
+    hint: `Unter Null ist Untergeschoss. ${formatNegativeZahl(a)} ${hoch ? "+" : "−"} ${b}.`,
+  };
+}
+
 // Generator: negative Zahlen (Addition & Subtraktion)
-// Zufallsmix aus +/- als Operator und positiv/negativ pro Operand.
+// Mischt reine Rechnungen mit realistischen Kontext-Aufgaben.
 function negativeZahlenGen(vorhandene = []) {
   const vorhandeneFragen = new Set(vorhandene.map((a) => a.frage));
+  // Gut ein Drittel als echte Anwendungssituation (Temperatur, Geld, Aufzug).
+  if (Math.random() < 0.4) {
+    for (let versuch = 0; versuch < 12; versuch++) {
+      const k = negativeKontextAufgabe();
+      if (!vorhandeneFragen.has(k.frage)) return k;
+    }
+  }
   for (let versuch = 0; versuch < 25; versuch++) {
     const a = zufallsZahl(-12, 12);
     const b = zufallsZahl(-12, 12);
