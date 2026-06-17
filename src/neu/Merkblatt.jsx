@@ -27,6 +27,9 @@ export default function Merkblatt({ daten }) {
   );
   const [verstanden, setVerstanden] = useState({});
   const [zeile, setZeile] = useState(null); // hervorgehobene Tabellenzeile
+  // Aktives Abrufen: pro Tabelle die Antwort-Spalten verdecken, einzeln aufdecken.
+  const [verdeckt, setVerdeckt] = useState({}); // ai -> bool
+  const [aufgedeckt, setAufgedeckt] = useState({}); // "ai-zi-ci" -> true
 
   if (abschnitte.length === 0)
     return <p className="mb-leer">Kein Inhalt vorhanden.</p>;
@@ -45,6 +48,18 @@ export default function Merkblatt({ daten }) {
     setVerstanden({});
     setZeile(null);
     setOffen(abschnitte.map((_, i) => i === 0));
+  }
+  function toggleVerdeckt(ai) {
+    setVerdeckt((v) => ({ ...v, [ai]: !v[ai] }));
+    // Beim Umschalten die schon aufgedeckten Zellen dieser Tabelle zurücksetzen.
+    setAufgedeckt((a) => {
+      const n = { ...a };
+      for (const k of Object.keys(n)) if (k.startsWith(ai + "-")) delete n[k];
+      return n;
+    });
+  }
+  function deckeAuf(ai, zi, ci) {
+    setAufgedeckt((a) => ({ ...a, [`${ai}-${zi}-${ci}`]: true }));
   }
 
   return (
@@ -150,6 +165,18 @@ export default function Merkblatt({ daten }) {
 
                   {ab.tabelle && (
                     <div className="mb-tabelle-wrap">
+                      <div className="mb-tabelle-werkzeug">
+                        <button
+                          type="button"
+                          className={
+                            "mb-verdecken" + (verdeckt[ai] ? " an" : "")
+                          }
+                          onClick={() => toggleVerdeckt(ai)}
+                          aria-pressed={!!verdeckt[ai]}
+                        >
+                          {verdeckt[ai] ? "Wieder zeigen" : "Selbst abfragen"}
+                        </button>
+                      </div>
                       <table className="mb-tabelle">
                         <thead>
                           <tr>
@@ -170,16 +197,40 @@ export default function Merkblatt({ daten }) {
                                   setZeile((cur) => (cur === zk ? null : zk))
                                 }
                               >
-                                {z.map((c, ci) => (
-                                  <td key={ci}>{c}</td>
-                                ))}
+                                {z.map((c, ci) => {
+                                  const versteckt =
+                                    verdeckt[ai] &&
+                                    ci > 0 &&
+                                    !aufgedeckt[`${ai}-${zi}-${ci}`];
+                                  return (
+                                    <td key={ci}>
+                                      {versteckt ? (
+                                        <button
+                                          type="button"
+                                          className="mb-zelle-verdeckt"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            deckeAuf(ai, zi, ci);
+                                          }}
+                                          aria-label="Antwort aufdecken"
+                                        >
+                                          ?
+                                        </button>
+                                      ) : (
+                                        c
+                                      )}
+                                    </td>
+                                  );
+                                })}
                               </tr>
                             );
                           })}
                         </tbody>
                       </table>
                       <p className="mb-tabelle-tipp">
-                        Tippe eine Zeile an, um sie hervorzuheben.
+                        {verdeckt[ai]
+                          ? "Sag die verdeckte Antwort, dann tippe das Feld zum Aufdecken."
+                          : "Tippe eine Zeile an, um sie hervorzuheben. Oder frag dich selbst ab."}
                       </p>
                     </div>
                   )}

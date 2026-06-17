@@ -212,6 +212,46 @@
   font-size: 0.74rem;
   color: var(--muted);
 }
+/* Aktives Abrufen: Antwort-Spalten verdecken und einzeln aufdecken. */
+.mb-tabelle-werkzeug {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 6px;
+}
+.mb-verdecken {
+  border: 1px solid var(--line-strong);
+  background: var(--card);
+  color: var(--text-2);
+  font-size: 0.74rem;
+  font-weight: 700;
+  padding: 4px 11px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.mb-verdecken:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.mb-verdecken.an {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent-strong);
+}
+.mb-zelle-verdeckt {
+  width: 100%;
+  min-width: 36px;
+  border: 1px dashed var(--line-strong);
+  background: var(--bg);
+  color: var(--muted);
+  font-weight: 700;
+  border-radius: var(--r-sm, 6px);
+  padding: 3px 0;
+  cursor: pointer;
+}
+.mb-zelle-verdeckt:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
 
 .mb-leer {
   margin: 0;
