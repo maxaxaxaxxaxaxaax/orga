@@ -26,6 +26,7 @@ export default function Reihenfolge({ daten }) {
   const schritte = (daten && daten.schritte) || [];
   const [order, setOrder] = useState(() => mischen(schritte.length));
   const [geprueft, setGeprueft] = useState(false);
+  const [loesungGezeigt, setLoesungGezeigt] = useState(false);
 
   if (schritte.length === 0)
     return <p className="rf-leer">Für diese Übung gibt es noch keine Schritte.</p>;
@@ -42,6 +43,7 @@ export default function Reihenfolge({ daten }) {
       return next;
     });
     setGeprueft(false);
+    setLoesungGezeigt(false);
   }
 
   function pruefen() {
@@ -51,6 +53,7 @@ export default function Reihenfolge({ daten }) {
   function nochmal() {
     setOrder(mischen(schritte.length));
     setGeprueft(false);
+    setLoesungGezeigt(false);
   }
 
   if (geprueft && alleRichtig) {
@@ -125,9 +128,29 @@ export default function Reihenfolge({ daten }) {
       </button>
 
       {geprueft && !alleRichtig && (
-        <p className="rf-hinweis" role="status">
-          Noch nicht ganz. Verschiebe die roten Karten und prüfe erneut.
-        </p>
+        <div className="rf-nachhilfe">
+          <p className="rf-hinweis" role="status">
+            Noch nicht ganz. Verschiebe die roten Karten und prüfe erneut.
+          </p>
+          {loesungGezeigt ? (
+            <div className="rf-loesung">
+              <span className="rf-loesung-label">So ist die richtige Reihenfolge:</span>
+              <ol className="rf-loesung-liste">
+                {schritte.map((s, i) => (
+                  <li key={i}>{s}</li>
+                ))}
+              </ol>
+            </div>
+          ) : (
+            <button
+              type="button"
+              className="rf-loesung-btn"
+              onClick={() => setLoesungGezeigt(true)}
+            >
+              Lösung zeigen
+            </button>
+          )}
+        </div>
       )}
     </div>
   );

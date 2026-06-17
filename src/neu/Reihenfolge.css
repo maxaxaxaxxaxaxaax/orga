@@ -138,6 +138,47 @@
   color: var(--text-2);
   text-align: center;
 }
+/* Gestaffelte Hilfe: erst ringen, auf Wunsch die richtige Reihenfolge sehen. */
+.rf-nachhilfe {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.rf-loesung-btn {
+  border: 1px solid var(--line-strong);
+  background: var(--card);
+  color: var(--text-2);
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 7px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.rf-loesung-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.rf-loesung {
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--accent-soft);
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, var(--line));
+  border-radius: var(--r-sm, 8px);
+  padding: 10px 14px;
+}
+.rf-loesung-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--accent-strong);
+}
+.rf-loesung-liste {
+  margin: 6px 0 0;
+  padding-left: 20px;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: var(--text);
+}
 
 .rf-leer {
   margin: 0;
