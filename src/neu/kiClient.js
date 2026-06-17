@@ -25,7 +25,11 @@ export async function pruefeKi() {
   if (!namen || !namen.length) return null;
   const text = namen.filter((n) => !istVision(n));
   const wahl = text.length ? text : namen;
-  return wahl.find((n) => n.startsWith("qwen2.5:")) || wahl[0];
+  return (
+    wahl.find((n) => n.startsWith("qwen3")) ||
+    wahl.find((n) => n.startsWith("qwen2.5")) ||
+    wahl[0]
+  );
 }
 
 // Erkennt Vision-Modelle am Namen.
@@ -39,7 +43,11 @@ export async function pruefeVision() {
   if (!namen || !namen.length) return null;
   const vision = namen.filter(istVision);
   if (!vision.length) return null;
-  return vision.find((n) => n.startsWith("qwen2.5vl")) || vision[0];
+  return (
+    vision.find((n) => n.startsWith("qwen3-vl")) ||
+    vision.find((n) => n.startsWith("qwen2.5vl")) ||
+    vision[0]
+  );
 }
 
 function systemPrompt(kontextName, materialien) {
@@ -191,12 +199,14 @@ async function chatEinmal({
 // zuverlässiger und deckt Lesefehler auf (die Abschrift wird dem Kind gezeigt).
 export async function lieRechenweg({ bild, modell, signal }) {
   const system = [
-    "Du bist eine genaue Texterkennung für handschriftliche Mathematik.",
+    "Du bist eine genaue Texterkennung (OCR) für handschriftliche Mathematik.",
     "Auf dem Bild steht ein handschriftlicher Rechenweg, oft über mehrere Zeilen.",
-    "Schreibe NUR ab, was du siehst, Zeile für Zeile, genau die Zeichen (Zahlen, + - · : = ( ) und Buchstaben wie x).",
-    "Rechne nichts, bewerte nichts, ergänze nichts und ändere nichts.",
-    "Wenn eine Zeile nicht lesbar ist, schreibe dort [unklar].",
-    "Gib ausschließlich die abgeschriebenen Zeilen aus, sonst keinen Text.",
+    "Schreibe Zeichen für Zeichen GENAU ab, was tatsächlich dasteht, Zeile für Zeile.",
+    "Ganz wichtig: Korrigiere NICHTS und rechne NICHTS. Schreibe auch dann genau ab, wenn das Ergebnis mathematisch falsch aussieht. Steht da 2-2=1, dann schreibe 2-2=1, niemals 2-2=0. Steht da 4+5=8, dann schreibe 4+5=8.",
+    "Achte genau auf die Zeichen und verwechsle sie nicht: Minus (-), Gleich (=), Plus (+), Mal (* oder ·), Geteilt (: oder /), Klammern ( ), und Buchstaben wie x.",
+    "Ergänze nichts, lass nichts weg, erfinde keine Zeilen.",
+    "Wenn eine Stelle wirklich nicht lesbar ist, schreibe dort [unklar].",
+    "Gib ausschließlich die abgeschriebenen Zeilen aus, sonst keinen Text, keine Erklärung.",
   ].join("\n");
   return chatEinmal({
     nachrichten: [
@@ -204,11 +214,15 @@ export async function lieRechenweg({ bild, modell, signal }) {
       {
         role: "user",
         content: [
-          { type: "text", text: "Schreibe diesen Rechenweg Zeile für Zeile ab." },
+          {
+            type: "text",
+            text: "Schreibe diesen Rechenweg Zeichen für Zeichen ab, genau wie er dasteht. Korrigiere nichts.",
+          },
           { type: "image_url", image_url: { url: bild } },
         ],
       },
     ],
+    temperature: 0,
     modell,
     signal,
   });

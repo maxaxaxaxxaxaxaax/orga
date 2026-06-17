@@ -208,14 +208,19 @@ export default function Rechenweg({ kb, onClose }) {
     const pad = 28;
     const w = Math.max(1, maxX - minX) + pad * 2;
     const h = Math.max(1, maxY - minY) + pad * 2;
+    // Hochskalieren: mehr Pixel pro Ziffer hilft der Texterkennung deutlich.
+    // Kleine Rechenwege werden groß gerendert, große bleiben begrenzt.
+    const skala = Math.min(4, Math.max(2, 1100 / w));
     const off = document.createElement("canvas");
-    off.width = Math.round(w);
-    off.height = Math.round(h);
+    off.width = Math.round(w * skala);
+    off.height = Math.round(h * skala);
     const ctx = off.getContext("2d");
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(0, 0, off.width, off.height);
-    ctx.strokeStyle = "#14202b";
-    ctx.fillStyle = "#14202b";
+    ctx.scale(skala, skala);
+    // Reines Schwarz auf Weiß: maximaler Kontrast, etwas dickere Striche.
+    ctx.strokeStyle = "#000000";
+    ctx.fillStyle = "#000000";
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
     const dx = pad - minX;
@@ -224,14 +229,14 @@ export default function Rechenweg({ kb, onClose }) {
       const p = s.punkte;
       if (p.length === 1) {
         ctx.beginPath();
-        ctx.arc(p[0].x + dx, p[0].y + dy, 2.2, 0, Math.PI * 2);
+        ctx.arc(p[0].x + dx, p[0].y + dy, 2.6, 0, Math.PI * 2);
         ctx.fill();
         continue;
       }
       for (let i = 1; i < p.length; i++) {
         const a = p[i - 1];
         const b = p[i];
-        ctx.lineWidth = BREITE * (0.6 + (b.p || 0.5));
+        ctx.lineWidth = BREITE * (0.9 + (b.p || 0.5));
         ctx.beginPath();
         ctx.moveTo(a.x + dx, a.y + dy);
         ctx.lineTo(b.x + dx, b.y + dy);
