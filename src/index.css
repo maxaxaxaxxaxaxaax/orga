@@ -241,3 +241,26 @@ select:focus-visible {
     }
   }
 }
+
+/* Touch-Geraete: bequeme Trefferflaechen in den Uebungen (Kinder am Tablet).
+   Nur Mindestgroessen, damit nichts schrumpft. */
+@media (pointer: coarse) {
+  .aq-option,
+  .qz-option {
+    min-height: 48px;
+  }
+  .aq-weiter,
+  .qz-weiter,
+  .qz-pruefen,
+  .lt-pruefen,
+  .lt-weiter,
+  .zs-weiter,
+  .rf-pruefen {
+    min-height: 44px;
+  }
+  .rf-pfeil {
+    width: 40px;
+    height: 34px;
+    font-size: 1.05rem;
+  }
+}
