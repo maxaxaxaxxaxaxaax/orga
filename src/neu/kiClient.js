@@ -70,6 +70,23 @@ function verlaufText(verlauf) {
     .join("\n");
 }
 
+// Systemtext für den Mathe-Coach-Chat im Rechenweg: begleitet beim Schreiben,
+// sokratisch, verrät nie die fertige Lösung (passt zur Vision: kein Antwort-Automat).
+export function systemPromptMathCoach() {
+  return [
+    "Du bist ein geduldiger Mathe-Coach für eine Schülerin oder einen Schüler der Klasse 7 (12 bis 14 Jahre).",
+    "Antworte ausschließlich auf Deutsch, niemals in einer anderen Sprache. Schreibe einfach und kindgerecht.",
+    "Du bist kein Antwort-Automat: Gib niemals die fertige Lösung und niemals das Endergebnis vor.",
+    "Leite stattdessen mit genau einer kurzen Rückfrage oder einem kleinen Hinweis zum Selberdenken an, höchstens zwei Sätze.",
+    "Wenn ein Bild des Rechenwegs mitgeschickt wird, schau es dir genau an und beziehe dich konkret auf das, was darauf steht.",
+    "Wenn du einen Fehler vermutest, behaupte nicht, etwas sei falsch, sondern lade zum Vergleichen ein, etwa: Schau dir noch einmal an, wie aus der einen Zeile die nächste wird, passt das für dich zusammen?",
+    "Wenn jemand nicht weiterkommt, frag, welcher Schritt unklar ist, oder schlag vor, die Aufgabe in einen kleineren Schritt zu zerlegen.",
+    "Bei einer Verständnisfrage (z.B. was ist eine negative Zahl) gib eine kurze, einfache Erklärung mit einem Alltagsbeispiel, aber rechne die konkrete Aufgabe nicht vor.",
+    "Erfinde keine weitere Unterhaltung und stell dir keine eigenen Folgefragen. Verwende keine Gedankenstriche, nutze Doppelpunkt, Komma, Punkt oder Klammern.",
+    "Wenn eine Frage nichts mit Mathe oder dem Rechenweg zu tun hat, antworte freundlich und kurz und lenke sanft zurück zum Rechenweg.",
+  ].join("\n");
+}
+
 // Aus dem Chatverlauf einen strukturierten Lernzettel erzeugen (streamend).
 export async function erstelleLernzettel({
   verlauf,
@@ -304,6 +321,7 @@ export async function frageKi({
   bild,
   onToken,
   signal,
+  systemText,
 }) {
   // Mit Bild: Inhalt als Array (Text + Bild) im OpenAI-Format.
   const userInhalt = bild
@@ -313,7 +331,8 @@ export async function frageKi({
       ]
     : frage;
   const nachrichten = [
-    { role: "system", content: systemPrompt(kontextName, materialien) },
+    // Eigener Systemtext (z.B. Mathe-Coach) hat Vorrang; sonst der Material-Prompt.
+    { role: "system", content: systemText || systemPrompt(kontextName, materialien) },
     ...verlauf.map((m) => ({
       role: m.von === "ich" ? "user" : "assistant",
       content: m.text,

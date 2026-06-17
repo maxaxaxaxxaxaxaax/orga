@@ -5,6 +5,8 @@ import {
   pruefeKi,
   lieRechenweg,
   pruefeRechenwegText,
+  frageKi,
+  systemPromptMathCoach,
 } from "./kiClient";
 import "./Rechenweg.css";
 
@@ -17,6 +19,14 @@ import "./Rechenweg.css";
 // Das Zeichnen ist imperativ (Canvas-Kontext, laufender Strich): das passiert
 // nur in Event-Handlern und Effekten, nie im Render (Ref-Regeln bleiben sauber).
 
+// Startvorschläge für den Mathe-Coach-Chat (vor der ersten eigenen Frage).
+const CHAT_VORSCHLAEGE = [
+  "Wie geht der nächste Schritt?",
+  "Ich komme hier nicht weiter",
+  "Was ist eine negative Zahl?",
+  "Schau mal auf meinen Rechenweg",
+];
+
 export default function Rechenweg({ kb, onClose }) {
   const canvasRef = useRef(null);
   const wrapRef = useRef(null);
@@ -27,6 +37,24 @@ export default function Rechenweg({ kb, onClose }) {
   const [visionModell, setVisionModell] = useState(null); // lokales Vision-Modell
   const [textModell, setTextModell] = useState(null); // lokales Text-Modell (Rechnen)
   const [analyse, setAnalyse] = useState(null); // { lauft, stufe, transkript, text, fehler, hinweis }
+
+  // Mathe-Coach-Chat: Fragen stellen, während man schreibt (optional mit Handschrift-Bild).
+  const [chatOffen, setChatOffen] = useState(false);
+  const [chatNachrichten, setChatNachrichten] = useState(() => [
+    {
+      von: "ki",
+      text: "Hier kannst du mir Fragen stellen, während du schreibst, etwa wie der nächste Schritt geht oder was eine negative Zahl ist. Ich gebe dir keine fertige Lösung, sondern bringe dich mit Rückfragen weiter. Deinen ganzen Weg prüfst du mit dem Knopf Rechenweg vom Coach prüfen lassen.",
+    },
+  ]);
+  const [chatEingabe, setChatEingabe] = useState("");
+  const [chatDenkt, setChatDenkt] = useState(false); // Tipp-Punkte bis zum ersten Token
+  const [chatLaeuft, setChatLaeuft] = useState(false); // Anfrage in Arbeit (sperrt Senden)
+  const [handschriftMit, setHandschriftMit] = useState(false);
+  const chatEndeRef = useRef(null); // Autoscroll-Anker
+  const chatInputRef = useRef(null); // Fokus beim Öffnen
+  const chatFabRef = useRef(null); // Fokus zurück beim Schließen
+  const chatWarOffenRef = useRef(false); // war der Chat schon mal offen?
+  const chatAbbruchRef = useRef(null); // AbortController des laufenden Streams
 
   const tinteRef = useRef("#1f2933"); // Tinten-Farbe, folgt dem Theme (--text)
   const BREITE = 2.4;
@@ -110,20 +138,26 @@ export default function Rechenweg({ kb, onClose }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [striche]);
 
-  // Esc schließt das Overlay.
+  // Esc schließt erst den Chat (falls offen), dann das Overlay.
   useEffect(() => {
     const onKey = (e) => {
-      if (e.key === "Escape") onClose();
+      if (e.key !== "Escape") return;
+      if (chatOffen) setChatOffen(false);
+      else onClose();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [onClose]);
+  }, [onClose, chatOffen]);
 
   // Welche lokalen Modelle laufen? Vision zum Ablesen, Text zum Nachrechnen.
+  // Läuft ein Vision-Modell, ist das Handschrift-Mitschicken im Chat per Default
+  // an (im Chat-Kopf abschaltbar: Datenhoheit).
   useEffect(() => {
     let aktiv = true;
     pruefeVision().then((m) => {
-      if (aktiv) setVisionModell(m);
+      if (!aktiv) return;
+      setVisionModell(m);
+      if (m) setHandschriftMit(true);
     });
     pruefeKi().then((m) => {
       if (aktiv) setTextModell(m);
@@ -131,6 +165,27 @@ export default function Rechenweg({ kb, onClose }) {
     return () => {
       aktiv = false;
     };
+  }, []);
+
+  // Fokus mitführen: beim Öffnen ins Eingabefeld, beim Schließen zurück auf den
+  // Knopf, der den Chat öffnet (nur wenn er vorher offen war, nicht beim Mount).
+  useEffect(() => {
+    if (chatOffen) {
+      chatWarOffenRef.current = true;
+      chatInputRef.current?.focus();
+    } else if (chatWarOffenRef.current) {
+      chatFabRef.current?.focus();
+    }
+  }, [chatOffen]);
+
+  // Bei neuer Nachricht ans Listenende scrollen.
+  useEffect(() => {
+    chatEndeRef.current?.scrollIntoView({ block: "end" });
+  }, [chatNachrichten]);
+
+  // Laufenden Chat-Stream beim Schließen des Overlays abbrechen.
+  useEffect(() => {
+    return () => chatAbbruchRef.current?.abort();
   }, []);
 
   // Den Rechenweg als Bild exportieren (dunkle Tinte auf Weiß, auf den Inhalt
@@ -225,6 +280,62 @@ export default function Rechenweg({ kb, onClose }) {
     }
   }
 
+  // Eine Frage an den Mathe-Coach schicken. Optional reist die aktuelle
+  // Handschrift als Bild mit (dann übers Vision-Modell), sonst reine Textfrage.
+  async function sendeChat(text) {
+    const frage = (text ?? chatEingabe).trim();
+    if (!frage || chatLaeuft) return;
+    const bild =
+      handschriftMit && visionModell ? exportiereBild() : null;
+    const modell = bild ? visionModell : textModell || visionModell;
+    const verlauf = chatNachrichten;
+    setChatEingabe("");
+    setChatNachrichten((n) => [
+      ...n,
+      { von: "ich", text: frage },
+      { von: "ki", text: "" },
+    ]);
+    setChatLaeuft(true);
+    setChatDenkt(true);
+    chatAbbruchRef.current?.abort();
+    const ac = new AbortController();
+    chatAbbruchRef.current = ac;
+    const setzeLetzte = (aender) =>
+      setChatNachrichten((n) => {
+        const kopie = [...n];
+        const i = kopie.length - 1;
+        kopie[i] = aender(kopie[i]);
+        return kopie;
+      });
+    try {
+      if (!modell) throw new Error("keine KI");
+      await frageKi({
+        frage,
+        verlauf,
+        kontextName: "Rechenweg",
+        materialien: [],
+        modell,
+        bild,
+        systemText: systemPromptMathCoach(),
+        signal: ac.signal,
+        onToken: (stueck) => {
+          setChatDenkt(false);
+          setzeLetzte((m) => ({ ...m, text: m.text + stueck }));
+        },
+      });
+    } catch (e) {
+      if (e.name !== "AbortError") {
+        setzeLetzte(() => ({
+          von: "ki",
+          text: "Ich kann gerade nicht antworten. Der Mathe-Coach braucht eine laufende lokale KI. Schreib ruhig weiter, das klappt auch ohne mich.",
+        }));
+      }
+    } finally {
+      setChatDenkt(false);
+      setChatLaeuft(false);
+    }
+  }
+
   function pos(e) {
     const c = canvasRef.current;
     const r = c.getBoundingClientRect();
@@ -297,6 +408,8 @@ export default function Rechenweg({ kb, onClose }) {
     setStriche([]);
   }
 
+  const chatNochKeineFrage = !chatNachrichten.some((m) => m.von === "ich");
+
   return (
     <div className="rw" role="dialog" aria-modal="true" aria-label="Rechenweg">
       <header className="rw-kopf">
@@ -336,24 +449,26 @@ export default function Rechenweg({ kb, onClose }) {
         Maus. Alles bleibt erhalten, bis du es löschst.
       </p>
 
-      <div className="rw-flaeche" ref={wrapRef}>
-        <canvas
-          ref={canvasRef}
-          className="rw-canvas"
-          onPointerDown={start}
-          onPointerMove={bewege}
-          onPointerUp={ende}
-          onPointerLeave={ende}
-          onPointerCancel={ende}
-        />
-        {striche.length === 0 && (
-          <span className="rw-platzhalter" aria-hidden="true">
-            Hier schreiben …
-          </span>
-        )}
-      </div>
+      <div className="rw-arbeit">
+        <div className="rw-haupt">
+          <div className="rw-flaeche" ref={wrapRef}>
+            <canvas
+              ref={canvasRef}
+              className="rw-canvas"
+              onPointerDown={start}
+              onPointerMove={bewege}
+              onPointerUp={ende}
+              onPointerLeave={ende}
+              onPointerCancel={ende}
+            />
+            {striche.length === 0 && (
+              <span className="rw-platzhalter" aria-hidden="true">
+                Hier schreiben …
+              </span>
+            )}
+          </div>
 
-      <div className="rw-coach">
+          <div className="rw-coach">
         {analyse && (
           <div className={"rw-coach-panel" + (analyse.fehler ? " fehler" : "")}>
             <div className="rw-coach-kopf">
@@ -390,16 +505,134 @@ export default function Rechenweg({ kb, onClose }) {
             )}
           </div>
         )}
-        <button
-          type="button"
-          className="rw-pruefen"
-          onClick={pruefen}
-          disabled={striche.length === 0 || (analyse && analyse.lauft)}
-        >
-          {analyse && analyse.lauft
-            ? "Der Coach schaut …"
-            : "Rechenweg vom Coach prüfen lassen"}
-        </button>
+          <button
+            type="button"
+            className="rw-pruefen"
+            onClick={pruefen}
+            disabled={striche.length === 0 || (analyse && analyse.lauft)}
+          >
+            {analyse && analyse.lauft
+              ? "Der Coach schaut …"
+              : "Rechenweg vom Coach prüfen lassen"}
+          </button>
+          </div>
+        </div>
+
+        {chatOffen && (
+          <aside className="rw-chat" id="rw-chat" aria-label="Mathe-Coach Chat">
+            <header className="rw-chat-kopf">
+              <span className="rw-chat-titel">Mathe-Coach</span>
+              <span
+                className={
+                  "rw-chat-modus" +
+                  (textModell || visionModell ? " lokal" : "")
+                }
+              >
+                {textModell || visionModell ? "lokale KI" : "keine KI"}
+              </span>
+              <label
+                className="rw-chat-handschrift"
+                title={
+                  visionModell
+                    ? "Deine Handschrift als Bild mitschicken"
+                    : "Braucht ein lokales KI-Vision-Modell"
+                }
+              >
+                <input
+                  type="checkbox"
+                  checked={handschriftMit}
+                  disabled={!visionModell}
+                  onChange={(e) => setHandschriftMit(e.target.checked)}
+                  aria-label="Meinen Rechenweg mitschicken"
+                />
+                Weg mitschicken
+              </label>
+              <button
+                type="button"
+                className="rw-chat-zu"
+                onClick={() => setChatOffen(false)}
+                aria-label="Chat schließen"
+              >
+                Schließen
+              </button>
+            </header>
+
+            <div className="rw-chat-verlauf" role="log" aria-live="polite">
+              {chatNachrichten.map((m, i) => (
+                <div key={i} className={"rw-chat-msg rw-chat-" + m.von}>
+                  {m.text ? (
+                    <p className="rw-chat-text">{m.text}</p>
+                  ) : (
+                    chatDenkt && (
+                      <p className="rw-chat-text rw-chat-denkt">
+                        <span />
+                        <span />
+                        <span />
+                      </p>
+                    )
+                  )}
+                </div>
+              ))}
+              <div ref={chatEndeRef} />
+            </div>
+
+            {chatNochKeineFrage && (
+              <div className="rw-chat-vorschlaege">
+                {CHAT_VORSCHLAEGE.map((v) => (
+                  <button
+                    key={v}
+                    type="button"
+                    className="rw-chat-chip"
+                    onClick={() => sendeChat(v)}
+                  >
+                    {v}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            <form
+              className="rw-chat-eingabe"
+              onSubmit={(e) => {
+                e.preventDefault();
+                sendeChat();
+              }}
+            >
+              <input
+                ref={chatInputRef}
+                type="text"
+                value={chatEingabe}
+                onChange={(e) => setChatEingabe(e.target.value)}
+                placeholder="Frag den Coach etwas"
+                aria-label="Frage an den Mathe-Coach"
+              />
+              <button
+                type="submit"
+                className="rw-chat-senden"
+                aria-label="Senden"
+                disabled={chatLaeuft}
+              >
+                →
+              </button>
+            </form>
+
+            <p className="rw-chat-fuss">
+              Dein Rechenweg wird nur auf diesem Gerät angesehen, nichts wird
+              ins Internet geladen.
+            </p>
+          </aside>
+        )}
+
+        {!chatOffen && (
+          <button
+            ref={chatFabRef}
+            type="button"
+            className="rw-chat-fab"
+            onClick={() => setChatOffen(true)}
+          >
+            Coach fragen
+          </button>
+        )}
       </div>
     </div>
   );
