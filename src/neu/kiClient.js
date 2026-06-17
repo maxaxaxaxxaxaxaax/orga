@@ -142,6 +142,78 @@ export async function erstelleLernzettel({
   return voll;
 }
 
+// Rechenweg-Coach: bekommt ein Bild des handschriftlichen Rechenwegs und sucht
+// den ersten Schritt, an dem das Denken kippt, ohne die Lösung zu verraten
+// (Lern-Coach, keine Antwortmaschine). Streamt die Antwort. Braucht ein lokales
+// Vision-Modell (siehe pruefeVision).
+export async function analysiereRechenweg({ bild, modell, onToken, signal }) {
+  const system = [
+    "Du bist ein geduldiger Mathe-Lerncoach für eine Schülerin oder einen Schüler der Klasse 7 (12 bis 14 Jahre).",
+    "Auf dem Bild steht ein handschriftlicher Rechenweg.",
+    "Antworte ausschließlich auf Deutsch, einfach und kindgerecht, höchstens vier Sätze, keine Gedankenstriche.",
+    "Geh so vor: Lies den Rechenweg Schritt für Schritt. Finde den ERSTEN Schritt, an dem ein Denkfehler passiert.",
+    "Sage kurz, WELCHER Schritt kippt und was dort schiefläuft, und gib einen gezielten Hinweis zum Selber-Korrigieren.",
+    "Verrate NICHT die fertige Lösung und rechne sie nicht vor.",
+    "Wenn alles richtig ist, bestätige das kurz und ermutigend.",
+    "Wenn du die Handschrift nicht sicher lesen kannst, sag das freundlich und bitte um deutlicheres Schreiben.",
+  ].join("\n");
+  const nachrichten = [
+    { role: "system", content: system },
+    {
+      role: "user",
+      content: [
+        { type: "text", text: "Hier ist mein Rechenweg. An welchem Schritt kippt mein Denken?" },
+        { type: "image_url", image_url: { url: bild } },
+      ],
+    },
+  ];
+
+  const r = await fetch(BASIS + "/v1/chat/completions", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: modell,
+      messages: nachrichten,
+      stream: true,
+      temperature: 0.2,
+      max_tokens: 350,
+      stop: ["<|im_end|>", "<|im_start|>", "\nuser", "\nassistant"],
+    }),
+    signal,
+  });
+  if (!r.ok || !r.body)
+    throw new Error("Rechenweg-Analyse fehlgeschlagen: " + r.status);
+
+  const reader = r.body.getReader();
+  const decoder = new TextDecoder();
+  let voll = "";
+  let puffer = "";
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    puffer += decoder.decode(value, { stream: true });
+    const zeilen = puffer.split("\n");
+    puffer = zeilen.pop() || "";
+    for (const zeile of zeilen) {
+      const t = zeile.trim();
+      if (!t.startsWith("data:")) continue;
+      const daten = t.slice(5).trim();
+      if (daten === "[DONE]") continue;
+      try {
+        const j = JSON.parse(daten);
+        const stueck = j.choices?.[0]?.delta?.content || "";
+        if (stueck) {
+          voll += stueck;
+          onToken?.(stueck);
+        }
+      } catch {
+        // unvollständiges JSON-Stück
+      }
+    }
+  }
+  return voll;
+}
+
 // Streaming-Chat: onToken(stück) wird pro Text-Stück aufgerufen, der ganze
 // Text wird am Ende zurückgegeben.
 export async function frageKi({

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { ladeStriche, speichereStriche } from "./rechenwegSpeicher";
+import { pruefeVision, analysiereRechenweg } from "./kiClient";
 import "./Rechenweg.css";
 
 // Rechenweg-Schreibfläche: der Schüler hält seinen Mathe-Rechenweg handschriftlich
@@ -18,6 +19,8 @@ export default function Rechenweg({ kb, onClose }) {
   const aktuellRef = useRef(null); // laufender Strich {punkte:[{x,y,p}]}
   const [striche, setStriche] = useState(() => ladeStriche(kb.id));
   const stricheRef = useRef(striche); // Spiegel für die Zeichen-Routine
+  const [visionModell, setVisionModell] = useState(null); // lokales Vision-Modell
+  const [analyse, setAnalyse] = useState(null); // { lauft, text, fehler, hinweis }
 
   const tinteRef = useRef("#1f2933"); // Tinten-Farbe, folgt dem Theme (--text)
   const BREITE = 2.4;
@@ -109,6 +112,102 @@ export default function Rechenweg({ kb, onClose }) {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
+
+  // Läuft ein lokales Vision-Modell (für die Rechenweg-Analyse)?
+  useEffect(() => {
+    let aktiv = true;
+    pruefeVision().then((m) => {
+      if (aktiv) setVisionModell(m);
+    });
+    return () => {
+      aktiv = false;
+    };
+  }, []);
+
+  // Den Rechenweg als Bild exportieren (dunkle Tinte auf Weiß, auf den Inhalt
+  // zugeschnitten), damit das Vision-Modell ihn wie auf Papier lesen kann.
+  function exportiereBild() {
+    const liste = stricheRef.current;
+    if (!liste.length) return null;
+    let minX = Infinity,
+      minY = Infinity,
+      maxX = -Infinity,
+      maxY = -Infinity;
+    for (const s of liste)
+      for (const q of s.punkte) {
+        if (q.x < minX) minX = q.x;
+        if (q.y < minY) minY = q.y;
+        if (q.x > maxX) maxX = q.x;
+        if (q.y > maxY) maxY = q.y;
+      }
+    const pad = 28;
+    const w = Math.max(1, maxX - minX) + pad * 2;
+    const h = Math.max(1, maxY - minY) + pad * 2;
+    const off = document.createElement("canvas");
+    off.width = Math.round(w);
+    off.height = Math.round(h);
+    const ctx = off.getContext("2d");
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, off.width, off.height);
+    ctx.strokeStyle = "#14202b";
+    ctx.fillStyle = "#14202b";
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    const dx = pad - minX;
+    const dy = pad - minY;
+    for (const s of liste) {
+      const p = s.punkte;
+      if (p.length === 1) {
+        ctx.beginPath();
+        ctx.arc(p[0].x + dx, p[0].y + dy, 2.2, 0, Math.PI * 2);
+        ctx.fill();
+        continue;
+      }
+      for (let i = 1; i < p.length; i++) {
+        const a = p[i - 1];
+        const b = p[i];
+        ctx.lineWidth = BREITE * (0.6 + (b.p || 0.5));
+        ctx.beginPath();
+        ctx.moveTo(a.x + dx, a.y + dy);
+        ctx.lineTo(b.x + dx, b.y + dy);
+        ctx.stroke();
+      }
+    }
+    return off.toDataURL("image/png");
+  }
+
+  async function pruefen() {
+    if (!stricheRef.current.length) return;
+    if (!visionModell) {
+      setAnalyse({
+        lauft: false,
+        text: "",
+        fehler: true,
+        hinweis:
+          "Für die Analyse deines Rechenwegs braucht es ein lokales KI-Vision-Modell (Ollama). Gerade läuft keins. Das Aufschreiben funktioniert trotzdem.",
+      });
+      return;
+    }
+    const bild = exportiereBild();
+    if (!bild) return;
+    setAnalyse({ lauft: true, text: "", fehler: false, hinweis: "" });
+    try {
+      await analysiereRechenweg({
+        bild,
+        modell: visionModell,
+        onToken: (st) =>
+          setAnalyse((a) => (a ? { ...a, text: a.text + st } : a)),
+      });
+      setAnalyse((a) => (a ? { ...a, lauft: false } : a));
+    } catch {
+      setAnalyse({
+        lauft: false,
+        text: "",
+        fehler: true,
+        hinweis: "Die Analyse hat nicht geklappt. Versuch es gleich nochmal.",
+      });
+    }
+  }
 
   function pos(e) {
     const c = canvasRef.current;
@@ -236,6 +335,41 @@ export default function Rechenweg({ kb, onClose }) {
             Hier schreiben …
           </span>
         )}
+      </div>
+
+      <div className="rw-coach">
+        {analyse && (
+          <div className={"rw-coach-panel" + (analyse.fehler ? " fehler" : "")}>
+            <div className="rw-coach-kopf">
+              <span className="rw-coach-label">Lerncoach</span>
+              {!analyse.lauft && (
+                <button
+                  type="button"
+                  className="rw-coach-zu"
+                  onClick={() => setAnalyse(null)}
+                >
+                  Schließen
+                </button>
+              )}
+            </div>
+            <p className="rw-coach-text">
+              {analyse.fehler
+                ? analyse.hinweis
+                : analyse.text ||
+                  (analyse.lauft ? "Der Coach schaut sich deinen Rechenweg an …" : "")}
+            </p>
+          </div>
+        )}
+        <button
+          type="button"
+          className="rw-pruefen"
+          onClick={pruefen}
+          disabled={striche.length === 0 || (analyse && analyse.lauft)}
+        >
+          {analyse && analyse.lauft
+            ? "Der Coach schaut …"
+            : "Rechenweg vom Coach prüfen lassen"}
+        </button>
       </div>
     </div>
   );
