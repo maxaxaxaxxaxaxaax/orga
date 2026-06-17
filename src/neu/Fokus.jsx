@@ -21,9 +21,14 @@ import {
 } from "./coach";
 import Quiz from "./Quiz";
 import MaterialAnsicht from "./MaterialAnsicht";
+import MaterialInhalt from "./MaterialInhalt";
 import MaterialUpload from "./MaterialUpload";
 import { addNotiz, ladeNotizen } from "./notizen";
-import { istOeffenbar, aktivitaetLabel } from "./interaktiv";
+import {
+  istOeffenbar,
+  aktivitaetLabel,
+  interaktivFuerMaterial,
+} from "./interaktiv";
 import "./Fokus.css";
 
 // Fokus-Modus: Vollbild, ein Schritt pro Seite. "Jetzt" öffnet das Ziel hier,
@@ -40,7 +45,6 @@ export default function Fokus({ kb, naechste, onFertig, onClose }) {
   const [gefuehl, setGefuehl] = useState(() => ladeGefuehl(kb.id));
   const [material, setMaterial] = useState(null);
   const [uploadOffen, setUploadOffen] = useState(false);
-  const [uebenOffen, setUebenOffen] = useState(false);
   const [hilfe, setHilfe] = useState(() => !!ladeHilferufe()[kb.id]);
   const [frage, setFrage] = useState(() => ladeFragen()[kb.id] || "");
   const [hilfeOffen, setHilfeOffen] = useState(false);
@@ -82,7 +86,6 @@ export default function Fokus({ kb, naechste, onFertig, onClose }) {
     const next = { ...stand, [aktuell]: true };
     setStand(next);
     speichereSchritte(kb.id, next);
-    setUebenOffen(false);
   }
   function zurueck() {
     const i = (aktuell === -1 ? schritte.length : aktuell) - 1;
@@ -90,7 +93,6 @@ export default function Fokus({ kb, naechste, onFertig, onClose }) {
     const next = { ...stand, [i]: false };
     setStand(next);
     speichereSchritte(kb.id, next);
-    setUebenOffen(false);
   }
   // Gefühl für den aktuellen Schritt setzen. Nochmal dasselbe tippen hebt es auf.
   function waehleGefuehl(wert) {
@@ -256,7 +258,8 @@ export default function Fokus({ kb, naechste, onFertig, onClose }) {
               <div className="fokus-mats">
                 {materialien.map((m) => {
                   const aktivitaet = aktivitaetLabel(m);
-                  const inner = (
+                  const uebung = interaktivFuerMaterial(m.id);
+                  const kopf = (
                     <>
                       <span className="fokus-mat-art">
                         {ART_LABEL[m.art] || m.art}
@@ -274,6 +277,16 @@ export default function Fokus({ kb, naechste, onFertig, onClose }) {
                       )}
                     </>
                   );
+                  // Interaktive Übung direkt offen im Fokus (kein Klick nötig).
+                  if (uebung) {
+                    return (
+                      <div key={m.id} className="fokus-mat-offen">
+                        <div className="fokus-mat-offen-kopf">{kopf}</div>
+                        <MaterialInhalt material={m} />
+                      </div>
+                    );
+                  }
+                  // Reines Lese-Material (PDF, Notiz): weiter antippbar zum Öffnen.
                   return istOeffenbar(m) ? (
                     <button
                       key={m.id}
@@ -281,11 +294,11 @@ export default function Fokus({ kb, naechste, onFertig, onClose }) {
                       className="fokus-mat fokus-mat-klick"
                       onClick={() => setMaterial(m)}
                     >
-                      {inner}
+                      {kopf}
                     </button>
                   ) : (
                     <span key={m.id} className="fokus-mat">
-                      {inner}
+                      {kopf}
                     </span>
                   );
                 })}
@@ -293,20 +306,12 @@ export default function Fokus({ kb, naechste, onFertig, onClose }) {
             )}
           </div>
 
-          {genKey &&
-            (uebenOffen ? (
-              <div className="fokus-quiz">
-                <Quiz generatorKey={genKey} />
-              </div>
-            ) : (
-              <button
-                type="button"
-                className="fokus-ueben"
-                onClick={() => setUebenOffen(true)}
-              >
-                Dazu üben
-              </button>
-            ))}
+          {genKey && (
+            <div className="fokus-quiz">
+              <div className="fokus-label fokus-quiz-label">Dazu üben</div>
+              <Quiz generatorKey={genKey} />
+            </div>
+          )}
 
           <div className="fokus-fuss">
             {aktuell > 0 && (

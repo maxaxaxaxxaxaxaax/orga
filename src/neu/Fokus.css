@@ -259,27 +259,29 @@
 .fokus-mat-klick:hover .fokus-mat-aktiv {
   border-color: var(--accent);
 }
-.fokus-ueben {
-  align-self: flex-start;
-  border: 1px solid var(--line-strong);
-  background: var(--card);
-  color: var(--text);
-  font-size: 0.9rem;
-  font-weight: 600;
-  padding: 9px 16px;
-  border-radius: 999px;
-  cursor: pointer;
-  transition: border-color 0.12s ease, color 0.12s ease;
-}
-.fokus-ueben:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-}
 .fokus-quiz {
   background: var(--card);
   border: 1px solid var(--line);
   border-radius: var(--r-md, 12px);
   padding: 14px;
+}
+.fokus-quiz-label {
+  margin-bottom: 10px;
+}
+/* Interaktive Übung direkt offen im Material-Block (ohne Klick). */
+.fokus-mat-offen {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md, 12px);
+  padding: 12px 13px;
+}
+.fokus-mat-offen-kopf {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--line);
 }
 
 .fokus-fuss {
