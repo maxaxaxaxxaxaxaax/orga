@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { faecher } from "../data/wissen";
 import { koennensbeweise, kbFarbe } from "../data/koennensbeweise";
 import { lade, ERLEDIGT_KEY } from "./planung";
+import { ladeSchritte } from "./lernschritte";
 import { ART_LABEL } from "./material";
 import { ladeEigene, speichereEigenes } from "./eigeneMaterialien";
 import KbInhalt from "./KbInhalt";
@@ -45,6 +46,18 @@ function datumText(iso) {
 
 function passt(text, q) {
   return (text || "").toLowerCase().includes(q);
+}
+
+// Schritt-Fortschritt eines Lernwegs: schon erledigte Schritte / gesamt. Zeigt
+// in der Lernweg-Liste, was angefangen wurde (dünne Leiste, Skill-Überblick).
+function schrittFortschritt(thema) {
+  const schritte = thema?.schritte || [];
+  if (!schritte.length) return null;
+  const stand = ladeSchritte(thema.kbId);
+  const fertig = schritte.filter((st, i) =>
+    stand[i] != null ? stand[i] : !!st.fertig
+  ).length;
+  return { fertig, gesamt: schritte.length };
 }
 
 // Unterregister der "Alle Materialien"-Ansicht: nach Art, Lernweg oder Bereich
@@ -233,6 +246,8 @@ export default function Ablage() {
   function oeffneMaterial(f, material) {
     const thema = f.themen.find((t) => t.label === material.thema);
     oeffneLernweg(f, thema);
+    // Direkt ins Material springen (Übung/Lesen), der Lernweg liegt dahinter.
+    if (istOeffenbar(material)) setOffenesMaterial(material);
   }
   function zuFaechern() {
     setFachId(null);
@@ -492,6 +507,10 @@ export default function Ablage() {
               const matAnzahl = alleMaterialien.filter(
                 (m) => m.thema === t.label
               ).length;
+              const fort = schrittFortschritt(t);
+              // Dünne Leiste nur, wenn angefangen aber noch nicht durch.
+              const zeigeBalken =
+                !fertig && fort && fort.fertig > 0 && fort.fertig < fort.gesamt;
               return (
                 <button
                   key={t.id}
@@ -509,6 +528,20 @@ export default function Ablage() {
                   <span className="ab-zeile-titel">{t.label}</span>
                   {matAnzahl > 0 && (
                     <span className="ab-zeile-zahl">{matAnzahl}</span>
+                  )}
+                  {zeigeBalken && (
+                    <span
+                      className="ab-zeile-balken"
+                      aria-hidden="true"
+                      title={`${fort.fertig} von ${fort.gesamt} Schritten`}
+                    >
+                      <span
+                        className="ab-zeile-balken-fuell"
+                        style={{
+                          width: (fort.fertig / fort.gesamt) * 100 + "%",
+                        }}
+                      />
+                    </span>
                   )}
                 </button>
               );

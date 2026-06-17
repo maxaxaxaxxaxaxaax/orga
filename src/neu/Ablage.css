@@ -277,6 +277,7 @@
   }
 }
 .ab-zeile {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -286,6 +287,23 @@
   background: transparent;
   cursor: pointer;
   text-align: left;
+  overflow: hidden;
+}
+/* Dünne Schritt-Fortschrittsleiste am unteren Rand (angefangener Lernweg). */
+.ab-zeile-balken {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 3px;
+  height: 2px;
+  background: var(--line);
+  border-radius: 1px;
+}
+.ab-zeile-balken-fuell {
+  display: block;
+  height: 100%;
+  background: color-mix(in srgb, var(--c) 60%, var(--accent));
+  border-radius: 1px;
 }
 .ab-zeile:hover {
   background: var(--bg);
