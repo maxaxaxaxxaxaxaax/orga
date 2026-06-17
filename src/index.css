@@ -195,4 +195,49 @@ select:focus-visible {
       transform: none;
     }
   }
+
+  /* Lebendiges Richtig/Falsch-Feedback in den Uebungen: ein kurzer Pop bei
+     richtig, ein sanftes Wackeln bei falsch (Kahoot-artig, kindgerecht). Nur
+     wenn keine reduzierte Bewegung gewuenscht ist. */
+  .qz-option.richtig,
+  .aq-option.ok,
+  .lt-feedback.ok,
+  .zs-feedback.ok {
+    animation: uebung-pop 0.32s cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+  .qz-option.falsch,
+  .aq-option.no,
+  .lt-feedback.no,
+  .zs-feedback.no {
+    animation: uebung-wackel 0.34s ease;
+  }
+  @keyframes uebung-pop {
+    0% {
+      transform: scale(1);
+    }
+    45% {
+      transform: scale(1.05);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  @keyframes uebung-wackel {
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+    20% {
+      transform: translateX(-4px);
+    }
+    40% {
+      transform: translateX(4px);
+    }
+    60% {
+      transform: translateX(-3px);
+    }
+    80% {
+      transform: translateX(2px);
+    }
+  }
 }
