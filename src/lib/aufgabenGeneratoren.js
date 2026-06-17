@@ -57,46 +57,62 @@ function negativeKontextAufgabe() {
   };
 }
 
-// Generator: negative Zahlen (Addition & Subtraktion)
-// Mischt reine Rechnungen mit realistischen Kontext-Aufgaben.
+// Eine reine Vorzeichen-Rechnung mit passendem Hinweis bauen.
+function baueRechnung(a, b, op) {
+  const result = op === "+" ? a + b : a - b;
+  const frage = `${formatNegativeZahl(a)} ${op} ${formatNegativeZahlMitKlammer(b)}`;
+  let hint = "Stell dir den Zahlenstrahl vor.";
+  if (op === "−" && b < 0) {
+    hint = "Minus und Minus wird Plus. Du rechnest also " + formatNegativeZahl(a) + " + " + Math.abs(b) + ".";
+  } else if (op === "+" && b < 0) {
+    hint = "Plus und Minus wird Minus. Du rechnest also " + formatNegativeZahl(a) + " − " + Math.abs(b) + ".";
+  } else if (a < 0 && b > 0 && op === "+") {
+    hint = "Von " + formatNegativeZahl(a) + " aus " + b + " Schritte nach rechts.";
+  } else if (a > 0 && b > 0 && op === "−" && b > a) {
+    hint = "Von " + a + " aus " + b + " Schritte nach links: du landest unter Null.";
+  }
+  return { frage, loesung: result, hint };
+}
+
+// Generator: negative Zahlen (Addition & Subtraktion) mit Schwierigkeits-
+// Progression ueber die Runde: leicht -> Festigung -> Transfer (Minus und Minus)
+// -> Kontext-Anwendung. Die Position in der Runde steckt in vorhandene.length.
 function negativeZahlenGen(vorhandene = []) {
   const vorhandeneFragen = new Set(vorhandene.map((a) => a.frage));
-  // Gut ein Drittel als echte Anwendungssituation (Temperatur, Geld, Aufzug).
-  if (Math.random() < 0.4) {
-    for (let versuch = 0; versuch < 12; versuch++) {
+  const i = vorhandene.length;
+
+  // Spaeter in der Runde die Anwendung im echten Kontext (Temperatur/Geld/Aufzug).
+  if (i >= 5 || (i >= 3 && Math.random() < 0.35)) {
+    for (let v = 0; v < 12; v++) {
       const k = negativeKontextAufgabe();
       if (!vorhandeneFragen.has(k.frage)) return k;
     }
   }
-  for (let versuch = 0; versuch < 25; versuch++) {
-    const a = zufallsZahl(-12, 12);
-    const b = zufallsZahl(-12, 12);
-    if (a === 0 && b === 0) continue;
-    const op = Math.random() < 0.5 ? "+" : "−";
-    const result = op === "+" ? a + b : a - b;
-    const frage = `${formatNegativeZahl(a)} ${op} ${formatNegativeZahlMitKlammer(b)}`;
-    if (vorhandeneFragen.has(frage)) continue;
 
-    let hint = "Stell dir den Zahlenstrahl vor.";
-    if (op === "−" && b < 0) {
-      hint = "Minus mal minus wird plus. Du rechnest also " + formatNegativeZahl(a) + " + " + Math.abs(b) + ".";
-    } else if (op === "+" && b < 0) {
-      hint = "Plus mal minus wird minus. Du rechnest also " + formatNegativeZahl(a) + " − " + Math.abs(b) + ".";
-    } else if (a < 0 && b > 0 && op === "+") {
-      hint = "Von " + formatNegativeZahl(a) + " aus " + b + " Schritte nach rechts.";
-    } else if (a > 0 && b > 0 && op === "−" && b > a) {
-      hint = "Von " + a + " aus " + b + " Schritte nach links: du landest unter Null.";
+  for (let versuch = 0; versuch < 30; versuch++) {
+    let a, b, op;
+    if (i <= 1) {
+      // Stufe 1, leicht: kleine Betraege, sanfter Einstieg.
+      op = Math.random() < 0.5 ? "+" : "−";
+      a = zufallsZahl(-6, 6);
+      b = zufallsZahl(1, 6);
+    } else if (i <= 3) {
+      // Stufe 2, Festigung: gemischte Vorzeichen im vollen Bereich.
+      op = Math.random() < 0.5 ? "+" : "−";
+      a = zufallsZahl(-10, 10);
+      b = zufallsZahl(-10, 10);
+    } else {
+      // Stufe 3, Transfer: das knifflige Minus und Minus (a − (−b)).
+      op = "−";
+      a = zufallsZahl(-9, 9);
+      b = -zufallsZahl(1, 9);
     }
-    return { frage, loesung: result, hint };
+    if (a === 0 && b === 0) continue;
+    const aufg = baueRechnung(a, b, op);
+    if (vorhandeneFragen.has(aufg.frage)) continue;
+    return aufg;
   }
-  // Fallback nach vielen Kollisionen: simple Aufgabe
-  const a = zufallsZahl(-9, 9);
-  const b = zufallsZahl(-9, 9);
-  return {
-    frage: `${formatNegativeZahl(a)} + ${formatNegativeZahlMitKlammer(b)}`,
-    loesung: a + b,
-    hint: "Stell dir den Zahlenstrahl vor.",
-  };
+  return baueRechnung(zufallsZahl(-9, 9), zufallsZahl(1, 9), "+");
 }
 
 // Generator: Latein ACI + Auslöser-Vokabeln.
