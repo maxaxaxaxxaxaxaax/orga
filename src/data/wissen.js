@@ -132,6 +132,7 @@ export const faecher = [
       { id: "e2", thema: "Vocabulary Unit 5 (pp. 84-93)", titel: "Vokabelliste Unit 5, S. 84-93", art: "arbeitsblatt", bereich: "unterricht", datum: "2026-04-23" },
       { id: "e3", thema: "will-future · question tags · if-clause I", titel: "Mitschrift: will vs. going-to", art: "notiz", bereich: "unterricht", datum: "2026-04-30" },
       { id: "e4", thema: "will-future · question tags · if-clause I", titel: "Arbeitsblatt: if-clause I Übungen", art: "arbeitsblatt", bereich: "unterricht", datum: "2026-05-07" },
+      { id: "e7", thema: "will-future · question tags · if-clause I", titel: "Übung: Satz bauen", art: "arbeitsblatt", bereich: "selbstlernen", datum: "2026-05-08" },
       { id: "e5", thema: "Vocabulary Unit 5 (pp. 94-99)", titel: "Vokabelliste Unit 5, S. 94-99", art: "arbeitsblatt", bereich: "unterricht", datum: "2026-05-14" },
       { id: "e6", thema: "Everyday English: Dialog", titel: "Spickzettel: useful phrases for asking", art: "notiz", bereich: "selbstlernen", datum: "2026-05-19" },
     ],

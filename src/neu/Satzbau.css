@@ -1,0 +1,195 @@
+.sb {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md, 12px);
+  padding: 16px;
+}
+.sb-kopf {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+.sb-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+}
+.sb-serie {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--accent-strong);
+  background: var(--accent-soft);
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-variant-numeric: tabular-nums;
+}
+.sb-fortschritt {
+  height: 4px;
+  background: var(--line);
+  border-radius: 2px;
+  overflow: hidden;
+  margin: 8px 0 4px;
+}
+.sb-fortschritt-fuell {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 2px;
+  transition: width 0.25s ease;
+}
+.sb-aufgabe {
+  margin: 6px 0 12px;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  color: var(--text-2);
+}
+.sb-aufgabe strong {
+  color: var(--text);
+}
+
+/* Satzzeile: hierhin wandern die gewählten Wörter, in Reihenfolge. */
+.sb-satzzeile {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  min-height: 48px;
+  padding: 10px 12px;
+  background: var(--card);
+  border: 1.5px dashed var(--line-strong);
+  border-radius: var(--r-sm, 8px);
+  margin-bottom: 12px;
+}
+.sb-satzzeile.ok {
+  border-style: solid;
+  border-color: var(--ok-text);
+  background: var(--ok-bg);
+}
+.sb-satzzeile.no {
+  border-style: solid;
+  border-color: var(--warn-line);
+  background: var(--warn-bg);
+}
+.sb-platzhalter {
+  font-size: 0.85rem;
+  color: var(--muted);
+  font-style: italic;
+}
+
+/* Wort-Bausteine: Vorrat unten, gelegte oben. */
+.sb-vorrat {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-height: 40px;
+  margin-bottom: 4px;
+}
+.sb-wort {
+  padding: 8px 13px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--card);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-sm, 8px);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition:
+    border-color 0.12s ease,
+    transform 0.08s ease;
+}
+.sb-wort:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+.sb-wort:active:not(:disabled) {
+  transform: translateY(1px);
+}
+.sb-wort:disabled {
+  cursor: default;
+  opacity: 0.85;
+}
+.sb-wort-gelegt {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  box-shadow: none;
+}
+/* Touch: bequeme Tap-Flächen für Kinder am Tablet. */
+@media (pointer: coarse) {
+  .sb-wort {
+    padding: 11px 15px;
+  }
+}
+
+.sb-feedback {
+  margin-top: 12px;
+  padding: 10px 13px;
+  border-radius: var(--r-sm, 8px);
+}
+.sb-feedback.ok {
+  background: var(--ok-bg);
+}
+.sb-feedback.no {
+  background: var(--warn-bg);
+}
+.sb-feedback-text {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+.sb-feedback.ok .sb-feedback-text {
+  color: var(--ok-text);
+}
+.sb-feedback.no .sb-feedback-text {
+  color: var(--warn-text);
+}
+.sb-loesung {
+  margin: 6px 0 0;
+  font-size: 0.9rem;
+  color: var(--text);
+}
+.sb-aktionen {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+.sb-pruefen,
+.sb-weiter {
+  border: none;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: 0.9rem;
+  font-weight: 700;
+  padding: 9px 18px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.sb-pruefen:disabled {
+  background: var(--line-strong);
+  color: var(--muted);
+  cursor: not-allowed;
+}
+.sb-nochmal,
+.sb-loesung-btn {
+  border: 1px solid var(--line-strong);
+  background: var(--card);
+  color: var(--text-2);
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 8px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.sb-nochmal:hover,
+.sb-loesung-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.sb-leer {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--muted);
+  font-style: italic;
+}

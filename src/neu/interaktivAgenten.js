@@ -2,6 +2,22 @@
 // und Zuordnung. Getrennt von interaktiv.js, damit die Registry übersichtlich
 // bleibt. Wird in interaktiv.js eingemischt.
 
+// Satzbau: aus Wort-Bausteinen den richtigen englischen Satz bauen (woerter in
+// korrekter Reihenfolge). Die deutsche Bedeutung ist der Anlass. Fachlich
+// sichere, gaengige Saetze (if-clause I, will-future, Unit-5-Sprache).
+export const SATZBAU = {
+  e7: {
+    saetze: [
+      { woerter: ["If", "it", "rains,", "we", "will", "stay", "at", "home."], uebersetzung: "Wenn es regnet, bleiben wir zu Hause." },
+      { woerter: ["I", "will", "help", "you", "if", "you", "ask", "me."], uebersetzung: "Ich helfe dir, wenn du mich fragst." },
+      { woerter: ["She", "will", "be", "happy", "if", "she", "wins."], uebersetzung: "Sie wird glücklich sein, wenn sie gewinnt." },
+      { woerter: ["Can", "you", "recommend", "a", "good", "restaurant?"], uebersetzung: "Kannst du ein gutes Restaurant empfehlen?" },
+      { woerter: ["The", "entrance", "fee", "is", "five", "euros."], uebersetzung: "Der Eintrittspreis beträgt fünf Euro." },
+      { woerter: ["If", "you", "study", "hard,", "you", "will", "pass", "the", "exam."], uebersetzung: "Wenn du fleißig lernst, bestehst du die Prüfung." },
+    ],
+  },
+};
+
 export const MERKBLATT = {
   m3: {
     abschnitte: [

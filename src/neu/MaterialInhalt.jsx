@@ -5,6 +5,7 @@ import Lueckentext from "./Lueckentext";
 import Zuordnung from "./Zuordnung";
 import Reihenfolge from "./Reihenfolge";
 import Auswahlquiz from "./Auswahlquiz";
+import Satzbau from "./Satzbau";
 import { interaktivFuerMaterial } from "./interaktiv";
 
 // Leichter Text-Renderer für Materialien mit Volltext (Lernzettel u. ä.):
@@ -54,6 +55,7 @@ export default function MaterialInhalt({ material }) {
     return <Reihenfolge daten={eintrag.daten} />;
   if (eintrag?.typ === "auswahlquiz")
     return <Auswahlquiz daten={eintrag.daten} />;
+  if (eintrag?.typ === "satzbau") return <Satzbau daten={eintrag.daten} />;
   if (material.inhalt) return <Textinhalt text={material.inhalt} />;
   return (
     <p className="ma-leer">Für dieses Material gibt es noch keine Vorschau.</p>
