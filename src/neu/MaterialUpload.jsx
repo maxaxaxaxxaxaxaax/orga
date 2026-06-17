@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { faecher } from "../data/wissen";
+import { MATHE_KATEGORIEN } from "../data/matheKategorien";
 import "./MaterialUpload.css";
 
 // Eigenes Material hinzufügen (Demo): Datei wählen, die App erkennt Fach und
@@ -162,11 +163,27 @@ export default function MaterialUpload({
               <span>Lernweg (optional)</span>
               <select value={thema} onChange={(e) => setThema(e.target.value)}>
                 <option value="">Nur im Fach ablegen</option>
-                {fach.themen.map((t) => (
-                  <option key={t.id} value={t.label}>
-                    {t.label}
-                  </option>
-                ))}
+                {fach.themen.some((t) => t.kategorie)
+                  ? MATHE_KATEGORIEN.map((kat) => {
+                      const wege = fach.themen.filter(
+                        (t) => t.kategorie === kat
+                      );
+                      if (!wege.length) return null;
+                      return (
+                        <optgroup key={kat} label={kat}>
+                          {wege.map((t) => (
+                            <option key={t.id} value={t.label}>
+                              {t.label}
+                            </option>
+                          ))}
+                        </optgroup>
+                      );
+                    })
+                  : fach.themen.map((t) => (
+                      <option key={t.id} value={t.label}>
+                        {t.label}
+                      </option>
+                    ))}
               </select>
             </label>
             <label className="mu-feld">
