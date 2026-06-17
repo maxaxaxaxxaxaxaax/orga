@@ -157,6 +157,38 @@
   color: var(--warn-text);
 }
 
+/* Rechenweg-Starter: bei Mathe-Zielen den handschriftlichen Rechenweg oeffnen. */
+.fokus-rechenweg {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 9px 15px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.fokus-rechenweg:hover {
+  background: color-mix(in srgb, var(--accent) 18%, var(--card));
+}
+.fokus-rechenweg-stift {
+  font-size: 1.05rem;
+}
+.fokus-rechenweg-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
 .fokus-block {
   display: flex;
   flex-direction: column;

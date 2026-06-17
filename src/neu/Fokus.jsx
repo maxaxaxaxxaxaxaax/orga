@@ -23,6 +23,8 @@ import Quiz from "./Quiz";
 import MaterialAnsicht from "./MaterialAnsicht";
 import MaterialInhalt from "./MaterialInhalt";
 import MaterialUpload from "./MaterialUpload";
+import Rechenweg from "./Rechenweg";
+import { hatRechenweg } from "./rechenwegSpeicher";
 import { addNotiz, ladeNotizen } from "./notizen";
 import {
   istOeffenbar,
@@ -45,6 +47,9 @@ export default function Fokus({ kb, naechste, onFertig, onClose }) {
   const [gefuehl, setGefuehl] = useState(() => ladeGefuehl(kb.id));
   const [material, setMaterial] = useState(null);
   const [uploadOffen, setUploadOffen] = useState(false);
+  // Handschriftlicher Rechenweg (nur bei Mathe-Zielen sinnvoll).
+  const [rechenwegOffen, setRechenwegOffen] = useState(false);
+  const istMathe = kb.fach === "Mathematik";
   const [hilfe, setHilfe] = useState(() => !!ladeHilferufe()[kb.id]);
   const [frage, setFrage] = useState(() => ladeFragen()[kb.id] || "");
   const [hilfeOffen, setHilfeOffen] = useState(false);
@@ -238,6 +243,22 @@ export default function Fokus({ kb, naechste, onFertig, onClose }) {
               ))}
             </div>
           </div>
+
+          {istMathe && (
+            <button
+              type="button"
+              className="fokus-rechenweg"
+              onClick={() => setRechenwegOffen(true)}
+            >
+              <span className="fokus-rechenweg-stift" aria-hidden="true">
+                ✎
+              </span>
+              Rechenweg aufschreiben
+              {hatRechenweg(kb.id) && (
+                <span className="fokus-rechenweg-badge">gespeichert</span>
+              )}
+            </button>
+          )}
 
           <div className="fokus-block">
             <div className="fokus-label-zeile">
@@ -449,6 +470,9 @@ export default function Fokus({ kb, naechste, onFertig, onClose }) {
           }}
           onClose={() => setUploadOffen(false)}
         />
+      )}
+      {rechenwegOffen && (
+        <Rechenweg kb={kb} onClose={() => setRechenwegOffen(false)} />
       )}
     </div>
   );
