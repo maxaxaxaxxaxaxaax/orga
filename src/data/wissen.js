@@ -6,6 +6,8 @@
 // Stundenplan-Fächer ohne aktuellen KB (z. B. Bio, Geschichte) tauchen hier
 // bewusst nicht auf, damit nichts „ohne Lernweg" angezeigt wird.
 
+import { MATHE_LANDKARTE } from "./matheLandkarte";
+
 export const faecher = [
   {
     id: "mathe",
@@ -38,6 +40,8 @@ export const faecher = [
         { text: "Geschwindigkeit trainieren", fertig: false },
         { text: "Probediplom durchgehen", fertig: false },
       ] },
+      // Landkarte der ganzen Schulmathematik (7 Kategorien, nur Ueberblick/Fortschritt).
+      ...MATHE_LANDKARTE,
     ],
     verknuepfungen: [
       ["grundlagen", "addsub"],
