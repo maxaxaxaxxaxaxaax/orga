@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import Fertig from "./Fertig";
+import UebungHinweis from "./UebungHinweis";
 import "./Merkblatt.css";
 
 // Interaktives Merk-/Nachschlageblatt: Abschnitte mit Regeln und kleinen
@@ -73,10 +74,18 @@ export default function Merkblatt({ daten }) {
         />
       )}
 
+      <UebungHinweis id="merkblatt">
+        Klapp die Abschnitte auf und hake ab, was du schon sicher kannst.
+      </UebungHinweis>
+
       <div className="mb-liste">
         {abschnitte.map((ab, ai) => {
           const istOffen = offen[ai];
           const regeln = ab.regeln || [];
+          // Pro Abschnitt zeigen, wie viele Regeln schon abgehakt sind: so wird
+          // der Stand auch bei eingeklappten Abschnitten sichtbar.
+          const abGeschafft = regeln.filter((_, ri) => verstanden[`${ai}-${ri}`]).length;
+          const abVoll = regeln.length > 0 && abGeschafft === regeln.length;
           return (
             <section className="mb-abschnitt" key={ai}>
               <button
@@ -86,6 +95,11 @@ export default function Merkblatt({ daten }) {
                 onClick={() => umschalten(ai)}
               >
                 <span className="mb-titel-text">{ab.titel}</span>
+                {regeln.length > 0 && (
+                  <span className={"mb-titel-zahl" + (abVoll ? " voll" : "")}>
+                    {abVoll ? "✓" : `${abGeschafft}/${regeln.length}`}
+                  </span>
+                )}
                 <span
                   className={"mb-pfeil" + (istOffen ? " auf" : "")}
                   aria-hidden="true"

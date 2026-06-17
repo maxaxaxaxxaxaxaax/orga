@@ -61,8 +61,24 @@
   color: var(--text);
 }
 .mb-titel-text {
+  flex: 1;
   font-size: 0.95rem;
   font-weight: 600;
+}
+/* Pro-Abschnitt-Stand: zeigt auch eingeklappt, wie viel schon abgehakt ist. */
+.mb-titel-zahl {
+  flex: none;
+  font-size: 0.74rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+  background: color-mix(in srgb, var(--text) 8%, transparent);
+  border-radius: 999px;
+  padding: 1px 8px;
+}
+.mb-titel-zahl.voll {
+  color: var(--ok-text);
+  background: var(--ok-bg);
 }
 .mb-pfeil {
   flex: none;
