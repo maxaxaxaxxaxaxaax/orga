@@ -135,6 +135,8 @@ export default function Lueckentext({ daten }) {
         Tippe die fehlende Lösung in die Lücke und drücke Enter oder Prüfen.
       </UebungHinweis>
 
+      {satz.situation && <p className="lt-situation">{satz.situation}</p>}
+
       <p className="lt-satz">
         {satz.vor}
         {geprueft ? (

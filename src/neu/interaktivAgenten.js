@@ -303,14 +303,14 @@ export const MERKBLATT = {
 export const LUECKENTEXT = {
   e4: {
     saetze: [
-      { vor: "If it ", loesung: ["rains"], nach: " tomorrow, we will stay at home.", tipp: "Bedingung im Present Simple (he/she/it: + s)." },
-      { vor: "If it rains tomorrow, we ", loesung: ["will stay", "'ll stay"], nach: " at home.", tipp: "Folge mit will + Grundform." },
-      { vor: "If you ", loesung: ["study", "work"], nach: " hard, you will pass the exam.", tipp: "Bedingungssatz: Present Simple." },
-      { vor: "If you study hard, you ", loesung: ["will pass", "'ll pass"], nach: " the exam.", tipp: "will + Grundform." },
-      { vor: "She will be happy if she ", loesung: ["wins", "win"], nach: " the game.", tipp: "Nach if steht das Present Simple (she: + s)." },
-      { vor: "If we ", loesung: ["miss", "missed"], nach: " the bus, we will be late.", tipp: "Bedingung im Present Simple, kein will nach if." },
-      { vor: "If the weather is nice, they ", loesung: ["will go", "'ll go", "will play", "'ll play"], nach: " to the beach.", tipp: "Hauptsatz mit will + Grundform." },
-      { vor: "I will help you if you ", loesung: ["ask", "ask me"], nach: " me.", tipp: "Nach if: Present Simple." },
+      { situation: "Ihr plant das Wochenende und schaut auf die Wetter-App.", vor: "If it ", loesung: ["rains"], nach: " tomorrow, we will stay at home.", tipp: "Nach if steht das Present Simple (it: + s)." },
+      { situation: "Ihr plant das Wochenende und schaut auf die Wetter-App.", vor: "If it rains tomorrow, we ", loesung: ["will stay", "'ll stay"], nach: " at home.", tipp: "Die Folge im Hauptsatz: will + Grundform." },
+      { situation: "Kurz vor der Klassenarbeit.", vor: "If you ", loesung: ["study", "work"], nach: " hard, you will pass the exam.", tipp: "Bedingung nach if: Present Simple." },
+      { situation: "Kurz vor der Klassenarbeit.", vor: "If you study hard, you ", loesung: ["will pass", "'ll pass"], nach: " the exam.", tipp: "Hauptsatz: will + Grundform." },
+      { situation: "Beim Fußballspiel deiner Schwester.", vor: "She will be happy if she ", loesung: ["wins"], nach: " the game.", tipp: "Nach if: Present Simple, bei she immer + s (wins)." },
+      { situation: "Der Bus kommt gleich, ihr seid spät dran.", vor: "If we ", loesung: ["miss"], nach: " the bus, we will be late.", tipp: "Bedingung im Present Simple, niemals will nach if." },
+      { situation: "Morgen soll die Sonne scheinen.", vor: "If the weather is nice, they ", loesung: ["will go", "'ll go", "will play", "'ll play"], nach: " to the beach.", tipp: "Hauptsatz mit will + Grundform." },
+      { situation: "Dein Freund braucht Hilfe bei den Hausaufgaben.", vor: "I will help you if you ", loesung: ["ask", "ask me"], nach: " me.", tipp: "Nach if: Present Simple." },
     ],
   },
   e3: {
