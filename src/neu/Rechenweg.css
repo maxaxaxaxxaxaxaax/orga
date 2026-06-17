@@ -113,7 +113,8 @@
   pointer-events: none;
 }
 
-/* Coach-Leiste unten: Rechenweg prüfen lassen + die Rückmeldung. */
+/* Coach-Leiste unten: Knopf, der den ganzen Rechenweg prüfen lässt. Das
+   Ergebnis erscheint als Nachricht im Chat, nicht hier. */
 .rw-coach {
   flex-shrink: 0;
   display: flex;
@@ -137,62 +138,8 @@
   color: var(--muted);
   cursor: not-allowed;
 }
-.rw-coach-panel {
-  background: var(--accent-soft);
-  border: 1px solid color-mix(in srgb, var(--accent) 30%, var(--line));
-  border-radius: var(--r-md, 12px);
-  padding: 12px 14px;
-}
-.rw-coach-panel.fehler {
-  background: var(--warn-bg);
-  border-color: var(--warn-line);
-}
-.rw-coach-kopf {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 4px;
-}
-.rw-coach-label {
-  font-size: 0.7rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--accent-strong);
-}
-.rw-coach-panel.fehler .rw-coach-label {
-  color: var(--warn-text);
-}
-.rw-coach-zu {
-  border: none;
-  background: none;
-  color: var(--text-2);
-  font-size: 0.8rem;
-  cursor: pointer;
-}
-.rw-coach-zu:hover {
-  color: var(--text);
-}
-.rw-coach-gelesen {
-  margin: 0 0 8px;
-  font-size: 0.82rem;
-  line-height: 1.5;
-  color: var(--text-2);
-}
-.rw-coach-transkript {
-  white-space: pre-line;
-  font-family: var(--mono, ui-monospace, monospace);
-  color: var(--text);
-}
-.rw-coach-text {
-  margin: 0;
-  font-size: 0.95rem;
-  line-height: 1.5;
-  color: var(--text);
-}
 
-/* Arbeitsbereich: Schreibfläche (links/oben) und optionaler Coach-Chat. */
+/* Arbeitsbereich: Schreibfläche (links/oben) und der Coach-Chat. */
 .rw-arbeit {
   position: relative;
   display: flex;

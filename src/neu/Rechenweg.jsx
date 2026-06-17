@@ -36,24 +36,24 @@ export default function Rechenweg({ kb, onClose }) {
   const stricheRef = useRef(striche); // Spiegel für die Zeichen-Routine
   const [visionModell, setVisionModell] = useState(null); // lokales Vision-Modell
   const [textModell, setTextModell] = useState(null); // lokales Text-Modell (Rechnen)
-  const [analyse, setAnalyse] = useState(null); // { lauft, stufe, transkript, text, fehler, hinweis }
 
-  // Mathe-Coach-Chat: Fragen stellen, während man schreibt (optional mit Handschrift-Bild).
-  const [chatOffen, setChatOffen] = useState(false);
+  // Mathe-Coach-Chat: Fragen stellen und den Rechenweg prüfen lassen, beides
+  // läuft als Nachrichten im selben Chat. Standardmäßig offen, einklappbar.
+  const [chatOffen, setChatOffen] = useState(true);
   const [chatNachrichten, setChatNachrichten] = useState(() => [
     {
       von: "ki",
-      text: "Hier kannst du mir Fragen stellen, während du schreibst, etwa wie der nächste Schritt geht oder was eine negative Zahl ist. Ich gebe dir keine fertige Lösung, sondern bringe dich mit Rückfragen weiter. Deinen ganzen Weg prüfst du mit dem Knopf Rechenweg vom Coach prüfen lassen.",
+      text: "Hier kannst du mir Fragen stellen, während du schreibst, etwa wie der nächste Schritt geht oder was eine negative Zahl ist. Ich gebe dir keine fertige Lösung, sondern bringe dich mit Rückfragen weiter. Tipp unten auf Rechenweg vom Coach prüfen lassen, dann schaue ich mir deinen ganzen Weg an und schreibe dir das Ergebnis hier rein.",
     },
   ]);
   const [chatEingabe, setChatEingabe] = useState("");
   const [chatDenkt, setChatDenkt] = useState(false); // Tipp-Punkte bis zum ersten Token
-  const [chatLaeuft, setChatLaeuft] = useState(false); // Anfrage in Arbeit (sperrt Senden)
+  const [chatLaeuft, setChatLaeuft] = useState(false); // Anfrage in Arbeit (sperrt Senden/Prüfen)
   const [handschriftMit, setHandschriftMit] = useState(false);
   const chatEndeRef = useRef(null); // Autoscroll-Anker
-  const chatInputRef = useRef(null); // Fokus beim Öffnen
-  const chatFabRef = useRef(null); // Fokus zurück beim Schließen
-  const chatWarOffenRef = useRef(false); // war der Chat schon mal offen?
+  const chatInputRef = useRef(null); // Fokus beim Ausklappen
+  const chatFabRef = useRef(null); // Fokus zurück beim Einklappen
+  const chatVorherOffenRef = useRef(chatOffen); // letzter Offen-Zustand (Übergänge)
   const chatAbbruchRef = useRef(null); // AbortController des laufenden Streams
 
   const tinteRef = useRef("#1f2933"); // Tinten-Farbe, folgt dem Theme (--text)
@@ -167,15 +167,16 @@ export default function Rechenweg({ kb, onClose }) {
     };
   }, []);
 
-  // Fokus mitführen: beim Öffnen ins Eingabefeld, beim Schließen zurück auf den
-  // Knopf, der den Chat öffnet (nur wenn er vorher offen war, nicht beim Mount).
+  // Fokus nur bei einem echten Wechsel mitführen: beim Ausklappen ins
+  // Eingabefeld, beim Einklappen zurück auf den Ausklapp-Knopf. Beim Mount
+  // (Chat schon offen) passiert nichts, sonst spränge auf dem Tablet die
+  // Tastatur auf, obwohl der Schüler schreiben will. Der Vergleich mit dem
+  // vorherigen Zustand ist auch gegen StrictMode-Doppelläufe stabil.
   useEffect(() => {
-    if (chatOffen) {
-      chatWarOffenRef.current = true;
-      chatInputRef.current?.focus();
-    } else if (chatWarOffenRef.current) {
-      chatFabRef.current?.focus();
-    }
+    const vorher = chatVorherOffenRef.current;
+    chatVorherOffenRef.current = chatOffen;
+    if (chatOffen && !vorher) chatInputRef.current?.focus();
+    else if (!chatOffen && vorher) chatFabRef.current?.focus();
   }, [chatOffen]);
 
   // Bei neuer Nachricht ans Listenende scrollen.
@@ -240,43 +241,72 @@ export default function Rechenweg({ kb, onClose }) {
     return off.toDataURL("image/png");
   }
 
+  // Die zuletzt eingefügte Chat-Nachricht ändern (für streamende Antworten).
+  function chatSetzeLetzte(aender) {
+    setChatNachrichten((n) => {
+      const kopie = [...n];
+      const i = kopie.length - 1;
+      kopie[i] = aender(kopie[i]);
+      return kopie;
+    });
+  }
+
+  // Den ganzen Rechenweg prüfen lassen. Das Ergebnis erscheint als Nachrichten
+  // im Chat (nicht in einem eigenen Panel): erst die erkannte Lesart, dann das
+  // Urteil. Zweistufig: ablesen (Vision), dann nachrechnen (Text, sonst Vision).
   async function pruefen() {
-    if (!stricheRef.current.length) return;
+    if (!stricheRef.current.length || chatLaeuft) return;
+    setChatOffen(true);
     if (!visionModell) {
-      setAnalyse({
-        lauft: false,
-        stufe: "fehler",
-        transkript: "",
-        text: "",
-        fehler: true,
-        hinweis:
-          "Für die Analyse deines Rechenwegs braucht es ein lokales KI-Vision-Modell (Ollama). Gerade läuft keins. Das Aufschreiben funktioniert trotzdem.",
-      });
+      setChatNachrichten((n) => [
+        ...n,
+        {
+          von: "ki",
+          text: "Zum Prüfen deines ganzen Rechenwegs brauche ich ein lokales KI-Vision-Modell (Ollama). Gerade läuft keins. Schreiben und Fragenstellen geht trotzdem.",
+        },
+      ]);
       return;
     }
     const bild = exportiereBild();
     if (!bild) return;
-    setAnalyse({ lauft: true, stufe: "lese", transkript: "", text: "", fehler: false, hinweis: "" });
+    setChatNachrichten((n) => [
+      ...n,
+      { von: "ich", text: "Prüf bitte meinen ganzen Rechenweg." },
+      { von: "ki", text: "" },
+    ]);
+    setChatLaeuft(true);
+    setChatDenkt(true);
+    chatAbbruchRef.current?.abort();
+    const ac = new AbortController();
+    chatAbbruchRef.current = ac;
     try {
-      // Schritt 1: ablesen (Vision). Schritt 2: nachrechnen (Text-Modell, sonst Vision).
-      const transkript = await lieRechenweg({ bild, modell: visionModell });
-      setAnalyse((a) => (a ? { ...a, stufe: "pruefe", transkript } : a));
+      const transkript = await lieRechenweg({ bild, modell: visionModell, signal: ac.signal });
+      setChatDenkt(false);
+      chatSetzeLetzte(() => ({
+        von: "ki",
+        text: "Ich lese deinen Weg als: " + transkript,
+      }));
+      setChatNachrichten((n) => [...n, { von: "ki", text: "" }]);
+      setChatDenkt(true);
       await pruefeRechenwegText({
         transkript,
         modell: textModell || visionModell,
-        onToken: (st) =>
-          setAnalyse((a) => (a ? { ...a, text: a.text + st } : a)),
+        signal: ac.signal,
+        onToken: (st) => {
+          setChatDenkt(false);
+          chatSetzeLetzte((m) => ({ ...m, text: m.text + st }));
+        },
       });
-      setAnalyse((a) => (a ? { ...a, lauft: false } : a));
-    } catch {
-      setAnalyse((a) => ({
-        lauft: false,
-        stufe: "fehler",
-        transkript: a ? a.transkript : "",
-        text: "",
-        fehler: true,
-        hinweis: "Die Analyse hat nicht geklappt. Versuch es gleich nochmal.",
-      }));
+    } catch (e) {
+      if (e.name !== "AbortError") {
+        chatSetzeLetzte(() => ({
+          von: "ki",
+          text: "Das Prüfen hat gerade nicht geklappt. Versuch es gleich nochmal.",
+        }));
+      }
+    } finally {
+      setChatDenkt(false);
+      setChatLaeuft(false);
     }
   }
 
@@ -300,13 +330,6 @@ export default function Rechenweg({ kb, onClose }) {
     chatAbbruchRef.current?.abort();
     const ac = new AbortController();
     chatAbbruchRef.current = ac;
-    const setzeLetzte = (aender) =>
-      setChatNachrichten((n) => {
-        const kopie = [...n];
-        const i = kopie.length - 1;
-        kopie[i] = aender(kopie[i]);
-        return kopie;
-      });
     try {
       if (!modell) throw new Error("keine KI");
       await frageKi({
@@ -320,12 +343,12 @@ export default function Rechenweg({ kb, onClose }) {
         signal: ac.signal,
         onToken: (stueck) => {
           setChatDenkt(false);
-          setzeLetzte((m) => ({ ...m, text: m.text + stueck }));
+          chatSetzeLetzte((m) => ({ ...m, text: m.text + stueck }));
         },
       });
     } catch (e) {
       if (e.name !== "AbortError") {
-        setzeLetzte(() => ({
+        chatSetzeLetzte(() => ({
           von: "ki",
           text: "Ich kann gerade nicht antworten. Der Mathe-Coach braucht eine laufende lokale KI. Schreib ruhig weiter, das klappt auch ohne mich.",
         }));
@@ -469,52 +492,14 @@ export default function Rechenweg({ kb, onClose }) {
           </div>
 
           <div className="rw-coach">
-        {analyse && (
-          <div className={"rw-coach-panel" + (analyse.fehler ? " fehler" : "")}>
-            <div className="rw-coach-kopf">
-              <span className="rw-coach-label">Lerncoach</span>
-              {!analyse.lauft && (
-                <button
-                  type="button"
-                  className="rw-coach-zu"
-                  onClick={() => setAnalyse(null)}
-                >
-                  Schließen
-                </button>
-              )}
-            </div>
-            {analyse.fehler ? (
-              <p className="rw-coach-text">{analyse.hinweis}</p>
-            ) : (
-              <>
-                {analyse.transkript && (
-                  <p className="rw-coach-gelesen">
-                    Ich lese deinen Weg als:{" "}
-                    <span className="rw-coach-transkript">
-                      {analyse.transkript}
-                    </span>
-                  </p>
-                )}
-                <p className="rw-coach-text">
-                  {analyse.text ||
-                    (analyse.stufe === "lese"
-                      ? "Ich lese deinen Rechenweg …"
-                      : "Ich rechne deinen Weg Schritt für Schritt nach …")}
-                </p>
-              </>
-            )}
-          </div>
-        )}
-          <button
-            type="button"
-            className="rw-pruefen"
-            onClick={pruefen}
-            disabled={striche.length === 0 || (analyse && analyse.lauft)}
-          >
-            {analyse && analyse.lauft
-              ? "Der Coach schaut …"
-              : "Rechenweg vom Coach prüfen lassen"}
-          </button>
+            <button
+              type="button"
+              className="rw-pruefen"
+              onClick={pruefen}
+              disabled={striche.length === 0 || chatLaeuft}
+            >
+              Rechenweg vom Coach prüfen lassen
+            </button>
           </div>
         </div>
 
@@ -551,9 +536,9 @@ export default function Rechenweg({ kb, onClose }) {
                 type="button"
                 className="rw-chat-zu"
                 onClick={() => setChatOffen(false)}
-                aria-label="Chat schließen"
+                aria-label="Chat einklappen"
               >
-                Schließen
+                Einklappen
               </button>
             </header>
 
@@ -630,7 +615,7 @@ export default function Rechenweg({ kb, onClose }) {
             className="rw-chat-fab"
             onClick={() => setChatOffen(true)}
           >
-            Coach fragen
+            Coach ausklappen
           </button>
         )}
       </div>
