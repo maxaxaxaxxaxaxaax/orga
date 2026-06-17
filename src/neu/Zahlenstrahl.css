@@ -151,6 +151,16 @@
 .zs-ziel .zs-marke-text {
   color: var(--ok-text);
 }
+/* Bezugszahl (Gegenzahl-Aufgaben): zeigt die Ausgangszahl als Anker, damit die
+   Spiegelung an der Null sichtbar wird. */
+.zs-quelle .zs-marke-punkt {
+  background: var(--accent);
+  border-color: var(--card);
+}
+.zs-quelle .zs-marke-text {
+  color: var(--accent-strong);
+  font-weight: 700;
+}
 
 .zs-feedback {
   border-radius: var(--r-sm, 8px);

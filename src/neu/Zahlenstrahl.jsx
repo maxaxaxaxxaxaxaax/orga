@@ -149,6 +149,17 @@ export default function Zahlenstrahl({ daten }) {
             <span className={"zs-zahl" + (w === 0 ? " null" : "")}>{w}</span>
           </span>
         ))}
+        {/* Bezugszahl (z.B. bei Gegenzahl): zeigt die Ausgangszahl, damit die
+            Spiegelung an der Null sichtbar wird. */}
+        {aufgabe.quelle != null && (
+          <span
+            className="zs-marke zs-quelle"
+            style={{ left: pct(aufgabe.quelle) + "%" }}
+          >
+            <span className="zs-marke-punkt" />
+            <span className="zs-marke-text">{aufgabe.quelle}</span>
+          </span>
+        )}
         {beantwortet && !warRichtig && (
           <span
             className="zs-marke zs-ziel"
