@@ -11,6 +11,7 @@ import {
   REIHENFOLGE,
   AUSWAHLQUIZ,
   SATZBAU,
+  BILDZUORDNUNG,
 } from "./interaktivAgenten";
 
 export const INTERAKTIV = {
@@ -193,6 +194,8 @@ for (const [id, daten] of Object.entries(AUSWAHLQUIZ))
   INTERAKTIV[id] = { typ: "auswahlquiz", daten };
 for (const [id, daten] of Object.entries(SATZBAU))
   INTERAKTIV[id] = { typ: "satzbau", daten };
+for (const [id, daten] of Object.entries(BILDZUORDNUNG))
+  INTERAKTIV[id] = { typ: "bildzuordnung", daten };
 
 export function interaktivFuerMaterial(id) {
   return INTERAKTIV[id] || null;
@@ -208,6 +211,7 @@ export const TYP_LABEL = {
   reihenfolge: "Reihenfolge",
   auswahlquiz: "Quiz",
   satzbau: "Satz bauen",
+  bildzuordnung: "Plan-Übung",
 };
 
 // Aktivitäts-Label für ein Material: die Übungsform, sonst "Lesen" für reinen

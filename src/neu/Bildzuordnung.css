@@ -1,0 +1,134 @@
+.bz {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md, 12px);
+  padding: 16px;
+}
+.bz-kopf {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+.bz-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+}
+.bz-serie {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--accent-strong);
+  background: var(--accent-soft);
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-variant-numeric: tabular-nums;
+}
+.bz-fortschritt {
+  height: 4px;
+  background: var(--line);
+  border-radius: 2px;
+  overflow: hidden;
+  margin: 8px 0 4px;
+}
+.bz-fortschritt-fuell {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 2px;
+  transition: width 0.25s ease;
+}
+.bz-frage {
+  margin: 6px 0 12px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* Plan als SVG mit anklickbaren Raeumen. */
+.bz-plan {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+.bz-rahmen {
+  fill: var(--card);
+  stroke: var(--line-strong);
+  stroke-width: 1.5;
+}
+.bz-raum {
+  cursor: pointer;
+}
+.bz-raum rect {
+  fill: var(--bg);
+  stroke: var(--line-strong);
+  stroke-width: 1.5;
+  transition:
+    fill 0.15s ease,
+    stroke 0.15s ease;
+}
+.bz-raum text {
+  fill: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+  pointer-events: none;
+}
+.bz-raum:hover rect {
+  stroke: var(--accent);
+  fill: var(--accent-soft);
+}
+.bz-raum.ok rect {
+  fill: var(--ok-bg);
+  stroke: var(--ok-text);
+  stroke-width: 2.5;
+}
+.bz-raum.ok text {
+  fill: var(--ok-text);
+}
+.bz-raum.no rect {
+  fill: var(--warn-bg);
+  stroke: var(--warn-line);
+  stroke-width: 2.5;
+}
+
+.bz-feedback {
+  margin-top: 12px;
+  padding: 10px 13px;
+  border-radius: var(--r-sm, 8px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.bz-feedback.ok {
+  background: var(--ok-bg);
+}
+.bz-feedback-text {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--ok-text);
+}
+.bz-weiter {
+  border: none;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: 0.88rem;
+  font-weight: 700;
+  padding: 8px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.bz-hinweis {
+  margin: 12px 0 0;
+  font-size: 0.85rem;
+  color: var(--warn-text);
+}
+.bz-leer {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--muted);
+  font-style: italic;
+}

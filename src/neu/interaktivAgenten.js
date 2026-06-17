@@ -29,6 +29,29 @@ export const SATZBAU = {
   },
 };
 
+// Plan-Uebung (Bild-Zuordnung): englische Ortsfrage -> richtigen Raum im Plan
+// antippen. Raum-Labels auf Deutsch, Frage auf Englisch (Vokabel im Raumkontext).
+export const BILDZUORDNUNG = {
+  e9: {
+    raeume: [
+      { id: "eingang", label: "Eingang" },
+      { id: "info", label: "Information" },
+      { id: "cafe", label: "Café" },
+      { id: "toiletten", label: "Toiletten" },
+      { id: "laden", label: "Laden" },
+      { id: "ausgang", label: "Ausgang" },
+    ],
+    fragen: [
+      { frage: "Where is the entrance?", raum: "eingang" },
+      { frage: "Where are the toilets?", raum: "toiletten" },
+      { frage: "Where is the gift shop?", raum: "laden" },
+      { frage: "Where is the exit?", raum: "ausgang" },
+      { frage: "Where is the café?", raum: "cafe" },
+      { frage: "Where is the information desk?", raum: "info" },
+    ],
+  },
+};
+
 export const MERKBLATT = {
   m3: {
     abschnitte: [

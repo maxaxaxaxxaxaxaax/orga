@@ -136,6 +136,7 @@ export const faecher = [
       { id: "e5", thema: "Vocabulary Unit 5 (pp. 94-99)", titel: "Vokabelliste Unit 5, S. 94-99", art: "arbeitsblatt", bereich: "unterricht", datum: "2026-05-14" },
       { id: "e6", thema: "Everyday English: Dialog", titel: "Spickzettel: useful phrases for asking", art: "notiz", bereich: "selbstlernen", datum: "2026-05-19" },
       { id: "e8", thema: "Everyday English: Dialog", titel: "Übung: Satz bauen", art: "arbeitsblatt", bereich: "selbstlernen", datum: "2026-05-20" },
+      { id: "e9", thema: "Everyday English: Dialog", titel: "Übung: Orte im Plan finden", art: "arbeitsblatt", bereich: "selbstlernen", datum: "2026-05-21" },
     ],
   },
   {
