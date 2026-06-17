@@ -12,12 +12,14 @@ import MaterialAnsicht from "./MaterialAnsicht";
 import { istOeffenbar, aktivitaetLabel, TYP_LABEL } from "./interaktiv";
 import Begriff from "./Begriff";
 import { pruefeKi, pruefeVision } from "./kiClient";
+import { MATHE_KATEGORIEN } from "../data/matheKategorien";
 import "./Ablage.css";
 
 // Merkt sich, wie der Schüler die Ablage zuletzt sortiert/gruppiert hat, damit
 // die Ansicht beim nächsten Mal vertraut bleibt (kleine, unsichtbare Usability).
 const GRUPPE_KEY = "neu.ablage.gruppe";
 const SORT_KEY = "neu.ablage.sort";
+const KAT_KEY = "neu.ablage.mathe.kategorien";
 
 function ladeText(key, fallback) {
   try {
@@ -143,6 +145,27 @@ export default function Ablage() {
   const [materialSort, setMaterialSort] = useState(() =>
     ladeText(SORT_KEY, "neu")
   ); // neu | az
+  const [katOffen, setKatOffen] = useState(() => {
+    try {
+      const r = localStorage.getItem(KAT_KEY);
+      return new Set(r ? JSON.parse(r) : ["Mathematische Grundlagen"]);
+    } catch {
+      return new Set(["Mathematische Grundlagen"]);
+    }
+  });
+  function toggleKat(name) {
+    setKatOffen((prev) => {
+      const next = new Set(prev);
+      if (next.has(name)) next.delete(name);
+      else next.add(name);
+      try {
+        localStorage.setItem(KAT_KEY, JSON.stringify([...next]));
+      } catch {
+        /* localStorage nicht verfuegbar */
+      }
+      return next;
+    });
+  }
   const erledigt = lade(ERLEDIGT_KEY);
 
   // Gruppieren/Sortieren über Sitzungen hinweg merken.
@@ -503,52 +526,86 @@ export default function Ablage() {
               <span className="ab-zeile-titel">Alle Materialien</span>
               <span className="ab-zeile-zahl">{alleMaterialien.length}</span>
             </button>
-            {fach.themen.map((t) => {
-              const kb = koennensbeweise.find((k) => k.id === t.kbId);
-              const aktiv = gewaehltId === t.id;
-              const fertig = kb ? !!erledigt[kb.id] : false;
-              const matAnzahl = alleMaterialien.filter(
-                (m) => m.thema === t.label
-              ).length;
-              const fort = schrittFortschritt(t);
-              // Dünne Leiste nur, wenn angefangen aber noch nicht durch.
-              const zeigeBalken =
-                !fertig && fort && fort.fertig > 0 && fort.fertig < fort.gesamt;
-              return (
-                <button
-                  key={t.id}
-                  type="button"
-                  className={"ab-zeile" + (aktiv ? " aktiv" : "")}
-                  onClick={() => setGewaehltId(aktiv ? null : t.id)}
-                  aria-pressed={aktiv}
-                >
-                  <span
-                    className={"ab-zeile-status" + (fertig ? " fertig" : "")}
-                    aria-hidden="true"
+            {(() => {
+              function lernwegButton(t) {
+                const kb = koennensbeweise.find((k) => k.id === t.kbId);
+                const aktiv = gewaehltId === t.id;
+                const fertig = kb ? !!erledigt[kb.id] : false;
+                const matAnzahl = alleMaterialien.filter(
+                  (m) => m.thema === t.label
+                ).length;
+                const fort = schrittFortschritt(t);
+                // Dünne Leiste nur, wenn angefangen aber noch nicht durch.
+                const zeigeBalken =
+                  !fertig && fort && fort.fertig > 0 && fort.fertig < fort.gesamt;
+                return (
+                  <button
+                    key={t.id}
+                    type="button"
+                    className={"ab-zeile" + (aktiv ? " aktiv" : "")}
+                    onClick={() => setGewaehltId(aktiv ? null : t.id)}
+                    aria-pressed={aktiv}
                   >
-                    {fertig ? "✓" : ""}
-                  </span>
-                  <span className="ab-zeile-titel">{t.label}</span>
-                  {matAnzahl > 0 && (
-                    <span className="ab-zeile-zahl">{matAnzahl}</span>
-                  )}
-                  {zeigeBalken && (
                     <span
-                      className="ab-zeile-balken"
+                      className={"ab-zeile-status" + (fertig ? " fertig" : "")}
                       aria-hidden="true"
-                      title={`${fort.fertig} von ${fort.gesamt} Schritten`}
                     >
-                      <span
-                        className="ab-zeile-balken-fuell"
-                        style={{
-                          width: (fort.fertig / fort.gesamt) * 100 + "%",
-                        }}
-                      />
+                      {fertig ? "✓" : ""}
                     </span>
-                  )}
-                </button>
+                    <span className="ab-zeile-titel">{t.label}</span>
+                    {matAnzahl > 0 && (
+                      <span className="ab-zeile-zahl">{matAnzahl}</span>
+                    )}
+                    {zeigeBalken && (
+                      <span
+                        className="ab-zeile-balken"
+                        aria-hidden="true"
+                        title={`${fort.fertig} von ${fort.gesamt} Schritten`}
+                      >
+                        <span
+                          className="ab-zeile-balken-fuell"
+                          style={{
+                            width: (fort.fertig / fort.gesamt) * 100 + "%",
+                          }}
+                        />
+                      </span>
+                    )}
+                  </button>
+                );
+              }
+              return fach.themen.some((t) => t.kategorie) ? (
+                MATHE_KATEGORIEN.map((kat) => {
+                  const wege = fach.themen.filter((t) => t.kategorie === kat);
+                  if (!wege.length) return null;
+                  const offen = katOffen.has(kat);
+                  const erledigteWege = wege.filter((t) => {
+                    const f = schrittFortschritt(t);
+                    return f && f.fertig === f.gesamt;
+                  }).length;
+                  return (
+                    <div className="ab-kat" key={kat}>
+                      <button
+                        type="button"
+                        className="ab-kat-kopf"
+                        onClick={() => toggleKat(kat)}
+                        aria-expanded={offen}
+                      >
+                        <span className="ab-kat-pfeil" aria-hidden="true">
+                          {offen ? "▾" : "▸"}
+                        </span>
+                        <span className="ab-kat-name">{kat}</span>
+                        <span className="ab-kat-stand">
+                          {erledigteWege} / {wege.length}
+                        </span>
+                      </button>
+                      {offen && wege.map((t) => lernwegButton(t))}
+                    </div>
+                  );
+                })
+              ) : (
+                fach.themen.map((t) => lernwegButton(t))
               );
-            })}
+            })()}
           </nav>
 
           <section className="ab-detail">
