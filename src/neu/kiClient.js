@@ -23,18 +23,33 @@ async function modellNamen() {
 export async function pruefeKi() {
   const namen = await modellNamen();
   if (!namen || !namen.length) return null;
+  // Ein qwen3-Modell zuerst, auch das VL (kann Text sehr gut): dann läuft im
+  // Idealfall EIN Modell für Lesen, Urteil und Chat, ohne langsames Wechseln.
+  const q3 = besteVariante(namen, "qwen3");
+  if (q3) return q3;
+  // Sonst ein reines Textmodell bevorzugen (kein Vision-Modell für Text laden).
   const text = namen.filter((n) => !istVision(n));
   const wahl = text.length ? text : namen;
-  return (
-    wahl.find((n) => n.startsWith("qwen3")) ||
-    wahl.find((n) => n.startsWith("qwen2.5")) ||
-    wahl[0]
-  );
+  return besteVariante(wahl, "qwen2.5") || wahl[0];
 }
 
 // Erkennt Vision-Modelle am Namen.
 function istVision(name) {
   return /vl|vision|llava|moondream|minicpm-v|bakllava|gemma3/.test(name);
+}
+
+// Aus einer Modell-Liste die beste Variante mit gegebenem Präfix wählen:
+// Instruct bevorzugen, Thinking meiden. Die Thinking-Variante liest beim
+// Abschreiben schlechter wörtlich ab (korrigiert/rechnet still) und antwortet
+// im Chat langsamer und weitschweifiger als die Instruct-Variante.
+function besteVariante(liste, praefix) {
+  const treffer = liste.filter((n) => n.startsWith(praefix));
+  return (
+    treffer.find((n) => n.includes("instruct")) ||
+    treffer.find((n) => !n.includes("thinking")) ||
+    treffer[0] ||
+    null
+  );
 }
 
 // Läuft ein Vision-Modell (für Bild-Fragen)? Gibt den Namen zurück oder null.
@@ -44,8 +59,8 @@ export async function pruefeVision() {
   const vision = namen.filter(istVision);
   if (!vision.length) return null;
   return (
-    vision.find((n) => n.startsWith("qwen3-vl")) ||
-    vision.find((n) => n.startsWith("qwen2.5vl")) ||
+    besteVariante(vision, "qwen3-vl") ||
+    besteVariante(vision, "qwen2.5vl") ||
     vision[0]
   );
 }
