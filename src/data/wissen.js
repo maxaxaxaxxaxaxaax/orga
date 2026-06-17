@@ -216,6 +216,7 @@ export const faecher = [
       { id: "gr2", thema: "Vokabeln L 1", titel: "Vokabelliste L 1", art: "arbeitsblatt", bereich: "unterricht", datum: "2026-04-23" },
       { id: "gr3", thema: "a-Deklination im Singular", titel: "Spickzettel: Die vier Fälle", art: "notiz", bereich: "selbstlernen", datum: "2026-04-30" },
       { id: "gr4", thema: "a-Deklination im Singular", titel: "Übersicht: a-Deklination Endungen", art: "zusammenfassung", bereich: "selbstlernen", datum: "2026-05-07" },
+      { id: "gr6", thema: "a-Deklination im Singular", titel: "Übung: Die vier Fälle", art: "arbeitsblatt", bereich: "selbstlernen", datum: "2026-05-08" },
       { id: "gr5", thema: "Vokabeln L 2", titel: "Vokabelliste L 2", art: "arbeitsblatt", bereich: "unterricht", datum: "2026-05-14" },
     ],
   },

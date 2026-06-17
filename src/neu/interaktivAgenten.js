@@ -47,6 +47,21 @@ export const MERKBLATT = {
   m4: {
     abschnitte: [
       {
+        titel: "Warum ist das so?",
+        einleitung:
+          "Ein Minus bedeutet: das Gegenteil. Minus mal minus heißt dann das Gegenteil vom Gegenteil, und damit landest du wieder beim Ursprung. Das ist keine Willkür, sondern folgt aus der Bedeutung von Minus.",
+        regeln: [
+          {
+            text: "Ein Minus dreht die Richtung um. Zwei Minus drehen zweimal, du schaust wieder in die Ausgangsrichtung.",
+            beispiel: "Das Gegenteil vom Gegenteil von 5 ist wieder 5.",
+          },
+          {
+            text: "Darum ergibt minus mal minus ein Plus.",
+            beispiel: "(−1) mal (−3): zweimal das Gegenteil von 3, also +3.",
+          },
+        ],
+      },
+      {
         titel: "Die Grundregel",
         einleitung: "Bei Mal und Geteilt zählt nur, ob die Vorzeichen gleich oder verschieden sind.",
         regeln: [
@@ -349,6 +364,47 @@ export const REIHENFOLGE = {
 };
 
 export const AUSWAHLQUIZ = {
+  gr6: {
+    fragen: [
+      {
+        frage:
+          "Welcher Fall ist das Subjekt im Satz (du fragst: wer oder was handelt)?",
+        optionen: ["Nominativ", "Genitiv", "Dativ", "Akkusativ"],
+        richtig: 0,
+        erklaerung: "Der Nominativ ist der Fall des Subjekts: wer oder was tut etwas.",
+      },
+      {
+        frage: "Auf welche Frage antwortet der Genitiv?",
+        optionen: ["wem?", "wessen?", "wen oder was?", "wer oder was?"],
+        richtig: 1,
+        erklaerung: "Der Genitiv zeigt Besitz und Zugehörigkeit, du fragst wessen.",
+      },
+      {
+        frage: "Du fragst, wem etwas gegeben wird. Welcher Fall ist das?",
+        optionen: ["Akkusativ", "Nominativ", "Dativ", "Genitiv"],
+        richtig: 2,
+        erklaerung: "Der Dativ ist der Empfänger, das indirekte Objekt: wem.",
+      },
+      {
+        frage: "Ich sehe die Göttin. In welchem Fall steht die Göttin?",
+        optionen: ["Nominativ", "Dativ", "Genitiv", "Akkusativ"],
+        richtig: 3,
+        erklaerung: "Wen sehe ich? Die Göttin ist das direkte Objekt, also Akkusativ.",
+      },
+      {
+        frage: "Das Haus der Göttin. In welchem Fall steht der Göttin?",
+        optionen: ["Genitiv", "Dativ", "Akkusativ", "Nominativ"],
+        richtig: 0,
+        erklaerung: "Wessen Haus? Der Göttin steht im Genitiv (Zugehörigkeit).",
+      },
+      {
+        frage: "Ich folge der Göttin. In welchem Fall steht der Göttin?",
+        optionen: ["Akkusativ", "Dativ", "Nominativ", "Genitiv"],
+        richtig: 1,
+        erklaerung: "Wem folge ich? Der Göttin steht im Dativ (Empfänger).",
+      },
+    ],
+  },
   m6: {
     fragen: [
       {

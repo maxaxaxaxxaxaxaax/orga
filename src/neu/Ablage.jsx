@@ -584,7 +584,9 @@ export default function Ablage() {
                 </header>
                 {alleMaterialien.length === 0 ? (
                   <p className="ab-detail-leer">
-                    Noch keine Materialien in diesem Fach.
+                    Noch keine Materialien in diesem Fach. Du findest sie auch
+                    bei den Lernwegen links, oder lade über „+ Material" etwas
+                    Neues hoch.
                   </p>
                 ) : (
                   <>
