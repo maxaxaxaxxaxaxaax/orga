@@ -583,6 +583,9 @@ export default function Ablage() {
                       {fertig ? "✓" : ""}
                     </span>
                     <span className="ab-zeile-titel">{t.label}</span>
+                    {!t.landkarte && koennensbeweise.some((k) => k.id === t.kbId) && (
+                      <span className="ab-zeile-aktiv" title="In dieser Etappe aktiv">aktiv</span>
+                    )}
                     {matAnzahl > 0 && (
                       <span className="ab-zeile-zahl">{matAnzahl}</span>
                     )}
