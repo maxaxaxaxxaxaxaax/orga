@@ -177,6 +177,9 @@ export default function Ablage() {
   const gewaehltKb = gewaehlt
     ? koennensbeweise.find((k) => k.id === gewaehlt.kbId)
     : null;
+  // Landkarten-Lernwege haben keinen echten KB. Ersatz-Objekt nur mit id/label,
+  // damit KbInhalt (das ueber kb.id den Lernweg findet) funktioniert.
+  const detailKb = gewaehltKb || (gewaehlt ? { id: gewaehlt.kbId, label: gewaehlt.label } : null);
   const alleMaterialien = fach
     ? [
         ...(fach.materialien || []),
@@ -549,27 +552,29 @@ export default function Ablage() {
           </nav>
 
           <section className="ab-detail">
-            {gewaehlt && gewaehltKb ? (
+            {gewaehlt ? (
               <>
                 <header className="ab-detail-kopf">
                   <span className="ab-detail-fach">{fach.fach}</span>
                   <h2 className="ab-detail-titel">
                     {gewaehlt.label}
-                    {erledigt[gewaehltKb.id] && (
+                    {detailKb && erledigt[detailKb.id] && (
                       <span className="ab-detail-fertig">✓ erledigt</span>
                     )}
                   </h2>
-                  <p className="ab-detail-meta">
-                    {gewaehltKb.code} · {gewaehltKb.cluster}{" "}
-                    <Begriff name="cluster">
-                      {gewaehltKb.cluster === 1
-                        ? "Clusterstunde"
-                        : "Clusterstunden"}
-                    </Begriff>
-                  </p>
+                  {gewaehltKb && (
+                    <p className="ab-detail-meta">
+                      {gewaehltKb.code} · {gewaehltKb.cluster}{" "}
+                      <Begriff name="cluster">
+                        {gewaehltKb.cluster === 1
+                          ? "Clusterstunde"
+                          : "Clusterstunden"}
+                      </Begriff>
+                    </p>
+                  )}
                 </header>
                 <div className="ab-detail-inhalt">
-                  <KbInhalt key={gewaehltKb.id} kb={gewaehltKb} kompakt />
+                  <KbInhalt key={detailKb.id} kb={detailKb} kompakt />
                 </div>
               </>
             ) : (
