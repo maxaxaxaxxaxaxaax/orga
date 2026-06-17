@@ -16,11 +16,36 @@
   letter-spacing: 0.04em;
   color: var(--muted);
 }
-.zs-score {
-  font-size: 0.78rem;
+/* Serie (eigener Schwung, kein Vergleich): nur ab 2 richtigen in Folge. */
+.zs-serie {
+  font-size: 0.72rem;
   font-weight: 700;
+  color: var(--accent-strong);
+  background: var(--accent-soft);
+  padding: 2px 9px;
+  border-radius: 999px;
   font-variant-numeric: tabular-nums;
-  color: var(--muted);
+}
+/* Dünner Fortschrittsbalken über den aktuellen Durchgang. */
+.zs-fortschritt {
+  height: 4px;
+  background: var(--line);
+  border-radius: 2px;
+  overflow: hidden;
+  margin: 8px 0 4px;
+}
+.zs-fortschritt-fuell {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 2px;
+  transition: width 0.25s ease;
+}
+/* Banner zur Nacharbeits-Runde: ruhig und ermutigend, kein Tadel. */
+.zs-nacharbeit {
+  margin: 4px 0 0;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--accent-strong);
 }
 .zs-frage {
   margin: 0;

@@ -2,10 +2,11 @@ import { useState } from "react";
 import Fertig from "./Fertig";
 import "./Lueckentext.css";
 
-// Lückentext (Cloze): Satz mit einer Lücke zwischen "vor" und "nach". Der Schüler
-// tippt die Lösung, sofortige Prüfung (case-insensitive, getrimmt, mehrere erlaubte
-// Lösungen über ein Array). Fortschritt im Kopf, ruhiger Fertig-Zustand mit "nochmal".
-// Reiner Übungsmodus, kein Tracking nach außen.
+// Lückentext (Cloze) als Lern-Session: Satz mit einer Lücke zwischen "vor" und
+// "nach". Der Schüler tippt die Lösung, sofortige Prüfung (case-insensitive,
+// getrimmt, mehrere erlaubte Lösungen über ein Array). Falsch beantwortete Sätze
+// kommen am Ende erneut dran, bis sie sitzen (Mastery, wie bei Duolingo). Eine
+// Serie zeigt den eigenen Schwung. Reiner Übungsmodus, kein Tracking nach außen.
 
 function istRichtig(loesung, eingabe) {
   const a = eingabe.trim().toLowerCase();
@@ -20,30 +21,48 @@ function loesungText(loesung) {
 
 export default function Lueckentext({ daten }) {
   const saetze = daten?.saetze || [];
-  const gesamt = saetze.length;
 
-  const [index, setIndex] = useState(0);
+  // Sessions-Maschine: aktueller Durchgang, Warteschlange, Position, falsche zum
+  // Nacharbeiten. So kommen knifflige Sätze am Ende erneut dran.
+  const [s, setS] = useState(() => ({
+    durchgang: 1,
+    queue: saetze,
+    pos: 0,
+    falsche: [],
+    startAnzahl: saetze.length,
+  }));
   const [eingabe, setEingabe] = useState("");
   const [geprueft, setGeprueft] = useState(false);
-  const [richtig, setRichtig] = useState(0);
+  const [serie, setSerie] = useState(0);
+  const [besteSerie, setBesteSerie] = useState(0);
+  const [aufAnhieb, setAufAnhieb] = useState(0);
   const [fertig, setFertig] = useState(false);
 
-  if (gesamt === 0) return <p className="lt-leer">Keine Sätze vorhanden.</p>;
+  if (s.startAnzahl === 0)
+    return <p className="lt-leer">Keine Sätze vorhanden.</p>;
 
   function neuStarten() {
-    setIndex(0);
+    setS({ durchgang: 1, queue: saetze, pos: 0, falsche: [], startAnzahl: saetze.length });
     setEingabe("");
     setGeprueft(false);
-    setRichtig(0);
+    setSerie(0);
+    setBesteSerie(0);
+    setAufAnhieb(0);
     setFertig(false);
   }
 
   if (fertig) {
+    const allesAufAnhieb = aufAnhieb === s.startAnzahl;
     return (
       <div className="lt">
         <Fertig
-          text={`Alle ${gesamt} Sätze geschafft.`}
-          bilanz={`${richtig} von ${gesamt} auf Anhieb richtig.`}
+          text={`Alle ${s.startAnzahl} Sätze geschafft.`}
+          bilanz={
+            (allesAufAnhieb
+              ? "Alles auf Anhieb richtig. Stark."
+              : "Die kniffligen hast du nachgearbeitet, jetzt sitzen sie.") +
+            (besteSerie >= 3 ? ` Beste Serie: ${besteSerie} nacheinander.` : "")
+          }
           nochmalLabel="Nochmal von vorn"
           onNochmal={neuStarten}
         />
@@ -51,21 +70,42 @@ export default function Lueckentext({ daten }) {
     );
   }
 
-  const satz = saetze[index];
+  const satz = s.queue[s.pos];
   const warRichtig = geprueft && istRichtig(satz.loesung, eingabe);
+  const istNacharbeit = s.durchgang > 1;
+  const proz = Math.round((s.pos / s.queue.length) * 100);
 
   function pruefen() {
     if (geprueft || !eingabe.trim()) return;
     setGeprueft(true);
-    if (istRichtig(satz.loesung, eingabe)) setRichtig((r) => r + 1);
+    if (istRichtig(satz.loesung, eingabe)) {
+      const n = serie + 1;
+      setSerie(n);
+      if (n > besteSerie) setBesteSerie(n);
+      if (s.durchgang === 1) setAufAnhieb((v) => v + 1);
+    } else {
+      setSerie(0);
+    }
   }
 
   function weiter() {
-    if (index + 1 >= gesamt) {
+    const ok = istRichtig(satz.loesung, eingabe);
+    const neueFalsche =
+      ok || s.falsche.includes(satz) ? s.falsche : [...s.falsche, satz];
+    const naechste = s.pos + 1;
+    if (naechste < s.queue.length) {
+      setS({ ...s, pos: naechste, falsche: neueFalsche });
+    } else if (neueFalsche.length > 0) {
+      setS({
+        durchgang: s.durchgang + 1,
+        queue: neueFalsche,
+        pos: 0,
+        falsche: [],
+        startAnzahl: s.startAnzahl,
+      });
+    } else {
       setFertig(true);
-      return;
     }
-    setIndex((i) => i + 1);
     setEingabe("");
     setGeprueft(false);
   }
@@ -73,11 +113,22 @@ export default function Lueckentext({ daten }) {
   return (
     <div className="lt">
       <div className="lt-kopf">
-        <span className="lt-label">Lückentext</span>
-        <span className="lt-fortschritt">
-          {index + 1} / {gesamt}
+        <span className="lt-label">
+          {istNacharbeit ? "Nochmal" : "Lückentext"} {s.pos + 1} / {s.queue.length}
         </span>
+        {serie >= 2 && (
+          <span className="lt-serie" aria-label={`${serie} richtig in Folge`}>
+            {serie} in Folge
+          </span>
+        )}
       </div>
+      <div className="lt-fortschritt" aria-hidden="true">
+        <div className="lt-fortschritt-fuell" style={{ width: proz + "%" }} />
+      </div>
+
+      {istNacharbeit && s.pos === 0 && (
+        <p className="lt-nacharbeit">Diese noch einmal, dann sitzen sie.</p>
+      )}
 
       <p className="lt-satz">
         {satz.vor}
@@ -133,7 +184,11 @@ export default function Lueckentext({ daten }) {
           </button>
         ) : (
           <button type="button" className="lt-weiter" onClick={weiter}>
-            {index + 1 >= gesamt ? "Fertig" : "Weiter"}
+            {s.pos + 1 < s.queue.length
+              ? "Weiter"
+              : s.falsche.length > 0 || !warRichtig
+                ? "Zur Nacharbeit"
+                : "Fertig"}
           </button>
         )}
       </div>

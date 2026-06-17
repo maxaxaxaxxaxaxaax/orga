@@ -2,16 +2,13 @@ import { useState } from "react";
 import Fertig from "./Fertig";
 import "./Auswahlquiz.css";
 
-// Auswahlquiz (Single-Choice) für Materialien: eine Frage nach der anderen, je
-// 2-4 Antwortmöglichkeiten. Antippen wählt direkt aus und rastet ein: die
-// richtige Option wird grün, eine falsche Wahl rot (richtige bleibt markiert).
-// Optional eine kurze Erklärung. "Weiter" geht zur nächsten Frage, am Ende ein
-// ruhiges Ergebnis mit "nochmal". Selbsttest mit fester Lösung im Material,
-// kein Antwort-Generator (anders als das generatorbasierte Quiz beim Üben).
+// Auswahlquiz (Single-Choice) als Lern-Session: eine Frage nach der anderen, je
+// 2-4 Antwortmöglichkeiten (gemischt, damit man den Inhalt lernt statt der
+// Position). Antippen wählt direkt aus und rastet ein: die richtige Option wird
+// grün, eine falsche Wahl rot. Falsch beantwortete Fragen kommen am Ende erneut
+// dran, bis sie sitzen (Mastery, wie bei Duolingo). Eine Serie zeigt den eigenen
+// Schwung. Optional kurze Erklärungen. Selbsttest mit fester Lösung im Material.
 
-// Mischt die Optionen einer Frage, ohne die Lösung zu verraten: liefert eine
-// Permutation der Original-Indizes, die Richtig-Markierung bleibt über den
-// Original-Index erhalten. Verhindert, dass man die Position statt des Inhalts lernt.
 function mischeIndizes(n) {
   const a = Array.from({ length: n }, (_, i) => i);
   for (let i = n - 1; i > 0; i--) {
@@ -21,79 +18,127 @@ function mischeIndizes(n) {
   return a;
 }
 
+// Eine Frage plus die (einmalig gemischte) Reihenfolge ihrer Optionen.
+function baueQueue(fragen) {
+  return fragen.map((f) => ({
+    frage: f,
+    ord: mischeIndizes((f.optionen || []).length),
+  }));
+}
+
 export default function Auswahlquiz({ daten }) {
   const fragen = (daten && daten.fragen) || [];
-  const [index, setIndex] = useState(0);
-  const [gewaehlt, setGewaehlt] = useState(null); // gewählter Options-Index (Original)
-  const [punkte, setPunkte] = useState(0);
-  const [fertig, setFertig] = useState(false);
-  const [reihenfolgen, setReihenfolgen] = useState(() =>
-    fragen.map((f) => mischeIndizes((f.optionen || []).length))
-  );
 
-  if (fragen.length === 0)
+  const [s, setS] = useState(() => ({
+    durchgang: 1,
+    queue: baueQueue(fragen),
+    pos: 0,
+    falsche: [],
+    startAnzahl: fragen.length,
+  }));
+  const [gewaehlt, setGewaehlt] = useState(null); // gewählter Options-Index (Original)
+  const [serie, setSerie] = useState(0);
+  const [besteSerie, setBesteSerie] = useState(0);
+  const [aufAnhieb, setAufAnhieb] = useState(0);
+  const [fertig, setFertig] = useState(false);
+
+  if (s.startAnzahl === 0)
     return <p className="aq-leer">Für dieses Quiz gibt es noch keine Fragen.</p>;
 
-  function waehle(i) {
-    if (gewaehlt !== null) return; // schon beantwortet
-    setGewaehlt(i);
-    if (i === fragen[index].richtig) setPunkte((p) => p + 1);
-  }
-
-  function weiter() {
-    if (index + 1 >= fragen.length) {
-      setFertig(true);
-      return;
-    }
-    setIndex((i) => i + 1);
+  function neuStarten() {
+    setS({ durchgang: 1, queue: baueQueue(fragen), pos: 0, falsche: [], startAnzahl: fragen.length });
     setGewaehlt(null);
-  }
-
-  function nochmal() {
-    setIndex(0);
-    setGewaehlt(null);
-    setPunkte(0);
+    setSerie(0);
+    setBesteSerie(0);
+    setAufAnhieb(0);
     setFertig(false);
-    // Neu mischen, damit die zweite Runde nicht identisch ist.
-    setReihenfolgen(fragen.map((f) => mischeIndizes((f.optionen || []).length)));
   }
 
   if (fertig) {
-    const alle = fragen.length;
+    const allesAufAnhieb = aufAnhieb === s.startAnzahl;
     return (
       <div className="aq">
         <Fertig
-          text={`${punkte} von ${alle} richtig`}
+          text={`Alle ${s.startAnzahl} Fragen gemeistert.`}
           bilanz={
-            punkte === alle
-              ? "Alles sitzt. Stark."
-              : "Schau dir die offenen Fragen noch einmal an."
+            (allesAufAnhieb
+              ? "Alles auf Anhieb richtig. Stark."
+              : "Die kniffligen hast du nachgearbeitet, jetzt sitzen sie.") +
+            (besteSerie >= 3 ? ` Beste Serie: ${besteSerie} nacheinander.` : "")
           }
-          onNochmal={nochmal}
+          nochmalLabel="Nochmal"
+          onNochmal={neuStarten}
         />
       </div>
     );
   }
 
-  const frage = fragen[index];
+  const item = s.queue[s.pos];
+  const frage = item.frage;
   const beantwortet = gewaehlt !== null;
+  const istNacharbeit = s.durchgang > 1;
+  const proz = Math.round((s.pos / s.queue.length) * 100);
+
+  function waehle(i) {
+    if (beantwortet) return;
+    setGewaehlt(i);
+    if (i === frage.richtig) {
+      const n = serie + 1;
+      setSerie(n);
+      if (n > besteSerie) setBesteSerie(n);
+      if (s.durchgang === 1) setAufAnhieb((v) => v + 1);
+    } else {
+      setSerie(0);
+    }
+  }
+
+  function weiter() {
+    const ok = gewaehlt === frage.richtig;
+    const neueFalsche =
+      ok || s.falsche.includes(item) ? s.falsche : [...s.falsche, item];
+    const naechste = s.pos + 1;
+    if (naechste < s.queue.length) {
+      setS({ ...s, pos: naechste, falsche: neueFalsche });
+    } else if (neueFalsche.length > 0) {
+      setS({
+        durchgang: s.durchgang + 1,
+        queue: neueFalsche,
+        pos: 0,
+        falsche: [],
+        startAnzahl: s.startAnzahl,
+      });
+    } else {
+      setFertig(true);
+    }
+    setGewaehlt(null);
+  }
 
   return (
     <div className="aq">
       <div className="aq-kopf">
-        <span className="aq-label">Quiz</span>
-        <span className="aq-fortschritt">
-          {index + 1} / {fragen.length}
+        <span className="aq-label">
+          {istNacharbeit ? "Nochmal" : "Quiz"} {s.pos + 1} / {s.queue.length}
         </span>
+        {serie >= 2 && (
+          <span className="aq-serie" aria-label={`${serie} richtig in Folge`}>
+            {serie} in Folge
+          </span>
+        )}
       </div>
+      <div className="aq-fortschritt" aria-hidden="true">
+        <div className="aq-fortschritt-fuell" style={{ width: proz + "%" }} />
+      </div>
+
+      {istNacharbeit && s.pos === 0 && (
+        <p className="aq-nacharbeit">Diese noch einmal, dann sitzen sie.</p>
+      )}
 
       <p className="aq-frage">{frage.frage}</p>
 
       <div className="aq-optionen">
-        {(reihenfolgen[index] || frage.optionen.map((_, i) => i)).map((i) => {
+        {(item.ord || frage.optionen.map((_, i) => i)).map((i) => {
           // i ist der Original-Index der Option (Reihenfolge gemischt).
           const opt = frage.optionen[i];
-          // Option ist entweder ein String oder { text, erklaerung }.
           const text = typeof opt === "string" ? opt : opt.text;
           const erkl = typeof opt === "string" ? null : opt.erklaerung;
           let status = "";
@@ -101,8 +146,6 @@ export default function Auswahlquiz({ daten }) {
             if (i === frage.richtig) status = "ok";
             else if (i === gewaehlt) status = "no";
           }
-          // Erklaerung der richtigen Option immer zeigen, der eben falsch
-          // gewaehlten auch (damit man versteht, warum nicht).
           const zeigeErkl =
             beantwortet && erkl && (i === frage.richtig || i === gewaehlt);
           return (
@@ -138,7 +181,11 @@ export default function Auswahlquiz({ daten }) {
 
       {beantwortet && (
         <button type="button" className="aq-weiter" onClick={weiter}>
-          {index + 1 >= fragen.length ? "Ergebnis" : "Weiter"}
+          {s.pos + 1 < s.queue.length
+            ? "Weiter"
+            : s.falsche.length > 0 || gewaehlt !== frage.richtig
+              ? "Zur Nacharbeit"
+              : "Ergebnis"}
         </button>
       )}
     </div>

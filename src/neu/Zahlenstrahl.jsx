@@ -2,44 +2,69 @@ import { useRef, useState } from "react";
 import Fertig from "./Fertig";
 import "./Zahlenstrahl.css";
 
-// Interaktiver Zahlenstrahl: eine Aufgabe nennt eine Zahl, der Schüler klickt
-// die Stelle auf der Linie. Der Klick rastet auf die nächste Ganzzahl ein,
-// sofort Feedback (richtige Stelle wird mitgezeigt), dann die nächste Aufgabe.
+// Interaktiver Zahlenstrahl als Lern-Session: eine Aufgabe nennt eine Zahl, der
+// Schüler klickt die Stelle auf der Linie. Der Klick rastet auf die nächste
+// Ganzzahl ein, sofort Feedback (die richtige Stelle wird mitgezeigt). Falsch
+// getroffene Aufgaben kommen am Ende erneut dran, bis sie sitzen (Mastery). Eine
+// Serie zeigt den eigenen Schwung.
 export default function Zahlenstrahl({ daten }) {
   const von = daten?.von ?? -10;
   const bis = daten?.bis ?? 10;
   const aufgaben = daten?.aufgaben || [];
-  const [i, setI] = useState(0);
+
+  const [s, setS] = useState(() => ({
+    durchgang: 1,
+    queue: aufgaben,
+    pos: 0,
+    falsche: [],
+    startAnzahl: aufgaben.length,
+  }));
   const [klick, setKlick] = useState(null);
-  const [richtig, setRichtig] = useState(0);
+  const [serie, setSerie] = useState(0);
+  const [besteSerie, setBesteSerie] = useState(0);
+  const [aufAnhieb, setAufAnhieb] = useState(0);
+  const [fertig, setFertig] = useState(false);
   const lineRef = useRef(null);
 
-  if (aufgaben.length === 0) return <p className="zs-leer">Keine Aufgaben.</p>;
+  if (s.startAnzahl === 0) return <p className="zs-leer">Keine Aufgaben.</p>;
 
   const pct = (w) => ((w - von) / (bis - von)) * 100;
   const ticks = [];
   for (let w = von; w <= bis; w++) ticks.push(w);
 
-  if (i >= aufgaben.length) {
+  function neuStarten() {
+    setS({ durchgang: 1, queue: aufgaben, pos: 0, falsche: [], startAnzahl: aufgaben.length });
+    setKlick(null);
+    setSerie(0);
+    setBesteSerie(0);
+    setAufAnhieb(0);
+    setFertig(false);
+  }
+
+  if (fertig) {
+    const allesAufAnhieb = aufAnhieb === s.startAnzahl;
     return (
       <div className="zs">
         <Fertig
           text="Zahlenstrahl geschafft."
-          bilanz={`${richtig} von ${aufgaben.length} auf Anhieb getroffen.`}
+          bilanz={
+            (allesAufAnhieb
+              ? "Alles auf Anhieb getroffen. Stark."
+              : "Die kniffligen hast du nachgearbeitet, jetzt sitzen sie.") +
+            (besteSerie >= 3 ? ` Beste Serie: ${besteSerie} nacheinander.` : "")
+          }
           nochmalLabel="Nochmal üben"
-          onNochmal={() => {
-            setI(0);
-            setKlick(null);
-            setRichtig(0);
-          }}
+          onNochmal={neuStarten}
         />
       </div>
     );
   }
 
-  const aufgabe = aufgaben[i];
+  const aufgabe = s.queue[s.pos];
   const beantwortet = klick !== null;
   const warRichtig = beantwortet && klick === aufgabe.ziel;
+  const istNacharbeit = s.durchgang > 1;
+  const proz = Math.round((s.pos / s.queue.length) * 100);
 
   function aufLinie(e) {
     if (beantwortet) return;
@@ -48,10 +73,34 @@ export default function Zahlenstrahl({ daten }) {
     const wert = Math.round(von + anteil * (bis - von));
     const geklemmt = Math.max(von, Math.min(bis, wert));
     setKlick(geklemmt);
-    if (geklemmt === aufgabe.ziel) setRichtig((r) => r + 1);
+    if (geklemmt === aufgabe.ziel) {
+      const n = serie + 1;
+      setSerie(n);
+      if (n > besteSerie) setBesteSerie(n);
+      if (s.durchgang === 1) setAufAnhieb((v) => v + 1);
+    } else {
+      setSerie(0);
+    }
   }
+
   function weiter() {
-    setI((n) => n + 1);
+    const ok = klick === aufgabe.ziel;
+    const neueFalsche =
+      ok || s.falsche.includes(aufgabe) ? s.falsche : [...s.falsche, aufgabe];
+    const naechste = s.pos + 1;
+    if (naechste < s.queue.length) {
+      setS({ ...s, pos: naechste, falsche: neueFalsche });
+    } else if (neueFalsche.length > 0) {
+      setS({
+        durchgang: s.durchgang + 1,
+        queue: neueFalsche,
+        pos: 0,
+        falsche: [],
+        startAnzahl: s.startAnzahl,
+      });
+    } else {
+      setFertig(true);
+    }
     setKlick(null);
   }
 
@@ -59,10 +108,22 @@ export default function Zahlenstrahl({ daten }) {
     <div className="zs">
       <div className="zs-kopf">
         <span className="zs-label">
-          Aufgabe {i + 1} von {aufgaben.length}
+          {istNacharbeit ? "Nochmal" : "Aufgabe"} {s.pos + 1} / {s.queue.length}
         </span>
-        <span className="zs-score">{richtig} richtig</span>
+        {serie >= 2 && (
+          <span className="zs-serie" aria-label={`${serie} richtig in Folge`}>
+            {serie} in Folge
+          </span>
+        )}
       </div>
+      <div className="zs-fortschritt" aria-hidden="true">
+        <div className="zs-fortschritt-fuell" style={{ width: proz + "%" }} />
+      </div>
+
+      {istNacharbeit && s.pos === 0 && (
+        <p className="zs-nacharbeit">Diese noch einmal, dann sitzen sie.</p>
+      )}
+
       <p className="zs-frage">{aufgabe.frage}</p>
 
       <button
@@ -111,7 +172,11 @@ export default function Zahlenstrahl({ daten }) {
               : `Nicht ganz: du warst bei ${klick}, gesucht war ${aufgabe.ziel}.`}
           </p>
           <button type="button" className="zs-weiter" onClick={weiter}>
-            {i + 1 < aufgaben.length ? "Nächste Aufgabe →" : "Fertig →"}
+            {s.pos + 1 < s.queue.length
+              ? "Weiter →"
+              : s.falsche.length > 0 || !warRichtig
+                ? "Zur Nacharbeit →"
+                : "Fertig →"}
           </button>
         </div>
       )}
