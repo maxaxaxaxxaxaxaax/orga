@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Fertig from "./Fertig";
+import UebungHinweis from "./UebungHinweis";
 import "./Reihenfolge.css";
 
 // Reihenfolge-Übung (Sequencing): Schritte/Stationen in die richtige Ordnung
@@ -74,6 +75,11 @@ export default function Reihenfolge({ daten }) {
           </span>
         )}
       </div>
+
+      <UebungHinweis id="reihenfolge">
+        Bring die Karten mit den Pfeilen hoch und runter in die richtige
+        Reihenfolge, dann tippe auf Prüfen.
+      </UebungHinweis>
 
       {daten.aufgabe && <p className="rf-aufgabe">{daten.aufgabe}</p>}
 

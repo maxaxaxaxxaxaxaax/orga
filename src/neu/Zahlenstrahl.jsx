@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import Fertig from "./Fertig";
+import UebungHinweis from "./UebungHinweis";
 import "./Zahlenstrahl.css";
 
 // Interaktiver Zahlenstrahl als Lern-Session: eine Aufgabe nennt eine Zahl, der
@@ -123,6 +124,10 @@ export default function Zahlenstrahl({ daten }) {
       {istNacharbeit && s.pos === 0 && (
         <p className="zs-nacharbeit">Diese noch einmal, dann sitzen sie.</p>
       )}
+
+      <UebungHinweis id="zahlenstrahl">
+        Klicke auf die Stelle auf der Linie, die zur gesuchten Zahl passt.
+      </UebungHinweis>
 
       <p className="zs-frage">{aufgabe.frage}</p>
 

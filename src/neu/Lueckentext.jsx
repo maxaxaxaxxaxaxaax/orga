@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Fertig from "./Fertig";
+import UebungHinweis from "./UebungHinweis";
 import "./Lueckentext.css";
 
 // Lückentext (Cloze) als Lern-Session: Satz mit einer Lücke zwischen "vor" und
@@ -129,6 +130,10 @@ export default function Lueckentext({ daten }) {
       {istNacharbeit && s.pos === 0 && (
         <p className="lt-nacharbeit">Diese noch einmal, dann sitzen sie.</p>
       )}
+
+      <UebungHinweis id="lueckentext">
+        Tippe die fehlende Lösung in die Lücke und drücke Enter oder Prüfen.
+      </UebungHinweis>
 
       <p className="lt-satz">
         {satz.vor}

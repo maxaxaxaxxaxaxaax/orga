@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Fertig from "./Fertig";
+import UebungHinweis from "./UebungHinweis";
 import "./Karteikarten.css";
 
 // Vokabel-Karteikarten: Vorderseite zeigt das Wort, Tippen dreht zur Lösung.
@@ -106,6 +107,11 @@ export default function Karteikarten({ daten }) {
           style={{ width: (gekonnt / gesamt) * 100 + "%" }}
         />
       </div>
+
+      <UebungHinweis id="karteikarten">
+        Tippe auf die Karte, um die Lösung zu sehen. Dann sag, ob du es konntest
+        oder es nochmal üben willst.
+      </UebungHinweis>
 
       <button
         type="button"

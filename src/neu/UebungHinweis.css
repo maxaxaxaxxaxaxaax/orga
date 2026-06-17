@@ -1,0 +1,34 @@
+/* Erste-Hilfe-Anleitung pro Übungstyp: ruhig, freundlich, einmal pro Sitzung. */
+.uh {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  background: var(--accent-soft);
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--line));
+  border-radius: var(--r-sm, 8px);
+}
+.uh-text {
+  flex: 1;
+  font-size: 0.84rem;
+  line-height: 1.4;
+  color: var(--accent-strong);
+}
+.uh-zu {
+  flex-shrink: 0;
+  border: none;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: 0.76rem;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+/* Touch: bequem treffbare Fläche. */
+@media (pointer: coarse) {
+  .uh-zu {
+    padding: 8px 14px;
+  }
+}

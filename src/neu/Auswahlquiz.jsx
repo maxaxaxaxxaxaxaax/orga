@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Fertig from "./Fertig";
+import UebungHinweis from "./UebungHinweis";
 import "./Auswahlquiz.css";
 
 // Auswahlquiz (Single-Choice) als Lern-Session: eine Frage nach der anderen, je
@@ -132,6 +133,10 @@ export default function Auswahlquiz({ daten }) {
       {istNacharbeit && s.pos === 0 && (
         <p className="aq-nacharbeit">Diese noch einmal, dann sitzen sie.</p>
       )}
+
+      <UebungHinweis id="auswahlquiz">
+        Tippe die Antwort an, die du für richtig hältst.
+      </UebungHinweis>
 
       <p className="aq-frage">{frage.frage}</p>
 
