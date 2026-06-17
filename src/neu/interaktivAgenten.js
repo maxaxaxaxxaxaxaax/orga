@@ -619,6 +619,28 @@ export const AUSWAHLQUIZ = {
         richtig: 0,
         erklaerung: "cantare ist der Infinitiv und wird zu singt: Ich höre, dass der Junge singt.",
       },
+      {
+        frage: '"Magistra discipulam laborare videt." Welches Wort ist der Akkusativ (Subjekt des ACI)?',
+        optionen: [
+          "magistra",
+          { text: "discipulam", erklaerung: "" },
+          { text: "laborare", erklaerung: "laborare ist der Infinitiv, nicht der Akkusativ." },
+          { text: "videt", erklaerung: "videt ist das auslösende Verb (sehen)." },
+        ],
+        richtig: 1,
+        erklaerung: "discipulam ist Akkusativ und wird im dass-Satz zum Subjekt: dass die Schülerin arbeitet.",
+      },
+      {
+        frage: '"Magistra discipulam laborare videt." Wie übersetzt du den Satz?',
+        optionen: [
+          { text: "Die Lehrerin sieht, dass die Schülerin arbeitet.", erklaerung: "" },
+          { text: "Die Schülerin sieht, dass die Lehrerin arbeitet.", erklaerung: "Vertauscht: magistra (Nominativ) sieht, discipulam (Akkusativ) arbeitet." },
+          { text: "Die Lehrerin und die Schülerin arbeiten.", erklaerung: "Das ist kein dass-Satz, der ACI geht verloren." },
+          { text: "Die Lehrerin sieht die arbeitende Schülerin.", erklaerung: "Nah dran, aber der ACI wird mit dass aufgelöst." },
+        ],
+        richtig: 0,
+        erklaerung: "magistra (Nominativ) ist das Subjekt, der Akkusativ discipulam wird zum Subjekt des dass-Satzes, laborare zu arbeitet.",
+      },
     ],
   },
 };
