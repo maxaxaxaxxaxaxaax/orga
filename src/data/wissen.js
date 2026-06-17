@@ -177,6 +177,7 @@ export const faecher = [
       { id: "l1", thema: "Vokabeln L14", titel: "Vokabelliste L14", art: "arbeitsblatt", bereich: "unterricht", datum: "2026-04-21" },
       { id: "l2", thema: "ACI mit Übersetzung", titel: "Mitschrift: ACI erkennen", art: "notiz", bereich: "unterricht", datum: "2026-04-28" },
       { id: "l3", thema: "ACI mit Übersetzung", titel: "Übungsblatt: ACI übersetzen", art: "arbeitsblatt", bereich: "selbstlernen", datum: "2026-05-05" },
+      { id: "l6", thema: "ACI mit Übersetzung", titel: "Übung: ACI im Satz markieren", art: "arbeitsblatt", bereich: "selbstlernen", datum: "2026-05-06" },
       { id: "l4", thema: "Adj. kons. Dekl. (Wdh.)", titel: "Zusammenfassung: Endungen", art: "zusammenfassung", bereich: "selbstlernen", datum: "2026-05-12" },
       { id: "l5", thema: "Vokabeln L15 / Pronomen", titel: "Vokabelliste L15", art: "arbeitsblatt", bereich: "unterricht", datum: "2026-05-19" },
     ],

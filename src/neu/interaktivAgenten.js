@@ -29,6 +29,22 @@ export const SATZBAU = {
   },
 };
 
+// Im Satz markieren: ein Wort im echten Satz anklicken (Satzanalyse). Hier:
+// ACI im Latein, den Akkusativ (Subjekt) und den Infinitiv (Praedikat) im echten
+// Satz erkennen. Saetze fachlich geprueft (Standard-Schul-ACI).
+export const MARKIEREN = {
+  l6: {
+    saetze: [
+      { woerter: ["Magistra", "discipulam", "laborare", "videt."], ziel: 1, frage: "Klicke den Akkusativ an (im ACI wird er zum Subjekt).", uebersetzung: "Die Lehrerin sieht, dass die Schülerin arbeitet.", erklaerung: "discipulam ist Akkusativ und wird im dass-Satz zum Subjekt." },
+      { woerter: ["Magistra", "discipulam", "laborare", "videt."], ziel: 2, frage: "Klicke den Infinitiv an (er wird zum Prädikat).", uebersetzung: "Die Lehrerin sieht, dass die Schülerin arbeitet.", erklaerung: "laborare ist der Infinitiv und wird zu arbeitet." },
+      { woerter: ["Audio", "te", "cantare."], ziel: 1, frage: "Klicke den Akkusativ an.", uebersetzung: "Ich höre, dass du singst.", erklaerung: "te ist der Akkusativ (von du) und wird zum Subjekt des dass-Satzes." },
+      { woerter: ["Audio", "te", "cantare."], ziel: 2, frage: "Klicke den Infinitiv an.", uebersetzung: "Ich höre, dass du singst.", erklaerung: "cantare ist der Infinitiv und wird zu singst." },
+      { woerter: ["Puto", "magistrum", "venire."], ziel: 1, frage: "Klicke den Akkusativ an.", uebersetzung: "Ich glaube, dass der Lehrer kommt.", erklaerung: "magistrum ist der Akkusativ und wird zum Subjekt." },
+      { woerter: ["Puto", "magistrum", "venire."], ziel: 2, frage: "Klicke den Infinitiv an.", uebersetzung: "Ich glaube, dass der Lehrer kommt.", erklaerung: "venire ist der Infinitiv und wird zu kommt." },
+    ],
+  },
+};
+
 // Plan-Uebung (Bild-Zuordnung): englische Ortsfrage -> richtigen Raum im Plan
 // antippen. Raum-Labels auf Deutsch, Frage auf Englisch (Vokabel im Raumkontext).
 export const BILDZUORDNUNG = {

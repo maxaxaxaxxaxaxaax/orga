@@ -1,0 +1,142 @@
+.mk {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md, 12px);
+  padding: 16px;
+}
+.mk-kopf {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+.mk-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+}
+.mk-serie {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--accent-strong);
+  background: var(--accent-soft);
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-variant-numeric: tabular-nums;
+}
+.mk-fortschritt {
+  height: 4px;
+  background: var(--line);
+  border-radius: 2px;
+  overflow: hidden;
+  margin: 8px 0 4px;
+}
+.mk-fortschritt-fuell {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 2px;
+  transition: width 0.25s ease;
+}
+.mk-frage {
+  margin: 6px 0 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* Der Satz: jedes Wort ist anklickbar. */
+.mk-satz {
+  margin: 0 0 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 8px;
+  align-items: baseline;
+}
+.mk-wort {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--text);
+  background: transparent;
+  border: none;
+  border-bottom: 2px dashed var(--line-strong);
+  border-radius: 4px 4px 0 0;
+  padding: 2px 4px;
+  cursor: pointer;
+  transition:
+    background 0.12s ease,
+    border-color 0.12s ease,
+    color 0.12s ease;
+}
+.mk-wort:hover:not(:disabled) {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+.mk-wort:disabled {
+  cursor: default;
+}
+.mk-wort.ok {
+  background: var(--ok-bg);
+  border-bottom-color: var(--ok-text);
+  border-bottom-style: solid;
+  color: var(--ok-text);
+}
+.mk-wort.no {
+  background: var(--warn-bg);
+  border-bottom-color: var(--warn-line);
+  border-bottom-style: solid;
+  color: var(--warn-text);
+}
+/* Touch: bequeme Tap-Flächen. */
+@media (pointer: coarse) {
+  .mk-wort {
+    padding: 6px 7px;
+  }
+}
+
+.mk-uebersetzung {
+  margin: 0 0 4px;
+  font-size: 0.85rem;
+  font-style: italic;
+  color: var(--text-2);
+}
+.mk-feedback {
+  margin-top: 12px;
+  padding: 10px 13px;
+  border-radius: var(--r-sm, 8px);
+  background: var(--ok-bg);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.mk-feedback-text {
+  margin: 0;
+  flex: 1;
+  min-width: 60%;
+  font-size: 0.9rem;
+  color: var(--ok-text);
+}
+.mk-weiter {
+  border: none;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: 0.88rem;
+  font-weight: 700;
+  padding: 8px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.mk-hinweis {
+  margin: 12px 0 0;
+  font-size: 0.85rem;
+  color: var(--warn-text);
+}
+.mk-leer {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--muted);
+  font-style: italic;
+}
