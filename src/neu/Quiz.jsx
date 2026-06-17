@@ -144,6 +144,11 @@ export default function Quiz({ generatorKey }) {
 
       <p className="qz-frage">{aufgabe.frage}</p>
 
+      {/* In der Nacharbeit den Tipp vorab zeigen (Scaffolding nach Fehlversuch). */}
+      {istNacharbeit && !beantwortet && aufgabe.hint && (
+        <p className="qz-hint qz-hint-vorab">Tipp: {aufgabe.hint}</p>
+      )}
+
       {hatOptionen ? (
         <div className="qz-optionen">
           {optionen.map((opt, i) => {

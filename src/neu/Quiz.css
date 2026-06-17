@@ -156,6 +156,11 @@
   font-size: 0.86rem;
   color: var(--text-2);
 }
+/* Vorab-Tipp in der Nacharbeit: etwas Abstand zu den Optionen darunter. */
+.qz-hint-vorab {
+  margin: 0 0 12px;
+  color: var(--accent-strong);
+}
 .qz-weiter {
   margin-top: 10px;
   border: none;

@@ -163,16 +163,24 @@ export default function Lueckentext({ daten }) {
         <p className="lt-enter-hinweis">Drücke Enter, um zu prüfen.</p>
       )}
 
-      {satz.tipp && !geprueft && <p className="lt-tipp">Tipp: {satz.tipp}</p>}
+      {/* Gestaffelter Tipp: erste Runde ohne Tipp (selbst probieren), in der
+          Nacharbeit proaktiv (man hat ihn schon einmal verfehlt). */}
+      {satz.tipp && !geprueft && istNacharbeit && (
+        <p className="lt-tipp">Tipp: {satz.tipp}</p>
+      )}
 
       {geprueft && (
         <div className={"lt-feedback " + (warRichtig ? "ok" : "no")}>
           {warRichtig ? (
             <p className="lt-feedback-text">Richtig.</p>
           ) : (
-            <p className="lt-feedback-text">
-              Nicht ganz. Richtig: <strong>{loesungText(satz.loesung)}</strong>
-            </p>
+            <>
+              <p className="lt-feedback-text">
+                Nicht ganz. Richtig:{" "}
+                <strong>{loesungText(satz.loesung)}</strong>
+              </p>
+              {satz.tipp && <p className="lt-tipp">Tipp: {satz.tipp}</p>}
+            </>
           )}
         </div>
       )}
