@@ -50,7 +50,8 @@ export const INTERAKTIV = {
   e1: {
     typ: "karteikarten",
     daten: {
-      hinweis: "Irregular verbs (Grundform – simple past – past participle)",
+      hinweis:
+        "Irregular verbs: Grundform, simple past, past participle. Manche enden gleich, z.B. bring, buy und think auf -ought.",
       karten: [
         { vorne: "go", hinten: "went – gone" },
         { vorne: "see", hinten: "saw – seen" },
@@ -60,6 +61,11 @@ export const INTERAKTIV = {
         { vorne: "begin", hinten: "began – begun" },
         { vorne: "bring", hinten: "brought – brought" },
         { vorne: "buy", hinten: "bought – bought" },
+        { vorne: "think", hinten: "thought – thought" },
+        { vorne: "eat", hinten: "ate – eaten" },
+        { vorne: "give", hinten: "gave – given" },
+        { vorne: "find", hinten: "found – found" },
+        { vorne: "come", hinten: "came – come" },
       ],
     },
   },
@@ -150,9 +156,11 @@ export const INTERAKTIV = {
       aufgaben: [
         { frage: "Klicke auf die −3.", ziel: -3 },
         { frage: "Klicke auf die 5.", ziel: 5 },
-        { frage: "Klicke auf die −8.", ziel: -8 },
-        { frage: "Klicke auf die 0.", ziel: 0 },
-        { frage: "Klicke auf die −1.", ziel: -1 },
+        { frage: "Klicke auf die Gegenzahl von 8.", ziel: -8 },
+        { frage: "Welche Zahl ist größer? Klick sie an: −1 oder 0.", ziel: 0 },
+        { frage: "Klicke auf die Zahl genau zwischen 0 und 10.", ziel: 5 },
+        { frage: "Klicke auf die Gegenzahl von −4.", ziel: 4 },
+        { frage: "Klicke auf die −7.", ziel: -7 },
       ],
     },
   },
