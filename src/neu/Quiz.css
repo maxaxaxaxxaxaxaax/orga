@@ -17,11 +17,36 @@
   letter-spacing: 0.05em;
   color: var(--muted);
 }
-.qz-score {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--text-2);
+/* Serie (eigener Schwung, kein Vergleich): nur ab 2 richtigen in Folge. */
+.qz-serie {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--accent-strong);
+  background: var(--accent-soft);
+  padding: 2px 9px;
+  border-radius: 999px;
   font-variant-numeric: tabular-nums;
+}
+/* Dünner Fortschrittsbalken über den aktuellen Durchgang. */
+.qz-fortschritt {
+  height: 4px;
+  background: var(--line);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+.qz-fortschritt-fuell {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 2px;
+  transition: width 0.25s ease;
+}
+/* Banner zur Nacharbeits-Runde: ruhig, ermutigend, kein Tadel. */
+.qz-nacharbeit {
+  margin: 0 0 12px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--accent-strong);
 }
 .qz-frage {
   margin: 0 0 14px;
