@@ -62,6 +62,20 @@ function schrittFortschritt(thema) {
   return { fertig, gesamt: schritte.length };
 }
 
+// Gesamt-Fortschritt eines Fachs: alle Schritte aller Lernwege zusammen.
+function fachGesamt(themen) {
+  let fertig = 0;
+  let gesamt = 0;
+  for (const t of themen) {
+    const f = schrittFortschritt(t);
+    if (f) {
+      fertig += f.fertig;
+      gesamt += f.gesamt;
+    }
+  }
+  return { fertig, gesamt };
+}
+
 // Unterregister der "Alle Materialien"-Ansicht: nach Art, Lernweg oder Bereich
 // (Unterricht/Selbstlernen, nutzt das vorhandene bereich-Feld). Innerhalb jeder
 // Gruppe wird nach Datum oder Titel sortiert.
@@ -526,6 +540,22 @@ export default function Ablage() {
               <span className="ab-zeile-titel">Alle Materialien</span>
               <span className="ab-zeile-zahl">{alleMaterialien.length}</span>
             </button>
+            {fach.themen.some((t) => t.kategorie) && (() => {
+              const g = fachGesamt(fach.themen);
+              return (
+                <div className="ab-gesamt">
+                  <span className="ab-gesamt-text">
+                    {fach.fach} insgesamt: {g.fertig} von {g.gesamt} Schritten
+                  </span>
+                  <span className="ab-gesamt-balken" aria-hidden="true">
+                    <span
+                      className="ab-gesamt-fuell"
+                      style={{ width: (g.gesamt ? (g.fertig / g.gesamt) * 100 : 0) + "%" }}
+                    />
+                  </span>
+                </div>
+              );
+            })()}
             {(() => {
               function lernwegButton(t) {
                 const kb = koennensbeweise.find((k) => k.id === t.kbId);

@@ -574,3 +574,8 @@
 .ab-kat-name { flex: 1; }
 .ab-kat-stand { color: var(--muted); font-weight: 600; }
 .ab-kat-pfeil { width: 1em; color: var(--muted); }
+
+.ab-gesamt { padding: 8px 10px 12px; }
+.ab-gesamt-text { display: block; font-size: 0.78rem; color: var(--text-2); margin-bottom: 6px; }
+.ab-gesamt-balken { display: block; height: 6px; border-radius: 999px; background: var(--line); overflow: hidden; }
+.ab-gesamt-fuell { display: block; height: 100%; background: var(--accent); }
