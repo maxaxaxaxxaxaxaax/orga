@@ -7,6 +7,8 @@
 // bewusst nicht auf, damit nichts „ohne Lernweg" angezeigt wird.
 
 import { MATHE_LANDKARTE } from "./matheLandkarte";
+import { DEUTSCH_LANDKARTE } from "./deutschLandkarte";
+import { ENGLISCH_LANDKARTE } from "./englischLandkarte";
 
 export const faecher = [
   {
@@ -63,24 +65,25 @@ export const faecher = [
     fach: "Deutsch",
     farbe: "#e8590c",
     themen: [
-      { id: "mini-vortrag", label: "Mini-Vortrag", etappe: 4, kbId: "7DA1", schritte: [
+      { id: "mini-vortrag", label: "Mini-Vortrag", etappe: 4, kbId: "7DA1", kategorie: "Textarten und Schreiben", subkategorie: "Präsentieren und Gestalten", schritte: [
         { text: "Thema „Reise um die Welt“ wählen", fertig: false },
         { text: "Notizen und Stichpunkte sammeln", fertig: false },
         { text: "Vortrag laut üben (5 Min)", fertig: false },
       ] },
-      { id: "lernplakat", label: "Lernplakat", etappe: 4, kbId: "7DA2", schritte: [
+      { id: "lernplakat", label: "Lernplakat", etappe: 4, kbId: "7DA2", kategorie: "Textarten und Schreiben", subkategorie: "Präsentieren und Gestalten", schritte: [
         { text: "Plakat-Grundgerüst skizzieren", fertig: false },
         { text: "Bilder und Texte einplanen", fertig: false },
         { text: "Plakat sauber gestalten", fertig: false },
         { text: "Quellen angeben", fertig: false },
       ] },
-      { id: "lapbook", label: "Lapbook", etappe: 4, kbId: "7DA3", schritte: [
+      { id: "lapbook", label: "Lapbook", etappe: 4, kbId: "7DA3", kategorie: "Textarten und Schreiben", subkategorie: "Präsentieren und Gestalten", schritte: [
         { text: "Lapbook-Klappen vorbereiten", fertig: false },
         { text: "Inhalte ordnen und verteilen", fertig: false },
         { text: "Texte schreiben und einkleben", fertig: false },
         { text: "Lapbook gestalten und falten", fertig: false },
         { text: "Selbstcheck mit Checkliste", fertig: false },
       ] },
+      ...DEUTSCH_LANDKARTE,
     ],
     verknuepfungen: [
       ["mini-vortrag", "lernplakat"],
@@ -99,31 +102,32 @@ export const faecher = [
     fach: "Englisch",
     farbe: "#f59f00",
     themen: [
-      { id: "simple-past", label: "Revision simple past", etappe: 4, kbId: "7EA1", schritte: [
+      { id: "simple-past", label: "Revision simple past", etappe: 4, kbId: "7EA1", kategorie: "Zeitformen", subkategorie: "Vergangenheit", schritte: [
         { text: "Regelmäßige Verben (-ed) auffrischen", fertig: false },
         { text: "Unregelmäßige Verben (Top 30)", fertig: false },
         { text: "Fragen und Verneinungen", fertig: false },
       ] },
-      { id: "vok-pp84", label: "Vocabulary Unit 5 (pp. 84-93)", etappe: 4, kbId: "7EA2", schritte: [
+      { id: "vok-pp84", label: "Vocabulary Unit 5 (pp. 84-93)", etappe: 4, kbId: "7EA2", kategorie: "Wortschatz und Rechtschreibung", subkategorie: "Grundwortschatz", schritte: [
         { text: "Vokabeln lesen und übersetzen", fertig: false },
         { text: "Vokabeln mündlich abfragen", fertig: false },
       ] },
-      { id: "will-future", label: "will-future · question tags · if-clause I", etappe: 4, kbId: "7EA3", schritte: [
+      { id: "will-future", label: "will-future · question tags · if-clause I", etappe: 4, kbId: "7EA3", kategorie: "Zeitformen", subkategorie: "Zukunft", schritte: [
         { text: "will-future bilden und anwenden", fertig: false },
         { text: "question tags ans Satzende setzen", fertig: false },
         { text: "if-clause Type I (real conditions)", fertig: false },
         { text: "Mix-Übungen aus allen drei Themen", fertig: false },
       ] },
-      { id: "vok-pp94", label: "Vocabulary Unit 5 (pp. 94-99)", etappe: 4, kbId: "7EA4", schritte: [
+      { id: "vok-pp94", label: "Vocabulary Unit 5 (pp. 94-99)", etappe: 4, kbId: "7EA4", kategorie: "Wortschatz und Rechtschreibung", subkategorie: "Grundwortschatz", schritte: [
         { text: "Vokabeln lesen und übersetzen", fertig: false },
         { text: "Vokabeln mündlich abfragen", fertig: false },
       ] },
-      { id: "everyday", label: "Everyday English: Dialog", etappe: 4, kbId: "7EA5", schritte: [
+      { id: "everyday", label: "Everyday English: Dialog", etappe: 4, kbId: "7EA5", kategorie: "Sprachmittlung und Kommunikation", subkategorie: "Muendliche Kommunikation", schritte: [
         { text: "Vokabular „at an information center“ lernen", fertig: false },
         { text: "Dialog-Bausteine üben", fertig: false },
         { text: "Eigenen Dialog schreiben", fertig: false },
         { text: "Dialog mit Partner vortragen", fertig: false },
       ] },
+      ...ENGLISCH_LANDKARTE,
     ],
     verknuepfungen: [
       ["simple-past", "vok-pp84"],

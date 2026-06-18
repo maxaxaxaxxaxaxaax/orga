@@ -4,7 +4,50 @@ import { MATHE_KATEGORIEN, MATHE_SUBKATEGORIEN } from "./matheKategorien";
 // Faecher ohne Eintrag werden in der Ablage flach (ungruppiert) angezeigt.
 export const FACH_STRUKTUR = {
   mathe: { kategorien: MATHE_KATEGORIEN, subkategorien: MATHE_SUBKATEGORIEN },
-  // deutsch und englisch folgen
+  deutsch: {
+    kategorien: [
+      "Grammatik",
+      "Rechtschreibung",
+      "Textarten und Schreiben",
+      "Lyrik",
+      "Epik und Dramatik",
+      "Stilmittel",
+      "Literaturepochen",
+      "Literarische Werke",
+    ],
+    subkategorien: {
+      Grammatik: ["Wortarten", "Zeitformen und Modi", "Satzbau und Satzglieder", "Kasus und Deklination"],
+      Rechtschreibung: ["Schreibregeln", "Zeichensetzung", "Rechtschreibstrategien"],
+      "Textarten und Schreiben": ["Argumentierende Texte", "Analyse und Interpretation", "Berichtende und beschreibende Texte", "Journalistische und Gebrauchstexte", "Präsentieren und Gestalten"],
+      Lyrik: ["Grundlagen der Lyrik", "Metrum und Reim", "Gedichtarten"],
+      "Epik und Dramatik": ["Epische Texte", "Dramatische Texte"],
+      Stilmittel: ["Rhetorische Mittel", "Klang und Wiederholung"],
+      Literaturepochen: ["Aufklaerung bis Klassik", "Romantik bis Realismus", "Moderne und Gegenwart"],
+      "Literarische Werke": ["Dramen", "Romane und Erzaehlungen"],
+    },
+  },
+  englisch: {
+    kategorien: [
+      "Zeitformen",
+      "Verben",
+      "Wortarten",
+      "Satzbau",
+      "Schreiben und Textarten",
+      "Analyse und Interpretation",
+      "Wortschatz und Rechtschreibung",
+      "Sprachmittlung und Kommunikation",
+    ],
+    subkategorien: {
+      Zeitformen: ["Gegenwart", "Vergangenheit", "Zukunft", "Zeitformen im Vergleich"],
+      Verben: ["Besondere Verben", "Verbformen", "Passiv und Konstruktionen"],
+      Wortarten: ["Pronomen", "Adjektive und Adverbien", "Nomen und Artikel", "Präpositionen und Bindewörter"],
+      Satzbau: ["Satzstellung", "Nebensätze", "Zeichensetzung"],
+      "Schreiben und Textarten": ["Grundlegende Texte", "Argumentative Texte", "Briefe und E-Mails", "Kreatives und persoenliches Schreiben"],
+      "Analyse und Interpretation": ["Literarische Analyse", "Sach- und Medienanalyse", "Stilmittel und Sprache"],
+      "Wortschatz und Rechtschreibung": ["Grundwortschatz", "Typische Stolperfallen", "Aussprache und Schreibung"],
+      "Sprachmittlung und Kommunikation": ["Mediation", "Muendliche Kommunikation"],
+    },
+  },
 };
 
 // Prueft das Themen-Netz eines Fachs. Landkarten-Themen brauchen eine erklaerung,
