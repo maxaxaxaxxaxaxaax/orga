@@ -167,17 +167,44 @@ export default function Netz({ fach, struktur, erledigt, onSelect }) {
               const x2 = b.x - ux * ((nb?.r || 10) + (l.art === "baut" ? 8 : 2));
               const y2 = b.y - uy * ((nb?.r || 10) + (l.art === "baut" ? 8 : 2));
               const hervor = aktiv && (l.from === aktiv || l.to === aktiv);
+              const stroke = l.art === "baut" ? "var(--text-2,#888780)" : na?.color;
+              const sw = l.art === "baut" ? 2.4 : 1.3;
+              const so = hervor ? 0.9 : l.art === "baut" ? 0.6 : 0.3;
+              const marker = l.art === "baut" ? "url(#netz-pfeil)" : undefined;
+              const key = l.art + ":" + l.from + "->" + l.to;
+              // baut-Kante zwischen zwei aeusseren Knoten (keiner ist das Zentrum):
+              // nach aussen biegen, damit die Mitte frei bleibt und Linien sich kaum kreuzen.
+              if (l.art === "baut" && l.from !== zentrumId && l.to !== zentrumId) {
+                const mx = (x1 + x2) / 2;
+                const my = (y1 + y2) / 2;
+                const vx = mx - W / 2;
+                const vy = my - H / 2;
+                const vl = Math.hypot(vx, vy) || 1;
+                const cpx = mx + (vx / vl) * 48;
+                const cpy = my + (vy / vl) * 48;
+                return (
+                  <path
+                    key={key}
+                    d={`M ${x1} ${y1} Q ${cpx} ${cpy} ${x2} ${y2}`}
+                    fill="none"
+                    stroke={stroke}
+                    strokeWidth={sw}
+                    strokeOpacity={so}
+                    markerEnd={marker}
+                  />
+                );
+              }
               return (
                 <line
-                  key={l.art + ":" + l.from + "->" + l.to}
+                  key={key}
                   x1={x1}
                   y1={y1}
                   x2={x2}
                   y2={y2}
-                  stroke={l.art === "baut" ? "var(--text-2,#888780)" : na?.color}
-                  strokeWidth={l.art === "baut" ? 2.4 : 1.3}
-                  strokeOpacity={hervor ? 0.9 : l.art === "baut" ? 0.6 : 0.3}
-                  markerEnd={l.art === "baut" ? "url(#netz-pfeil)" : undefined}
+                  stroke={stroke}
+                  strokeWidth={sw}
+                  strokeOpacity={so}
+                  markerEnd={marker}
                 />
               );
             })}
