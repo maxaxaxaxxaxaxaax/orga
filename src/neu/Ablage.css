@@ -623,7 +623,9 @@
 }
 
 /* Ansichts-Umschalter Liste/Netz: Pillen-Reiter ueber der linken Spalte.
-   Die aktive Pille traegt die Fachfarbe (--c, gesetzt von .ab-spalten). */
+   Die aktive Pille wird mit der Fachfarbe (--c, von .ab-spalten) getoent und
+   umrandet, der Text bleibt aber die Theme-Textfarbe, damit er auf jeder
+   Fachfarbe (auch hellen wie Englisch-Amber) gut lesbar ist. */
 .ab-ansicht-schalter {
   display: flex;
   gap: 6px;
@@ -639,9 +641,9 @@
   color: var(--text-2, #6b6b6b);
 }
 .ab-ansicht-chip.an {
-  background: var(--c, #4263eb);
-  color: #fff;
-  border-color: transparent;
+  background: color-mix(in srgb, var(--c, #4263eb) 20%, transparent);
+  color: var(--text, #1d1d1f);
+  border-color: var(--c, #4263eb);
 }
 .ab-netz-spalte {
   display: block;
