@@ -37,11 +37,13 @@ import "./Fokus.css";
 // mit "Geschafft, weiter" arbeitet man den Lernweg Schritt für Schritt durch.
 // Reduktion und Fokus-Session aus der Vision; der Schritt-Stand teilt sich mit
 // der Ablage/Heute (gleiche localStorage-Quelle).
-export default function Fokus({ kb, naechste, onFertig, onClose }) {
+export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
   const lw = lernwegFuerKb(kb.id);
   const thema = lw?.thema || null;
   const schritte = thema?.schritte || [];
   const [stand, setStand] = useState(() => ladeSchritte(kb.id));
+  // Nach dem Abschliessen kein Auto-Sprung: erst diese Auswahl (weiter / zurueck).
+  const [abgeschlossen, setAbgeschlossen] = useState(false);
   // Freiwillige Selbsteinschätzung pro Schritt (leicht/ging so/schwer): spiegelt
   // dem Schüler später, wo es hakte. Kein Coach-Blick, keine Wertung.
   const [gefuehl, setGefuehl] = useState(() => ladeGefuehl(kb.id));
@@ -174,48 +176,77 @@ export default function Fokus({ kb, naechste, onFertig, onClose }) {
       </div>
 
       {alleFertig ? (
-        <main className="fokus-buehne">
-          <p className="fokus-eyebrow">Geschafft ✓</p>
-          <h1 className="fokus-titel">{kb.titel}</h1>
-          <p className="fokus-info">
-            {schritte.length > 0 ? "Alle Schritte erledigt. " : ""}
-            Wenn du dich sicher fühlst, melde den Könnensbeweis bei {COACH} zur
-            Abnahme an. Sonst hakst du ihn nur für heute ab.
-          </p>
-          {hilfe && (
-            <p className="fokus-hilfe-laeuft" role="status">
-              Dein Hilferuf an {COACH} läuft noch. {COACH} kümmert sich später
-              darum, du kannst ruhig weitermachen.
+        abgeschlossen ? (
+          <main className="fokus-buehne">
+            <p className="fokus-eyebrow">Geschafft ✓</p>
+            <h1 className="fokus-titel">{kb.titel}</h1>
+            <p className="fokus-info">
+              {naechste
+                ? "Gut gemacht. Möchtest du gleich weitermachen oder zurück zur Übersicht?"
+                : "Stark, du hast alle Ziele für heute geschafft."}
             </p>
-          )}
-          <div className="fokus-fuss">
-            <button
-              type="button"
-              className="fokus-weiter"
-              onClick={() => {
-                setzeAbnahme(kb.id, true);
-                onFertig(kb.id);
-              }}
-            >
-              Zur Abnahme anmelden
-            </button>
-            <button
-              type="button"
-              className="fokus-sekundaer"
-              onClick={() => onFertig(kb.id)}
-            >
-              {naechste ? "Nächstes Ziel →" : "Tag abschließen"}
-            </button>
-          </div>
-          {naechste && (
-            <p className="fokus-danach">
-              Danach: {naechste.fach} · {naechste.titel}
+            <div className="fokus-fuss">
+              {naechste && (
+                <button
+                  type="button"
+                  className="fokus-weiter"
+                  onClick={() => onWeiter(naechste.id)}
+                >
+                  Weiter mit {naechste.fach}: {naechste.titel} →
+                </button>
+              )}
+              <button
+                type="button"
+                className={naechste ? "fokus-sekundaer" : "fokus-weiter"}
+                onClick={onClose}
+              >
+                Zurück zur Übersicht
+              </button>
+            </div>
+          </main>
+        ) : (
+          <main className="fokus-buehne">
+            <p className="fokus-eyebrow">Geschafft ✓</p>
+            <h1 className="fokus-titel">{kb.titel}</h1>
+            <p className="fokus-info">
+              {schritte.length > 0 ? "Alle Schritte erledigt. " : ""}
+              Wenn du dich sicher fühlst, melde den Könnensbeweis bei {COACH} zur
+              Abnahme an. Sonst hakst du ihn nur für heute ab.
             </p>
-          )}
-          <button type="button" className="fokus-hilfe" onClick={onClose}>
-            Erst mal schließen
-          </button>
-        </main>
+            {hilfe && (
+              <p className="fokus-hilfe-laeuft" role="status">
+                Dein Hilferuf an {COACH} läuft noch. {COACH} kümmert sich später
+                darum, du kannst ruhig weitermachen.
+              </p>
+            )}
+            <div className="fokus-fuss">
+              <button
+                type="button"
+                className="fokus-weiter"
+                onClick={() => {
+                  setzeAbnahme(kb.id, true);
+                  onFertig(kb.id);
+                  setAbgeschlossen(true);
+                }}
+              >
+                Zur Abnahme anmelden
+              </button>
+              <button
+                type="button"
+                className="fokus-sekundaer"
+                onClick={() => {
+                  onFertig(kb.id);
+                  setAbgeschlossen(true);
+                }}
+              >
+                Nur für heute abhaken
+              </button>
+            </div>
+            <button type="button" className="fokus-hilfe" onClick={onClose}>
+              Erst mal schließen
+            </button>
+          </main>
+        )
       ) : (
         <main className="fokus-buehne">
           <p className="fokus-eyebrow">

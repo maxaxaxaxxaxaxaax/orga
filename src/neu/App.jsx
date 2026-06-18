@@ -97,9 +97,9 @@ export default function App() {
   }
 
   // Fokus-Abschluss: das Ziel als heute geschafft abhaken (eine Quelle für
-  // Heute-Haken, Weg-Fortschritt und Fokus) und nahtlos ins nächste offene Ziel
-  // springen: erst heute, dann ein offener Nachzügler. Gibt es keines mehr,
-  // schließt der Fokus.
+  // Heute-Haken, Weg-Fortschritt und Fokus). KEIN automatischer Sprung mehr:
+  // der Fokus zeigt danach eine Auswahl (weitermachen oder zurück zur Übersicht),
+  // damit der Schüler die Orientierung behält.
   function fokusFertig(kbId) {
     try {
       const e = lade(ERLEDIGT_KEY);
@@ -109,8 +109,6 @@ export default function App() {
       /* localStorage blockiert: dann nur diese Sitzung */
     }
     meldeAenderung();
-    const next = heuteOffeneZiele()[0] || nachzuegler()[0] || null;
-    setFokusKbId(next ? next.id : null);
   }
   // Der Weg begleitet die Reihenfolge (Planung + Heute + Plan), nicht das
   // Nachschlage-Werkzeug Ablage.
@@ -173,6 +171,7 @@ export default function App() {
           kb={fokusKb}
           naechste={fokusNaechste}
           onFertig={fokusFertig}
+          onWeiter={(id) => setFokusKbId(id)}
           onClose={() => setFokusKbId(null)}
         />
       )}
