@@ -259,6 +259,21 @@
   }
 }
 
+/* Wrapper um Umschalter + Spalten: der Umschalter steht UEBER dem Grid, nicht
+   darin (sonst belegt er eine Grid-Zelle und das Detail rutscht nach unten). */
+.ab-bereich {
+  margin-top: 24px;
+  max-width: 1100px;
+}
+.ab-bereich .ab-spalten {
+  margin-top: 0;
+}
+/* Im Netz-Modus bekommt das Netz die breite Spalte, das Detail die schmale,
+   beide oben buendig. */
+.ab-spalten-netz {
+  grid-template-columns: minmax(0, 1fr) minmax(230px, 300px);
+}
+
 /* Master-Liste: ruhige Zeilen, ein Aktiv-Zustand, bleibt beim Scrollen stehen. */
 .ab-liste {
   position: sticky;

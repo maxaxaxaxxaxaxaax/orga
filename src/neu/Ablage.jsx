@@ -538,7 +538,7 @@ export default function Ablage() {
         </div>
       ) : (
         // Schritt 2: Master-Detail des gewählten Fachs.
-        <div className="ab-spalten" style={{ "--c": farbe }}>
+        <div className="ab-bereich" style={{ "--c": farbe }}>
           {FACH_STRUKTUR[fach.id] && (
             <div className="ab-ansicht-schalter" role="tablist" aria-label="Ansicht">
               <button
@@ -561,6 +561,12 @@ export default function Ablage() {
               </button>
             </div>
           )}
+          <div
+            className={
+              "ab-spalten" +
+              (ansicht === "netz" && FACH_STRUKTUR[fach.id] ? " ab-spalten-netz" : "")
+            }
+          >
           {ansicht === "netz" && FACH_STRUKTUR[fach.id] ? (
             <div className="ab-liste ab-netz-spalte">
               <Netz
@@ -803,6 +809,7 @@ export default function Ablage() {
               </>
             )}
           </section>
+          </div>
         </div>
       )}
 
