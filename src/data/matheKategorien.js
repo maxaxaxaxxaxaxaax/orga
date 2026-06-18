@@ -14,6 +14,7 @@ export const MATHE_KATEGORIEN = [
 // subkategorie aus dieser Liste; die Ablage gruppiert Kategorie -> Subkategorie.
 export const MATHE_SUBKATEGORIEN = {
   "Mathematische Grundlagen": [
+    "Mengen und Logik",
     "Zahlen und Zahlbereiche",
     "Negative Zahlen",
     "Brüche und Dezimalzahlen",
@@ -25,6 +26,8 @@ export const MATHE_SUBKATEGORIEN = {
     "Terme",
     "Gleichungen und Ungleichungen",
     "Potenzen, Wurzeln, Logarithmen",
+    "Komplexe Zahlen",
+    "Matrizen",
   ],
   Funktionen: [
     "Grundlagen der Funktionen",
