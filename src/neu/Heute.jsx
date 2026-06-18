@@ -15,7 +15,6 @@ import {
   setzeHeuteTag,
   meldeAenderung,
 } from "./planung";
-import Begriff from "./Begriff";
 import KlassenPuls from "./KlassenPuls";
 import { ladeNotizen, entferneNotiz } from "./notizen";
 import { ladeSchritte } from "./lernschritte";
@@ -129,21 +128,6 @@ export default function Heute({ onFokus }) {
   function karte(k, istStart) {
     const done = !!erledigt[k.id];
     const info = kbInfo(k.id);
-    const std = k.cluster === 1 ? "Clusterstunde" : "Clusterstunden";
-    // In welchen Schulstunden dieses Ziel HEUTE eingeplant ist (aus der
-    // Wochenplanung). Ein KB kann über mehrere Stunden verteilt sein.
-    const heuteSlots = (stundenZuord[k.id] || [])
-      .filter((sid) => slotTag(sid) === tag)
-      .map((sid) => stundenWoche.find((s) => stundenId(s) === sid))
-      .filter(Boolean)
-      .sort((a, b) => a.von.localeCompare(b.von));
-    const heuteFaecher = [...new Set(heuteSlots.map((s) => s.fach))];
-    const stundenLabel =
-      heuteSlots.length === 0
-        ? null
-        : heuteFaecher.length === 1
-          ? `${heuteSlots.map((s) => s.von).join(", ")} · ${heuteFaecher[0]}`
-          : heuteSlots.map((s) => s.von).join(", ");
     return (
       <div
         className={"hu-kb" + (done ? " done" : "")}
@@ -180,41 +164,6 @@ export default function Heute({ onFokus }) {
                   <span className="hu-kb-bereit">bereit</span>
                 )}
               </span>
-              <span className="hu-kb-meta">
-                {stundenLabel && (
-                  <span className="hu-kb-meta-item hu-kb-stunde">
-                    {stundenLabel}
-                  </span>
-                )}
-                <span className="hu-kb-meta-item">{k.code}</span>
-                <span className="hu-kb-meta-item">
-                  {k.cluster} <Begriff name="cluster">{std}</Begriff>
-                </span>
-                {info.materialien > 0 && (
-                  <span className="hu-kb-meta-item">
-                    {info.materialien}{" "}
-                    {info.materialien === 1 ? "Material" : "Materialien"}
-                  </span>
-                )}
-                {info.schritte > 0 && !info.bereit && (
-                  <span className="hu-kb-meta-item">
-                    {info.fertigeSchritte > 0
-                      ? `${info.fertigeSchritte} von ${info.schritte} Schritten`
-                      : `→ Schritt 1 von ${info.schritte}`}
-                  </span>
-                )}
-              </span>
-              {info.schritte > 0 && !info.bereit && info.fertigeSchritte > 0 && (
-                <span className="hu-kb-balken" aria-hidden="true">
-                  <span
-                    className="hu-kb-balken-fuell"
-                    style={{
-                      width:
-                        (info.fertigeSchritte / info.schritte) * 100 + "%",
-                    }}
-                  />
-                </span>
-              )}
             </span>
             <span className="hu-kb-fokus-cue" aria-hidden="true">
               Fokus →
