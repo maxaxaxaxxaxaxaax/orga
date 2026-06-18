@@ -47,7 +47,17 @@ export function aggregatStatus(themen, erledigt) {
   return "offen";
 }
 
-const RADIUS = { 1: 24, 2: 17, 3: 12 };
+// Mindestgroesse je Ebene; dazu waechst der Knoten mit der Zahl der in der
+// aktuellen Etappe geplanten (aktiven) Lernwege darin, damit der aktuelle
+// Lern-Schwerpunkt auf jeder Ebene am groessten ist.
+const BASIS_R = { 1: 16, 2: 13, 3: 10 };
+function istEtappenAktiv(thema) {
+  return !thema.landkarte && koennensbeweise.some((k) => k.id === thema.kbId);
+}
+function radiusFuer(ebene, themen) {
+  const aktiv = themen.filter(istEtappenAktiv).length;
+  return BASIS_R[ebene] + Math.min(aktiv, 6) * 3.5;
+}
 
 // Baut Knoten und Kanten fuer EINE Ebene des Netzes (Drill-down gegen Ueberladung).
 // pfad = { kategorie, sub }:
@@ -74,7 +84,7 @@ export function baueNetz(fach, struktur, erledigt, voraussetzungen, pfad) {
       if (!katThemen.length) continue;
       nodes.push({
         id: katId(kat), label: kat, ebene: 1, kategorie: kat,
-        color: farbeFuerKategorie(struktur, kat), r: RADIUS[1],
+        color: farbeFuerKategorie(struktur, kat), r: radiusFuer(1, katThemen),
         status: aggregatStatus(katThemen, erledigt), aktion: "drillKat",
       });
     }
@@ -111,7 +121,8 @@ export function baueNetz(fach, struktur, erledigt, voraussetzungen, pfad) {
     // Ebene 2: Anker-Kategorie in der Mitte, ihre Subkategorien aussen herum.
     nodes.push({
       id: katId(kategorie), label: kategorie, ebene: 1, kategorie, color,
-      r: RADIUS[1], status: aggregatStatus(themenVon(kategorie), erledigt),
+      r: radiusFuer(1, themenVon(kategorie)),
+      status: aggregatStatus(themenVon(kategorie), erledigt),
       aktion: "hoch", zentrum: true,
     });
     for (const s of struktur.subkategorien[kategorie] || []) {
@@ -119,7 +130,7 @@ export function baueNetz(fach, struktur, erledigt, voraussetzungen, pfad) {
       if (!subThemen.length) continue;
       nodes.push({
         id: subId(kategorie, s), label: s, ebene: 2, kategorie, color,
-        r: RADIUS[2], status: aggregatStatus(subThemen, erledigt),
+        r: radiusFuer(2, subThemen), status: aggregatStatus(subThemen, erledigt),
         aktion: "drillSub", sub: s,
       });
       links.push({ from: katId(kategorie), to: subId(kategorie, s), art: "gehoert" });
@@ -130,12 +141,13 @@ export function baueNetz(fach, struktur, erledigt, voraussetzungen, pfad) {
   // Ebene 3: Anker-Subkategorie in der Mitte, ihre Lernwege aussen herum.
   nodes.push({
     id: subId(kategorie, sub), label: sub, ebene: 2, kategorie, color,
-    r: RADIUS[2], status: aggregatStatus(themenVon(kategorie, sub), erledigt),
+    r: radiusFuer(2, themenVon(kategorie, sub)),
+    status: aggregatStatus(themenVon(kategorie, sub), erledigt),
     aktion: "hoch", zentrum: true,
   });
   for (const t of themenVon(kategorie, sub)) {
     nodes.push({
-      id: t.id, label: t.label, ebene: 3, kategorie, color, r: RADIUS[3],
+      id: t.id, label: t.label, ebene: 3, kategorie, color, r: radiusFuer(3, [t]),
       status: lernwegStatus(t, erledigt), aktion: "lernweg", themaId: t.id,
     });
     links.push({ from: subId(kategorie, sub), to: t.id, art: "gehoert" });
