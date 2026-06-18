@@ -83,6 +83,25 @@ export function baueNetz(fach, struktur, erledigt, voraussetzungen, pfad) {
       if (vorhanden.has(katId(a)) && vorhanden.has(katId(b)))
         links.push({ from: katId(a), to: katId(b), art: "baut" });
     }
+    // Basis-Kategorie (keine eingehende baut-Kante, die meisten ausgehenden)
+    // kommt ins Zentrum; das Layout ordnet die uebrigen radial darum an.
+    const eingang = {};
+    const ausgang = {};
+    nodes.forEach((n) => {
+      eingang[n.id] = 0;
+      ausgang[n.id] = 0;
+    });
+    for (const l of links)
+      if (l.art === "baut") {
+        eingang[l.to]++;
+        ausgang[l.from]++;
+      }
+    let zentrum = null;
+    for (const n of nodes)
+      if (eingang[n.id] === 0 && (!zentrum || ausgang[n.id] > ausgang[zentrum]))
+        zentrum = n.id;
+    const zNode = nodes.find((n) => n.id === zentrum);
+    if (zNode) zNode.zentrum = true;
     return { nodes, links };
   }
 
@@ -93,7 +112,7 @@ export function baueNetz(fach, struktur, erledigt, voraussetzungen, pfad) {
     nodes.push({
       id: katId(kategorie), label: kategorie, ebene: 1, kategorie, color,
       r: RADIUS[1], status: aggregatStatus(themenVon(kategorie), erledigt),
-      aktion: "hoch",
+      aktion: "hoch", zentrum: true,
     });
     for (const s of struktur.subkategorien[kategorie] || []) {
       const subThemen = themenVon(kategorie, s);
@@ -112,7 +131,7 @@ export function baueNetz(fach, struktur, erledigt, voraussetzungen, pfad) {
   nodes.push({
     id: subId(kategorie, sub), label: sub, ebene: 2, kategorie, color,
     r: RADIUS[2], status: aggregatStatus(themenVon(kategorie, sub), erledigt),
-    aktion: "hoch",
+    aktion: "hoch", zentrum: true,
   });
   for (const t of themenVon(kategorie, sub)) {
     nodes.push({

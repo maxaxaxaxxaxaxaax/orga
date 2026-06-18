@@ -31,10 +31,12 @@ export default function Netz({ fach, struktur, erledigt, onSelect }) {
     [fach, struktur, erledigt, pfad]
   );
   const sig = nodes.map((n) => n.id).join("|");
+  const zentrumId = nodes.find((n) => n.zentrum)?.id;
   // Layout nur neu rechnen, wenn sich die Knotenmenge aendert (eingefroren =
-  // keine Dauer-Animation). sig kapselt die relevante Abhaengigkeit.
+  // keine Dauer-Animation). sig kapselt die relevante Abhaengigkeit; zentrumId
+  // ist aus nodes abgeleitet und damit ueber sig miterfasst.
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const pos = useMemo(() => layoutNetz(nodes, links, { width: W, height: H }), [sig]);
+  const pos = useMemo(() => layoutNetz(nodes, links, { width: W, height: H, zentrumId }), [sig]);
 
   const nachbarn = useMemo(() => {
     const map = {};
