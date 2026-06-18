@@ -399,11 +399,7 @@
   font-size: 0.74rem;
   font-weight: 700;
   color: #fff;
-  cursor: pointer;
   transition: border-color 0.15s ease, background 0.2s ease;
-}
-.hu-kb-check:hover {
-  border-color: var(--ok-text);
 }
 .hu-kb.done .hu-kb-check {
   background: var(--ok-text);

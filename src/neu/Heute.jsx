@@ -121,15 +121,6 @@ export default function Heute({ onFokus }) {
     setTag(c);
   }
 
-  function toggleErledigt(id) {
-    setErledigt((e) => {
-      const n = { ...e };
-      if (n[id]) delete n[id];
-      else n[id] = true;
-      return n;
-    });
-  }
-
   function notizWeg(i) {
     setNotizen(entferneNotiz(i));
   }
@@ -160,15 +151,13 @@ export default function Heute({ onFokus }) {
         style={{ "--c": kbFarbe[k.fach] || "#868e96" }}
       >
         <div className="hu-kb-zeile">
-          <button
-            type="button"
+          <span
             className="hu-kb-check"
-            onClick={() => toggleErledigt(k.id)}
-            aria-pressed={done}
-            aria-label={done ? "Wieder offen" : "Als erledigt markieren"}
+            role="img"
+            aria-label={done ? "erledigt" : "noch offen"}
           >
             {done ? "✓" : ""}
-          </button>
+          </span>
           <button
             type="button"
             className="hu-kb-open"
