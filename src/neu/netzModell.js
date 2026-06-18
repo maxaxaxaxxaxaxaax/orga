@@ -47,54 +47,79 @@ export function aggregatStatus(themen, erledigt) {
   return "offen";
 }
 
-const RADIUS = { 1: 22, 2: 14, 3: 9 };
+const RADIUS = { 1: 24, 2: 17, 3: 12 };
 
-// Baut Knoten und Kanten fuer ein Fach. `offeneSubs` ist ein Set der
-// Subkategorie-ids, deren Lernwege sichtbar sein sollen (progressive
-// Offenlegung gegen Dichte). Kategorie- und Subkategorie-Knoten sind immer da.
-export function baueNetz(fach, struktur, erledigt, voraussetzungen, offeneSubs) {
+// Baut Knoten und Kanten fuer EINE Ebene des Netzes (Drill-down gegen Ueberladung).
+// pfad = { kategorie, sub }:
+//   kategorie == null            -> Ebene 1: alle Kategorien + baut-auf-Pfeile.
+//   kategorie gesetzt, sub null  -> Ebene 2: Kategorie (Anker) + ihre Subkategorien.
+//   sub gesetzt                  -> Ebene 3: Subkategorie (Anker) + ihre Lernwege.
+// Knoten tragen eine aktion: "drillKat"/"drillSub" gehen eine Ebene tiefer,
+// "hoch" (Anker) eine Ebene zurueck, "lernweg" oeffnet den Detail (themaId).
+export function baueNetz(fach, struktur, erledigt, voraussetzungen, pfad) {
   const nodes = [];
   const links = [];
-  const subId = (kat, sub) => "sub:" + kat + "||" + sub;
+  const subId = (kat, s) => "sub:" + kat + "||" + s;
   const katId = (kat) => "kat:" + kat;
+  const themenVon = (kat, s) =>
+    fach.themen.filter((t) => t.kategorie === kat && (!s || t.subkategorie === s));
 
-  for (const kat of struktur.kategorien) {
-    const katThemen = fach.themen.filter((t) => t.kategorie === kat);
-    if (!katThemen.length) continue;
-    const color = farbeFuerKategorie(struktur, kat);
-    nodes.push({
-      id: katId(kat), label: kat, ebene: 1, kategorie: kat, color,
-      r: RADIUS[1], status: aggregatStatus(katThemen, erledigt),
-    });
-    for (const sub of struktur.subkategorien[kat] || []) {
-      const subThemen = katThemen.filter((t) => t.subkategorie === sub);
-      if (!subThemen.length) continue;
-      const sid = subId(kat, sub);
+  const kategorie = pfad?.kategorie || null;
+  const sub = pfad?.sub || null;
+
+  if (!kategorie) {
+    // Ebene 1: Kategorien mit ihren baut-auf-Pfeilen.
+    for (const kat of struktur.kategorien) {
+      const katThemen = themenVon(kat);
+      if (!katThemen.length) continue;
       nodes.push({
-        id: sid, label: sub, ebene: 2, kategorie: kat, color,
-        r: RADIUS[2], status: aggregatStatus(subThemen, erledigt),
+        id: katId(kat), label: kat, ebene: 1, kategorie: kat,
+        color: farbeFuerKategorie(struktur, kat), r: RADIUS[1],
+        status: aggregatStatus(katThemen, erledigt), aktion: "drillKat",
       });
-      links.push({ from: katId(kat), to: sid, art: "gehoert" });
-      if (offeneSubs.has(sid)) {
-        for (const t of subThemen) {
-          // themaId markiert anklickbare Lernweg-Knoten: Netz.jsx oeffnet damit
-          // den Lernweg-Detail. Nur Ebene-3-Knoten tragen dieses Feld.
-          nodes.push({
-            id: t.id, label: t.label, ebene: 3, kategorie: kat, color,
-            r: RADIUS[3], status: lernwegStatus(t, erledigt), themaId: t.id,
-          });
-          links.push({ from: sid, to: t.id, art: "gehoert" });
-        }
-      }
     }
+    const vorhanden = new Set(nodes.map((n) => n.id));
+    for (const [a, b] of voraussetzungen || []) {
+      if (vorhanden.has(katId(a)) && vorhanden.has(katId(b)))
+        links.push({ from: katId(a), to: katId(b), art: "baut" });
+    }
+    return { nodes, links };
   }
 
-  const vorhanden = new Set(nodes.map((n) => n.id));
-  for (const [a, b] of voraussetzungen || []) {
-    const fa = katId(a), fb = katId(b);
-    if (vorhanden.has(fa) && vorhanden.has(fb)) {
-      links.push({ from: fa, to: fb, art: "baut" });
+  const color = farbeFuerKategorie(struktur, kategorie);
+
+  if (!sub) {
+    // Ebene 2: Anker-Kategorie in der Mitte, ihre Subkategorien aussen herum.
+    nodes.push({
+      id: katId(kategorie), label: kategorie, ebene: 1, kategorie, color,
+      r: RADIUS[1], status: aggregatStatus(themenVon(kategorie), erledigt),
+      aktion: "hoch",
+    });
+    for (const s of struktur.subkategorien[kategorie] || []) {
+      const subThemen = themenVon(kategorie, s);
+      if (!subThemen.length) continue;
+      nodes.push({
+        id: subId(kategorie, s), label: s, ebene: 2, kategorie, color,
+        r: RADIUS[2], status: aggregatStatus(subThemen, erledigt),
+        aktion: "drillSub", sub: s,
+      });
+      links.push({ from: katId(kategorie), to: subId(kategorie, s), art: "gehoert" });
     }
+    return { nodes, links };
+  }
+
+  // Ebene 3: Anker-Subkategorie in der Mitte, ihre Lernwege aussen herum.
+  nodes.push({
+    id: subId(kategorie, sub), label: sub, ebene: 2, kategorie, color,
+    r: RADIUS[2], status: aggregatStatus(themenVon(kategorie, sub), erledigt),
+    aktion: "hoch",
+  });
+  for (const t of themenVon(kategorie, sub)) {
+    nodes.push({
+      id: t.id, label: t.label, ebene: 3, kategorie, color, r: RADIUS[3],
+      status: lernwegStatus(t, erledigt), aktion: "lernweg", themaId: t.id,
+    });
+    links.push({ from: subId(kategorie, sub), to: t.id, art: "gehoert" });
   }
   return { nodes, links };
 }

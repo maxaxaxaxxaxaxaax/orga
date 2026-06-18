@@ -10,15 +10,25 @@ const EBENE_LABEL = { 1: "Bereich", 2: "Unterthema", 3: "Lernweg" };
 const STATUS_LABEL = { erledigt: "erledigt", aktuell: "aktuell", offen: "offen" };
 
 export default function Netz({ fach, struktur, erledigt, onSelect }) {
-  const [offeneSubs, setOffeneSubs] = useState(() => new Set());
+  // pfad bestimmt die sichtbare Ebene: {kategorie:null} = Kategorien,
+  // {kategorie} = deren Subkategorien, {kategorie, sub} = deren Lernwege.
+  const [pfad, setPfad] = useState({ kategorie: null, sub: null });
   const [view, setView] = useState({ tx: 0, ty: 0, k: 1 });
   const [hover, setHover] = useState(null);
   const panRef = useRef(null);
   const [greift, setGreift] = useState(false);
 
+  // Eine Ebene wechseln und dabei Pan/Zoom zuruecksetzen, damit jede Ebene
+  // zentriert startet.
+  function gehe(naechster) {
+    setPfad(naechster);
+    setView({ tx: 0, ty: 0, k: 1 });
+    setHover(null);
+  }
+
   const { nodes, links } = useMemo(
-    () => baueNetz(fach, struktur, erledigt, VORAUSSETZUNGEN[fach.id], offeneSubs),
-    [fach, struktur, erledigt, offeneSubs]
+    () => baueNetz(fach, struktur, erledigt, VORAUSSETZUNGEN[fach.id], pfad),
+    [fach, struktur, erledigt, pfad]
   );
   const sig = nodes.map((n) => n.id).join("|");
   // Layout nur neu rechnen, wenn sich die Knotenmenge aendert (eingefroren =
@@ -39,16 +49,11 @@ export default function Netz({ fach, struktur, erledigt, onSelect }) {
   const nodeById = useMemo(() => new Map(nodes.map((n) => [n.id, n])), [nodes]);
 
   function klick(n) {
-    if (n.ebene === 2) {
-      setOffeneSubs((prev) => {
-        const next = new Set(prev);
-        if (next.has(n.id)) next.delete(n.id);
-        else next.add(n.id);
-        return next;
-      });
-    } else if (n.ebene === 3 && n.themaId) {
-      onSelect?.(n.themaId);
-    }
+    if (n.aktion === "drillKat") gehe({ kategorie: n.kategorie, sub: null });
+    else if (n.aktion === "drillSub") gehe({ kategorie: n.kategorie, sub: n.sub });
+    else if (n.aktion === "hoch")
+      gehe(n.ebene === 2 ? { kategorie: n.kategorie, sub: null } : { kategorie: null, sub: null });
+    else if (n.aktion === "lernweg" && n.themaId) onSelect?.(n.themaId);
   }
 
   function onWheel(e) {
@@ -79,6 +84,35 @@ export default function Netz({ fach, struktur, erledigt, onSelect }) {
   const aktiv = hover;
   return (
     <div>
+      <nav className="netz-brotkrumen" aria-label="Ebene">
+        <button
+          type="button"
+          className="netz-krume"
+          onClick={() => gehe({ kategorie: null, sub: null })}
+          disabled={!pfad.kategorie}
+        >
+          {fach.fach}
+        </button>
+        {pfad.kategorie && (
+          <>
+            <span className="netz-krume-sep" aria-hidden="true">›</span>
+            <button
+              type="button"
+              className="netz-krume"
+              onClick={() => gehe({ kategorie: pfad.kategorie, sub: null })}
+              disabled={!pfad.sub}
+            >
+              {pfad.kategorie}
+            </button>
+          </>
+        )}
+        {pfad.sub && (
+          <>
+            <span className="netz-krume-sep" aria-hidden="true">›</span>
+            <span className="netz-krume aktuell">{pfad.sub}</span>
+          </>
+        )}
+      </nav>
       <div className="netz-legende" aria-hidden="true">
         <span>Farbe = Bereich</span>
         <span>
