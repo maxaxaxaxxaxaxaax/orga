@@ -31,7 +31,7 @@ function IconOrdner() {
 }
 
 const PUNKTE = [
-  { id: "heute", label: "Heute", Icon: IconSonne },
+  { id: "heute", label: "Übersicht", Icon: IconSonne },
   { id: "plan", label: "Plan", Icon: IconRaster },
   { id: "ablage", label: "Ablage", Icon: IconOrdner },
 ];
