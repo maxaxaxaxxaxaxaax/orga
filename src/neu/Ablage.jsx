@@ -13,6 +13,7 @@ import { istOeffenbar, aktivitaetLabel, TYP_LABEL } from "./interaktiv";
 import Begriff from "./Begriff";
 import { pruefeKi, pruefeVision } from "./kiClient";
 import { FACH_STRUKTUR } from "../data/fachStruktur";
+import Netz from "./Netz";
 import "./Ablage.css";
 
 // Merkt sich, wie der Schüler die Ablage zuletzt sortiert/gruppiert hat, damit
@@ -134,6 +135,7 @@ function gruppiere(materialien, modus, sort, themenReihenfolge) {
 export default function Ablage() {
   const [fachId, setFachId] = useState(null); // null = noch kein Fach gewählt
   const [gewaehltId, setGewaehltId] = useState(null); // gewählter Lernweg
+  const [ansicht, setAnsicht] = useState("liste"); // liste | netz
   const [suche, setSuche] = useState("");
   const [uploadOffen, setUploadOffen] = useState(false);
   const [eigene, setEigene] = useState(ladeEigene);
@@ -537,7 +539,39 @@ export default function Ablage() {
       ) : (
         // Schritt 2: Master-Detail des gewählten Fachs.
         <div className="ab-spalten" style={{ "--c": farbe }}>
-          <nav className="ab-liste" aria-label="Lernwege">
+          {FACH_STRUKTUR[fach.id] && (
+            <div className="ab-ansicht-schalter" role="tablist" aria-label="Ansicht">
+              <button
+                type="button"
+                role="tab"
+                aria-selected={ansicht === "liste"}
+                className={"ab-ansicht-chip" + (ansicht === "liste" ? " an" : "")}
+                onClick={() => setAnsicht("liste")}
+              >
+                Liste
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={ansicht === "netz"}
+                className={"ab-ansicht-chip" + (ansicht === "netz" ? " an" : "")}
+                onClick={() => setAnsicht("netz")}
+              >
+                Netz
+              </button>
+            </div>
+          )}
+          {ansicht === "netz" && FACH_STRUKTUR[fach.id] ? (
+            <div className="ab-liste ab-netz-spalte">
+              <Netz
+                fach={fach}
+                struktur={FACH_STRUKTUR[fach.id]}
+                erledigt={erledigt}
+                onSelect={(themaId) => setGewaehltId(themaId)}
+              />
+            </div>
+          ) : (
+            <nav className="ab-liste" aria-label="Lernwege">
             <button
               type="button"
               className={
@@ -657,7 +691,8 @@ export default function Ablage() {
                 fach.themen.map((t) => lernwegButton(t))
               );
             })()}
-          </nav>
+            </nav>
+          )}
 
           <section className="ab-detail">
             {gewaehlt ? (

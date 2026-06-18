@@ -621,3 +621,28 @@
 .ab-sub .ab-zeile {
   padding-left: 24px;
 }
+
+/* Ansichts-Umschalter Liste/Netz: Pillen-Reiter ueber der linken Spalte.
+   Die aktive Pille traegt die Fachfarbe (--c, gesetzt von .ab-spalten). */
+.ab-ansicht-schalter {
+  display: flex;
+  gap: 6px;
+  margin: 0 0 10px;
+}
+.ab-ansicht-chip {
+  border: 1px solid var(--line, rgba(0, 0, 0, 0.12));
+  background: transparent;
+  border-radius: 999px;
+  padding: 4px 14px;
+  font-size: 14px;
+  cursor: pointer;
+  color: var(--text-2, #6b6b6b);
+}
+.ab-ansicht-chip.an {
+  background: var(--c, #4263eb);
+  color: #fff;
+  border-color: transparent;
+}
+.ab-netz-spalte {
+  display: block;
+}
