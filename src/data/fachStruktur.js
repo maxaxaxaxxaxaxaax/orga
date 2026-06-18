@@ -1,0 +1,38 @@
+import { MATHE_KATEGORIEN, MATHE_SUBKATEGORIEN } from "./matheKategorien";
+
+// Pro Fach die geordnete Gliederung: Kategorien und je Kategorie die Subkategorien.
+// Faecher ohne Eintrag werden in der Ablage flach (ungruppiert) angezeigt.
+export const FACH_STRUKTUR = {
+  mathe: { kategorien: MATHE_KATEGORIEN, subkategorien: MATHE_SUBKATEGORIEN },
+  // deutsch und englisch folgen
+};
+
+// Prueft das Themen-Netz eines Fachs. Landkarten-Themen brauchen eine erklaerung,
+// aktive KB-Lernwege brauchen schritte. Gibt eine Fehlerliste zurueck (leer = ok).
+export function pruefeFachNetz(faecher, fachId) {
+  const fehler = [];
+  const fach = faecher.find((f) => f.id === fachId);
+  if (!fach) return ["Fach '" + fachId + "' fehlt"];
+  const struktur = FACH_STRUKTUR[fachId];
+  const ids = new Set();
+  const kbIds = new Set();
+  for (const t of fach.themen) {
+    if (!t.id || ids.has(t.id)) fehler.push("id-Problem: " + t.id);
+    ids.add(t.id);
+    if (!t.kbId || kbIds.has(t.kbId)) fehler.push("kbId-Problem: " + t.kbId);
+    kbIds.add(t.kbId);
+    if (struktur) {
+      if (!t.kategorie || !struktur.kategorien.includes(t.kategorie))
+        fehler.push("kategorie-Problem bei " + t.id + ": " + t.kategorie);
+      else if (!t.subkategorie || !(struktur.subkategorien[t.kategorie] || []).includes(t.subkategorie))
+        fehler.push("subkategorie-Problem bei " + t.id + ": " + t.subkategorie);
+    }
+    if (t.landkarte) {
+      if (!t.erklaerung || !t.erklaerung.trim())
+        fehler.push("Landkarten-Thema ohne erklaerung: " + t.id);
+    } else if (!Array.isArray(t.schritte) || !t.schritte.length) {
+      fehler.push("Aktives Thema ohne schritte: " + t.id);
+    }
+  }
+  return fehler;
+}

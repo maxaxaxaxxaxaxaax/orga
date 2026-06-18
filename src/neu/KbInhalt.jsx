@@ -49,6 +49,9 @@ export default function KbInhalt({ kb, kompakt = false }) {
   const gelerntMin = Math.round(zi.gelerntSek / 60);
   const lw = lernwegFuerKb(kb.id);
   const thema = lw?.thema || null;
+  // Landkarten-Themen (studyflix-artig) zeigen statt Schritt-Plan nur die
+  // Erklaerung plus die eigenen Materialien zum Thema.
+  const istLandkarte = !!(thema && thema.landkarte);
   // Lernweg-Schritte: eigener Haken-Stand vor der Vorgabe aus wissen.js.
   const schrittFertig = (i) =>
     schrittStand[i] != null ? schrittStand[i] : !!thema?.schritte?.[i]?.fertig;
@@ -57,12 +60,12 @@ export default function KbInhalt({ kb, kompakt = false }) {
     setSchrittStand(next);
     speichereSchritte(kb.id, next);
   }
-  const fertigeSchritte = thema
+  const fertigeSchritte = thema?.schritte
     ? thema.schritte.filter((_, i) => schrittFertig(i)).length
     : 0;
   // Der aktuelle Schritt ist der erste noch offene. Der "Geschafft"-Knopf hakt
   // ihn ab und rückt so von selbst zum nächsten weiter (schnelles Durcharbeiten).
-  const aktuellerSchritt = thema
+  const aktuellerSchritt = thema?.schritte
     ? thema.schritte.findIndex((_, i) => !schrittFertig(i))
     : -1;
   // Seed-Materialien des Lernwegs plus eigene Uploads dazu.
@@ -311,6 +314,21 @@ export default function KbInhalt({ kb, kompakt = false }) {
       )}
     </section>
   );
+
+  if (istLandkarte) {
+    return (
+      <div className="ki ki-landkarte">
+        <p className="ki-erklaerung">{thema.erklaerung}</p>
+        {materialBlock}
+        {offenesMaterial && (
+          <MaterialAnsicht
+            material={offenesMaterial}
+            onClose={() => setOffenesMaterial(null)}
+          />
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="ki">

@@ -12,7 +12,7 @@ import MaterialAnsicht from "./MaterialAnsicht";
 import { istOeffenbar, aktivitaetLabel, TYP_LABEL } from "./interaktiv";
 import Begriff from "./Begriff";
 import { pruefeKi, pruefeVision } from "./kiClient";
-import { MATHE_KATEGORIEN, MATHE_SUBKATEGORIEN } from "../data/matheKategorien";
+import { FACH_STRUKTUR } from "../data/fachStruktur";
 import "./Ablage.css";
 
 // Merkt sich, wie der Schüler die Ablage zuletzt sortiert/gruppiert hat, damit
@@ -61,20 +61,6 @@ function schrittFortschritt(thema) {
     stand[i] != null ? stand[i] : !!st.fertig
   ).length;
   return { fertig, gesamt: schritte.length };
-}
-
-// Gesamt-Fortschritt eines Fachs: alle Schritte aller Lernwege zusammen.
-function fachGesamt(themen) {
-  let fertig = 0;
-  let gesamt = 0;
-  for (const t of themen) {
-    const f = schrittFortschritt(t);
-    if (f) {
-      fertig += f.fertig;
-      gesamt += f.gesamt;
-    }
-  }
-  return { fertig, gesamt };
 }
 
 // Unterregister der "Alle Materialien"-Ansicht: nach Art, Lernweg oder Bereich
@@ -564,22 +550,6 @@ export default function Ablage() {
               <span className="ab-zeile-titel">Alle Materialien</span>
               <span className="ab-zeile-zahl">{alleMaterialien.length}</span>
             </button>
-            {fach.themen.some((t) => t.kategorie) && (() => {
-              const g = fachGesamt(fach.themen);
-              return (
-                <div className="ab-gesamt">
-                  <span className="ab-gesamt-text">
-                    {fach.fach} insgesamt: {g.fertig} von {g.gesamt} Schritten
-                  </span>
-                  <span className="ab-gesamt-balken" aria-hidden="true">
-                    <span
-                      className="ab-gesamt-fuell"
-                      style={{ width: (g.gesamt ? (g.fertig / g.gesamt) * 100 : 0) + "%" }}
-                    />
-                  </span>
-                </div>
-              );
-            })()}
             {(() => {
               function lernwegButton(t) {
                 const kb = koennensbeweise.find((k) => k.id === t.kbId);
@@ -630,16 +600,13 @@ export default function Ablage() {
                   </button>
                 );
               }
-              return fach.themen.some((t) => t.kategorie) ? (
-                MATHE_KATEGORIEN.map((kat) => {
+              const struktur = FACH_STRUKTUR[fach.id];
+              return struktur ? (
+                struktur.kategorien.map((kat) => {
                   const wege = fach.themen.filter((t) => t.kategorie === kat);
                   if (!wege.length) return null;
                   const offen = katOffen.has(kat);
-                  const erledigteWege = wege.filter((t) => {
-                    const f = schrittFortschritt(t);
-                    return f && f.fertig === f.gesamt;
-                  }).length;
-                  const subListe = MATHE_SUBKATEGORIEN[kat] || [];
+                  const subListe = struktur.subkategorien[kat] || [];
                   return (
                     <div className="ab-kat" key={kat}>
                       <button
@@ -652,9 +619,7 @@ export default function Ablage() {
                           {offen ? "▾" : "▸"}
                         </span>
                         <span className="ab-kat-name">{kat}</span>
-                        <span className="ab-kat-stand">
-                          {erledigteWege} / {wege.length}
-                        </span>
+                        <span className="ab-kat-stand">{wege.length}</span>
                       </button>
                       {offen &&
                         subListe.map((sub) => {

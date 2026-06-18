@@ -395,3 +395,12 @@
 .ki-material-klick:hover .ki-material-aktiv {
   border-color: var(--accent);
 }
+
+/* Landkarten-Thema (studyflix-artig): kurze Erklaerung plus Materialien,
+   kein Schritt-Plan. */
+.ki-erklaerung {
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: var(--text);
+  margin: 0 0 16px;
+}
