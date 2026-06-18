@@ -1,9 +1,21 @@
-// Radiales Layout: ein Zentrum-Knoten in die Mitte, die uebrigen auf einen
-// Kreis darum. Kanten vom Zentrum sind damit reine Speichen (kreuzen sich nie).
-// Die Kreis-Reihenfolge kommt aus einem Graph-Durchlauf (DFS) ab dem Zentrum,
-// damit verbundene Knoten benachbart liegen und Sehnen sich kaum kreuzen.
-// Deterministisch (kein Zufall). Gibt eine Map id -> {x, y} zurueck.
-function radialLayout(nodes, links, zentrumId, W, H, PAD, cx, cy) {
+// Zell-Offsets (Spalte, Reihe) relativ zum Zentrum. Ring 1 = 3x3 ohne Mitte,
+// Reihenfolge wie im Mockup: oben, oben-rechts, rechts, unten, links, oben-links,
+// dann die unteren Ecken. Bei mehr als 8 Knoten kommt ein zweiter Ring dazu.
+function zellOffsets(m) {
+  const ring1 = [[0, -1], [1, -1], [1, 0], [0, 1], [-1, 0], [-1, -1], [1, 1], [-1, 1]];
+  if (m <= ring1.length) return ring1;
+  const ring2 = [];
+  for (let c = -2; c <= 2; c++)
+    for (let r = -2; r <= 2; r++)
+      if (Math.max(Math.abs(c), Math.abs(r)) === 2) ring2.push([c, r]);
+  return ring1.concat(ring2);
+}
+
+// Grid-Layout: Zentrum-Knoten in die Mitte, die uebrigen in ein ausgerichtetes
+// Raster (gleiche Spalten-x und Reihen-y) rundherum statt auf einen Kreis, damit
+// nichts hoehenversetzt steht. Reihenfolge aus einem Graph-Durchlauf (DFS) ab dem
+// Zentrum, damit verbundene Knoten benachbart liegen. Deterministisch. Map id -> {x, y}.
+function gridLayout(nodes, links, zentrumId, W, H, PAD, cx, cy) {
   const adj = {};
   nodes.forEach((nd) => (adj[nd.id] = []));
   for (const l of links)
@@ -24,20 +36,25 @@ function radialLayout(nodes, links, zentrumId, W, H, PAD, cx, cy) {
   for (const nd of nodes)
     if (nd.id !== zentrumId && !besucht.has(nd.id)) reihenfolge.push(nd.id);
 
+  const offsets = zellOffsets(reihenfolge.length);
+  const maxAbs = offsets
+    .slice(0, reihenfolge.length)
+    .reduce((a, [c, r]) => Math.max(a, Math.abs(c), Math.abs(r)), 1);
+  const colGap = Math.min(210, (W / 2 - PAD - 40) / maxAbs);
+  const rowGap = Math.min(150, (H / 2 - PAD - 40) / maxAbs);
+
   const out = {};
   out[zentrumId] = { x: cx, y: cy };
-  const m = reihenfolge.length;
-  const R = Math.max(70, Math.min(W, H) / 2 - PAD - 28);
   reihenfolge.forEach((id, i) => {
-    const a = -Math.PI / 2 + (i / Math.max(1, m)) * Math.PI * 2;
-    out[id] = { x: cx + Math.cos(a) * R, y: cy + Math.sin(a) * R };
+    const [c, r] = offsets[i];
+    out[id] = { x: cx + c * colGap, y: cy + r * rowGap };
   });
   return out;
 }
 
-// Deterministisches Layout. Mit opt.zentrumId radial (Zentrum gepinnt, Rest auf
-// Kreis); sonst als Fallback ein eingefrorenes Kraft-Layout. Gleiche Eingabe ->
-// gleiche Ausgabe. Gibt eine Map id -> {x, y} zurueck.
+// Deterministisches Layout. Mit opt.zentrumId als Grid (Zentrum mittig, Rest im
+// ausgerichteten Raster); sonst als Fallback ein eingefrorenes Kraft-Layout.
+// Gleiche Eingabe -> gleiche Ausgabe. Gibt eine Map id -> {x, y} zurueck.
 export function layoutNetz(nodes, links, opt = {}) {
   const W = opt.width || 680;
   const H = opt.height || 520;
@@ -47,7 +64,7 @@ export function layoutNetz(nodes, links, opt = {}) {
   if (!n) return {};
   const cx = W / 2, cy = H / 2;
   if (opt.zentrumId && nodes.some((nd) => nd.id === opt.zentrumId))
-    return radialLayout(nodes, links, opt.zentrumId, W, H, PAD, cx, cy);
+    return gridLayout(nodes, links, opt.zentrumId, W, H, PAD, cx, cy);
   const r0 = Math.min(W, H) / 3;
   const idx = {};
   nodes.forEach((nd, i) => (idx[nd.id] = i));
