@@ -36,6 +36,8 @@ export default function Netz({ fach, struktur, erledigt, onSelect }) {
     return map;
   }, [nodes, links]);
 
+  const nodeById = useMemo(() => new Map(nodes.map((n) => [n.id, n])), [nodes]);
+
   function klick(n) {
     if (n.ebene === 2) {
       setOffeneSubs((prev) => {
@@ -58,6 +60,7 @@ export default function Netz({ fach, struktur, erledigt, onSelect }) {
     if (e.target.closest(".netz-knoten")) return;
     panRef.current = { x: e.clientX, y: e.clientY, tx: view.tx, ty: view.ty };
     setGreift(true);
+    e.currentTarget.setPointerCapture?.(e.pointerId);
   }
   function onMove(e) {
     if (!panRef.current) return;
@@ -111,12 +114,12 @@ export default function Netz({ fach, struktur, erledigt, onSelect }) {
             </marker>
           </defs>
           <g transform={`translate(${view.tx},${view.ty}) scale(${view.k})`}>
-            {links.map((l, i) => {
+            {links.map((l) => {
               const a = pos[l.from],
                 b = pos[l.to];
               if (!a || !b) return null;
-              const na = nodes.find((n) => n.id === l.from);
-              const nb = nodes.find((n) => n.id === l.to);
+              const na = nodeById.get(l.from);
+              const nb = nodeById.get(l.to);
               const dx = b.x - a.x,
                 dy = b.y - a.y;
               const d = Math.hypot(dx, dy) || 1;
@@ -129,7 +132,7 @@ export default function Netz({ fach, struktur, erledigt, onSelect }) {
               const hervor = aktiv && (l.from === aktiv || l.to === aktiv);
               return (
                 <line
-                  key={i}
+                  key={l.art + ":" + l.from + "->" + l.to}
                   x1={x1}
                   y1={y1}
                   x2={x2}
@@ -167,6 +170,15 @@ export default function Netz({ fach, struktur, erledigt, onSelect }) {
                     }
                   }}
                 >
+                  <circle
+                    className="netz-knoten-fokus"
+                    r={n.r + 5}
+                    fill="none"
+                    stroke="var(--text,#1d1d1f)"
+                    strokeWidth="2"
+                    strokeDasharray="3 3"
+                    opacity="0"
+                  />
                   {n.status === "aktuell" && (
                     <circle
                       className="netz-knoten-ring"

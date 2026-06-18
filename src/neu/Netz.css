@@ -20,7 +20,10 @@
   cursor: pointer;
   outline: none;
 }
-.netz-knoten:focus-visible .netz-knoten-ring {
+.netz-knoten-fokus {
+  opacity: 0;
+}
+.netz-knoten:focus-visible .netz-knoten-fokus {
   opacity: 1;
 }
 .netz-label {
