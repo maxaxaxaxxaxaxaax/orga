@@ -1,0 +1,56 @@
+.netz-flaeche {
+  width: 100%;
+  height: 520px;
+  border: 1px solid var(--line, rgba(0, 0, 0, 0.08));
+  border-radius: 14px;
+  background: var(--card-2, rgba(0, 0, 0, 0.02));
+  overflow: hidden;
+  touch-action: none;
+}
+.netz-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+}
+.netz-svg.greift {
+  cursor: grabbing;
+}
+.netz-knoten {
+  cursor: pointer;
+  outline: none;
+}
+.netz-knoten:focus-visible .netz-knoten-ring {
+  opacity: 1;
+}
+.netz-label {
+  font-size: 12px;
+  fill: var(--text, #1d1d1f);
+  paint-order: stroke;
+  stroke: var(--card, #fff);
+  stroke-width: 3px;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+.netz-label.gross {
+  font-size: 14px;
+}
+.netz-legende {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  font-size: 13px;
+  color: var(--text-2, #6b6b6b);
+  margin: 0 0 10px;
+}
+.netz-legende span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.netz-punkt {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  display: inline-block;
+}
