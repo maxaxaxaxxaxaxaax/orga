@@ -146,8 +146,8 @@ export default function Netz({ fach, struktur, erledigt, onSelect }) {
           onPointerLeave={onUp}
         >
           <defs>
-            <marker id="netz-pfeil" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
-              <path d="M0,0 L8,4 L0,8 z" fill="var(--text-2,#888780)" />
+            <marker id="netz-pfeil" markerUnits="userSpaceOnUse" markerWidth="10" markerHeight="7" refX="8" refY="3.5" orient="auto">
+              <path d="M0,0 L8,3.5 L0,7 z" fill="var(--text-2,#888780)" />
             </marker>
           </defs>
           <g transform={`translate(${view.tx},${view.ty}) scale(${view.k})`}>
