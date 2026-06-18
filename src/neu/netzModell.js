@@ -19,6 +19,9 @@ export function farbeFuerKategorie(struktur, kategorie) {
 // Planungsblatt der aktuellen Etappe, daher ist die Mitgliedschaft hier gleich
 // "in dieser Etappe aktiv" (gleiche Bedingung wie der aktiv-Chip in Ablage.jsx).
 export function lernwegStatus(thema, erledigt) {
+  // Landkarten-Themen (kbId "MAP-...") werden im neu-Flow nie abgehakt, daher
+  // greift erledigt[kbId] hier praktisch nur fuer echte KBs. Falls Landkarten-KBs
+  // spaeter abhakbar werden, hier wie in Ablage gegen echte KBs absichern.
   if (erledigt[thema.kbId]) return "erledigt";
   const aktiverKb =
     !thema.landkarte && koennensbeweise.some((k) => k.id === thema.kbId);
