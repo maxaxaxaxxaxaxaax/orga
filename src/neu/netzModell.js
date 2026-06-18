@@ -3,6 +3,7 @@ import { ladeSchritte } from "./lernschritte";
 
 // Kategoriale Farbpalette (mittlere Ton-Stufen, lesbar in hell und dunkel).
 // Zuordnung ueber den Index der Kategorie in FACH_STRUKTUR.kategorien.
+// Reicht fuer bis zu 9 Kategorien; danach wiederholen sich die Farben (modulo).
 export const KATEGORIE_PALETTE = [
   "#888780", "#E24B4A", "#639922", "#378ADD", "#D4537E",
   "#BA7517", "#1D9E75", "#7F77DD", "#D85A30",
@@ -14,6 +15,9 @@ export function farbeFuerKategorie(struktur, kategorie) {
 }
 
 // Lernstand eines einzelnen Lernwegs: erledigt > aktuell > offen.
+// "aktuell" = aktiver KB der laufenden Etappe: koennensbeweise ist das
+// Planungsblatt der aktuellen Etappe, daher ist die Mitgliedschaft hier gleich
+// "in dieser Etappe aktiv" (gleiche Bedingung wie der aktiv-Chip in Ablage.jsx).
 export function lernwegStatus(thema, erledigt) {
   if (erledigt[thema.kbId]) return "erledigt";
   const aktiverKb =
@@ -70,6 +74,8 @@ export function baueNetz(fach, struktur, erledigt, voraussetzungen, offeneSubs) 
       links.push({ from: katId(kat), to: sid, art: "gehoert" });
       if (offeneSubs.has(sid)) {
         for (const t of subThemen) {
+          // themaId markiert anklickbare Lernweg-Knoten: Netz.jsx oeffnet damit
+          // den Lernweg-Detail. Nur Ebene-3-Knoten tragen dieses Feld.
           nodes.push({
             id: t.id, label: t.label, ebene: 3, kategorie: kat, color,
             r: RADIUS[3], status: lernwegStatus(t, erledigt), themaId: t.id,
