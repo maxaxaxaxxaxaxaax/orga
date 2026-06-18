@@ -63,12 +63,13 @@ export default function Netz({ fach, struktur, erledigt, onSelect }) {
     e.currentTarget.setPointerCapture?.(e.pointerId);
   }
   function onMove(e) {
-    if (!panRef.current) return;
-    setView((v) => ({
-      ...v,
-      tx: panRef.current.tx + (e.clientX - panRef.current.x),
-      ty: panRef.current.ty + (e.clientY - panRef.current.y),
-    }));
+    const pan = panRef.current;
+    if (!pan) return;
+    // Werte jetzt festhalten: der Updater laeuft spaeter, dann kann panRef
+    // (nach pointerup) schon null sein.
+    const dx = e.clientX - pan.x;
+    const dy = e.clientY - pan.y;
+    setView((v) => ({ ...v, tx: pan.tx + dx, ty: pan.ty + dy }));
   }
   function onUp() {
     panRef.current = null;
