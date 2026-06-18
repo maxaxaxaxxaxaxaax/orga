@@ -149,11 +149,13 @@ export default function Ablage() {
     ladeText(SORT_KEY, "neu")
   ); // neu | az
   const [katOffen, setKatOffen] = useState(() => {
+    // Standard: alle Kategorien eingeklappt (ruhiger Einstieg). Der zuletzt
+    // aufgeklappte Stand wird weiter gemerkt.
     try {
       const r = localStorage.getItem(KAT_KEY);
-      return new Set(r ? JSON.parse(r) : ["Mathematische Grundlagen"]);
+      return new Set(r ? JSON.parse(r) : []);
     } catch {
-      return new Set(["Mathematische Grundlagen"]);
+      return new Set();
     }
   });
   function toggleKat(name) {
