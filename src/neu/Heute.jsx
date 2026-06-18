@@ -368,7 +368,7 @@ export default function Heute({ onFokus }) {
     <div className="hu-screen">
       <header className="hu-kopf">
         <div className="hu-kopf-text">
-          <p className="hu-eyebrow">Heute</p>
+          <p className="hu-eyebrow">Übersicht</p>
           <h1 className="hu-titel">{gruss}, Max.</h1>
           <p className="hu-sub">{datumText}</p>
         </div>

@@ -17,7 +17,7 @@ const SCHRITTE = [
   },
   {
     nr: 3,
-    titel: "Heute",
+    titel: "Übersicht",
     text: 'Tippe ein Ziel an: es öffnet sich im Fokus, und du machst es Schritt für Schritt. Mit „Jetzt" oben geht es direkt ins nächste.',
   },
 ];

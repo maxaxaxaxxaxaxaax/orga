@@ -243,7 +243,7 @@ export default function Etappenplan({ onWeiter }) {
               disabled={!alleZugeordnet}
               title={
                 alleZugeordnet
-                  ? "Weiter zur Heute-Seite"
+                  ? "Weiter zur Übersicht"
                   : "Erst alle Könnensbeweise in Wochen ziehen"
               }
             >

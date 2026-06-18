@@ -43,7 +43,7 @@ export function wegStatus() {
     const schritte = [
       schritt("etappe", 1, "Etappe planen"),
       schritt("woche", 2, "Woche planen"),
-      schritt("heute", 3, "Heute"),
+      schritt("heute", 3, "Übersicht"),
     ];
     const jetzt =
       aktiv === "etappe"

@@ -339,7 +339,7 @@ export default function Wochenplan({ onZurueck, onWeiter, woche = 0 }) {
               disabled={!aktuelleWocheFertig}
               title={
                 aktuelleWocheFertig
-                  ? "Weiter zur Heute-Seite"
+                  ? "Weiter zur Übersicht"
                   : "Erst alle Uhren der laufenden Woche auf Stunden verteilen"
               }
             >
