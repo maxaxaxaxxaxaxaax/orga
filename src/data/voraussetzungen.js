@@ -64,8 +64,15 @@ export function pruefeVoraussetzungen(fachId) {
     const key = a + "->" + b;
     if (gesehen.has(key)) fehler.push("Doppelte Kante: " + key);
     gesehen.add(key);
-    (nachfolger[a] = nachfolger[a] || []).push(b);
+    // Nur Kanten zwischen bekannten Kategorien in den Graphen aufnehmen, damit
+    // der Zyklus-Check auf der gueltigen Struktur arbeitet.
+    if (kats.has(a) && kats.has(b)) {
+      if (!nachfolger[a]) nachfolger[a] = [];
+      nachfolger[a].push(b);
+    }
   }
+  // Zyklus-Check per DFS (Dreifaerbung: 0 unbesucht, 1 aktiv, 2 fertig).
+  // Meldet jede Kategorie, an der ein Zyklus beginnt.
   const farbe = {};
   function hatZyklus(k) {
     farbe[k] = 1;
@@ -77,10 +84,7 @@ export function pruefeVoraussetzungen(fachId) {
     return false;
   }
   for (const k of kats) {
-    if (!farbe[k] && hatZyklus(k)) {
-      fehler.push("Zyklus ab Kategorie: " + k);
-      break;
-    }
+    if (!farbe[k] && hatZyklus(k)) fehler.push("Zyklus ab Kategorie: " + k);
   }
   return fehler;
 }
