@@ -15,7 +15,15 @@ export function ladeEigene() {
   }
 }
 
-export function speichereEigenes({ titel, fachId, thema, art, inhalt, bereich }) {
+export function speichereEigenes({
+  titel,
+  fachId,
+  thema,
+  art,
+  inhalt,
+  bereich,
+  schritt,
+}) {
   const alle = ladeEigene();
   const neu = {
     id: "eigen-" + Date.now(),
@@ -27,6 +35,8 @@ export function speichereEigenes({ titel, fachId, thema, art, inhalt, bereich })
     // Eigenes Material ist im Zweifel selbst gelernt.
     bereich: bereich || "selbstlernen",
     inhalt: inhalt || null, // Volltext (z. B. Lernzettel), sonst null
+    // Optionaler Bezug zum Lernweg-Schritt (Aufschrieb gehoert zu DIESER Aufgabe).
+    schritt: schritt == null ? null : schritt,
     datum: new Date().toISOString().slice(0, 10),
     eigen: true,
   };

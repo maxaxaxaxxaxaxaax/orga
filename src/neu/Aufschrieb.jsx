@@ -11,12 +11,15 @@ import "./Aufschrieb.css";
 //
 // Das Zeichnen ist imperativ (Canvas-Kontext): nur in Event-Handlern und
 // Effekten, nie im Render (Ref-Regeln bleiben sauber).
-export default function Aufschrieb({ kb, onGespeichert, onClose }) {
+export default function Aufschrieb({ kb, schritt, aufgabe, onGespeichert, onClose }) {
+  // Eigener Speicher-Slot pro Schritt: so vermischt sich der Aufschrieb nicht
+  // mit dem des naechsten Schritts und nicht mit dem Mathe-Coach (Slot "rechenweg").
+  const slot = "schritt-" + (schritt ?? 0);
   const canvasRef = useRef(null);
   const wrapRef = useRef(null);
   const ctxRef = useRef(null);
   const aktuellRef = useRef(null); // laufender Strich {punkte:[{x,y,p}]}
-  const [striche, setStriche] = useState(() => ladeStriche(kb.id));
+  const [striche, setStriche] = useState(() => ladeStriche(kb.id, slot));
   const stricheRef = useRef(striche);
   const [visionModell, setVisionModell] = useState(null);
   const [bearbeiten, setBearbeiten] = useState(false); // Vorschau/Tippen offen?
@@ -233,19 +236,19 @@ export default function Aufschrieb({ kb, onGespeichert, onClose }) {
     };
     setStriche((prev) => {
       const next = [...prev, kompakt];
-      speichereStriche(kb.id, next);
+      speichereStriche(kb.id, slot, next);
       return next;
     });
   }
   function zurueck() {
     setStriche((prev) => {
       const next = prev.slice(0, -1);
-      speichereStriche(kb.id, next);
+      speichereStriche(kb.id, slot, next);
       return next;
     });
   }
   function loeschen() {
-    speichereStriche(kb.id, []);
+    speichereStriche(kb.id, slot, []);
     setStriche([]);
   }
 
@@ -316,6 +319,12 @@ export default function Aufschrieb({ kb, onGespeichert, onClose }) {
         </div>
       </header>
 
+      {aufgabe && (
+        <p className="au-aufgabe">
+          <span className="au-aufgabe-label">Aufgabe</span>
+          {aufgabe}
+        </p>
+      )}
       <p className="au-hinweis">
         Schreib oder skizziere hier, was du auf Papier gemacht hast. Tipp dann
         auf Digitalisieren, dann wird daraus Text für dein Material.

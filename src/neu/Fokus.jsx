@@ -325,7 +325,7 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
                   ✎
                 </span>
                 Aufschrieb digitalisieren
-                {hatRechenweg(kb.id) && (
+                {hatRechenweg(kb.id, "schritt-" + aktuell) && (
                   <span className="fokus-rechenweg-badge">gespeichert</span>
                 )}
               </button>
@@ -374,7 +374,7 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
                     ✎
                   </span>
                   Rechenweg aufschreiben
-                  {hatRechenweg(kb.id) && (
+                  {hatRechenweg(kb.id, "rechenweg") && (
                     <span className="fokus-rechenweg-badge">gespeichert</span>
                   )}
                 </button>
@@ -652,20 +652,31 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
         />
       )}
       {rechenwegOffen && (
-        <Rechenweg kb={kb} onClose={() => setRechenwegOffen(false)} />
+        <Rechenweg
+          kb={kb}
+          aufgabe={schritte[aktuell]?.text}
+          onClose={() => setRechenwegOffen(false)}
+        />
       )}
       {aufschriebOffen && (
         <Aufschrieb
           kb={kb}
+          schritt={aktuell}
+          aufgabe={schritte[aktuell]?.text}
           onClose={() => setAufschriebOffen(false)}
           onGespeichert={(text) => {
+            const schrittText = schritte[aktuell]?.text;
             speichereEigenes({
-              titel: "Mein Aufschrieb",
+              // Sprechender Titel mit Bezug zum Schritt, statt pauschal "Mein Aufschrieb".
+              titel: schrittText
+                ? "Aufschrieb: " + schrittText
+                : "Mein Aufschrieb",
               fachId: lw?.fachId,
               thema: thema?.label || null,
               art: "aufschrieb",
               inhalt: text,
               bereich: "selbstlernen",
+              schritt: aktuell,
             });
             setAufschriebOffen(false);
           }}

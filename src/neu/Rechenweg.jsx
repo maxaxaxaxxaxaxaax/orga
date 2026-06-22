@@ -27,12 +27,12 @@ const CHAT_VORSCHLAEGE = [
   "Schau mal auf meinen Rechenweg",
 ];
 
-export default function Rechenweg({ kb, onClose }) {
+export default function Rechenweg({ kb, aufgabe, onClose }) {
   const canvasRef = useRef(null);
   const wrapRef = useRef(null);
   const ctxRef = useRef(null);
   const aktuellRef = useRef(null); // laufender Strich {punkte:[{x,y,p}]}
-  const [striche, setStriche] = useState(() => ladeStriche(kb.id));
+  const [striche, setStriche] = useState(() => ladeStriche(kb.id, "rechenweg"));
   const stricheRef = useRef(striche); // Spiegel für die Zeichen-Routine
   const [visionModell, setVisionModell] = useState(null); // lokales Vision-Modell
   const [textModell, setTextModell] = useState(null); // lokales Text-Modell (Rechnen)
@@ -419,7 +419,7 @@ export default function Rechenweg({ kb, onClose }) {
     };
     setStriche((prev) => {
       const next = [...prev, kompakt];
-      speichereStriche(kb.id, next);
+      speichereStriche(kb.id, "rechenweg", next);
       return next;
     });
   }
@@ -427,12 +427,12 @@ export default function Rechenweg({ kb, onClose }) {
   function zurueck() {
     setStriche((prev) => {
       const next = prev.slice(0, -1);
-      speichereStriche(kb.id, next);
+      speichereStriche(kb.id, "rechenweg", next);
       return next;
     });
   }
   function loeschen() {
-    speichereStriche(kb.id, []);
+    speichereStriche(kb.id, "rechenweg", []);
     setStriche([]);
   }
 
@@ -472,6 +472,12 @@ export default function Rechenweg({ kb, onClose }) {
         </div>
       </header>
 
+      {aufgabe && (
+        <p className="rw-aufgabe">
+          <span className="rw-aufgabe-label">Aufgabe</span>
+          {aufgabe}
+        </p>
+      )}
       <p className="rw-hinweis">
         Schreib deinen Rechenweg Schritt für Schritt auf, mit Stift, Finger oder
         Maus. Alles bleibt erhalten, bis du es löschst.
