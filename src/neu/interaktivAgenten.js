@@ -430,6 +430,61 @@ export const REIHENFOLGE = {
 };
 
 export const AUSWAHLQUIZ = {
+  // Deutsch: Lernplakat gestalten, situative Entscheidungen (Anwendung der Regeln).
+  d7: {
+    fragen: [
+      {
+        frage: "Du gestaltest ein Lernplakat. Wie viel Text gehört darauf?",
+        optionen: [
+          "Wenig Text, nur kurze Stichpunkte.",
+          { text: "So viel wie möglich, damit alles ganz genau erklärt ist.", erklaerung: "Zu viel Text kann aus der Entfernung niemand lesen. Ein Plakat lebt von kurzen Stichpunkten." },
+          { text: "Gar kein Text, nur Bilder.", erklaerung: "Ein paar Stichworte braucht es zur Orientierung. Nur Bilder ohne Worte sind oft nicht eindeutig." },
+        ],
+        richtig: 0,
+        erklaerung: "Auf ein Lernplakat kommen kurze Stichpunkte, keine ganzen Sätze. So bleibt es übersichtlich und aus der Ferne lesbar.",
+      },
+      {
+        frage: "Wohin gehört die Überschrift?",
+        optionen: [
+          "Oben, groß und gut lesbar.",
+          { text: "Unten klein in die Ecke.", erklaerung: "Die Überschrift ist das Erste, was alle sehen sollen. In der Ecke geht sie unter." },
+          { text: "Mittig versteckt zwischen den Bildern.", erklaerung: "Zwischen den Bildern fällt die Überschrift nicht auf. Sie gehört klar nach oben." },
+        ],
+        richtig: 0,
+        erklaerung: "Die Überschrift steht groß oben, damit sofort klar ist, worum es auf dem Plakat geht.",
+      },
+      {
+        frage: "Wie ordnest du die Inhalte auf dem Plakat?",
+        optionen: [
+          "In klare Felder mit eigenen Überschriften.",
+          { text: "Kreuz und quer, wo gerade Platz ist.", erklaerung: "Ohne Ordnung findet das Auge keinen Anfang. Klare Felder führen durch das Plakat." },
+          { text: "Alles in einen langen Fließtext untereinander.", erklaerung: "Ein langer Fließtext wirkt wie eine Textwand. Felder und Stichpunkte sind übersichtlicher." },
+        ],
+        richtig: 0,
+        erklaerung: "Klare Bereiche mit Überschriften gliedern das Plakat, sodass man es schnell erfassen kann.",
+      },
+      {
+        frage: "Womit prüfst du, ob dein Plakat lesbar ist?",
+        optionen: [
+          "Du trittst ein paar Schritte zurück und schaust, ob du es noch lesen kannst.",
+          { text: "Du gehst mit der Lupe ganz nah heran.", erklaerung: "Ein Plakat wird aus der Entfernung betrachtet, nicht mit der Lupe. Der Test ist der Abstand." },
+          { text: "Gar nicht, Hauptsache es ist bunt.", erklaerung: "Bunt allein hilft nicht. Wichtig ist, dass man Überschrift und Stichpunkte aus der Ferne lesen kann." },
+        ],
+        richtig: 0,
+        erklaerung: "Tritt ein paar Schritte zurück: Wenn die Überschrift und die Stichpunkte noch lesbar sind, passt die Schriftgröße.",
+      },
+      {
+        frage: "Was gehört zum Schluss noch auf das Plakat?",
+        optionen: [
+          "Die Quellen, also woher deine Bilder und Infos stammen.",
+          { text: "Nichts weiter, das Plakat ist fertig.", erklaerung: "Quellen gehören dazu, damit man weiß, woher die Infos kommen. Sie werden oft vergessen." },
+          { text: "Ein großes buntes Muster über den ganzen Rand.", erklaerung: "Deko über den ganzen Rand lenkt ab. Wichtiger ist die Quellenangabe." },
+        ],
+        richtig: 0,
+        erklaerung: "Am Ende gibst du deine Quellen an, also woher die Bilder und Informationen kommen. Das gehört immer dazu.",
+      },
+    ],
+  },
   // Mathe: Plus und Minus mit negativen Zahlen anwenden (inkl. Sachaufgaben).
   m7: {
     fragen: [

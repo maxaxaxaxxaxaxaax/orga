@@ -96,6 +96,7 @@ export const faecher = [
     materialien: [
       ...LERNZETTEL.deutsch,
       { id: "d6", thema: "Mini-Vortrag", titel: "Übung: Mini-Vortrag", art: "arbeitsblatt", bereich: "selbstlernen", datum: "2026-05-18" },
+      { id: "d7", thema: "Lernplakat", titel: "Übung: Lernplakat gestalten", art: "arbeitsblatt", bereich: "selbstlernen", datum: "2026-05-19" },
       { id: "d1", thema: "Mini-Vortrag", titel: "Mitschrift: Aufbau eines Mini-Vortrags", art: "notiz", bereich: "unterricht", datum: "2026-04-21" },
       { id: "d2", thema: "Mini-Vortrag", titel: "Checkliste: Laut sprechen, Blickkontakt", art: "zusammenfassung", bereich: "selbstlernen", datum: "2026-04-22" },
       { id: "d3", thema: "Lernplakat", titel: "Arbeitsblatt: Lernplakat-Vorlage", art: "arbeitsblatt", bereich: "unterricht", datum: "2026-04-28" },
