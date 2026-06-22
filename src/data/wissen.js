@@ -9,6 +9,7 @@
 import { MATHE_LANDKARTE } from "./matheLandkarte";
 import { DEUTSCH_LANDKARTE } from "./deutschLandkarte";
 import { ENGLISCH_LANDKARTE } from "./englischLandkarte";
+import { LERNZETTEL } from "./lernzettel";
 
 export const faecher = [
   {
@@ -52,6 +53,7 @@ export const faecher = [
       ["rechengesetze", "rechendiplom"],
     ],
     materialien: [
+      ...LERNZETTEL.mathe,
       { id: "m1", thema: "Grundlagen negative Zahlen", titel: "Mitschrift: Zahlengerade", art: "notiz", bereich: "unterricht", datum: "2026-04-21" },
       { id: "m2", thema: "Grundlagen negative Zahlen", titel: "Arbeitsblatt: Vorzeichen-Memo", art: "arbeitsblatt", bereich: "unterricht", datum: "2026-04-22" },
       { id: "m3", thema: "Addieren & Subtrahieren", titel: "Spickzettel: Plus- und Minus-Regeln", art: "notiz", bereich: "selbstlernen", datum: "2026-04-28" },
@@ -90,6 +92,7 @@ export const faecher = [
       ["lernplakat", "lapbook"],
     ],
     materialien: [
+      ...LERNZETTEL.deutsch,
       { id: "d1", thema: "Mini-Vortrag", titel: "Mitschrift: Aufbau eines Mini-Vortrags", art: "notiz", bereich: "unterricht", datum: "2026-04-21" },
       { id: "d2", thema: "Mini-Vortrag", titel: "Checkliste: Laut sprechen, Blickkontakt", art: "zusammenfassung", bereich: "selbstlernen", datum: "2026-04-22" },
       { id: "d3", thema: "Lernplakat", titel: "Arbeitsblatt: Lernplakat-Vorlage", art: "arbeitsblatt", bereich: "unterricht", datum: "2026-04-28" },
@@ -136,6 +139,7 @@ export const faecher = [
       ["vok-pp94", "everyday"],
     ],
     materialien: [
+      ...LERNZETTEL.englisch,
       { id: "e1", thema: "Revision simple past", titel: "Übersicht: Irregular verbs", art: "zusammenfassung", bereich: "selbstlernen", datum: "2026-04-21" },
       { id: "e2", thema: "Vocabulary Unit 5 (pp. 84-93)", titel: "Vokabelliste Unit 5, S. 84-93", art: "arbeitsblatt", bereich: "unterricht", datum: "2026-04-23" },
       { id: "e3", thema: "will-future · question tags · if-clause I", titel: "Mitschrift: will vs. going-to", art: "notiz", bereich: "unterricht", datum: "2026-04-30" },
@@ -182,6 +186,7 @@ export const faecher = [
       ["vok-l15-pronomen", "lektionstext-l15"],
     ],
     materialien: [
+      ...LERNZETTEL.latein,
       { id: "l1", thema: "Vokabeln L14", titel: "Vokabelliste L14", art: "arbeitsblatt", bereich: "unterricht", datum: "2026-04-21" },
       { id: "l2", thema: "ACI mit Übersetzung", titel: "Mitschrift: ACI erkennen", art: "notiz", bereich: "unterricht", datum: "2026-04-28" },
       { id: "l3", thema: "ACI mit Übersetzung", titel: "Übungsblatt: ACI übersetzen", art: "arbeitsblatt", bereich: "selbstlernen", datum: "2026-05-05" },
@@ -224,6 +229,7 @@ export const faecher = [
       ["vok-l2", "uebersetzung-l2"],
     ],
     materialien: [
+      ...LERNZETTEL.griechisch,
       { id: "gr1", thema: "Griechische Buchstaben und Lautlehre", titel: "Arbeitsblatt: Alphabet schreiben", art: "arbeitsblatt", bereich: "unterricht", datum: "2026-04-21" },
       { id: "gr2", thema: "Vokabeln L 1", titel: "Vokabelliste L 1", art: "arbeitsblatt", bereich: "unterricht", datum: "2026-04-23" },
       { id: "gr3", thema: "a-Deklination im Singular", titel: "Spickzettel: Die vier Fälle", art: "notiz", bereich: "selbstlernen", datum: "2026-04-30" },
