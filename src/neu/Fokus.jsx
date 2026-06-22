@@ -18,13 +18,18 @@ import {
   setzeAbnahme,
   ladeFragen,
   setzeFrage,
+  ladeMaterialwuensche,
+  setzeMaterialwunsch,
 } from "./coach";
 import Quiz from "./Quiz";
 import MaterialAnsicht from "./MaterialAnsicht";
 import MaterialInhalt from "./MaterialInhalt";
 import MaterialUpload from "./MaterialUpload";
 import Rechenweg from "./Rechenweg";
+import Aufschrieb from "./Aufschrieb";
 import { hatRechenweg } from "./rechenwegSpeicher";
+import { ladeArbeitsmodus, speichereArbeitsmodus } from "./arbeitsmodus";
+import { materialHinweis } from "./materialHinweis";
 import { addNotiz, ladeNotizen } from "./notizen";
 import {
   istOeffenbar,
@@ -52,6 +57,14 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
   // Handschriftlicher Rechenweg (nur bei Mathe-Zielen sinnvoll).
   const [rechenwegOffen, setRechenwegOffen] = useState(false);
   const istMathe = kb.fach === "Mathematik";
+  // Arbeitsmodus: "digital" (am Gerät) oder "tisch" (analog am Schreibtisch).
+  // Eine bewusste Schüler-Wahl, sitzungsweit gemerkt (Self-Signal, kein Tracking).
+  const [arbeitsmodus, setArbeitsmodus] = useState(ladeArbeitsmodus);
+  const [aufschriebOffen, setAufschriebOffen] = useState(false);
+  // Material-Lücke: Wunsch nach mehr Material (Brücke zum Coach) und ein
+  // KI-Hinweis, der nur auf Vorhandenes zeigt.
+  const [matWunsch, setMatWunsch] = useState(() => !!ladeMaterialwuensche()[kb.id]);
+  const [hinweisOffen, setHinweisOffen] = useState(false);
   const [hilfe, setHilfe] = useState(() => !!ladeHilferufe()[kb.id]);
   const [frage, setFrage] = useState(() => ladeFragen()[kb.id] || "");
   const [hilfeOffen, setHilfeOffen] = useState(false);
@@ -140,6 +153,10 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
     addNotiz(t, kontext);
     setParkEntwurf("");
     setParkAnzahl((n) => n + 1);
+  }
+  function waehleModus(m) {
+    setArbeitsmodus(m);
+    speichereArbeitsmodus(m);
   }
 
   const materialien = lw
@@ -249,6 +266,28 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
         )
       ) : (
         <main className="fokus-buehne">
+          <div className="fokus-modus" role="group" aria-label="Arbeitsmodus">
+            <button
+              type="button"
+              className={
+                "fokus-modus-knopf" + (arbeitsmodus === "digital" ? " aktiv" : "")
+              }
+              aria-pressed={arbeitsmodus === "digital"}
+              onClick={() => waehleModus("digital")}
+            >
+              Digital
+            </button>
+            <button
+              type="button"
+              className={
+                "fokus-modus-knopf" + (arbeitsmodus === "tisch" ? " aktiv" : "")
+              }
+              aria-pressed={arbeitsmodus === "tisch"}
+              onClick={() => waehleModus("tisch")}
+            >
+              Am Tisch
+            </button>
+          </div>
           <p className="fokus-eyebrow">
             Schritt {aktuell + 1} von {schritte.length}
           </p>
@@ -275,94 +314,204 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
             </div>
           </div>
 
-          {istMathe && (
-            <button
-              type="button"
-              className="fokus-rechenweg"
-              onClick={() => setRechenwegOffen(true)}
-            >
-              <span className="fokus-rechenweg-stift" aria-hidden="true">
-                ✎
-              </span>
-              Rechenweg aufschreiben
-              {hatRechenweg(kb.id) && (
-                <span className="fokus-rechenweg-badge">gespeichert</span>
-              )}
-            </button>
-          )}
-
-          <div className="fokus-block">
-            <div className="fokus-label-zeile">
-              <span className="fokus-label">Material dazu</span>
+          {arbeitsmodus === "tisch" ? (
+            <div className="fokus-tisch">
               <button
                 type="button"
-                className="fokus-mat-add"
-                onClick={() => setUploadOffen(true)}
+                className="fokus-digitalisieren"
+                onClick={() => setAufschriebOffen(true)}
               >
-                + anhängen
+                <span className="fokus-rechenweg-stift" aria-hidden="true">
+                  ✎
+                </span>
+                Aufschrieb digitalisieren
+                {hatRechenweg(kb.id) && (
+                  <span className="fokus-rechenweg-badge">gespeichert</span>
+                )}
               </button>
-            </div>
-            {materialien.length === 0 ? (
-              <p className="fokus-mat-leer">
-                Noch nichts angehängt. Häng ein Foto, PDF oder eine Notiz an.
-              </p>
-            ) : (
-              <div className="fokus-mats">
-                {materialien.map((m) => {
-                  const aktivitaet = aktivitaetLabel(m);
-                  const uebung = interaktivFuerMaterial(m.id);
-                  const kopf = (
-                    <>
-                      <span className="fokus-mat-art">
-                        {ART_LABEL[m.art] || m.art}
-                      </span>
-                      <span className="fokus-mat-titel">{m.titel}</span>
-                      {aktivitaet && (
-                        <span
-                          className={
-                            "fokus-mat-aktiv" +
-                            (aktivitaet === "Lesen" ? " lesen" : "")
-                          }
-                        >
-                          {aktivitaet}
+              {istMathe && (
+                <button
+                  type="button"
+                  className="fokus-rechenweg"
+                  onClick={() => setRechenwegOffen(true)}
+                >
+                  <span className="fokus-rechenweg-stift" aria-hidden="true">
+                    ✎
+                  </span>
+                  Rechenweg mit Coach
+                </button>
+              )}
+              <div className="fokus-tisch-ref">
+                <span className="fokus-label">Dazu liegt digital bereit</span>
+                {materialien.length === 0 ? (
+                  <p className="fokus-mat-leer">
+                    Noch kein Material hinterlegt. Wechsle zu Digital, um welches
+                    anzufragen.
+                  </p>
+                ) : (
+                  <ul className="fokus-tisch-liste">
+                    {materialien.map((m) => (
+                      <li key={m.id} className="fokus-tisch-mat">
+                        <span className="fokus-mat-art">
+                          {ART_LABEL[m.art] || m.art}
                         </span>
-                      )}
-                    </>
-                  );
-                  // Interaktive Übung direkt offen im Fokus (kein Klick nötig).
-                  if (uebung) {
-                    return (
-                      <div key={m.id} className="fokus-mat-offen">
-                        <div className="fokus-mat-offen-kopf">{kopf}</div>
-                        <MaterialInhalt material={m} />
-                      </div>
-                    );
-                  }
-                  // Reines Lese-Material (PDF, Notiz): weiter antippbar zum Öffnen.
-                  return istOeffenbar(m) ? (
-                    <button
-                      key={m.id}
-                      type="button"
-                      className="fokus-mat fokus-mat-klick"
-                      onClick={() => setMaterial(m)}
-                    >
-                      {kopf}
-                    </button>
-                  ) : (
-                    <span key={m.id} className="fokus-mat">
-                      {kopf}
-                    </span>
-                  );
-                })}
+                        <span className="fokus-mat-titel">{m.titel}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
-            )}
-          </div>
-
-          {genKey && (
-            <div className="fokus-quiz">
-              <div className="fokus-label fokus-quiz-label">Dazu üben</div>
-              <Quiz generatorKey={genKey} />
             </div>
+          ) : (
+            <>
+              {istMathe && (
+                <button
+                  type="button"
+                  className="fokus-rechenweg"
+                  onClick={() => setRechenwegOffen(true)}
+                >
+                  <span className="fokus-rechenweg-stift" aria-hidden="true">
+                    ✎
+                  </span>
+                  Rechenweg aufschreiben
+                  {hatRechenweg(kb.id) && (
+                    <span className="fokus-rechenweg-badge">gespeichert</span>
+                  )}
+                </button>
+              )}
+
+              <div className="fokus-block">
+                <div className="fokus-label-zeile">
+                  <span className="fokus-label">Material dazu</span>
+                  <button
+                    type="button"
+                    className="fokus-mat-add"
+                    onClick={() => setUploadOffen(true)}
+                  >
+                    + anhängen
+                  </button>
+                </div>
+                {materialien.length === 0 ? (
+                  <>
+                    <p className="fokus-mat-leer">
+                      Noch nichts angehängt. Häng ein Foto, PDF oder eine Notiz
+                      an.
+                    </p>
+                    <div className="fokus-luecke">
+                      {matWunsch ? (
+                        <p className="fokus-luecke-gesendet" role="status">
+                          <span
+                            className="fokus-hilfe-haken"
+                            aria-hidden="true"
+                          >
+                            ✓
+                          </span>
+                          Material bei {COACH} angefragt.
+                          <button
+                            type="button"
+                            className="fokus-luecke-zurueck"
+                            onClick={() => {
+                              setzeMaterialwunsch(kb.id, false);
+                              setMatWunsch(false);
+                            }}
+                          >
+                            zurücknehmen
+                          </button>
+                        </p>
+                      ) : (
+                        <button
+                          type="button"
+                          className="fokus-luecke-aktion"
+                          onClick={() => {
+                            setzeMaterialwunsch(kb.id, true);
+                            setMatWunsch(true);
+                          }}
+                        >
+                          Mehr Material anfragen
+                        </button>
+                      )}
+                      {hinweisOffen ? (
+                        <div className="fokus-hinweis" role="note">
+                          {materialHinweis({
+                            lw,
+                            materialien,
+                            naechsterSchrittText: schritte[aktuell]?.text,
+                          })
+                            .split("\n")
+                            .map((zeile, i) => (
+                              <p key={i}>{zeile}</p>
+                            ))}
+                        </div>
+                      ) : (
+                        <button
+                          type="button"
+                          className="fokus-luecke-aktion"
+                          onClick={() => setHinweisOffen(true)}
+                        >
+                          Mit KI anreichern
+                        </button>
+                      )}
+                    </div>
+                  </>
+                ) : (
+                  <div className="fokus-mats">
+                    {materialien.map((m) => {
+                      const aktivitaet = aktivitaetLabel(m);
+                      const uebung = interaktivFuerMaterial(m.id);
+                      const kopf = (
+                        <>
+                          <span className="fokus-mat-art">
+                            {ART_LABEL[m.art] || m.art}
+                          </span>
+                          <span className="fokus-mat-titel">{m.titel}</span>
+                          {aktivitaet && (
+                            <span
+                              className={
+                                "fokus-mat-aktiv" +
+                                (aktivitaet === "Lesen" ? " lesen" : "")
+                              }
+                            >
+                              {aktivitaet}
+                            </span>
+                          )}
+                        </>
+                      );
+                      // Interaktive Übung direkt offen im Fokus (kein Klick nötig).
+                      if (uebung) {
+                        return (
+                          <div key={m.id} className="fokus-mat-offen">
+                            <div className="fokus-mat-offen-kopf">{kopf}</div>
+                            <MaterialInhalt material={m} />
+                          </div>
+                        );
+                      }
+                      // Reines Lese-Material (PDF, Notiz): antippbar zum Öffnen.
+                      return istOeffenbar(m) ? (
+                        <button
+                          key={m.id}
+                          type="button"
+                          className="fokus-mat fokus-mat-klick"
+                          onClick={() => setMaterial(m)}
+                        >
+                          {kopf}
+                        </button>
+                      ) : (
+                        <span key={m.id} className="fokus-mat">
+                          {kopf}
+                        </span>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              {genKey && (
+                <div className="fokus-quiz">
+                  <div className="fokus-label fokus-quiz-label">Dazu üben</div>
+                  <Quiz generatorKey={genKey} />
+                </div>
+              )}
+            </>
           )}
 
           <div className="fokus-fuss">
@@ -504,6 +653,23 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
       )}
       {rechenwegOffen && (
         <Rechenweg kb={kb} onClose={() => setRechenwegOffen(false)} />
+      )}
+      {aufschriebOffen && (
+        <Aufschrieb
+          kb={kb}
+          onClose={() => setAufschriebOffen(false)}
+          onGespeichert={(text) => {
+            speichereEigenes({
+              titel: "Mein Aufschrieb",
+              fachId: lw?.fachId,
+              thema: thema?.label || null,
+              art: "aufschrieb",
+              inhalt: text,
+              bereich: "selbstlernen",
+            });
+            setAufschriebOffen(false);
+          }}
+        />
       )}
     </div>
   );

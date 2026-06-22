@@ -7,4 +7,5 @@ export const ART_LABEL = {
   pdf: "PDF",
   bild: "Bild",
   lernzettel: "Lernzettel",
+  aufschrieb: "Mein Aufschrieb",
 };

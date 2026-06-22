@@ -9,6 +9,7 @@ export const COACH = "Fr. Berg"; // fester Demo-Lerncoach (siehe SCHULE.md)
 const HILFE_KEY = "neu.hilferufe"; // kbId -> true
 const ABNAHME_KEY = "neu.abnahmen"; // kbId -> true
 const FRAGE_KEY = "neu.fragen"; // kbId -> Fragetext (eine offene Frage pro Ziel)
+const MATERIALWUNSCH_KEY = "neu.materialwuensche"; // kbId -> true
 
 function lade(key) {
   try {
@@ -30,6 +31,12 @@ export const ladeHilferufe = () => lade(HILFE_KEY);
 export const setzeHilferuf = (id, an) => setze(HILFE_KEY, id, an);
 export const ladeAbnahmen = () => lade(ABNAHME_KEY);
 export const setzeAbnahme = (id, an) => setze(ABNAHME_KEY, id, an);
+
+// Schülergeführter Wunsch nach mehr Material zu einem Ziel: eine explizite
+// Brücke zum Lerncoach (wie der Hilferuf), nicht an eine Antwort-KI. Sichtbar
+// nur, wenn der Schüler den Knopf drückt; jederzeit zurücknehmbar.
+export const ladeMaterialwuensche = () => lade(MATERIALWUNSCH_KEY);
+export const setzeMaterialwunsch = (id, an) => setze(MATERIALWUNSCH_KEY, id, an);
 
 // Stille, schülergeführte Frage an den Lerncoach (SCHULE.md Cluster 3: Fragen aus
 // dem Schritt heraus merken, ohne sich laut melden zu müssen). Freitext, eine

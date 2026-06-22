@@ -567,3 +567,140 @@
   font-size: 0.78rem;
   color: var(--muted);
 }
+
+/* Arbeitsmodus-Umschalter: Digital (am Gerät) oder Am Tisch (analog). */
+.fokus-modus {
+  align-self: center;
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+}
+.fokus-modus-knopf {
+  border: none;
+  background: transparent;
+  color: var(--text-2);
+  font-size: 0.84rem;
+  font-weight: 600;
+  padding: 6px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+.fokus-modus-knopf:hover {
+  color: var(--text);
+}
+.fokus-modus-knopf.aktiv {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+/* Material-Lücke: ruhige Zeile mit Coach-Anfrage und KI-Hinweis. */
+.fokus-luecke {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+.fokus-luecke-aktion {
+  border: 1px solid var(--line-strong);
+  background: var(--card);
+  color: var(--text-2);
+  font-size: 0.84rem;
+  font-weight: 600;
+  padding: 8px 15px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.fokus-luecke-aktion:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.fokus-luecke-gesendet {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--ok-text);
+}
+.fokus-luecke-zurueck {
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-size: 0.82rem;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.fokus-luecke-zurueck:hover {
+  color: var(--text-2);
+}
+/* KI-Hinweis: zeigt nur auf Vorhandenes (kein neuer Inhalt). */
+.fokus-hinweis {
+  flex-basis: 100%;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md, 12px);
+  padding: 12px 14px;
+}
+.fokus-hinweis p {
+  margin: 0 0 6px;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--text);
+}
+.fokus-hinweis p:last-child {
+  margin-bottom: 0;
+}
+
+/* Am-Tisch-Modus: ruhige Begleitung zum analogen Arbeiten. */
+.fokus-tisch {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.fokus-digitalisieren {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: none;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: 0.92rem;
+  font-weight: 700;
+  padding: 11px 20px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.fokus-digitalisieren:hover {
+  background: var(--accent-strong);
+}
+.fokus-tisch-ref {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.fokus-tisch-liste {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.fokus-tisch-mat {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 13px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm, 8px);
+}

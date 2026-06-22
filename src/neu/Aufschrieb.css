@@ -1,0 +1,240 @@
+/* Aufschrieb-Overlay: Vollbild-Schreibfläche über dem Fokus, ohne Coach-Chat. */
+.au {
+  position: fixed;
+  inset: 0;
+  z-index: 210;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  animation: au-rein 0.25s ease both;
+}
+@keyframes au-rein {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .au {
+    animation: none;
+  }
+}
+
+.au-kopf {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--line);
+}
+.au-zu {
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--line);
+  background: var(--card);
+  color: var(--text-2);
+  border-radius: 50%;
+  font-size: 1rem;
+  cursor: pointer;
+}
+.au-zu:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.au-titel {
+  flex: 1;
+  min-width: 0;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.au-werkzeuge {
+  flex-shrink: 0;
+  display: flex;
+  gap: 8px;
+}
+.au-werkzeug {
+  border: 1px solid var(--line-strong);
+  background: var(--card);
+  color: var(--text-2);
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 7px 13px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.au-werkzeug:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.au-werkzeug:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.au-hinweis {
+  flex-shrink: 0;
+  margin: 0;
+  padding: 10px 18px 0;
+  font-size: 0.84rem;
+  color: var(--muted);
+}
+
+/* Schreibfläche: gepunkteter Hintergrund (wie kariertes Papier), Canvas darüber. */
+.au-flaeche {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  margin: 12px 18px 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md, 12px);
+  background-color: var(--card);
+  background-image: radial-gradient(
+    color-mix(in srgb, var(--text) 18%, transparent) 1px,
+    transparent 1px
+  );
+  background-size: 22px 22px;
+  background-position: 11px 11px;
+  overflow: hidden;
+}
+.au-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+  cursor: crosshair;
+}
+.au-platzhalter {
+  position: absolute;
+  top: 18px;
+  left: 20px;
+  font-size: 1.1rem;
+  color: var(--muted);
+  pointer-events: none;
+}
+
+/* Fußleiste: der Digitalisieren-Knopf. */
+.au-fuss {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0 18px 18px;
+}
+.au-digitalisieren {
+  align-self: flex-start;
+  border: none;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: 0.92rem;
+  font-weight: 700;
+  padding: 11px 20px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.au-digitalisieren:hover:not(:disabled) {
+  background: var(--accent-strong);
+}
+.au-digitalisieren:disabled {
+  background: var(--line-strong);
+  color: var(--muted);
+  cursor: not-allowed;
+}
+.au-fuss-hinweis {
+  margin: 0;
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+
+/* Vorschau: der digitalisierte, bearbeitbare Text. */
+.au-vorschau {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 0 18px 18px;
+}
+.au-vorschau-label {
+  margin: 0;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.au-fehler {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--warn-text, var(--text-2));
+}
+.au-feld {
+  width: 100%;
+  box-sizing: border-box;
+  resize: vertical;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md, 12px);
+  background: var(--card);
+  color: var(--text);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  padding: 12px 14px;
+  font-family: inherit;
+}
+.au-feld:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.au-vorschau-aktionen {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.au-speichern {
+  border: none;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: 0.92rem;
+  font-weight: 700;
+  padding: 11px 20px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.au-speichern:hover:not(:disabled) {
+  background: var(--accent-strong);
+}
+.au-speichern:disabled {
+  background: var(--line-strong);
+  color: var(--muted);
+  cursor: not-allowed;
+}
+.au-nochmal,
+.au-zurueck {
+  border: 1px solid var(--line-strong);
+  background: var(--card);
+  color: var(--text-2);
+  font-size: 0.86rem;
+  font-weight: 600;
+  padding: 10px 18px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.au-nochmal:hover,
+.au-zurueck:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+@media (pointer: coarse) {
+  .au-zu,
+  .au-werkzeug,
+  .au-digitalisieren,
+  .au-speichern,
+  .au-nochmal,
+  .au-zurueck {
+    min-height: 44px;
+  }
+}
