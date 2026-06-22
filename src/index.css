@@ -5,6 +5,10 @@
   --font-display: "Fraunces", "Hanken Grotesk", Georgia, serif;
   --font-text: "Hanken Grotesk", system-ui, -apple-system, BlinkMacSystemFont,
     "Segoe UI", sans-serif;
+  /* Satoshi: geometrisch-humanistische Sans, bewusst nur auf der Uebersicht
+     (Dashboard-Redesign) eingesetzt; der Rest der App bleibt bei Fraunces/Hanken. */
+  --font-satoshi: "Satoshi", "Hanken Grotesk", system-ui, -apple-system,
+    "Segoe UI", sans-serif;
 
   /* === Hell: warmes Cremepapier ("der digitale Schulplaner") ===
      Tinte und Papier. Farbe trägt Bedeutung (Fach, Status), die Fläche bleibt warm-neutral. */

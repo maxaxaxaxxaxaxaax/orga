@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { koennensbeweise, kbFarbe } from "../data/koennensbeweise";
+import { koennensbeweise, kbFarbe, kbFaecher } from "../data/koennensbeweise";
 import { stundenWoche, fachFarbe, stundenId } from "../data/stundenplanWoche";
 import { etappen } from "../data/etappen";
 import { lernwegFuerKb } from "../data/wissen";
 import { generatorFuerKb } from "./uebungen";
+import Etappenring from "./Etappenring";
 import {
   lade,
   WOCHEN_KEY,
@@ -124,53 +125,58 @@ export default function Heute({ onFokus }) {
     setNotizen(entferneNotiz(i));
   }
 
-  // Eine Tageskarte, geteilt von "Heute geplant" und "Noch offen von früher".
+  // Die frueheste fuer dieses Ziel heute eingeplante Stunde (fuer Zeit + Raum auf
+  // der Aufgaben-Karte). Nachzuegler aus frueheren Tagen liefern hier null.
+  function tagesStunde(k) {
+    const stunden = (stundenZuord[k.id] || [])
+      .filter((sid) => slotTag(sid) === tag)
+      .map((sid) => stundenWoche.find((s) => stundenId(s) === sid))
+      .filter(Boolean)
+      .sort((a, b) => minutenAusZeit(a.von) - minutenAusZeit(b.von));
+    return stunden[0] || null;
+  }
+
+  // Eine Aufgaben-Karte, geteilt von "Meine Aufgaben" und "Noch offen von früher".
   function karte(k, istStart) {
     const done = !!erledigt[k.id];
     const info = kbInfo(k.id);
+    const st = tagesStunde(k);
     return (
-      <div
-        className={"hu-kb" + (done ? " done" : "")}
+      <button
+        type="button"
+        className={"hu-auf" + (done ? " done" : "")}
         key={k.id}
         style={{ "--c": kbFarbe[k.fach] || "#868e96" }}
+        onClick={() => onFokus(k.id)}
+        title="Im Fokus öffnen und Schritt für Schritt machen"
       >
-        <div className="hu-kb-zeile">
-          <span
-            className="hu-kb-check"
-            role="img"
-            aria-label={done ? "erledigt" : "noch offen"}
-          >
-            {done ? "✓" : ""}
+        <span className="hu-auf-kopf">
+          <span className="hu-auf-zeit">
+            {st ? `${st.von} – ${st.bis}` : "frei einteilbar"}
           </span>
-          <button
-            type="button"
-            className="hu-kb-open"
-            onClick={() => onFokus(k.id)}
-            title="Im Fokus öffnen und Schritt für Schritt machen"
-          >
-            <span className="hu-kb-text">
-              <span className="hu-kb-haupt">
-                {istStart && !info.bereit && (
-                  <span className="hu-kb-start">
-                    {offeneAnzahl >= 2 ? "Start hier" : "Dein Ziel jetzt"}
-                  </span>
-                )}
-                <span className="hu-kb-fach">{k.fach}</span>
-                <span className="hu-kb-titel">{k.titel}</span>
-                {info.hatUebung && !info.bereit && (
-                  <span className="hu-kb-uebung">Üben</span>
-                )}
-                {info.bereit && !done && (
-                  <span className="hu-kb-bereit">bereit</span>
-                )}
-              </span>
+          {done ? (
+            <span className="hu-auf-marke done" aria-label="erledigt">
+              ✓ fertig
             </span>
-            <span className="hu-kb-fokus-cue" aria-hidden="true">
-              Fokus →
+          ) : info.bereit ? (
+            <span className="hu-auf-marke bereit">bereit</span>
+          ) : istStart ? (
+            <span className="hu-auf-marke start">
+              {offeneAnzahl >= 2 ? "Start hier" : "jetzt"}
             </span>
-          </button>
-        </div>
-      </div>
+          ) : info.hatUebung ? (
+            <span className="hu-auf-marke ueben">Üben</span>
+          ) : null}
+        </span>
+        <span className="hu-auf-titel">{k.titel}</span>
+        <span className="hu-auf-fuss">
+          <span className="hu-auf-badge">{k.fach}</span>
+          {st && <span className="hu-auf-raum">{st.raum}</span>}
+          <span className="hu-auf-cue" aria-hidden="true">
+            Fokus →
+          </span>
+        </span>
+      </button>
     );
   }
 
@@ -256,6 +262,29 @@ export default function Heute({ onFokus }) {
       : 0;
   const morgenVoll = morgenUhren >= 5;
 
+  // Etappenfortschritt: pro Fach Anteil erledigter Ziele (Ring) plus drei
+  // sachliche Kennzahlen. Spiegelt den Stand, wertet nicht (VISION).
+  const proFach = kbFaecher.map((f) => {
+    const ziele = koennensbeweise.filter((k) => k.fach === f);
+    const done = ziele.filter((k) => erledigt[k.id]).length;
+    return {
+      fach: f,
+      color: kbFarbe[f] || "#868e96",
+      total: ziele.length,
+      done,
+      fraction: ziele.length ? done / ziele.length : 0,
+    };
+  });
+  const zieleGesamt = koennensbeweise.length;
+  const zieleDone = koennensbeweise.filter((k) => erledigt[k.id]).length;
+  const restMs =
+    new Date(ETAPPE.bis + "T23:59:59").getTime() - tagDatum.getTime();
+  const restWochen = Math.max(0, Math.ceil(restMs / (7 * 24 * 3600 * 1000)));
+  const wocheKbs = koennensbeweise.filter(
+    (k) => wochenZuordnung[k.id] === AKTUELLE_WOCHE
+  );
+  const wocheDone = wocheKbs.filter((k) => erledigt[k.id]).length;
+
   // Tag geschafft: ruhiger grüner Abschluss als kleine Belohnung, bevor der Tag
   // wieder zur Liste wird.
   if (allesGeschafft && !tagAnsehen) {
@@ -312,6 +341,8 @@ export default function Heute({ onFokus }) {
         </div>
         <div
           className="hu-tag-nav"
+          role="group"
+          aria-label="Tag wählen"
           title="Anderen Tag simulieren, um zu testen, was an dem Tag passiert"
         >
           <button
@@ -323,9 +354,7 @@ export default function Heute({ onFokus }) {
           >
             ‹
           </button>
-          <span className="hu-tag-label" aria-hidden="true">
-            {kurzTag}
-          </span>
+          <span className="hu-tag-label">{kurzTag}</span>
           <button
             type="button"
             className="hu-tag-pfeil"
@@ -338,121 +367,160 @@ export default function Heute({ onFokus }) {
         </div>
       </header>
 
-      <div className="hu-spalten">
-        <section className="hu-block">
-          <h2 className="hu-block-titel">Heute geplant</h2>
-          {allesGeschafft && (
-            <p className="hu-geschafft">
-              Alles geschafft! Du hast alle Ziele für heute erledigt.
-            </p>
-          )}
-          {tagKbs.length === 0 ? (
-            <p className="hu-leer">
-              {nachzueglerList.length > 0
-                ? "Für heute ist nichts Neues geplant."
-                : "Für heute hast du nichts eingeplant."}
-            </p>
-          ) : (
-            <div className="hu-kbs">
-              {tagKbs.map((k) =>
-                karte(k, !erledigt[k.id] && ersterOffen?.id === k.id)
-              )}
-            </div>
-          )}
-          {morgenAnzahl > 0 && (
-            <p className={"hu-morgen" + (morgenVoll ? " voll" : "")}>
-              Morgen geplant: {morgenAnzahl}{" "}
-              {morgenAnzahl === 1 ? "Ziel" : "Ziele"}
-              {morgenUhren > 0 &&
-                `, ${morgenUhren} ${morgenUhren === 1 ? "Uhr" : "Uhren"}`}
-              {morgenVoll && " · ziemlich voll"}
-            </p>
-          )}
-
-          {nachzueglerList.length > 0 && (
-            <div className="hu-nachzuegler">
-              <h3 className="hu-nachzuegler-titel">Noch offen von früher</h3>
-              <div className="hu-kbs">
-                {(nachzueglerAlle
-                  ? nachzueglerList
-                  : nachzueglerList.slice(0, 3)
-                ).map((k) => karte(k, false))}
+      <div className="hu-grid">
+        <div className="hu-main">
+          <div className="hu-oben">
+            <section className="hu-karte hu-fortschritt">
+              <h2 className="hu-karte-titel">Etappenfortschritt</h2>
+              <Etappenring ringe={proFach} />
+              <div className="hu-stats">
+                <div className="hu-stat">
+                  <span className="hu-stat-zahl">
+                    {zieleDone}
+                    <span className="hu-stat-von">/{zieleGesamt}</span>
+                  </span>
+                  <span className="hu-stat-label">Ziele erreicht</span>
+                </div>
+                <div className="hu-stat">
+                  <span className="hu-stat-zahl">{restWochen}</span>
+                  <span className="hu-stat-label">
+                    {restWochen === 1 ? "Woche übrig" : "Wochen übrig"}
+                  </span>
+                </div>
+                <div className="hu-stat">
+                  <span className="hu-stat-zahl">
+                    {wocheKbs.length ? (
+                      <>
+                        {wocheDone}
+                        <span className="hu-stat-von">/{wocheKbs.length}</span>
+                      </>
+                    ) : (
+                      "–"
+                    )}
+                  </span>
+                  <span className="hu-stat-label">diese Woche</span>
+                </div>
               </div>
-              {nachzueglerList.length > 3 && (
-                <button
-                  type="button"
-                  className="hu-nachzuegler-mehr"
-                  onClick={() => setNachzueglerAlle((v) => !v)}
-                >
-                  {nachzueglerAlle
-                    ? "Weniger anzeigen"
-                    : `+ ${nachzueglerList.length - 3} weitere anzeigen`}
-                </button>
-              )}
-            </div>
-          )}
-        </section>
+            </section>
 
-        <div className="hu-rechts">
-          <section className="hu-block">
-            <h2 className="hu-block-titel">Stundenplan</h2>
-          <ul className="hu-plan">
-            {tagStunden.map((s, i) => {
-              const lernzeit = s.art === "studierzeit" || s.art === "selbst";
-              return (
-                <li
-                  className={"hu-stunde" + (lernzeit ? " lernzeit" : "")}
-                  key={i}
-                >
-                  <span className="hu-stunde-zeit">{s.von}</span>
-                  <span
-                    className="hu-stunde-strich"
-                    style={{ background: fachFarbe[s.fach] || "#868e96" }}
-                  />
-                  <span className="hu-stunde-fach">{s.fach}</span>
-                  {lernzeit && (
-                    <span className="hu-stunde-hinweis">
-                      Zeit für deine Ziele
-                    </span>
-                  )}
-                  <span className="hu-stunde-raum">{s.raum}</span>
-                </li>
-              );
-            })}
-          </ul>
+            <KlassenPuls />
+          </div>
+
+          <section className="hu-karte hu-aufgaben">
+            <h2 className="hu-karte-titel">Meine Aufgaben</h2>
+            {allesGeschafft && (
+              <p className="hu-geschafft">
+                Alles geschafft! Du hast alle Ziele für heute erledigt.
+              </p>
+            )}
+            {tagKbs.length === 0 ? (
+              <p className="hu-leer">
+                {nachzueglerList.length > 0
+                  ? "Für heute ist nichts Neues geplant."
+                  : "Für heute hast du nichts eingeplant."}
+              </p>
+            ) : (
+              <div className="hu-auf-grid">
+                {tagKbs.map((k) =>
+                  karte(k, !erledigt[k.id] && ersterOffen?.id === k.id)
+                )}
+              </div>
+            )}
+            {morgenAnzahl > 0 && (
+              <p className={"hu-morgen" + (morgenVoll ? " voll" : "")}>
+                Morgen geplant: {morgenAnzahl}{" "}
+                {morgenAnzahl === 1 ? "Ziel" : "Ziele"}
+                {morgenUhren > 0 &&
+                  `, ${morgenUhren} ${morgenUhren === 1 ? "Uhr" : "Uhren"}`}
+                {morgenVoll && " · ziemlich voll"}
+              </p>
+            )}
+
+            {nachzueglerList.length > 0 && (
+              <div className="hu-nachzuegler">
+                <h3 className="hu-nachzuegler-titel">Noch offen von früher</h3>
+                <div className="hu-auf-grid">
+                  {(nachzueglerAlle
+                    ? nachzueglerList
+                    : nachzueglerList.slice(0, 3)
+                  ).map((k) => karte(k, false))}
+                </div>
+                {nachzueglerList.length > 3 && (
+                  <button
+                    type="button"
+                    className="hu-nachzuegler-mehr"
+                    onClick={() => setNachzueglerAlle((v) => !v)}
+                  >
+                    {nachzueglerAlle
+                      ? "Weniger anzeigen"
+                      : `+ ${nachzueglerList.length - 3} weitere anzeigen`}
+                  </button>
+                )}
+              </div>
+            )}
           </section>
-          <KlassenPuls />
-        </div>
-      </div>
 
-      {notizen.length > 0 && (
-        <section className="hu-notizen">
-          <h2 className="hu-block-titel">Notizzettel</h2>
-          <p className="hu-notizen-hinweis">
-            Geparkte Gedanken aus dem Fokus. Hak einen ab, wenn er erledigt ist.
-          </p>
-          <ul className="hu-notiz-liste">
-            {notizen.map((n, i) => (
-              <li className="hu-notiz" key={i}>
-                <button
-                  type="button"
-                  className="hu-notiz-weg"
-                  onClick={() => notizWeg(i)}
-                  aria-label="Notiz wegräumen"
-                >
-                  ✓
-                </button>
-                <span className="hu-notiz-text">
-                  {n.text}
-                  {n.kontext && (
-                    <span className="hu-notiz-kontext">{n.kontext}</span>
-                  )}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
+          {notizen.length > 0 && (
+            <section className="hu-karte hu-notizen">
+              <h2 className="hu-karte-titel">Notizzettel</h2>
+              <p className="hu-notizen-hinweis">
+                Geparkte Gedanken aus dem Fokus. Hak einen ab, wenn er erledigt
+                ist.
+              </p>
+              <ul className="hu-notiz-liste">
+                {notizen.map((n, i) => (
+                  <li className="hu-notiz" key={i}>
+                    <button
+                      type="button"
+                      className="hu-notiz-weg"
+                      onClick={() => notizWeg(i)}
+                      aria-label="Notiz wegräumen"
+                    >
+                      ✓
+                    </button>
+                    <span className="hu-notiz-text">
+                      {n.text}
+                      {n.kontext && (
+                        <span className="hu-notiz-kontext">{n.kontext}</span>
+                      )}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+        </div>
+
+        <aside className="hu-aside">
+          <section className="hu-karte hu-plan-karte">
+            <h2 className="hu-karte-titel">Stundenplan</h2>
+            <ul className="hu-plan">
+              {tagStunden.map((s, i) => {
+                const lernzeit = s.art === "studierzeit" || s.art === "selbst";
+                return (
+                  <li
+                    className={"hu-stunde" + (lernzeit ? " lernzeit" : "")}
+                    key={i}
+                  >
+                    <span className="hu-stunde-zeit">{s.von}</span>
+                    <span
+                      className="hu-stunde-strich"
+                      style={{ background: fachFarbe[s.fach] || "#868e96" }}
+                    />
+                    <span className="hu-stunde-fach">{s.fach}</span>
+                    {lernzeit && (
+                      <span className="hu-stunde-hinweis">
+                        Zeit für deine Ziele
+                      </span>
+                    )}
+                    <span className="hu-stunde-raum">{s.raum}</span>
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+        </aside>
+      </div>
     </div>
   );
 }
