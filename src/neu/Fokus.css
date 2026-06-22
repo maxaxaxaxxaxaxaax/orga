@@ -201,6 +201,56 @@
   letter-spacing: 0.05em;
   color: var(--muted);
 }
+/* Aufgaben-Block: das, was man bearbeitet, klar abgesetzt und prominent. */
+.fokus-aufgaben {
+  border: 1px solid var(--accent);
+  border-radius: var(--r-md, 12px);
+  padding: 14px;
+  background: color-mix(in srgb, var(--accent) 5%, var(--card));
+}
+.fokus-block-hint {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: none;
+  letter-spacing: 0;
+}
+/* Nachschlage-Material: ruhiger, einklappbarer Block unter den Aufgaben. */
+.fokus-nachschlagen {
+  border: 1px solid var(--line);
+  border-radius: var(--r-md, 12px);
+  padding: 4px 14px;
+  background: var(--card);
+}
+.fokus-nachschlagen-kopf {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  text-align: left;
+}
+.fokus-nachschlagen-zahl {
+  flex-shrink: 0;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text-2);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 1px 8px;
+}
+.fokus-nachschlagen-pfeil {
+  margin-left: auto;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+.fokus-nachschlagen .fokus-mats {
+  padding-bottom: 10px;
+}
 /* Kopfzeile des Material-Blocks: Label links, "anhaengen" rechts. */
 .fokus-label-zeile {
   display: flex;

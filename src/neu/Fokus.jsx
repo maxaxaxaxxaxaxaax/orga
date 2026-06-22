@@ -38,6 +38,20 @@ import {
 } from "./interaktiv";
 import "./Fokus.css";
 
+// Welche Material-Typen sind eine AUFGABE zum Bearbeiten (statt Nachschlage-Material)?
+// Damit im Fokus klar getrennt wird, was man tut und was man nur liest.
+const AUFGABE_TYPEN = [
+  "auswahlquiz",
+  "lueckentext",
+  "zuordnung",
+  "reihenfolge",
+  "satzbau",
+  "bildzuordnung",
+  "markieren",
+  "zahlenstrahl",
+  "karteikarten",
+];
+
 // Fokus-Modus: Vollbild, ein Schritt pro Seite. "Jetzt" öffnet das Ziel hier,
 // mit "Geschafft, weiter" arbeitet man den Lernweg Schritt für Schritt durch.
 // Reduktion und Fokus-Session aus der Vision; der Schritt-Stand teilt sich mit
@@ -65,6 +79,9 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
   // KI-Hinweis, der nur auf Vorhandenes zeigt.
   const [matWunsch, setMatWunsch] = useState(() => !!ladeMaterialwuensche()[kb.id]);
   const [hinweisOffen, setHinweisOffen] = useState(false);
+  // Nachschlage-Material standardmaessig eingeklappt: erst die Aufgabe, dann bei
+  // Bedarf das Material. So ist klar, was man bearbeitet und was nur Hilfe ist.
+  const [nachschlagenOffen, setNachschlagenOffen] = useState(false);
   const [hilfe, setHilfe] = useState(() => !!ladeHilferufe()[kb.id]);
   const [frage, setFrage] = useState(() => ladeFragen()[kb.id] || "");
   const [hilfeOffen, setHilfeOffen] = useState(false);
@@ -166,6 +183,15 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
       ]
     : [];
   const genKey = generatorFuerKb(kb.id);
+  // Material in zwei Gruppen: Aufgaben (interaktiv, zum Bearbeiten) und
+  // Nachschlage-Material (lesen: Lernzettel, Merkblatt, Mitschrift, Aufschrieb).
+  const istAufgabeMat = (m) => {
+    const e = interaktivFuerMaterial(m.id);
+    return !!e && AUFGABE_TYPEN.includes(e.typ);
+  };
+  const aufgabenMats = materialien.filter(istAufgabeMat);
+  const materialMats = materialien.filter((m) => !istAufgabeMat(m));
+  const hatAufgabe = aufgabenMats.length > 0 || !!genKey;
   const proz = schritte.length
     ? Math.round((fertigeAnzahl / schritte.length) * 100)
     : 100;
@@ -380,30 +406,47 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
                 </button>
               )}
 
-              <div className="fokus-block">
+              <div className="fokus-block fokus-aufgaben">
                 <div className="fokus-label-zeile">
-                  <span className="fokus-label">Material dazu</span>
-                  <button
-                    type="button"
-                    className="fokus-mat-add"
-                    onClick={() => setUploadOffen(true)}
-                  >
-                    + anhängen
-                  </button>
+                  <span className="fokus-label">Aufgaben</span>
+                  <span className="fokus-block-hint">Das bearbeitest du hier</span>
                 </div>
-                {materialien.length === 0 ? (
+                {hatAufgabe ? (
+                  <div className="fokus-mats">
+                    {aufgabenMats.map((m) => (
+                      <div key={m.id} className="fokus-mat-offen">
+                        <div className="fokus-mat-offen-kopf">
+                          <span className="fokus-mat-art">
+                            {ART_LABEL[m.art] || m.art}
+                          </span>
+                          <span className="fokus-mat-titel">{m.titel}</span>
+                          <span className="fokus-mat-aktiv">
+                            {aktivitaetLabel(m)}
+                          </span>
+                        </div>
+                        <MaterialInhalt material={m} />
+                      </div>
+                    ))}
+                    {genKey && (
+                      <div className="fokus-mat-offen">
+                        <div className="fokus-mat-offen-kopf">
+                          <span className="fokus-mat-art">Übung</span>
+                          <span className="fokus-mat-titel">Dazu üben</span>
+                          <span className="fokus-mat-aktiv">Quiz</span>
+                        </div>
+                        <Quiz generatorKey={genKey} />
+                      </div>
+                    )}
+                  </div>
+                ) : (
                   <>
                     <p className="fokus-mat-leer">
-                      Noch nichts angehängt. Häng ein Foto, PDF oder eine Notiz
-                      an.
+                      Zu diesem Schritt gibt es noch keine fertige Übung.
                     </p>
                     <div className="fokus-luecke">
                       {matWunsch ? (
                         <p className="fokus-luecke-gesendet" role="status">
-                          <span
-                            className="fokus-hilfe-haken"
-                            aria-hidden="true"
-                          >
+                          <span className="fokus-hilfe-haken" aria-hidden="true">
                             ✓
                           </span>
                           Material bei {COACH} angefragt.
@@ -453,62 +496,64 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
                       )}
                     </div>
                   </>
-                ) : (
-                  <div className="fokus-mats">
-                    {materialien.map((m) => {
-                      const aktivitaet = aktivitaetLabel(m);
-                      const uebung = interaktivFuerMaterial(m.id);
-                      const kopf = (
-                        <>
-                          <span className="fokus-mat-art">
-                            {ART_LABEL[m.art] || m.art}
-                          </span>
-                          <span className="fokus-mat-titel">{m.titel}</span>
-                          {aktivitaet && (
-                            <span
-                              className={
-                                "fokus-mat-aktiv" +
-                                (aktivitaet === "Lesen" ? " lesen" : "")
-                              }
-                            >
-                              {aktivitaet}
-                            </span>
-                          )}
-                        </>
-                      );
-                      // Interaktive Übung direkt offen im Fokus (kein Klick nötig).
-                      if (uebung) {
-                        return (
-                          <div key={m.id} className="fokus-mat-offen">
-                            <div className="fokus-mat-offen-kopf">{kopf}</div>
-                            <MaterialInhalt material={m} />
-                          </div>
-                        );
-                      }
-                      // Reines Lese-Material (PDF, Notiz): antippbar zum Öffnen.
-                      return istOeffenbar(m) ? (
-                        <button
-                          key={m.id}
-                          type="button"
-                          className="fokus-mat fokus-mat-klick"
-                          onClick={() => setMaterial(m)}
-                        >
-                          {kopf}
-                        </button>
-                      ) : (
-                        <span key={m.id} className="fokus-mat">
-                          {kopf}
-                        </span>
-                      );
-                    })}
-                  </div>
                 )}
               </div>
 
-              {genKey && (
-                <div className="fokus-quiz">
-                  <div className="fokus-label fokus-quiz-label">Dazu üben</div>
-                  <Quiz generatorKey={genKey} />
+              {materialMats.length > 0 && (
+                <div className="fokus-block fokus-nachschlagen">
+                  <button
+                    type="button"
+                    className="fokus-nachschlagen-kopf"
+                    onClick={() => setNachschlagenOffen((v) => !v)}
+                    aria-expanded={nachschlagenOffen}
+                  >
+                    <span className="fokus-label">Material zum Nachschlagen</span>
+                    <span className="fokus-nachschlagen-zahl">
+                      {materialMats.length}
+                    </span>
+                    <span
+                      className="fokus-nachschlagen-pfeil"
+                      aria-hidden="true"
+                    >
+                      {nachschlagenOffen ? "▾" : "▸"}
+                    </span>
+                  </button>
+                  {nachschlagenOffen && (
+                    <div className="fokus-mats">
+                      {materialMats.map((m) =>
+                        istOeffenbar(m) ? (
+                          <button
+                            key={m.id}
+                            type="button"
+                            className="fokus-mat fokus-mat-klick"
+                            onClick={() => setMaterial(m)}
+                          >
+                            <span className="fokus-mat-art">
+                              {ART_LABEL[m.art] || m.art}
+                            </span>
+                            <span className="fokus-mat-titel">{m.titel}</span>
+                            <span className="fokus-mat-aktiv lesen">
+                              {aktivitaetLabel(m) || "Lesen"}
+                            </span>
+                          </button>
+                        ) : (
+                          <span key={m.id} className="fokus-mat">
+                            <span className="fokus-mat-art">
+                              {ART_LABEL[m.art] || m.art}
+                            </span>
+                            <span className="fokus-mat-titel">{m.titel}</span>
+                          </span>
+                        )
+                      )}
+                      <button
+                        type="button"
+                        className="fokus-mat-add"
+                        onClick={() => setUploadOffen(true)}
+                      >
+                        + anhängen
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
             </>
