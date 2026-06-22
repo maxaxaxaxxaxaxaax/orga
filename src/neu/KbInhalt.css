@@ -41,6 +41,21 @@
   letter-spacing: 0.05em;
   color: var(--muted);
 }
+/* Kleiner Zusatz neben dem Block-Titel, z. B. "zum Bearbeiten". */
+.ki-block-hint {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--muted);
+}
+/* Aufgaben-Block klar abgesetzt und prominent (das, was man bearbeitet). */
+.ki-aufgaben {
+  border: 1px solid var(--accent);
+  border-radius: var(--r-md, 12px);
+  padding: 14px;
+  background: color-mix(in srgb, var(--accent) 5%, var(--card));
+}
 .ki-schritte-zahl {
   font-weight: 600;
   text-transform: none;

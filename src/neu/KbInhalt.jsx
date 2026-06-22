@@ -8,7 +8,7 @@ import { ladeSchritte, speichereSchritte } from "./lernschritte";
 import { GEFUEHL_LABEL, ladeGefuehl } from "./schrittgefuehl";
 import { ladeZiel, setzeZiel } from "./lernziele";
 import { lade, ERLEDIGT_KEY } from "./planung";
-import { istOeffenbar, aktivitaetLabel } from "./interaktiv";
+import { istOeffenbar, aktivitaetLabel, istAufgabeMaterial } from "./interaktiv";
 import Quiz from "./Quiz";
 import MaterialAnsicht from "./MaterialAnsicht";
 import CoachBruecke from "./CoachBruecke";
@@ -76,6 +76,11 @@ export default function KbInhalt({ kb, kompakt = false }) {
       ]
     : [];
   const genKey = generatorFuerKb(kb.id);
+  // Material in zwei Gruppen trennen: Aufgaben (interaktive Uebungen, zum
+  // Bearbeiten) und Nachschlage-Material (lesen). Gleiche Logik wie im Fokus.
+  const aufgabenMats = materialien.filter(istAufgabeMaterial);
+  const materialMats = materialien.filter((m) => !istAufgabeMaterial(m));
+  const hatAufgabe = aufgabenMats.length > 0 || !!genKey;
 
   // Lernpfad-Einordnung: worauf dieses Ziel aufbaut (Vorgänger in der Fach-Kette
   // aus wissen.js). Hilft, Blockaden als fehlende Grundlage zu erkennen, statt
@@ -106,19 +111,63 @@ export default function KbInhalt({ kb, kompakt = false }) {
     </section>
   ) : null;
 
-  const uebenBlock = genKey ? (
-    <section className="ki-block" key="ueben">
-      <h4 className="ki-block-titel">Üben</h4>
-      {kompakt && !uebenOffen ? (
-        <button
-          type="button"
-          className="ki-ueben-start"
-          onClick={() => setUebenOffen(true)}
-        >
-          Übung starten
-        </button>
-      ) : (
-        <Quiz generatorKey={genKey} />
+  // Ein Material als Listeneintrag (antippbar zum Oeffnen im Modal).
+  const materialItem = (m) => {
+    const aktivitaet = aktivitaetLabel(m);
+    const inner = (
+      <>
+        <span className="ki-material-art">{ART_LABEL[m.art] || m.art}</span>
+        <span className="ki-material-titel">{m.titel}</span>
+        {aktivitaet && (
+          <span
+            className={
+              "ki-material-aktiv" + (aktivitaet === "Lesen" ? " lesen" : "")
+            }
+          >
+            {aktivitaet}
+          </span>
+        )}
+      </>
+    );
+    return (
+      <li key={m.id}>
+        {istOeffenbar(m) ? (
+          <button
+            type="button"
+            className="ki-material ki-material-klick"
+            onClick={() => setOffenesMaterial(m)}
+            title="Material öffnen"
+          >
+            {inner}
+          </button>
+        ) : (
+          <div className="ki-material">{inner}</div>
+        )}
+      </li>
+    );
+  };
+
+  // Aufgaben-Block: das, was man bearbeitet (interaktive Uebungen + Quiz).
+  const aufgabenBlock = hatAufgabe ? (
+    <section className="ki-block ki-aufgaben" key="aufgaben">
+      <h4 className="ki-block-titel">
+        Aufgaben
+        <span className="ki-block-hint">zum Bearbeiten</span>
+      </h4>
+      {genKey &&
+        (kompakt && !uebenOffen ? (
+          <button
+            type="button"
+            className="ki-ueben-start"
+            onClick={() => setUebenOffen(true)}
+          >
+            Übung starten
+          </button>
+        ) : (
+          <Quiz generatorKey={genKey} />
+        ))}
+      {aufgabenMats.length > 0 && (
+        <ul className="ki-materialien">{aufgabenMats.map(materialItem)}</ul>
       )}
     </section>
   ) : null;
@@ -211,51 +260,15 @@ export default function KbInhalt({ kb, kompakt = false }) {
       </section>
     ) : null;
 
-  const materialBlock = (
+  // Nachschlage-Block: Material zum Lesen (Lernzettel, Merkblatt, Mitschrift,
+  // eigener Aufschrieb), klar getrennt von den Aufgaben.
+  const nachschlagenBlock = (
     <section className="ki-block" key="material">
-      <h4 className="ki-block-titel">Materialien</h4>
-      {materialien.length === 0 ? (
-        <p className="ki-leer">Noch keine Materialien zu diesem Ziel.</p>
+      <h4 className="ki-block-titel">Material zum Nachschlagen</h4>
+      {materialMats.length === 0 ? (
+        <p className="ki-leer">Noch kein Nachschlage-Material zu diesem Ziel.</p>
       ) : (
-        <ul className="ki-materialien">
-          {materialien.map((m) => {
-            const aktivitaet = aktivitaetLabel(m);
-            const inner = (
-              <>
-                <span className="ki-material-art">
-                  {ART_LABEL[m.art] || m.art}
-                </span>
-                <span className="ki-material-titel">{m.titel}</span>
-                {aktivitaet && (
-                  <span
-                    className={
-                      "ki-material-aktiv" +
-                      (aktivitaet === "Lesen" ? " lesen" : "")
-                    }
-                  >
-                    {aktivitaet}
-                  </span>
-                )}
-              </>
-            );
-            return (
-              <li key={m.id}>
-                {istOeffenbar(m) ? (
-                  <button
-                    type="button"
-                    className="ki-material ki-material-klick"
-                    onClick={() => setOffenesMaterial(m)}
-                    title="Material öffnen"
-                  >
-                    {inner}
-                  </button>
-                ) : (
-                  <div className="ki-material">{inner}</div>
-                )}
-              </li>
-            );
-          })}
-        </ul>
+        <ul className="ki-materialien">{materialMats.map(materialItem)}</ul>
       )}
     </section>
   );
@@ -319,7 +332,7 @@ export default function KbInhalt({ kb, kompakt = false }) {
     return (
       <div className="ki ki-landkarte">
         <p className="ki-erklaerung">{thema.erklaerung}</p>
-        {materialBlock}
+        {nachschlagenBlock}
         {offenesMaterial && (
           <MaterialAnsicht
             material={offenesMaterial}
@@ -345,9 +358,7 @@ export default function KbInhalt({ kb, kompakt = false }) {
       </p>
       {zielBlock}
       {vorBlock}
-      {kompakt
-        ? [materialBlock, schritteBlock, uebenBlock, bereitBlock]
-        : [uebenBlock, schritteBlock, materialBlock, bereitBlock]}
+      {[aufgabenBlock, schritteBlock, nachschlagenBlock, bereitBlock]}
       <CoachBruecke kb={kb} />
       {offenesMaterial && (
         <MaterialAnsicht

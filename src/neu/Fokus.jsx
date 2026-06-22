@@ -34,23 +34,9 @@ import { addNotiz, ladeNotizen } from "./notizen";
 import {
   istOeffenbar,
   aktivitaetLabel,
-  interaktivFuerMaterial,
+  istAufgabeMaterial,
 } from "./interaktiv";
 import "./Fokus.css";
-
-// Welche Material-Typen sind eine AUFGABE zum Bearbeiten (statt Nachschlage-Material)?
-// Damit im Fokus klar getrennt wird, was man tut und was man nur liest.
-const AUFGABE_TYPEN = [
-  "auswahlquiz",
-  "lueckentext",
-  "zuordnung",
-  "reihenfolge",
-  "satzbau",
-  "bildzuordnung",
-  "markieren",
-  "zahlenstrahl",
-  "karteikarten",
-];
 
 // Fokus-Modus: Vollbild, ein Schritt pro Seite. "Jetzt" öffnet das Ziel hier,
 // mit "Geschafft, weiter" arbeitet man den Lernweg Schritt für Schritt durch.
@@ -185,12 +171,8 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
   const genKey = generatorFuerKb(kb.id);
   // Material in zwei Gruppen: Aufgaben (interaktiv, zum Bearbeiten) und
   // Nachschlage-Material (lesen: Lernzettel, Merkblatt, Mitschrift, Aufschrieb).
-  const istAufgabeMat = (m) => {
-    const e = interaktivFuerMaterial(m.id);
-    return !!e && AUFGABE_TYPEN.includes(e.typ);
-  };
-  const aufgabenMats = materialien.filter(istAufgabeMat);
-  const materialMats = materialien.filter((m) => !istAufgabeMat(m));
+  const aufgabenMats = materialien.filter(istAufgabeMaterial);
+  const materialMats = materialien.filter((m) => !istAufgabeMaterial(m));
   const hatAufgabe = aufgabenMats.length > 0 || !!genKey;
   const proz = schritte.length
     ? Math.round((fertigeAnzahl / schritte.length) * 100)

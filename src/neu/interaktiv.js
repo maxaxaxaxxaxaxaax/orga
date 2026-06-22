@@ -209,6 +209,25 @@ export function interaktivFuerMaterial(id) {
   return INTERAKTIV[id] || null;
 }
 
+// Welche interaktiven Typen sind eine AUFGABE zum Bearbeiten (statt
+// Nachschlage-Material)? Geteilt von Fokus und Ablage, damit beide gleich
+// trennen, was man tut und was man nur liest. Merkblatt zaehlt als Nachschlagen.
+export const AUFGABE_TYPEN = [
+  "auswahlquiz",
+  "lueckentext",
+  "zuordnung",
+  "reihenfolge",
+  "satzbau",
+  "bildzuordnung",
+  "markieren",
+  "zahlenstrahl",
+  "karteikarten",
+];
+export function istAufgabeMaterial(material) {
+  const e = INTERAKTIV[material.id];
+  return !!e && AUFGABE_TYPEN.includes(e.typ);
+}
+
 // Kurzes Aktivitäts-Label pro Typ: sagt vorab, was beim Öffnen wartet.
 export const TYP_LABEL = {
   karteikarten: "Karteikarten",
