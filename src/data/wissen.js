@@ -60,6 +60,8 @@ export const faecher = [
       { id: "m4", thema: "Multiplikation & Division", titel: "Übersicht: Vorzeichen bei Mal & Geteilt", art: "zusammenfassung", bereich: "selbstlernen", datum: "2026-05-05" },
       { id: "m5", thema: "Rechengesetze mit Vorzeichen", titel: "Arbeitsblatt: Klammern auflösen", art: "arbeitsblatt", bereich: "unterricht", datum: "2026-05-12" },
       { id: "m6", thema: "Rechendiplom", titel: "Probe-Rechendiplom (Vorlage)", art: "pdf", bereich: "selbstlernen", datum: "2026-05-19" },
+      { id: "m7", thema: "Addieren & Subtrahieren", titel: "Übung: Plus und Minus rechnen", art: "arbeitsblatt", bereich: "selbstlernen", datum: "2026-04-29" },
+      { id: "m8", thema: "Multiplikation & Division", titel: "Übung: Mal und Geteilt rechnen", art: "arbeitsblatt", bereich: "selbstlernen", datum: "2026-05-06" },
     ],
   },
   {

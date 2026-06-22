@@ -430,6 +430,126 @@ export const REIHENFOLGE = {
 };
 
 export const AUSWAHLQUIZ = {
+  // Mathe: Plus und Minus mit negativen Zahlen anwenden (inkl. Sachaufgaben).
+  m7: {
+    fragen: [
+      {
+        frage: "Wie viel ist −8 + 3?",
+        optionen: [
+          "−5",
+          { text: "5", erklaerung: "−8 hat den größeren Betrag, also bleibt das Ergebnis negativ." },
+          { text: "11", erklaerung: "Das wäre 8 + 3. Die 8 ist hier aber negativ." },
+          { text: "−11", erklaerung: "Das wäre −(8 + 3). Nur eine der Zahlen ist negativ." },
+        ],
+        richtig: 0,
+        erklaerung: "Verschiedene Vorzeichen: Beträge abziehen (8 − 3 = 5), Vorzeichen der größeren Zahl, also −5.",
+      },
+      {
+        frage: "Wie viel ist −5 + (−7)?",
+        optionen: [
+          "−12",
+          { text: "12", erklaerung: "Gleiche Vorzeichen: Beträge addieren, aber das Vorzeichen bleibt minus." },
+          { text: "2", erklaerung: "Hier wird nicht abgezogen, beide Zahlen sind negativ." },
+          { text: "−2", erklaerung: "Beträge werden addiert (5 + 7), nicht abgezogen." },
+        ],
+        richtig: 0,
+        erklaerung: "Gleiche Vorzeichen: Beträge addieren (5 + 7 = 12), Vorzeichen behalten, also −12.",
+      },
+      {
+        frage: "Wie viel ist 6 − (−4)?",
+        optionen: [
+          { text: "2", erklaerung: "Minus und Minus werden zu Plus, das Ergebnis wird größer." },
+          "10",
+          { text: "−10", erklaerung: "Die 6 bleibt positiv, es wird 6 + 4 gerechnet." },
+          { text: "−2", erklaerung: "Doppelvorzeichen zuerst auflösen: − (−4) wird + 4." },
+        ],
+        richtig: 1,
+        erklaerung: "Minus und Minus wird Plus: 6 + 4 = 10.",
+      },
+      {
+        frage: "Morgens sind es −3 Grad. Bis Mittag wird es 7 Grad wärmer. Wie viel Grad sind es dann?",
+        optionen: [
+          { text: "−10 Grad", erklaerung: "Es wird wärmer, du rechnest −3 + 7, nicht −3 − 7." },
+          "4 Grad",
+          { text: "10 Grad", erklaerung: "Start ist −3, nicht 3. Erst über die 0, dann weiter." },
+          { text: "−4 Grad", erklaerung: "7 ist größer als 3, also landest du über null." },
+        ],
+        richtig: 1,
+        erklaerung: "−3 + 7 = 4: von −3 sieben Schritte nach rechts landet bei +4 Grad.",
+      },
+      {
+        frage: "Lina hat −12 Euro auf dem Konto (also 12 Euro Schulden) und zahlt 20 Euro ein. Wie ist der Kontostand?",
+        optionen: [
+          "8 Euro",
+          { text: "−8 Euro", erklaerung: "20 ist größer als 12, die Schulden sind ausgeglichen und es bleibt etwas übrig." },
+          { text: "−32 Euro", erklaerung: "Einzahlen macht den Kontostand größer, du rechnest −12 + 20." },
+          { text: "32 Euro", erklaerung: "Das wäre 12 + 20. Die 12 ist aber ein Minus (Schulden)." },
+        ],
+        richtig: 0,
+        erklaerung: "−12 + 20 = 8: die 12 Euro Schulden sind weg, 8 Euro bleiben übrig.",
+      },
+    ],
+  },
+  // Mathe: Mal und Geteilt mit negativen Zahlen anwenden (inkl. Sachaufgabe).
+  m8: {
+    fragen: [
+      {
+        frage: "Wie viel ist −6 · 4?",
+        optionen: [
+          "−24",
+          { text: "24", erklaerung: "Verschiedene Vorzeichen (minus mal plus) ergeben minus." },
+          { text: "−10", erklaerung: "Das wäre −6 − 4. Hier wird multipliziert." },
+          { text: "−2", erklaerung: "Das wäre −6 + 4. Hier wird multipliziert." },
+        ],
+        richtig: 0,
+        erklaerung: "Minus mal Plus ergibt Minus: 6 · 4 = 24, also −24.",
+      },
+      {
+        frage: "Wie viel ist −5 · (−3)?",
+        optionen: [
+          { text: "−15", erklaerung: "Minus mal Minus ergibt Plus, nicht Minus." },
+          "15",
+          { text: "8", erklaerung: "Das wäre −5 + (−3) als Betrag. Hier wird mal gerechnet." },
+          { text: "−8", erklaerung: "Hier wird multipliziert, nicht addiert." },
+        ],
+        richtig: 1,
+        erklaerung: "Minus mal Minus ergibt Plus: 5 · 3 = 15.",
+      },
+      {
+        frage: "Wie viel ist −18 : 6?",
+        optionen: [
+          "−3",
+          { text: "3", erklaerung: "Minus geteilt durch Plus bleibt minus." },
+          { text: "−12", erklaerung: "Das wäre −18 − 6. Hier wird geteilt." },
+          { text: "−108", erklaerung: "Das wäre −18 · 6. Hier wird geteilt, nicht mal." },
+        ],
+        richtig: 0,
+        erklaerung: "Minus geteilt durch Plus ergibt Minus: 18 : 6 = 3, also −3.",
+      },
+      {
+        frage: "Wie viel ist −2 · (−3) · (−1)?",
+        optionen: [
+          { text: "6", erklaerung: "Zähle die Minuszeichen: drei sind ungerade, also wird das Ergebnis minus." },
+          "−6",
+          { text: "−5", erklaerung: "Hier wird multipliziert, nicht addiert." },
+          { text: "5", erklaerung: "Hier wird multipliziert (2 · 3 · 1 = 6), nicht addiert." },
+        ],
+        richtig: 1,
+        erklaerung: "Drei Minuszeichen (ungerade) ergeben Minus: 2 · 3 · 1 = 6, also −6.",
+      },
+      {
+        frage: "Ein Taucher sinkt von der Wasseroberfläche (0 m) jede Minute 3 Meter. Wo ist er nach 4 Minuten?",
+        optionen: [
+          "−12 Meter",
+          { text: "12 Meter", erklaerung: "Er sinkt, geht also unter null: das Ergebnis ist negativ." },
+          { text: "−7 Meter", erklaerung: "Pro Minute sinkt er, das ist −3 · 4, nicht −3 − 4." },
+          { text: "−1 Meter", erklaerung: "Nach 4 Minuten ist er viermal 3 Meter tiefer." },
+        ],
+        richtig: 0,
+        erklaerung: "−3 · 4 = −12: viermal 3 Meter abwärts sind 12 Meter unter der Oberfläche.",
+      },
+    ],
+  },
   gr7: {
     fragen: [
       {
