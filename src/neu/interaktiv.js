@@ -14,6 +14,7 @@ import {
   BILDZUORDNUNG,
   MARKIEREN,
 } from "./interaktivAgenten";
+import { UEBUNGEN_EXTRA } from "../data/uebungenExtra";
 
 export const INTERAKTIV = {
   // ---- Latein: Vokabel-Karteikarten -----------------------------------------
@@ -199,6 +200,10 @@ for (const [id, daten] of Object.entries(BILDZUORDNUNG))
   INTERAKTIV[id] = { typ: "bildzuordnung", daten };
 for (const [id, daten] of Object.entries(MARKIEREN))
   INTERAKTIV[id] = { typ: "markieren", daten };
+// Zusatz-Uebungen (Rollout): nach Typ gruppiert, generisch einmischen.
+for (const [typ, eintraege] of Object.entries(UEBUNGEN_EXTRA))
+  for (const [id, daten] of Object.entries(eintraege))
+    INTERAKTIV[id] = { typ, daten };
 
 export function interaktivFuerMaterial(id) {
   return INTERAKTIV[id] || null;

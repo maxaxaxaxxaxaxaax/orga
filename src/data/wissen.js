@@ -95,6 +95,7 @@ export const faecher = [
     ],
     materialien: [
       ...LERNZETTEL.deutsch,
+      { id: "d6", thema: "Mini-Vortrag", titel: "Übung: Mini-Vortrag", art: "arbeitsblatt", bereich: "selbstlernen", datum: "2026-05-18" },
       { id: "d1", thema: "Mini-Vortrag", titel: "Mitschrift: Aufbau eines Mini-Vortrags", art: "notiz", bereich: "unterricht", datum: "2026-04-21" },
       { id: "d2", thema: "Mini-Vortrag", titel: "Checkliste: Laut sprechen, Blickkontakt", art: "zusammenfassung", bereich: "selbstlernen", datum: "2026-04-22" },
       { id: "d3", thema: "Lernplakat", titel: "Arbeitsblatt: Lernplakat-Vorlage", art: "arbeitsblatt", bereich: "unterricht", datum: "2026-04-28" },
@@ -142,6 +143,8 @@ export const faecher = [
     ],
     materialien: [
       ...LERNZETTEL.englisch,
+      { id: "e10", thema: "will-future · question tags · if-clause I", titel: "Übung: will oder going-to?", art: "arbeitsblatt", bereich: "selbstlernen", datum: "2026-05-12" },
+      { id: "e11", thema: "Revision simple past", titel: "Übung: Simple Past", art: "arbeitsblatt", bereich: "selbstlernen", datum: "2026-05-05" },
       { id: "e1", thema: "Revision simple past", titel: "Übersicht: Irregular verbs", art: "zusammenfassung", bereich: "selbstlernen", datum: "2026-04-21" },
       { id: "e2", thema: "Vocabulary Unit 5 (pp. 84-93)", titel: "Vokabelliste Unit 5, S. 84-93", art: "arbeitsblatt", bereich: "unterricht", datum: "2026-04-23" },
       { id: "e3", thema: "will-future · question tags · if-clause I", titel: "Mitschrift: will vs. going-to", art: "notiz", bereich: "unterricht", datum: "2026-04-30" },
@@ -189,6 +192,8 @@ export const faecher = [
     ],
     materialien: [
       ...LERNZETTEL.latein,
+      { id: "l7", thema: "Lektionstext 15", titel: "Übung: Lektionstext 15 übersetzen", art: "arbeitsblatt", bereich: "selbstlernen", datum: "2026-05-20" },
+      { id: "l8", thema: "Adj. kons. Dekl. (Wdh.)", titel: "Übung: konsonantische Deklination", art: "arbeitsblatt", bereich: "selbstlernen", datum: "2026-05-21" },
       { id: "l1", thema: "Vokabeln L14", titel: "Vokabelliste L14", art: "arbeitsblatt", bereich: "unterricht", datum: "2026-04-21" },
       { id: "l2", thema: "ACI mit Übersetzung", titel: "Mitschrift: ACI erkennen", art: "notiz", bereich: "unterricht", datum: "2026-04-28" },
       { id: "l3", thema: "ACI mit Übersetzung", titel: "Übungsblatt: ACI übersetzen", art: "arbeitsblatt", bereich: "selbstlernen", datum: "2026-05-05" },
@@ -232,6 +237,7 @@ export const faecher = [
     ],
     materialien: [
       ...LERNZETTEL.griechisch,
+      { id: "gr8", thema: "Übersetzung L 2", titel: "Übung: Sätze übersetzen", art: "arbeitsblatt", bereich: "selbstlernen", datum: "2026-05-16" },
       { id: "gr1", thema: "Griechische Buchstaben und Lautlehre", titel: "Arbeitsblatt: Alphabet schreiben", art: "arbeitsblatt", bereich: "unterricht", datum: "2026-04-21" },
       { id: "gr2", thema: "Vokabeln L 1", titel: "Vokabelliste L 1", art: "arbeitsblatt", bereich: "unterricht", datum: "2026-04-23" },
       { id: "gr3", thema: "a-Deklination im Singular", titel: "Spickzettel: Die vier Fälle", art: "notiz", bereich: "selbstlernen", datum: "2026-04-30" },
