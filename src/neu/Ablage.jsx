@@ -3,6 +3,7 @@ import { faecher } from "../data/wissen";
 import { koennensbeweise, kbFarbe } from "../data/koennensbeweise";
 import { ladeEigene, speichereEigenes } from "./eigeneMaterialien";
 import { istOeffenbar } from "./interaktiv";
+import { FACH_STRUKTUR } from "../data/fachStruktur";
 import MaterialUpload from "./MaterialUpload";
 import MaterialAnsicht from "./MaterialAnsicht";
 import KbInhalt from "./KbInhalt";
@@ -138,12 +139,22 @@ export default function Ablage() {
   const [sort, setSort] = useState("neu"); // neu | az
   const [sortOffen, setSortOffen] = useState(false);
   const [raster, setRaster] = useState(false); // Liste | Raster
+  const [katOffen, setKatOffen] = useState(() => new Set()); // offene Kompetenzbereiche
   const [uploadOffen, setUploadOffen] = useState(false);
   const [eigene, setEigene] = useState(ladeEigene);
   const [offenesMaterial, setOffenesMaterial] = useState(null);
   const [offenerLernweg, setOffenerLernweg] = useState(null);
 
   const fach = faecher.find((f) => f.id === fachId) || null;
+  const struktur = fach ? FACH_STRUKTUR[fach.id] : null;
+  function toggleKat(kat) {
+    setKatOffen((prev) => {
+      const next = new Set(prev);
+      if (next.has(kat)) next.delete(kat);
+      else next.add(kat);
+      return next;
+    });
+  }
 
   // Aktive Lernwege des Fachs (die mit echtem Könnensbeweis in der Etappe).
   const lernwege = fach
@@ -251,7 +262,69 @@ export default function Ablage() {
 
           <section className="ab-card ab-kompetenzen">
             <h2 className="ab-card-titel">Kompetenzen</h2>
-            <p className="ab-kompetenzen-leer">Bald verfügbar.</p>
+            {!fach ? (
+              <p className="ab-kompetenzen-leer">Wähle ein Fach.</p>
+            ) : struktur ? (
+              <div className="ab-komp">
+                {struktur.kategorien.map((kat) => {
+                  const wege = fach.themen.filter((t) => t.kategorie === kat);
+                  if (!wege.length) return null;
+                  const offen = katOffen.has(kat);
+                  return (
+                    <div className="ab-komp-kat" key={kat}>
+                      <button
+                        type="button"
+                        className="ab-komp-kopf"
+                        onClick={() => toggleKat(kat)}
+                        aria-expanded={offen}
+                      >
+                        <span className="ab-komp-pfeil" aria-hidden="true">
+                          {offen ? "▾" : "▸"}
+                        </span>
+                        <span className="ab-komp-name">{kat}</span>
+                        <span className="ab-komp-zahl">{wege.length}</span>
+                      </button>
+                      {offen && (
+                        <ul className="ab-komp-wege">
+                          {wege.map((t) => (
+                            <li key={t.id}>
+                              <button
+                                type="button"
+                                className="ab-komp-weg"
+                                onClick={() =>
+                                  setOffenerLernweg({
+                                    id: t.kbId,
+                                    label: t.label,
+                                  })
+                                }
+                              >
+                                {t.label}
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <ul className="ab-komp-wege ab-komp-flach">
+                {fach.themen.map((t) => (
+                  <li key={t.id}>
+                    <button
+                      type="button"
+                      className="ab-komp-weg"
+                      onClick={() =>
+                        setOffenerLernweg({ id: t.kbId, label: t.label })
+                      }
+                    >
+                      {t.label}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
           </section>
         </div>
 

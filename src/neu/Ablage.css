@@ -164,6 +164,87 @@
   color: var(--muted);
   font-style: italic;
 }
+/* Kompetenzbereiche (Landkarte) als aufklappbarer Baum */
+.ab-komp {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  max-height: 440px;
+  overflow-y: auto;
+  margin: 0 -6px;
+  padding: 0 6px;
+}
+.ab-komp-kopf {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px;
+  border: none;
+  background: transparent;
+  border-radius: var(--r-sm, 9px);
+  cursor: pointer;
+  text-align: left;
+}
+.ab-komp-kopf:hover {
+  background: var(--card-2);
+}
+.ab-komp-pfeil {
+  flex-shrink: 0;
+  width: 12px;
+  color: var(--muted);
+  font-size: 0.7rem;
+}
+.ab-komp-name {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.ab-komp-zahl {
+  flex-shrink: 0;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--text-2);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0 7px;
+}
+.ab-komp-wege {
+  list-style: none;
+  margin: 0 0 4px;
+  padding: 0 0 0 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.ab-komp-flach {
+  padding-left: 0;
+  max-height: 440px;
+  overflow-y: auto;
+  margin: 0 -6px;
+  padding: 0 6px;
+}
+.ab-komp-weg {
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: transparent;
+  color: var(--text-2);
+  font-size: 0.84rem;
+  padding: 6px 8px;
+  border-radius: var(--r-sm, 9px);
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ab-komp-weg:hover {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
 
 /* Materialien */
 .ab-materialien {
