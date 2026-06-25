@@ -92,6 +92,7 @@ export default function Wochenplan({ onZurueck, onWeiter, onEtappeAnpassen, woch
   const [resetConfirm, setResetConfirm] = useState(false);
   const [aktiveWoche, setAktiveWoche] = useState(woche);
   const [zuFaecher, setZuFaecher] = useState(() => new Set()); // eingeklappte Fächer
+  const [suche, setSuche] = useState("");
 
   useEffect(() => {
     localStorage.setItem(STUNDEN_KEY, JSON.stringify(stunden));
@@ -165,9 +166,15 @@ export default function Wochenplan({ onZurueck, onWeiter, onEtappeAnpassen, woch
     year: "numeric",
   });
 
-  // Vorrat nach Fach gruppieren (stabile Fach-Reihenfolge).
+  // Vorrat nach Fach gruppieren (stabile Fach-Reihenfolge), optional per Suche gefiltert.
+  const q = suche.trim().toLowerCase();
   const vorratNachFach = kbFaecher
-    .map((fach) => ({ fach, kbs: vorrat.filter((k) => k.fach === fach) }))
+    .map((fach) => ({
+      fach,
+      kbs: vorrat.filter(
+        (k) => k.fach === fach && (!q || k.titel.toLowerCase().includes(q))
+      ),
+    }))
     .filter((g) => g.kbs.length > 0);
 
   function dragStart(e, id, quelleSlot) {
@@ -388,6 +395,31 @@ export default function Wochenplan({ onZurueck, onWeiter, onEtappeAnpassen, woch
 
   return (
     <div className="wp-screen" onClick={() => gewaehltId != null && setGewaehltId(null)}>
+      {/* Werkzeugzeile wie im Etappenplan: Suche links, Vorschlag rechts */}
+      <div className="wp-top">
+        <div className="ep-suche">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="7" />
+            <path d="M21 21l-4.35-4.35" />
+          </svg>
+          <input
+            type="text"
+            value={suche}
+            onChange={(e) => setSuche(e.target.value)}
+            placeholder="Suche"
+            aria-label="Ziele durchsuchen"
+          />
+        </div>
+        <button
+          type="button"
+          className="ep-vorschlag-knopf"
+          onClick={vorschlagVerteilen}
+          disabled={vorrat.length === 0}
+          title="Die offenen Uhren ausgewogen auf die Stunden verteilen"
+        >
+          <span aria-hidden="true">✦</span> Für mich vorschlagen
+        </button>
+      </div>
       <div className="wp-layout">
         {/* Linke Spalte: Lernwege je Fach, zum Platzieren */}
         <aside
@@ -412,6 +444,9 @@ export default function Wochenplan({ onZurueck, onWeiter, onEtappeAnpassen, woch
                 </p>
               </div>
             </div>
+            <p className="wp-seite-erklaer">
+              Zieh die Ziele der Woche in deine freien Stunden.
+            </p>
 
             <div className="wp-seite-status">
               <span className={"wp-status-rest" + (wocheFertig ? " fertig" : "")}>
@@ -427,15 +462,6 @@ export default function Wochenplan({ onZurueck, onWeiter, onEtappeAnpassen, woch
             </div>
 
             <div className="wp-seite-aktionen">
-              <button
-                type="button"
-                className="wp-akt"
-                onClick={vorschlagVerteilen}
-                disabled={vorrat.length === 0}
-                title="Die offenen Uhren ausgewogen auf die Stunden verteilen"
-              >
-                Für mich vorschlagen
-              </button>
               {resetConfirm ? (
                 <span className="wp-reset-confirm">
                   <button
@@ -462,6 +488,21 @@ export default function Wochenplan({ onZurueck, onWeiter, onEtappeAnpassen, woch
                   title="Die Stunden dieser Woche löschen (Lernstand bleibt)"
                 >
                   Zurücksetzen
+                </button>
+              )}
+              {onWeiter && (
+                <button
+                  type="button"
+                  className="wp-weiter"
+                  onClick={onWeiter}
+                  disabled={!aktuelleWocheFertig}
+                  title={
+                    aktuelleWocheFertig
+                      ? "Weiter zur Übersicht"
+                      : "Erst alle Uhren der laufenden Woche verteilen"
+                  }
+                >
+                  Weiter →
                 </button>
               )}
             </div>
@@ -554,21 +595,6 @@ export default function Wochenplan({ onZurueck, onWeiter, onEtappeAnpassen, woch
               {onZurueck && (
                 <button type="button" className="wp-akt" onClick={onZurueck}>
                   ← Etappenplan
-                </button>
-              )}
-              {onWeiter && (
-                <button
-                  type="button"
-                  className="wp-weiter"
-                  onClick={onWeiter}
-                  disabled={!aktuelleWocheFertig}
-                  title={
-                    aktuelleWocheFertig
-                      ? "Weiter zur Übersicht"
-                      : "Erst alle Uhren der laufenden Woche verteilen"
-                  }
-                >
-                  Weiter →
                 </button>
               )}
             </div>

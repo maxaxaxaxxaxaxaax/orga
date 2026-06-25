@@ -10,6 +10,16 @@
   /* oben Platz fuer die Nav-Pille (Plan-Tab); unten fuer die schwebende Leiste */
   padding: 70px 18px 76px;
 }
+/* Werkzeugzeile oben (wie im Etappenplan): Suche links auf Spaltenbreite,
+   "Fuer mich vorschlagen" rechts. */
+.wp-top {
+  flex-shrink: 0;
+  display: grid;
+  grid-template-columns: minmax(240px, 300px) minmax(0, 1fr);
+  gap: 20px;
+  align-items: center;
+  margin-bottom: 16px;
+}
 .wp-layout {
   flex: 1;
   min-height: 0;
@@ -24,6 +34,9 @@
     height: auto;
     overflow: visible;
     padding: 70px 14px 76px;
+  }
+  .wp-top {
+    grid-template-columns: 1fr auto;
   }
   .wp-layout {
     grid-template-columns: 1fr;
@@ -87,6 +100,12 @@
   margin: 2px 0 0;
   font-size: 0.82rem;
   color: var(--muted);
+}
+.wp-seite-erklaer {
+  margin: 0;
+  font-size: 0.84rem;
+  line-height: 1.4;
+  color: var(--text-2);
 }
 .wp-seite-status {
   display: flex;
