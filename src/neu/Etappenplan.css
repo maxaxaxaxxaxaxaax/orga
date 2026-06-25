@@ -2,10 +2,13 @@
    ausklappbare Fach-Karten mit bunten Chips), rechts sechs Wochen-Karten als
    Drop-Ziele. Nutzt die globalen CSS-Variablen (Hell). */
 .ep-screen {
-  min-height: 100vh;
+  height: 100dvh;
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   /* oben Platz für die schwebende Leiste, unten etwas Luft */
-  padding: 70px 28px 36px;
+  padding: 70px 28px 28px;
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-satoshi);
@@ -22,6 +25,7 @@
 
 /* Werkzeugzeile: Suche (Vorrat-Breite) links, Vorschlag rechts */
 .ep-top {
+  flex-shrink: 0;
   display: grid;
   grid-template-columns: minmax(280px, 340px) minmax(0, 1fr);
   gap: 18px;
@@ -82,21 +86,41 @@
 
 /* Zwei Spalten: Vorrat links, Wochen rechts */
 .ep-layout {
+  flex: 1;
+  min-height: 0;
   display: grid;
   grid-template-columns: minmax(280px, 340px) minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
   gap: 18px;
-  align-items: start;
+  align-items: stretch;
 }
 .ep-vorrat {
   display: flex;
   flex-direction: column;
   gap: 14px;
   min-width: 0;
+  min-height: 0;
+  max-height: 100%;
 }
 @media (max-width: 860px) {
+  .ep-screen {
+    height: auto;
+    overflow: visible;
+  }
   .ep-top,
   .ep-layout {
     grid-template-columns: 1fr;
+  }
+  .ep-layout {
+    grid-template-rows: auto;
+  }
+  .ep-vorrat {
+    max-height: none;
+  }
+  .ep-vorrat-liste,
+  .ep-wochen-grid {
+    overflow-y: visible;
+    max-height: none;
   }
   .ep-vorschlag-knopf {
     justify-self: stretch;
@@ -106,6 +130,7 @@
 
 /* Kopf-Karte */
 .ep-kopf-karte {
+  flex-shrink: 0;
   background: var(--card);
   border: 1px solid var(--line);
   border-radius: var(--r-lg, 20px);
@@ -212,9 +237,14 @@
 
 /* Vorrat-Liste: Fach-Karten */
 .ep-vorrat-liste {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 12px;
+  margin: 0 -4px;
+  padding: 0 4px;
 }
 .ep-vorrat.ueber .ep-vorrat-liste {
   outline: 2px dashed var(--accent);
@@ -229,6 +259,7 @@
   font-style: italic;
 }
 .ep-fachgruppe {
+  flex-shrink: 0;
   background: var(--card);
   border: 1px solid var(--line);
   border-radius: var(--r-md, 14px);
@@ -317,9 +348,15 @@
 
 /* Wochen-Raster: 3 Spalten */
 .ep-wochen-grid {
+  min-height: 0;
+  max-height: 100%;
+  overflow-y: auto;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-auto-rows: min-content;
+  align-content: start;
   gap: 16px;
+  padding-right: 4px;
 }
 @media (max-width: 860px) {
   .ep-wochen-grid {
