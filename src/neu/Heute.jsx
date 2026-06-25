@@ -136,11 +136,18 @@ export default function Heute({ onFokus }) {
     return stunden[0] || null;
   }
 
-  // Eine Aufgaben-Karte, geteilt von "Meine Aufgaben" und "Noch offen von früher".
-  function karte(k, istStart) {
+  // Eine Aufgaben-Karte (Lernweg-Stil), geteilt von "Meine Aufgaben" und "Noch
+  // offen von früher": Fach in Fachfarbe, der konkrete Lernweg darunter, Zeit- und
+  // Raum-Chip und unten ein ruhiger Fortschrittsbalken (schon gemachte Schritte).
+  function karte(k) {
     const done = !!erledigt[k.id];
     const info = kbInfo(k.id);
     const st = tagesStunde(k);
+    const prog =
+      info.schritte > 0
+        ? Math.round((info.fertigeSchritte / info.schritte) * 100)
+        : 0;
+    const bereit = !done && prog >= 100;
     return (
       <button
         type="button"
@@ -150,32 +157,44 @@ export default function Heute({ onFokus }) {
         onClick={() => onFokus(k.id)}
         title="Im Fokus öffnen und Schritt für Schritt machen"
       >
-        <span className="hu-auf-kopf">
-          <span className="hu-auf-zeit">
+        <span className="hu-auf-icon" aria-hidden="true">
+          <svg
+            viewBox="0 0 24 24"
+            width="20"
+            height="20"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <circle cx="6" cy="6" r="2.3" />
+            <circle cx="18" cy="18" r="2.3" />
+            <path d="M6 8.3v3.4a4 4 0 0 0 4 4h5.4" />
+          </svg>
+        </span>
+        <span className="hu-auf-eyebrow">Lernweg</span>
+        <span className="hu-auf-fach">{k.fach}</span>
+        {info.lernweg && <span className="hu-auf-thema">{info.lernweg}</span>}
+        <span className="hu-auf-chips">
+          <span className="hu-auf-chip">
             {st ? `${st.von} – ${st.bis}` : "frei einteilbar"}
           </span>
-          {done ? (
-            <span className="hu-auf-marke done" aria-label="erledigt">
-              ✓ fertig
-            </span>
-          ) : info.bereit ? (
-            <span className="hu-auf-marke bereit">bereit</span>
-          ) : istStart ? (
-            <span className="hu-auf-marke start">
-              {offeneAnzahl >= 2 ? "Start hier" : "jetzt"}
-            </span>
-          ) : info.hatUebung ? (
-            <span className="hu-auf-marke ueben">Üben</span>
-          ) : null}
+          {st && <span className="hu-auf-chip">{st.raum}</span>}
         </span>
-        <span className="hu-auf-titel">{k.titel}</span>
-        <span className="hu-auf-fuss">
-          <span className="hu-auf-badge">{k.fach}</span>
-          {st && <span className="hu-auf-raum">{st.raum}</span>}
-          <span className="hu-auf-cue" aria-hidden="true">
-            Fokus →
+        {done ? (
+          <span className="hu-auf-status done">✓ Erledigt</span>
+        ) : prog > 0 ? (
+          <span className="hu-auf-prog">
+            <span className="hu-auf-prog-label">
+              {bereit ? "Bereit zur Abnahme" : "Von gestern"}
+            </span>
+            <span className="hu-auf-prog-bar">
+              <span style={{ width: prog + "%" }} />
+            </span>
+            <span className="hu-auf-prog-pct">{prog}%</span>
           </span>
-        </span>
+        ) : null}
       </button>
     );
   }
@@ -234,11 +253,6 @@ export default function Heute({ onFokus }) {
     tagKbs.length > 0 &&
     tagKbs.every((k) => erledigt[k.id]) &&
     nachzueglerList.length === 0;
-  // Gegen die "was jetzt?"-Blockade: den ersten offenen Punkt markieren, aber
-  // nur wenn es eine Wahl gibt (2+ offen). Bei genau einem offenen Ziel ist die
-  // Karte selbst schon der Start, ein extra Hinweis wäre bloß Dopplung.
-  const offeneAnzahl = tagKbs.filter((k) => !erledigt[k.id]).length;
-  const ersterOffen = tagKbs.find((k) => !erledigt[k.id]) || null;
   const morgenAnzahl =
     tag < 4
       ? koennensbeweise.filter(
@@ -277,13 +291,6 @@ export default function Heute({ onFokus }) {
   });
   const zieleGesamt = koennensbeweise.length;
   const zieleDone = koennensbeweise.filter((k) => erledigt[k.id]).length;
-  const restMs =
-    new Date(ETAPPE.bis + "T23:59:59").getTime() - tagDatum.getTime();
-  const restWochen = Math.max(0, Math.ceil(restMs / (7 * 24 * 3600 * 1000)));
-  const wocheKbs = koennensbeweise.filter(
-    (k) => wochenZuordnung[k.id] === AKTUELLE_WOCHE
-  );
-  const wocheDone = wocheKbs.filter((k) => erledigt[k.id]).length;
 
   // Tag geschafft: ruhiger grüner Abschluss als kleine Belohnung, bevor der Tag
   // wieder zur Liste wird.
@@ -372,42 +379,27 @@ export default function Heute({ onFokus }) {
           <div className="hu-oben">
             <section className="hu-karte hu-fortschritt">
               <h2 className="hu-karte-titel">Etappenfortschritt</h2>
-              <Etappenring ringe={proFach} />
-              <div className="hu-stats">
-                <div className="hu-stat">
-                  <span className="hu-stat-zahl">
-                    {zieleDone}
-                    <span className="hu-stat-von">/{zieleGesamt}</span>
-                  </span>
-                  <span className="hu-stat-label">Ziele erreicht</span>
-                </div>
-                <div className="hu-stat">
-                  <span className="hu-stat-zahl">{restWochen}</span>
-                  <span className="hu-stat-label">
-                    {restWochen === 1 ? "Woche übrig" : "Wochen übrig"}
-                  </span>
-                </div>
-                <div className="hu-stat">
-                  <span className="hu-stat-zahl">
-                    {wocheKbs.length ? (
-                      <>
-                        {wocheDone}
-                        <span className="hu-stat-von">/{wocheKbs.length}</span>
-                      </>
-                    ) : (
-                      "–"
-                    )}
-                  </span>
-                  <span className="hu-stat-label">diese Woche</span>
-                </div>
-              </div>
+              <Etappenring
+                ringe={proFach}
+                gesamtDone={zieleDone}
+                gesamtTotal={zieleGesamt}
+              />
             </section>
 
             <KlassenPuls />
           </div>
 
           <section className="hu-karte hu-aufgaben">
-            <h2 className="hu-karte-titel">Meine Aufgaben</h2>
+            <h2 className="hu-karte-titel hu-aufgaben-titel">
+              Meine Aufgaben
+              <span className="hu-aufgaben-datum">
+                {tagDatum.toLocaleDateString("de-DE", {
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "2-digit",
+                })}
+              </span>
+            </h2>
             {allesGeschafft && (
               <p className="hu-geschafft">
                 Alles geschafft! Du hast alle Ziele für heute erledigt.
@@ -420,11 +412,7 @@ export default function Heute({ onFokus }) {
                   : "Für heute hast du nichts eingeplant."}
               </p>
             ) : (
-              <div className="hu-auf-grid">
-                {tagKbs.map((k) =>
-                  karte(k, !erledigt[k.id] && ersterOffen?.id === k.id)
-                )}
-              </div>
+              <div className="hu-auf-grid">{tagKbs.map((k) => karte(k))}</div>
             )}
             {morgenAnzahl > 0 && (
               <p className={"hu-morgen" + (morgenVoll ? " voll" : "")}>
@@ -443,7 +431,7 @@ export default function Heute({ onFokus }) {
                   {(nachzueglerAlle
                     ? nachzueglerList
                     : nachzueglerList.slice(0, 3)
-                  ).map((k) => karte(k, false))}
+                  ).map((k) => karte(k))}
                 </div>
                 {nachzueglerList.length > 3 && (
                   <button

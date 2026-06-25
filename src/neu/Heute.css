@@ -279,85 +279,85 @@
   color: var(--text);
 }
 
-/* Etappenfortschritt: Ring + Legende, darunter drei Kennzahlen. */
+/* Etappenfortschritt: konzentrische Ringe + Gesamtzahl daneben, darunter die
+   Fächer mit farbigem Strich und Bruch. */
 .hu-fortschritt {
   display: flex;
   flex-direction: column;
 }
-.hu-ring-wrap {
-  display: flex;
-  align-items: center;
-  gap: 18px;
-}
-.hu-ring {
-  width: 132px;
-  height: 132px;
-  flex-shrink: 0;
-}
-.hu-ring-legende {
-  list-style: none;
-  margin: 0;
-  padding: 0;
+.hu-fort-inhalt {
   display: flex;
   flex-direction: column;
-  gap: 7px;
-  flex: 1;
-  min-width: 0;
+  gap: 18px;
 }
-.hu-ring-zeile {
+.hu-fort-oben {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 0.85rem;
+  gap: 22px;
 }
-.hu-ring-punkt {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
+.hu-ring {
+  width: 140px;
+  height: 140px;
   flex-shrink: 0;
 }
-.hu-ring-fach {
+.hu-fort-gesamt {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.hu-fort-gesamt-label {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-2);
+  letter-spacing: -0.01em;
+}
+.hu-fort-gesamt-zahl {
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--text);
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.hu-fort-gesamt-von {
+  color: var(--muted);
+}
+.hu-fort-faecher {
+  list-style: none;
+  margin: 0;
+  padding: 16px 0 0;
+  border-top: 1px solid var(--line);
+  display: flex;
+  gap: 8px;
+}
+.hu-fort-fach {
   flex: 1;
   min-width: 0;
-  color: var(--text-2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+}
+.hu-fort-fach-bar {
+  width: 100%;
+  height: 4px;
+  border-radius: 999px;
+}
+.hu-fort-fach-name {
+  max-width: 100%;
+  font-size: 0.66rem;
+  color: var(--muted);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.hu-ring-wert {
-  flex-shrink: 0;
+.hu-fort-fach-wert {
+  font-size: 1rem;
   font-weight: 700;
   color: var(--text);
   font-variant-numeric: tabular-nums;
-}
-.hu-stats {
-  margin-top: 18px;
-  padding-top: 16px;
-  border-top: 1px solid var(--line);
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-}
-.hu-stat {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-.hu-stat-zahl {
-  font-size: 1.5rem;
-  font-weight: 700;
-  line-height: 1;
-  color: var(--text);
-  font-variant-numeric: tabular-nums;
-}
-.hu-stat-von {
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: var(--muted);
-}
-.hu-stat-label {
-  font-size: 0.72rem;
-  color: var(--muted);
 }
 .hu-leer {
   margin: 0;
@@ -460,131 +460,134 @@
   font-size: 0.74rem;
   color: var(--muted);
 }
-/* Meine Aufgaben: Karten-Raster mit Fach-Akzent oben. */
+/* Meine Aufgaben: Lernweg-Karten. Fach in (kontrastsicher abgedunkelter)
+   Fachfarbe, der konkrete Lernweg darunter, Zeit/Raum als Chips, unten ein
+   ruhiger Fortschrittsbalken (schon gemachte Schritte). */
+.hu-aufgaben-titel {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+.hu-aufgaben-datum {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
 .hu-auf-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 14px;
 }
 .hu-auf {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 14px;
+  gap: 7px;
+  min-height: 196px;
+  padding: 16px;
   text-align: left;
   font: inherit;
   color: inherit;
   cursor: pointer;
-  background: var(--card-2);
+  background: var(--card);
   border: 1px solid var(--line);
-  border-top: 3px solid var(--c);
-  border-radius: var(--r-md, 14px);
+  border-radius: var(--r-lg, 20px);
+  box-shadow: var(--shadow-sm);
   transition: border-color 0.14s ease, box-shadow 0.14s ease,
     transform 0.14s ease;
 }
 .hu-auf:hover {
   box-shadow: var(--shadow-md);
   transform: translateY(-2px);
+  border-color: var(--line-strong);
 }
 .hu-auf.done {
-  opacity: 0.7;
+  opacity: 0.62;
 }
-.hu-auf-kopf {
+.hu-auf-icon {
+  display: inline-flex;
+  color: var(--muted);
+  margin-bottom: 2px;
+}
+.hu-auf-eyebrow {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+.hu-auf-fach {
+  font-size: 1.32rem;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  color: color-mix(in srgb, var(--c) 72%, var(--text));
+}
+.hu-auf.done .hu-auf-fach {
+  color: var(--muted);
+}
+.hu-auf-thema {
+  font-size: 0.82rem;
+  line-height: 1.35;
+  color: var(--muted);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.hu-auf-chips {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
 }
-.hu-auf-zeit {
-  font-size: 0.78rem;
+.hu-auf-chip {
+  font-size: 0.72rem;
+  color: var(--text-2);
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 3px 10px;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.hu-auf-prog {
+  margin-top: auto;
+  padding-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.hu-auf-prog-label {
+  font-size: 0.74rem;
+  color: var(--muted);
+}
+.hu-auf-prog-bar {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--line);
+  overflow: hidden;
+}
+.hu-auf-prog-bar > span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--c);
+}
+.hu-auf-prog-pct {
+  font-size: 0.72rem;
   font-weight: 600;
   color: var(--muted);
   font-variant-numeric: tabular-nums;
 }
-.hu-auf-marke {
-  flex-shrink: 0;
-  font-size: 0.62rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  padding: 2px 8px;
-  border-radius: 999px;
-}
-.hu-auf-marke.start {
-  color: var(--on-accent);
-  background: var(--accent);
-}
-.hu-auf-marke.bereit {
-  color: var(--on-accent);
-  background: var(--ok-text);
-}
-.hu-auf-marke.ueben {
-  color: var(--accent);
-  background: var(--accent-soft);
-}
-.hu-auf-marke.done {
-  /* Grün leicht Richtung Textfarbe gezogen: hebt den Kontrast in Hell über 4.5:1. */
-  color: color-mix(in srgb, var(--ok-text) 78%, var(--text));
-  background: var(--ok-bg);
-}
-.hu-auf-titel {
-  font-size: 1rem;
-  font-weight: 600;
-  line-height: 1.3;
-  color: var(--text);
-}
-.hu-auf.done .hu-auf-titel {
-  color: var(--muted);
-  text-decoration: line-through;
-}
-.hu-auf-fuss {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 8px;
+.hu-auf-status {
   margin-top: auto;
-}
-/* Fach-Badge: Name in sicherer Textfarbe, die Fach-Farbe trägt der Punkt (Dekor)
-   und der farbige Karten-Rand. So bleibt der Kontrast in Hell und Dunkel >= 4.5:1. */
-.hu-auf-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  max-width: 100%;
-  font-size: 0.64rem;
+  padding-top: 12px;
+  font-size: 0.82rem;
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--text-2);
-  background: color-mix(in srgb, var(--c) 9%, var(--card));
-  border: 1px solid var(--line);
-  padding: 3px 9px 3px 8px;
-  border-radius: 999px;
-  overflow-wrap: anywhere;
 }
-.hu-auf-badge::before {
-  content: "";
-  flex-shrink: 0;
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--c);
-}
-.hu-auf-raum {
-  font-size: 0.76rem;
-  color: var(--muted);
-}
-.hu-auf-cue {
-  margin-left: auto;
-  font-size: 0.72rem;
-  font-weight: 700;
-  color: var(--muted);
-  opacity: 0;
-  transition: opacity 0.14s ease, color 0.14s ease;
-}
-.hu-auf:hover .hu-auf-cue {
-  opacity: 1;
-  color: var(--accent);
+.hu-auf-status.done {
+  color: var(--ok-text);
 }
 
 /* Stundenplan-Agenda */
