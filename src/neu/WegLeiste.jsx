@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import { wegStatus } from "./weg";
 import "./WegLeiste.css";
 
-// Schwebende "Mein Weg"-Leiste unten mittig: reine Standanzeige, kein Aktions-
-// knopf. In der Planung die drei Schritte mit Status (der aktuelle hervorgehoben,
-// Klick springt dorthin), in der Mach-Phase das aktuelle Ziel mit Schritt-
-// Fortschritt. Aktualisiert sich live über das "neu:planung"-Event, sobald sich
-// der Planungs- oder Erledigt-Stand ändert (z.B. ein Ziel abgehakt wird).
+// Schwebende "Mein Weg"-Leiste unten mittig. In der Planung die drei Schritte
+// mit Status (der aktuelle hervorgehoben, Klick springt dorthin); in der
+// Mach-Phase das aktuelle Ziel mit Schritt-Fortschritt als Knopf, der direkt in
+// die Aufgabe (Fokus) springt. Aktualisiert sich live über das "neu:planung"-
+// Event, sobald sich der Planungs- oder Erledigt-Stand ändert.
 export default function WegLeiste({ onGo }) {
   const [stand, setStand] = useState(wegStatus);
 
@@ -48,11 +48,13 @@ export default function WegLeiste({ onGo }) {
               ))}
             </ol>
         ) : aufgabe ? (
-          // Mach-Phase: das aktuelle Ziel mit Schritt-Fortschritt, nur als
-          // Anzeige (wo stehe ich gerade), kein Knopf.
-          <div
+          // Mach-Phase: das aktuelle Ziel mit Schritt-Fortschritt. Ein Klick
+          // springt direkt in die Aufgabe (Fokus).
+          <button
+            type="button"
             className="weg-aufgabe"
-            title={`${aufgabe.fach}: ${aufgabe.titel}, ${aufgabe.fertigeAnzahl} von ${aufgabe.gesamt} Schritten`}
+            onClick={() => onGo(jetzt.ziel, jetzt.kbId)}
+            title={`${aufgabe.fach}: ${aufgabe.titel} öffnen`}
           >
             <span className="weg-aufgabe-text">
               <span className="weg-aufgabe-fach">{aufgabe.fach}</span>
@@ -77,7 +79,13 @@ export default function WegLeiste({ onGo }) {
                 </span>
               </>
             )}
-          </div>
+            <span className="weg-aufgabe-cta">
+              {jetzt.text || "Öffnen"}
+              <span className="weg-aufgabe-pfeil" aria-hidden="true">
+                →
+              </span>
+            </span>
+          </button>
         ) : (
           // Endzustand: alles geschafft oder nichts geplant.
           <span className={"weg-leer" + (jetzt.fertig ? " fertig" : "")}>

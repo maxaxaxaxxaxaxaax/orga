@@ -158,19 +158,29 @@
   font-weight: 600;
 }
 
-/* Mach-Phase: das aktuelle Ziel mit Schritt-Fortschritt, reine Anzeige (zeigt,
-   wo ich gerade stehe), kein Knopf. */
+/* Mach-Phase: das aktuelle Ziel mit Schritt-Fortschritt. Klickbarer Knopf, der
+   direkt in die Aufgabe (Fokus) springt. */
 .weg-aufgabe {
   flex: 1;
   min-width: 0;
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: 12px;
-  padding: 7px 10px;
+  padding: 5px 6px 5px 12px;
+  border: none;
+  background: transparent;
+  font: inherit;
+  color: inherit;
+  border-radius: 999px;
+  cursor: pointer;
   text-align: left;
+  transition: background 0.15s ease;
+}
+.weg-aufgabe:hover {
+  background: color-mix(in srgb, var(--text) 6%, transparent);
 }
 .weg-aufgabe-text {
+  flex: 1;
   min-width: 0;
   display: flex;
   align-items: baseline;
@@ -217,6 +227,28 @@
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   color: var(--muted);
+}
+/* CTA-Pille: direkt in die Aufgabe springen. */
+.weg-aufgabe-cta {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 7px 13px;
+  border-radius: 999px;
+  box-shadow: 0 4px 12px -3px var(--accent-shadow);
+  transition: background 0.15s ease;
+}
+.weg-aufgabe:hover .weg-aufgabe-cta {
+  background: var(--accent-strong);
+}
+.weg-aufgabe-pfeil {
+  flex-shrink: 0;
+  font-weight: 700;
 }
 .weg-leer {
   flex: 1;
