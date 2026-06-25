@@ -61,16 +61,11 @@ export default function App() {
     setIntroOffen(false);
   }
 
-  // Dunkles Schema dem Systemwunsch folgen lassen (die Palette in index.css hängt
-  // an .dark auf <html>). Bewusst kein extra Bedienelement: ruhig und automatisch,
-  // damit die Oberfläche nicht überladen wird.
+  // Die Oberfläche bleibt bewusst im hellen Cremepapier-Schema, auch wenn das
+  // System auf dunkel steht. Die dunkle Palette (an .dark auf <html>) wird daher
+  // nicht aktiviert; falls die Klasse irgendwo gesetzt wurde, hier entfernen.
   useEffect(() => {
-    const mq = window.matchMedia("(prefers-color-scheme: dark)");
-    const anwenden = () =>
-      document.documentElement.classList.toggle("dark", mq.matches);
-    anwenden();
-    mq.addEventListener("change", anwenden);
-    return () => mq.removeEventListener("change", anwenden);
+    document.documentElement.classList.remove("dark");
   }, []);
 
   const bereich =
