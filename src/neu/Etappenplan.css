@@ -1,18 +1,17 @@
-/* Etappenplan: ganze Etappe auf einen Blick, ohne Scrollen.
-   Nutzt die globalen CSS-Variablen aus index.css (Hell + Dunkel).
-   Oben der Vorrat pro Fach, darunter die Wochen als Drop-Ziele. */
-
+/* Etappe planen im Mockup-Layout: links Vorrat (Plane-deine-Etappe-Karte +
+   ausklappbare Fach-Karten mit bunten Chips), rechts sechs Wochen-Karten als
+   Drop-Ziele. Nutzt die globalen CSS-Variablen (Hell). */
 .ep-screen {
-  height: 100vh;
-  width: 100%;
+  min-height: 100vh;
   box-sizing: border-box;
-  /* Oben Platz für die schlanke Schritt-Leiste; unten nur etwas Luft. */
-  padding: 70px 40px 28px;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden; /* bewusst: nichts scrollt, die Etappe muss reinpassen */
+  /* oben Platz für die schwebende Leiste, unten etwas Luft */
+  padding: 70px 28px 36px;
   background: var(--bg);
   color: var(--text);
+  font-family: var(--font-satoshi);
+}
+.ep-screen :is(h1, h2) {
+  font-family: var(--font-satoshi);
 }
 @media (max-width: 560px) {
   .ep-screen {
@@ -21,23 +20,132 @@
   }
 }
 
-/* Kopf */
-.ep-kopf {
-  flex-shrink: 0;
-  margin-bottom: 22px;
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 24px;
+/* Werkzeugzeile: Suche (Vorrat-Breite) links, Vorschlag rechts */
+.ep-top {
+  display: grid;
+  grid-template-columns: minmax(280px, 340px) minmax(0, 1fr);
+  gap: 18px;
+  align-items: center;
+  margin-bottom: 18px;
 }
-.ep-kopf-aktion {
+.ep-suche {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  box-shadow: var(--shadow-sm);
+}
+.ep-suche svg {
+  width: 17px;
+  height: 17px;
+  flex-shrink: 0;
+  color: var(--muted);
+}
+.ep-suche input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  font: inherit;
+  font-size: 0.92rem;
+  color: var(--text);
+}
+.ep-suche input::placeholder {
+  color: var(--muted);
+}
+.ep-vorschlag-knopf {
+  justify-self: end;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: none;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: 0.92rem;
+  font-weight: 700;
+  padding: 11px 20px;
+  border-radius: 999px;
+  cursor: pointer;
+  box-shadow: 0 4px 14px -4px var(--accent-shadow);
+  transition: background 0.15s ease, transform 0.12s ease;
+}
+.ep-vorschlag-knopf:hover {
+  background: var(--accent-strong);
+}
+.ep-vorschlag-knopf:active {
+  transform: scale(0.97);
+}
+
+/* Zwei Spalten: Vorrat links, Wochen rechts */
+.ep-layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 340px) minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+.ep-vorrat {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  gap: 14px;
+  min-width: 0;
+}
+@media (max-width: 860px) {
+  .ep-top,
+  .ep-layout {
+    grid-template-columns: 1fr;
+  }
+  .ep-vorschlag-knopf {
+    justify-self: stretch;
+    justify-content: center;
+  }
+}
+
+/* Kopf-Karte */
+.ep-kopf-karte {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg, 20px);
+  padding: 18px 20px;
+  box-shadow: var(--shadow-sm);
+}
+.ep-kopf-titel {
+  margin: 0;
+  display: flex;
+  align-items: center;
   gap: 8px;
-  flex-shrink: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+.ep-kopf-icon {
+  font-size: 1.05rem;
+}
+.ep-kopf-meta {
+  margin: 8px 0 0;
+  font-size: 0.84rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.ep-kopf-text {
+  margin: 6px 0 0;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  color: var(--text-2);
+}
+.ep-kopf-aktionen {
+  margin-top: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
 }
 .ep-fortschritt {
+  margin-right: auto;
   font-size: 0.82rem;
   font-weight: 600;
   color: var(--muted);
@@ -45,22 +153,15 @@
 .ep-fortschritt.fertig {
   color: var(--ok-text);
 }
-.ep-kopf-buttons {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-/* Zuruecksetzen: sehr zurueckhaltend (Text-Knopf), mit 2-Schritt-Bestaetigung. */
 .ep-reset {
   border: none;
   background: transparent;
   color: var(--muted);
-  font-size: 0.85rem;
+  font-size: 0.84rem;
   font-weight: 600;
   padding: 8px 10px;
   border-radius: 999px;
   cursor: pointer;
-  transition: color 0.12s ease;
 }
 .ep-reset:hover:not(:disabled) {
   color: var(--text);
@@ -71,20 +172,15 @@
 }
 .ep-reset-confirm {
   display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-.ep-reset-frage {
-  font-size: 0.85rem;
-  color: var(--text-2);
+  gap: 6px;
 }
 .ep-reset-ja {
   border: 1px solid var(--danger-line);
   background: var(--danger-bg);
   color: var(--danger-text);
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   font-weight: 700;
-  padding: 7px 13px;
+  padding: 7px 12px;
   border-radius: 999px;
   cursor: pointer;
 }
@@ -92,273 +188,198 @@
   border: 1px solid var(--line-strong);
   background: var(--card);
   color: var(--text);
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   font-weight: 600;
-  padding: 7px 13px;
+  padding: 7px 12px;
   border-radius: 999px;
   cursor: pointer;
-}
-
-/* Der Toast (.ep-hinweis) ist zentral in index.css definiert, damit er nicht
-   doppelt (und konfliktierend) existiert. */
-/* Sekundär: ausgewogene Verteilung vorschlagen. Ruhiger Outline-Knopf, damit er
-   den primären "Weiter" nicht überstrahlt, aber als Einstieg sichtbar ist. */
-.ep-vorschlag {
-  border: 1px solid var(--line-strong);
-  background: var(--card);
-  color: var(--text);
-  font-weight: 600;
-  font-size: 0.92rem;
-  padding: 10px 18px;
-  border-radius: 999px;
-  cursor: pointer;
-  transition: border-color 0.12s ease, color 0.12s ease;
-}
-.ep-vorschlag:hover {
-  border-color: var(--accent);
-  color: var(--accent);
 }
 .ep-weiter {
   border: none;
   background: var(--accent);
   color: var(--on-accent);
-  font-weight: 600;
-  font-size: 0.95rem;
-  padding: 11px 22px;
+  font-size: 0.86rem;
+  font-weight: 700;
+  padding: 9px 18px;
   border-radius: 999px;
   cursor: pointer;
-  box-shadow: 0 4px 14px -4px var(--accent-shadow);
-  transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.12s ease;
-}
-.ep-weiter:not(:disabled):hover {
-  background: var(--accent-strong);
-  box-shadow: 0 7px 20px -5px var(--accent-shadow);
-}
-.ep-weiter:not(:disabled):active {
-  transform: scale(0.97);
 }
 .ep-weiter:disabled {
   background: var(--line-strong);
   color: var(--muted);
   cursor: not-allowed;
-  box-shadow: none;
-}
-.ep-kopf-eyebrow {
-  margin: 0 0 4px;
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-.ep-kopf-titel {
-  margin: 0;
-  font-size: 2.2rem;
-  font-weight: 700;
-  line-height: 1.1;
-  letter-spacing: -0.01em;
-}
-.ep-kopf-sub {
-  margin: 6px 0 0;
-  font-size: 0.96rem;
-  color: var(--text-2);
 }
 
-/* Vorrat: Fach-Spalten, auf Inhaltshöhe (nicht den ganzen Schirm).
-   align-items: start, damit leer geräumte Fächer klein zusammenfallen. */
-.ep-grid {
-  flex: 0 0 auto;
-  display: grid;
-  grid-template-columns: repeat(var(--spalten, 5), minmax(0, 1fr));
-  gap: 14px;
-  align-items: start;
+/* Vorrat-Liste: Fach-Karten */
+.ep-vorrat-liste {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
-.ep-fach {
+.ep-vorrat.ueber .ep-vorrat-liste {
+  outline: 2px dashed var(--accent);
+  outline-offset: 4px;
+  border-radius: var(--r-md, 14px);
+}
+.ep-vorrat-leer {
+  margin: 0;
+  padding: 6px 2px;
+  font-size: 0.86rem;
+  color: var(--muted);
+  font-style: italic;
+}
+.ep-fachgruppe {
   background: var(--card);
   border: 1px solid var(--line);
-  border-top: 3px solid var(--c);
-  border-radius: var(--r-md, 12px);
-  padding: 12px 12px 10px;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
+  border-radius: var(--r-md, 14px);
+  overflow: hidden;
   box-shadow: var(--shadow-sm);
-  transition: background 0.12s ease, border-color 0.12s ease;
 }
-.ep-fach.ueber {
+.ep-fachgruppe-kopf {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 11px 14px;
+  border: none;
+  border-left: 3px solid var(--c);
   background: color-mix(in srgb, var(--c) 8%, var(--card));
-  border-color: var(--c);
+  cursor: pointer;
+  text-align: left;
 }
-.ep-fach-kopf {
-  flex-shrink: 0;
-  padding-bottom: 10px;
-  margin-bottom: 8px;
-  border-bottom: 1px solid var(--line);
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-.ep-fach-name {
-  font-size: 0.9rem;
+.ep-fachgruppe-name {
+  font-size: 1rem;
   font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: color-mix(in srgb, var(--c) 78%, var(--text));
+  color: var(--text);
 }
-.ep-fach-thema {
-  font-size: 0.78rem;
+.ep-fachgruppe-zahl {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text-2);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0 7px;
+}
+.ep-fachgruppe-pfeil {
+  margin-left: auto;
   color: var(--muted);
-  line-height: 1.3;
+  font-size: 0.8rem;
 }
-.ep-kb-liste {
+.ep-fachgruppe-chips {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  min-height: 24px;
-}
-/* Fach komplett verteilt: ruhige, kompakte Bestätigung statt leerer Fläche. */
-.ep-fach-fertig {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--ok-text);
-  padding: 2px 2px 4px;
+  gap: 8px;
+  padding: 10px;
 }
 
-/* Wochen-Band: füllt die Resthöhe unten, sechs Drop-Ziele. */
-.ep-wochen {
-  flex: 1 1 auto;
-  min-height: 0;
-  margin-top: 22px;
+/* Bunter KB-Chip (Vollton in Fachfarbe) */
+.ep-kb {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: var(--c);
+  color: var(--kbt);
+  border-radius: var(--r-md, 14px);
+  padding: 10px 14px;
+  cursor: grab;
+  box-shadow: var(--shadow-sm);
+}
+.ep-kb:active {
+  cursor: grabbing;
+}
+.ep-kb.gewaehlt {
+  outline: 2px solid var(--text);
+  outline-offset: 2px;
+}
+.ep-kb-titel {
+  font-size: 0.92rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+.ep-kb-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  opacity: 0.85;
+}
+.ep-kb-uhr {
+  font-size: 0.8rem;
+}
+.ep-kb-code {
+  opacity: 0.85;
+}
+
+/* Wochen-Raster: 3 Spalten */
+.ep-wochen-grid {
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+@media (max-width: 860px) {
+  .ep-wochen-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 560px) {
+  .ep-wochen-grid {
+    grid-template-columns: 1fr;
+  }
 }
 .ep-woche {
   background: var(--card);
-  border: 1px dashed var(--line);
-  border-radius: var(--r-md, 12px);
-  padding: 10px 12px;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-  transition: background 0.12s ease, border-color 0.12s ease;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg, 20px);
+  padding: 16px;
+  box-shadow: var(--shadow-sm);
+  min-height: 220px;
+  transition: border-color 0.12s ease, box-shadow 0.12s ease;
 }
 .ep-woche.ueber {
-  border-style: solid;
   border-color: var(--accent);
-  background: var(--accent-soft);
-}
-/* Über Ziel (dauerhaft > 10) und Drag-Warnung (würde mit dem gezogenen KB über
-   10 gehen): orange. Die 10 ist ein Ziel, keine Wand -> Ablegen bleibt erlaubt. */
-.ep-woche.ueber-ziel,
-.ep-woche.drag-warn {
-  border-style: solid;
-  border-color: var(--warn-line);
-  background: var(--warn-bg);
+  box-shadow: 0 0 0 2px var(--accent-soft), var(--shadow-md);
 }
 .ep-woche-kopf {
-  flex-shrink: 0;
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
+  align-items: baseline;
   gap: 8px;
-  padding-bottom: 8px;
-  margin-bottom: 8px;
-  border-bottom: 1px solid var(--line);
-}
-.ep-woche-titel {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-  min-width: 0;
+  margin-bottom: 12px;
 }
 .ep-woche-nr {
-  font-size: 0.9rem;
+  font-size: 1.15rem;
   font-weight: 700;
   color: var(--text);
 }
 .ep-woche-datum {
-  font-size: 0.72rem;
+  font-size: 0.8rem;
   color: var(--muted);
   font-variant-numeric: tabular-nums;
 }
-.ep-woche-summe {
-  flex-shrink: 0;
-  font-size: 0.78rem;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  color: var(--muted);
-  white-space: nowrap;
-}
-/* Voll = genau am Ziel (10): positiv (grün) markiert, Woche + Summe. */
-.ep-woche-summe.voll {
-  color: var(--ok-text);
-}
-.ep-woche-summe.drueber {
-  color: var(--warn-text);
-}
-.ep-woche.voll {
-  border-style: solid;
-  border-color: var(--ok-text);
-  background: var(--ok-bg);
-}
-/* Während des Ziehens schlägt die Orange-Warnung die Grün-Markierung einer
-   bereits vollen Woche (steht bewusst NACH .ep-woche.voll). */
-.ep-woche.drag-warn {
-  border-color: var(--warn-line);
-  background: var(--warn-bg);
-}
-.ep-woche-kbs {
-  flex: 1;
-  min-height: 0;
+.ep-woche-slots {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  overflow-y: auto;
+  gap: 8px;
 }
-.ep-woche-leer {
-  font-size: 0.76rem;
-  color: var(--muted);
-  font-style: italic;
-  padding: 4px 2px;
+.ep-slot-leer {
+  height: 52px;
+  border: 1.5px dashed var(--line-strong);
+  border-radius: var(--r-md, 14px);
 }
-.ep-woche.ueber .ep-woche-leer {
-  color: var(--accent);
-  font-style: normal;
-  font-weight: 600;
-}
-
-/* Tippen-zum-Zuordnen: ist ein Chip ausgewählt, werden alle Wochen Tipp-Ziele. */
-.ep-woche.tippbar {
-  border-style: solid;
-  border-color: color-mix(in srgb, var(--accent) 42%, var(--line));
-  cursor: pointer;
-}
-.ep-woche.tippbar:hover {
+.ep-woche.ueber .ep-slot-leer,
+.ep-woche.tippbar .ep-slot-leer {
   border-color: var(--accent);
   background: var(--accent-soft);
 }
-.ep-woche.tippbar .ep-woche-leer {
-  color: var(--accent);
-  font-style: normal;
-  font-weight: 600;
-}
 
-/* Schmaler: Spalten umbrechen, dann darf die Seite ausnahmsweise scrollen. */
-@media (max-width: 760px) {
-  .ep-screen {
-    padding: 64px 18px 24px;
-    height: auto;
-    min-height: 100vh;
-    overflow: visible;
-  }
-  .ep-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  .ep-wochen {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-  .ep-kopf-titel {
-    font-size: 1.9rem;
+@media (pointer: coarse) {
+  .ep-reset,
+  .ep-weiter,
+  .ep-vorschlag-knopf {
+    min-height: 40px;
   }
 }
