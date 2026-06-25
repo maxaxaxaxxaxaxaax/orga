@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import Etappenplan from "./Etappenplan";
 import Wochenplan from "./Wochenplan";
 import Heute from "./Heute";
-import Plan from "./Plan";
 import Ablage from "./Ablage";
 import NavLeiste from "./NavLeiste";
 import WegLeiste from "./WegLeiste";
@@ -128,12 +127,7 @@ export default function App() {
   } else if (screen === "heute") {
     inhalt = <Heute onFokus={setFokusKbId} />;
   } else if (screen === "plan") {
-    inhalt = (
-      <Plan
-        onWochePlanen={() => setScreen("wochenplan")}
-        onEtappeAnpassen={() => setScreen("etappenplan")}
-      />
-    );
+    inhalt = <Wochenplan onEtappeAnpassen={() => setScreen("etappenplan")} />;
   } else if (screen === "ablage") {
     inhalt = <Ablage />;
   } else {

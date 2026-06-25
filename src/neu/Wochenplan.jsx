@@ -1,5 +1,10 @@
 import { useEffect, useState } from "react";
-import { koennensbeweise, wochenZielCluster } from "../data/koennensbeweise";
+import {
+  koennensbeweise,
+  wochenZielCluster,
+  kbFaecher,
+  kbFarbe,
+} from "../data/koennensbeweise";
 import { lernwegFuerKb } from "../data/wissen";
 import { ladeSchritte } from "./lernschritte";
 import {
@@ -7,23 +12,39 @@ import {
   fachFarbe,
   istBelegbar,
   stundenId,
-  artLabel,
+  tagStart,
+  tagEnde,
 } from "../data/stundenplanWoche";
 import { etappen } from "../data/etappen";
 import KbChip from "./KbChip";
-import { meldeAenderung, slotTag, ladeStunden } from "./planung";
+import { meldeAenderung, ladeStunden } from "./planung";
 import "./Wochenplan.css";
 
-// Wochenstart: der Schüler verteilt die Uhren (Clusterstunden) der KBs dieser
-// Woche auf konkrete Schulstunden. Eine Uhr = eine Unterrichtsstunde, also eine
-// Stunde pro Slot. Ein Ziel mit mehreren Uhren wird über mehrere Stunden
-// verteilt (auch über Tage). Belegbar sind Hauptfach-Stunden plus Studierzeit;
-// Nebenfächer und Projekte nicht. Immer nur eine Woche.
+// Woche planen als Kalender-Raster: links die Lernwege je Fach (zum Platzieren),
+// rechts die Woche als Zeitachse. Stundenplan-Stunden, die nicht belegbar sind
+// (Nebenfächer, Projekte, Pause), liegen ausgegraut als Kontext; die belegbaren
+// Stunden (Hauptfächer + Studierzeit) sind die "Freiarbeit"-Slots, auf die man
+// die Uhren der Etappenziele legt. Eine Uhr = eine Stunde. Drag-and-drop (Laptop)
+// und Tippen (Touch) funktionieren beide. Die Planungs-Logik ist unverändert,
+// nur die Darstellung ist neu.
 
 const ETAPPE = etappen.find((e) => e.id === 4) || etappen[0];
 const WOCHEN_KEY = "neu.etappenplan.zuordnung"; // kbId -> Wochen-Index (read-only)
 const STUNDEN_KEY = "neu.wochenplan.stunden"; // kbId -> [Stunden-ID, ...] (je 1 Uhr)
 const TAGE = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag"];
+const TAGE_KURZ = ["Mo", "Di", "Mi", "Do", "Fr"];
+
+// Zeitachse des Kalenders.
+const MIN = (hhmm) => {
+  const [h, m] = String(hhmm).split(":").map(Number);
+  return h * 60 + (m || 0);
+};
+const T_VON = MIN(tagStart); // 08:00
+const T_BIS = MIN(tagEnde); // 15:30
+const SPANNE = T_BIS - T_VON;
+const PPM = 1.25; // Pixel pro Minute
+const STUNDEN_LINIEN = [];
+for (let h = Math.ceil(T_VON / 60); h * 60 <= T_BIS; h++) STUNDEN_LINIEN.push(h);
 
 function lade(key) {
   try {
@@ -42,15 +63,13 @@ function wochenStart(e, wIdx) {
 function tagDatum(montag, tagIdx) {
   const d = new Date(montag);
   d.setDate(montag.getDate() + tagIdx);
-  return d.getDate() + "." + (d.getMonth() + 1) + ".";
+  return d.getDate() + "." + (d.getMonth() + 1);
 }
-function bereichText(montag) {
-  const bis = new Date(montag);
-  bis.setDate(montag.getDate() + 4); // Mo bis Fr
-  const m = (d) => d.toLocaleDateString("de-DE", { month: "short" });
-  const t = (d) => d.getDate();
-  if (m(montag) === m(bis)) return `${t(montag)}.–${t(bis)}. ${m(montag)}`;
-  return `${t(montag)}. ${m(montag)} – ${t(bis)}. ${m(bis)}`;
+function langDatum(iso) {
+  return new Date(iso + "T00:00:00").toLocaleDateString("de-DE", {
+    day: "numeric",
+    month: "long",
+  });
 }
 
 // Alle belegbaren Stunden-IDs der Woche (Mo-Fr), für die Auto-Verteilung.
@@ -64,25 +83,21 @@ function alleBelegbarenSlots() {
   return slots;
 }
 
-// woche = Index der aktuellen Woche (0-basiert). Vorerst fest Woche 1; sobald die
-// Heute-/Datums-Ebene steht, folgt sie der echten laufenden Woche.
-export default function Wochenplan({ onZurueck, onWeiter, woche = 0 }) {
+export default function Wochenplan({ onZurueck, onWeiter, onEtappeAnpassen, woche = 0 }) {
   const wochenZuordnung = lade(WOCHEN_KEY); // kbId -> Woche
   const [stunden, setStunden] = useState(ladeStunden); // kbId -> [Slot-IDs]
   const [ueber, setUeber] = useState(null); // aktuelles Drop-Ziel (Hover)
   const [gewaehltId, setGewaehltId] = useState(null); // angetippter Chip (Touch)
   const [hinweis, setHinweis] = useState(null); // kurze Rueckmeldung (Toast)
-  const [resetConfirm, setResetConfirm] = useState(false); // Reset-Sicherheitsfrage
-  // Angezeigte Woche: startet auf der laufenden Woche, lässt sich aber auf andere
-  // Wochen der Etappe umstellen, um vorauszuplanen. "woche" bleibt die laufende.
+  const [resetConfirm, setResetConfirm] = useState(false);
   const [aktiveWoche, setAktiveWoche] = useState(woche);
+  const [zuFaecher, setZuFaecher] = useState(() => new Set()); // eingeklappte Fächer
 
   useEffect(() => {
     localStorage.setItem(STUNDEN_KEY, JSON.stringify(stunden));
     meldeAenderung();
   }, [stunden]);
 
-  // Toast nach kurzer Zeit wieder ausblenden.
   useEffect(() => {
     if (!hinweis) return undefined;
     const t = setTimeout(() => setHinweis(null), 2600);
@@ -92,18 +107,12 @@ export default function Wochenplan({ onZurueck, onWeiter, woche = 0 }) {
   const wocheKbs = koennensbeweise.filter(
     (k) => wochenZuordnung[k.id] === aktiveWoche
   );
-  // Wie viele Uhren eines Ziels sind noch nicht auf eine Stunde gelegt?
   const restVon = (k) => k.cluster - (stunden[k.id]?.length || 0);
-  // Alle Wochen der Etappe mit mindestens einem Ziel: das sind die planbaren
-  // Wochen (für die Wochen-Umschaltung).
   const wochenMitKbs = [
     ...new Set(
-      koennensbeweise
-        .map((k) => wochenZuordnung[k.id])
-        .filter((w) => w != null)
+      koennensbeweise.map((k) => wochenZuordnung[k.id]).filter((w) => w != null)
     ),
   ].sort((a, b) => a - b);
-  // Ist eine ganze Woche fertig verteilt (alle Uhren auf Stunden)?
   const wocheVollstaendig = (w) => {
     const kbs = koennensbeweise.filter((k) => wochenZuordnung[k.id] === w);
     return (
@@ -111,8 +120,6 @@ export default function Wochenplan({ onZurueck, onWeiter, woche = 0 }) {
       kbs.every((k) => k.cluster - (stunden[k.id]?.length || 0) <= 0)
     );
   };
-  // Schon erledigte Lernweg-Schritte eines Ziels: zeigt beim Planen, was
-  // bereits angefangen wurde (duenne Leiste am Chip).
   const schrittFortschritt = (kbId) => {
     const lw = lernwegFuerKb(kbId);
     const schritte = lw?.thema?.schritte || [];
@@ -125,15 +132,8 @@ export default function Wochenplan({ onZurueck, onWeiter, woche = 0 }) {
   };
   const vorrat = wocheKbs.filter((k) => restVon(k) > 0);
   const wocheFertig = wocheKbs.length > 0 && vorrat.length === 0;
-  const wocheHatPlatziert = wocheKbs.some(
-    (k) => (stunden[k.id] || []).length > 0
-  );
-  // Das "Weiter" hängt an der LAUFENDEN Woche (woche), nicht an der gerade
-  // angezeigten: vorausplanen ist freiwillig, starten kann man, sobald diese
-  // Woche steht.
+  const wocheHatPlatziert = wocheKbs.some((k) => (stunden[k.id] || []).length > 0);
   const aktuelleWocheFertig = wocheVollstaendig(woche);
-  // Gesamte Uhren-Last dieser Woche (aus dem Etappenplan) im Vergleich zum
-  // Wochenziel: macht eine Ueberplanung sichtbar, ohne zu bevormunden.
   const wochenLast = wocheKbs.reduce((s, k) => s + k.cluster, 0);
   const lastStand =
     wochenLast > wochenZielCluster + 4
@@ -142,29 +142,29 @@ export default function Wochenplan({ onZurueck, onWeiter, woche = 0 }) {
         ? "knapp"
         : "ok";
   const montag = wochenStart(ETAPPE, aktiveWoche);
-
-  const proTag = TAGE.map((name, i) => {
-    const stundenDesTages = stundenWoche
-      .filter((s) => s.tag === i && s.art !== "pause")
-      .map((s) => ({ ...s, sid: stundenId(s), belegbar: istBelegbar(s) }));
-    const uhrenAmTag = wocheKbs.reduce(
-      (n, k) =>
-        n + (stunden[k.id] || []).filter((sid) => slotTag(sid) === i).length,
-      0
-    );
-    return { name, idx: i, datum: tagDatum(montag, i), stundenDesTages, uhrenAmTag };
+  const monatLabel = montag.toLocaleDateString("de-DE", {
+    month: "long",
+    year: "numeric",
   });
+
+  // Vorrat nach Fach gruppieren (stabile Fach-Reihenfolge).
+  const vorratNachFach = kbFaecher
+    .map((fach) => ({ fach, kbs: vorrat.filter((k) => k.fach === fach) }))
+    .filter((g) => g.kbs.length > 0);
 
   function dragStart(e, id, quelleSlot) {
     e.dataTransfer.setData("text/plain", id + "|" + (quelleSlot || ""));
     e.dataTransfer.effectAllowed = "move";
-    e.dataTransfer.setDragImage(e.currentTarget, 12, 12);
+    try {
+      e.dataTransfer.setDragImage(e.currentTarget, 12, 12);
+    } catch {
+      /* manche Browser ohne Drag-Image */
+    }
   }
   function dragEnde() {
     setUeber(null);
   }
 
-  // Eine Uhr auf eine Stunde legen (oder von einer Stunde auf eine andere ziehen).
   function platziereUhr(id, zielSlot, quelleSlot) {
     const kb = koennensbeweise.find((k) => k.id === id);
     if (!kb) return;
@@ -173,13 +173,11 @@ export default function Wochenplan({ onZurueck, onWeiter, woche = 0 }) {
       const istMove = !!quelleSlot && quelleSlot !== zielSlot;
       if (istMove) arr.delete(quelleSlot);
       if (arr.has(zielSlot)) return { ...prev, [id]: [...arr] };
-      // Mehr Uhren als das Ziel hat, gibt es nicht (außer beim Verschieben).
       if (!istMove && arr.size >= kb.cluster) return prev;
       arr.add(zielSlot);
       return { ...prev, [id]: [...arr] };
     });
   }
-  // Eine einzelne Uhr von einer Stunde zurück in den Vorrat.
   function entferneUhr(id, slotId) {
     setStunden((prev) => {
       const arr = (prev[id] || []).filter((s) => s !== slotId);
@@ -190,7 +188,6 @@ export default function Wochenplan({ onZurueck, onWeiter, woche = 0 }) {
     });
   }
 
-  // Tippen-zum-Zuordnen (Touch): Ziel antippen, dann eine Stunde antippen.
   function waehle(id) {
     setGewaehltId((g) => (g === id ? null : id));
   }
@@ -199,13 +196,10 @@ export default function Wochenplan({ onZurueck, onWeiter, woche = 0 }) {
     const kb = koennensbeweise.find((k) => k.id === gewaehltId);
     const schon = new Set(stunden[gewaehltId] || []);
     platziereUhr(gewaehltId, slotId, null);
-    // Liegen danach alle Uhren? Dann Auswahl lösen, sonst für die nächste Uhr halten.
     const nachher = schon.has(slotId) ? schon.size : schon.size + 1;
     if (!kb || nachher >= kb.cluster) setGewaehltId(null);
   }
 
-  // Offene Uhren ausgewogen auf die belegbaren Stunden verteilen (least-loaded
-  // zuerst, je Ziel höchstens eine Uhr pro Stunde). Danach frei anpassbar.
   function vorschlagVerteilen() {
     const slots = alleBelegbarenSlots();
     if (slots.length === 0) return;
@@ -214,9 +208,7 @@ export default function Wochenplan({ onZurueck, onWeiter, woche = 0 }) {
       const last = {};
       slots.forEach((sid) => (last[sid] = 0));
       for (const k of wocheKbs) {
-        for (const sid of next[k.id] || []) {
-          if (last[sid] != null) last[sid]++;
-        }
+        for (const sid of next[k.id] || []) if (last[sid] != null) last[sid]++;
       }
       for (const kb of wocheKbs) {
         const have = new Set(next[kb.id] || []);
@@ -227,7 +219,7 @@ export default function Wochenplan({ onZurueck, onWeiter, woche = 0 }) {
             if (have.has(sid)) continue;
             if (best === null || last[sid] < last[best]) best = sid;
           }
-          if (best === null) break; // keine freie Stunde mehr
+          if (best === null) break;
           have.add(best);
           last[best]++;
           fehlend--;
@@ -239,8 +231,6 @@ export default function Wochenplan({ onZurueck, onWeiter, woche = 0 }) {
     setHinweis("Ausgewogen auf die Stunden verteilt. Du kannst frei anpassen.");
   }
 
-  // Stunden-Zuordnung der angezeigten Woche verwerfen: ihre Uhren zurueck in den
-  // Vorrat. Andere Wochen, Lernstand und Wochen-Zuordnung bleiben unangetastet.
   function planZuruecksetzen() {
     setStunden((prev) => {
       const next = { ...prev };
@@ -252,61 +242,183 @@ export default function Wochenplan({ onZurueck, onWeiter, woche = 0 }) {
     setHinweis("Stunden dieser Woche zurückgesetzt. Dein Lernstand bleibt.");
   }
 
-  // KB-Chip einer einzelnen Uhr in einer Stunde (zurücklegbar per Tippen/Ziehen).
-  function uhrChip(k, sid) {
+  function toggleFach(fach) {
+    setZuFaecher((s) => {
+      const n = new Set(s);
+      if (n.has(fach)) n.delete(fach);
+      else n.add(fach);
+      return n;
+    });
+  }
+
+  // Drop zurück in den Vorrat (Sidebar): eine platzierte Uhr entfernen.
+  function dropInVorrat(e) {
+    e.preventDefault();
+    const [id, quelle] = (e.dataTransfer.getData("text/plain") || "").split("|");
+    if (id && quelle) entferneUhr(id, quelle);
+    setUeber(null);
+  }
+
+  // Ein Block im Kalender (eine Stunde des Tages).
+  function block(s) {
+    const sid = stundenId(s);
+    const stil = {
+      top: (MIN(s.von) - T_VON) * PPM + "px",
+      height: (MIN(s.bis) - MIN(s.von)) * PPM - 4 + "px",
+    };
+    if (s.art === "pause") {
+      return (
+        <div className="wp-blk wp-blk-pause" key={sid} style={stil}>
+          <span>{s.fach}</span>
+        </div>
+      );
+    }
+    if (!istBelegbar(s)) {
+      return (
+        <div className="wp-blk wp-blk-fix" key={sid} style={stil}>
+          <span className="wp-blk-fach">{s.fach}</span>
+          <span className="wp-blk-zeit">
+            {s.von} bis {s.bis}
+          </span>
+          <span className="wp-blk-raum">{s.raum}</span>
+          <span
+            className="wp-blk-strich"
+            style={{ background: fachFarbe[s.fach] || "#868e96" }}
+          />
+        </div>
+      );
+    }
+    const slotKbs = wocheKbs.filter((k) => (stunden[k.id] || []).includes(sid));
+    const leer = slotKbs.length === 0;
+    const aktiv = ueber === sid;
     return (
-      <KbChip
-        k={k}
-        key={k.id}
-        platziert
-        mitFach
-        zahl={null}
-        onDragStart={(e, id) => dragStart(e, id, sid)}
-        onDragEnd={dragEnde}
-        onZurueck={() => entferneUhr(k.id, sid)}
-      />
+      <div
+        key={sid}
+        className={
+          "wp-blk wp-blk-frei" +
+          (leer ? " leer" : " belegt") +
+          (aktiv ? " ueber" : "") +
+          (leer && gewaehltId != null ? " tippbar" : "")
+        }
+        style={stil}
+        onDragOver={(e) => {
+          e.preventDefault();
+          setUeber(sid);
+        }}
+        onDragLeave={() => setUeber((u) => (u === sid ? null : u))}
+        onDrop={(e) => {
+          e.preventDefault();
+          const [id, quelle] = (
+            e.dataTransfer.getData("text/plain") || ""
+          ).split("|");
+          if (id) platziereUhr(id, sid, quelle || null);
+          setUeber(null);
+        }}
+        onClick={(e) => {
+          e.stopPropagation();
+          tippZuSlot(sid);
+        }}
+      >
+        {leer ? (
+          <>
+            <span className="wp-frei-label">
+              {aktiv || gewaehltId != null ? "hier ablegen" : "Freiarbeit"}
+            </span>
+            <span className="wp-frei-zeit">
+              {s.von} bis {s.bis}
+            </span>
+          </>
+        ) : (
+          slotKbs.map((k) => (
+            <div
+              key={k.id}
+              className="wp-kb"
+              style={{ "--c": kbFarbe[k.fach] || "#868e96" }}
+              draggable
+              onDragStart={(e) => dragStart(e, k.id, sid)}
+              onDragEnd={dragEnde}
+              onClick={(e) => {
+                e.stopPropagation();
+                entferneUhr(k.id, sid);
+              }}
+              title={`${k.code} · antippen, um zurückzulegen`}
+            >
+              <span className="wp-kb-titel">{k.titel}</span>
+              <span className="wp-kb-meta">
+                <span className="wp-kb-uhr" aria-hidden="true">
+                  ◷
+                </span>
+                {k.cluster} · {k.fach}
+              </span>
+            </div>
+          ))
+        )}
+      </div>
     );
   }
 
+  const aktiverIdx = wochenMitKbs.indexOf(aktiveWoche);
+  const gehWoche = (delta) => {
+    const ni = aktiverIdx + delta;
+    if (ni < 0 || ni >= wochenMitKbs.length) return;
+    setAktiveWoche(wochenMitKbs[ni]);
+    setGewaehltId(null);
+  };
+
   return (
-    <div className="wp-screen">
-      <header className="wp-kopf">
-        <div className="wp-kopf-text">
-          <p className="wp-eyebrow">Woche planen</p>
-          <h1 className="wp-titel">Plane deine Woche</h1>
-          <p className="wp-sub">
-            Woche {aktiveWoche + 1}
-            {aktiveWoche === woche ? " (diese Woche)" : ""} ·{" "}
-            {bereichText(montag)} · leg jede Uhr auf eine Hauptfach-Stunde.
-            Größere Ziele gehen über mehrere Stunden.
-          </p>
-        </div>
-        <div className="wp-kopf-aktion">
-          {wochenLast > 0 && (
-            <span className="wp-wochenlast" data-stand={lastStand}>
-              {wochenLast} Uhren diese Woche · Ziel {wochenZielCluster}
+    <div className="wp-screen" onClick={() => gewaehltId != null && setGewaehltId(null)}>
+      <div className="wp-layout">
+        {/* Linke Spalte: Lernwege je Fach, zum Platzieren */}
+        <aside
+          className={"wp-seite" + (ueber === "pool" ? " ueber" : "")}
+          onDragOver={(e) => {
+            e.preventDefault();
+            setUeber("pool");
+          }}
+          onDragLeave={() => setUeber((u) => (u === "pool" ? null : u))}
+          onDrop={dropInVorrat}
+        >
+          <div className="wp-seite-kopf">
+            <span className="wp-seite-icon" aria-hidden="true">
+              🗓
             </span>
-          )}
-          <span className={"wp-fortschritt" + (wocheFertig ? " fertig" : "")}>
-            {wocheFertig ? "Alle Uhren verteilt ✓" : `noch ${vorrat.length} offen`}
-          </span>
-          <div className="wp-kopf-buttons">
-            <button type="button" className="wp-zurueck" onClick={onZurueck}>
-              ← Etappenplan
+            <div>
+              <h1 className="wp-seite-titel">Plane deine Woche</h1>
+              <p className="wp-seite-sub">
+                {langDatum(ETAPPE.von)} bis {langDatum(ETAPPE.bis)}
+              </p>
+            </div>
+          </div>
+
+          <div className="wp-seite-status">
+            <span className={"wp-status-rest" + (wocheFertig ? " fertig" : "")}>
+              {wocheFertig ? "Alle Uhren verteilt ✓" : `noch ${vorrat.length} offen`}
+            </span>
+            {wochenLast > 0 && (
+              <span className="wp-status-last" data-stand={lastStand}>
+                {wochenLast} von {wochenZielCluster} Uhren
+              </span>
+            )}
+          </div>
+
+          <div className="wp-seite-aktionen">
+            <button
+              type="button"
+              className="wp-akt"
+              onClick={vorschlagVerteilen}
+              disabled={vorrat.length === 0}
+              title="Die offenen Uhren ausgewogen auf die Stunden verteilen"
+            >
+              Für mich vorschlagen
             </button>
             {resetConfirm ? (
-              <span className="ep-reset-confirm" role="group">
-                <span className="ep-reset-frage">Stunden neu?</span>
-                <button
-                  type="button"
-                  className="ep-reset-ja"
-                  onClick={planZuruecksetzen}
-                >
-                  Ja, neu
+              <span className="wp-reset-confirm">
+                <button type="button" className="wp-akt warn" onClick={planZuruecksetzen}>
+                  Wirklich neu
                 </button>
                 <button
                   type="button"
-                  className="ep-reset-nein"
+                  className="wp-akt"
                   onClick={() => setResetConfirm(false)}
                 >
                   Abbrechen
@@ -315,194 +427,160 @@ export default function Wochenplan({ onZurueck, onWeiter, woche = 0 }) {
             ) : (
               <button
                 type="button"
-                className="ep-reset"
+                className="wp-akt"
                 onClick={() => setResetConfirm(true)}
                 disabled={!wocheHatPlatziert}
-                title="Die Stunden dieser Woche löschen und neu verteilen (dein Lernstand bleibt)"
+                title="Die Stunden dieser Woche löschen (Lernstand bleibt)"
               >
                 Zurücksetzen
               </button>
             )}
-            <button
-              type="button"
-              className="wp-vorschlag"
-              onClick={vorschlagVerteilen}
-              disabled={vorrat.length === 0}
-              title="Die offenen Uhren ausgewogen auf die Stunden verteilen, danach frei anpassen"
-            >
-              Für mich vorschlagen
-            </button>
-            <button
-              type="button"
-              className="wp-weiter"
-              onClick={onWeiter}
-              disabled={!aktuelleWocheFertig}
-              title={
-                aktuelleWocheFertig
-                  ? "Weiter zur Übersicht"
-                  : "Erst alle Uhren der laufenden Woche auf Stunden verteilen"
-              }
-            >
-              Weiter →
-            </button>
           </div>
-        </div>
-      </header>
 
-      {/* Wochen der Etappe: vorausplanen, ohne die laufende Woche zu verlassen */}
-      {wochenMitKbs.length > 1 && (
-        <div className="wp-wochen" role="tablist" aria-label="Woche wählen">
-          {wochenMitKbs.map((w) => (
-            <button
-              key={w}
-              type="button"
-              role="tab"
-              aria-selected={w === aktiveWoche}
-              className={
-                "wp-woche-tab" +
-                (w === aktiveWoche ? " aktiv" : "") +
-                (wocheVollstaendig(w) ? " fertig" : "")
-              }
-              onClick={() => {
-                setAktiveWoche(w);
-                setGewaehltId(null);
-              }}
-              title={
-                w === woche ? "Diese (laufende) Woche" : `Woche ${w + 1} vorausplanen`
-              }
-            >
-              <span className="wp-woche-tab-name">Woche {w + 1}</span>
-              {w === woche && <span className="wp-woche-tab-jetzt">jetzt</span>}
-              {wocheVollstaendig(w) && (
-                <span className="wp-woche-tab-haken" aria-hidden="true">
-                  ✓
-                </span>
-              )}
-            </button>
-          ))}
-        </div>
-      )}
-
-      {/* Vorrat: Ziele dieser Woche mit noch offenen Uhren */}
-      <div
-        className={"wp-vorrat" + (ueber === "pool" ? " ueber" : "")}
-        onDragOver={(e) => {
-          e.preventDefault();
-          setUeber("pool");
-        }}
-        onDragLeave={() => setUeber((u) => (u === "pool" ? null : u))}
-        onDrop={(e) => {
-          e.preventDefault();
-          const [id, quelle] = (e.dataTransfer.getData("text/plain") || "").split("|");
-          if (id && quelle) entferneUhr(id, quelle);
-          setUeber(null);
-        }}
-        onClick={() => gewaehltId != null && setGewaehltId(null)}
-      >
-        <span className="wp-vorrat-label">Diese Woche</span>
-        {vorrat.length === 0 ? (
-          <span className="wp-vorrat-leer">
-            {wocheKbs.length === 0
-              ? "Keine Ziele in dieser Woche."
-              : "Alle Uhren verteilt."}
-          </span>
-        ) : (
-          vorrat.map((k) => (
-            <KbChip
-              k={k}
-              key={k.id}
-              mitFach
-              zahl={restVon(k)}
-              fortschritt={schrittFortschritt(k.id)}
-              gewaehlt={gewaehltId === k.id}
-              onTippen={waehle}
-              onDragStart={(e, id) => dragStart(e, id, null)}
-              onDragEnd={dragEnde}
-            />
-          ))
-        )}
-      </div>
-
-      {/* Wochentage mit ihren Stunden als Drop-Ziele */}
-      <div className="wp-tage">
-        {proTag.map((tg) => (
-          <section key={tg.idx} className="wp-tag">
-            <header className="wp-tag-kopf">
-              <div className="wp-tag-titel">
-                <span className="wp-tag-name">{tg.name}</span>
-                <span className="wp-tag-datum">{tg.datum}</span>
-              </div>
-              {tg.uhrenAmTag > 0 && (
-                <span className="wp-tag-summe">{tg.uhrenAmTag}</span>
-              )}
-            </header>
-
-            <div className="wp-tag-stunden">
-              {tg.stundenDesTages.map((s) => {
-                if (!s.belegbar) {
-                  return (
-                    <div className="wp-stunde-zu" key={s.sid} title="Nicht belegbar">
-                      <span className="wp-stunde-zeit">{s.von}</span>
-                      <span
-                        className="wp-stunde-dot"
-                        style={{ background: fachFarbe[s.fach] || "#868e96" }}
-                      />
-                      <span className="wp-stunde-fach">{s.fach}</span>
-                    </div>
-                  );
-                }
-                const slotKbs = wocheKbs.filter((k) =>
-                  (stunden[k.id] || []).includes(s.sid)
-                );
-                const aktiv = ueber === s.sid;
+          <div className="wp-seite-liste">
+            {vorratNachFach.length === 0 ? (
+              <p className="wp-seite-leer">
+                {wocheKbs.length === 0
+                  ? "Keine Ziele in dieser Woche."
+                  : "Alle Uhren dieser Woche sind verteilt."}
+              </p>
+            ) : (
+              vorratNachFach.map((g) => {
+                const zu = zuFaecher.has(g.fach);
                 return (
-                  <div
-                    key={s.sid}
-                    className={
-                      "wp-slot" +
-                      (aktiv ? " ueber" : "") +
-                      (gewaehltId != null ? " tippbar" : "")
-                    }
-                    onDragOver={(e) => {
-                      e.preventDefault();
-                      setUeber(s.sid);
-                    }}
-                    onDragLeave={() => setUeber((u) => (u === s.sid ? null : u))}
-                    onDrop={(e) => {
-                      e.preventDefault();
-                      const [id, quelle] = (
-                        e.dataTransfer.getData("text/plain") || ""
-                      ).split("|");
-                      if (id) platziereUhr(id, s.sid, quelle || null);
-                      setUeber(null);
-                    }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      tippZuSlot(s.sid);
-                    }}
+                  <section
+                    className="wp-fachgruppe"
+                    key={g.fach}
+                    style={{ "--c": kbFarbe[g.fach] || "#868e96" }}
                   >
-                    <div className="wp-slot-kopf">
-                      <span className="wp-stunde-zeit">{s.von}</span>
-                      <span className="wp-slot-fach">{s.fach}</span>
-                      <span className={"wp-slot-art wp-art-" + s.art}>
-                        {artLabel[s.art] || s.art}
+                    <button
+                      type="button"
+                      className="wp-fachgruppe-kopf"
+                      onClick={() => toggleFach(g.fach)}
+                      aria-expanded={!zu}
+                    >
+                      <span className="wp-fachgruppe-name">{g.fach}</span>
+                      <span className="wp-fachgruppe-zahl">{g.kbs.length}</span>
+                      <span className="wp-fachgruppe-pfeil" aria-hidden="true">
+                        {zu ? "▸" : "▾"}
                       </span>
-                    </div>
-                    <div className="wp-slot-kbs">
-                      {slotKbs.length === 0 ? (
-                        <span className="wp-slot-leer">
-                          {aktiv || gewaehltId != null ? "hier ablegen" : "frei"}
-                        </span>
-                      ) : (
-                        slotKbs.map((k) => uhrChip(k, s.sid))
-                      )}
-                    </div>
-                  </div>
+                    </button>
+                    {!zu && (
+                      <div className="wp-fachgruppe-chips">
+                        {g.kbs.map((k) => (
+                          <KbChip
+                            k={k}
+                            key={k.id}
+                            zahl={restVon(k)}
+                            fortschritt={schrittFortschritt(k.id)}
+                            gewaehlt={gewaehltId === k.id}
+                            onTippen={waehle}
+                            onDragStart={(e, id) => dragStart(e, id, null)}
+                            onDragEnd={dragEnde}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </section>
                 );
-              })}
+              })
+            )}
+          </div>
+        </aside>
+
+        {/* Rechte Spalte: die Woche als Kalender */}
+        <section className="wp-kal">
+          <header className="wp-kal-kopf">
+            <div className="wp-kal-nav">
+              <button
+                type="button"
+                className="wp-kal-pfeil"
+                onClick={() => gehWoche(-1)}
+                disabled={aktiverIdx <= 0}
+                aria-label="Woche zurück"
+              >
+                ‹
+              </button>
+              <h2 className="wp-kal-monat">{monatLabel}</h2>
+              <button
+                type="button"
+                className="wp-kal-pfeil"
+                onClick={() => gehWoche(1)}
+                disabled={aktiverIdx < 0 || aktiverIdx >= wochenMitKbs.length - 1}
+                aria-label="Woche vor"
+              >
+                ›
+              </button>
+              {aktiveWoche === woche && wochenMitKbs.length > 1 && (
+                <span className="wp-kal-jetzt">diese Woche</span>
+              )}
             </div>
-          </section>
-        ))}
+            <div className="wp-kal-kopf-buttons">
+              {onEtappeAnpassen && (
+                <button type="button" className="wp-akt" onClick={onEtappeAnpassen}>
+                  Etappe anpassen
+                </button>
+              )}
+              {onZurueck && (
+                <button type="button" className="wp-akt" onClick={onZurueck}>
+                  ← Etappenplan
+                </button>
+              )}
+              {onWeiter && (
+                <button
+                  type="button"
+                  className="wp-weiter"
+                  onClick={onWeiter}
+                  disabled={!aktuelleWocheFertig}
+                  title={
+                    aktuelleWocheFertig
+                      ? "Weiter zur Übersicht"
+                      : "Erst alle Uhren der laufenden Woche verteilen"
+                  }
+                >
+                  Weiter →
+                </button>
+              )}
+            </div>
+          </header>
+
+          <div className="wp-kal-grid">
+            <div className="wp-kal-head">
+              <div className="wp-kal-gutter-head" />
+              {TAGE.map((name, i) => (
+                <div className="wp-kal-tag-head" key={i}>
+                  <span className="wp-kal-tag-datum">{tagDatum(montag, i)}</span>
+                  <span className="wp-kal-tag-name">{TAGE_KURZ[i]}</span>
+                </div>
+              ))}
+            </div>
+            <div className="wp-kal-body" style={{ height: SPANNE * PPM + "px" }}>
+              <div className="wp-kal-gutter">
+                {STUNDEN_LINIEN.map((h) => (
+                  <span
+                    className="wp-kal-zeit"
+                    key={h}
+                    style={{ top: (h * 60 - T_VON) * PPM + "px" }}
+                  >
+                    {h}:00
+                  </span>
+                ))}
+              </div>
+              {TAGE.map((name, i) => (
+                <div className="wp-kal-col" key={i}>
+                  {STUNDEN_LINIEN.map((h) => (
+                    <span
+                      className="wp-kal-linie"
+                      key={h}
+                      style={{ top: (h * 60 - T_VON) * PPM + "px" }}
+                    />
+                  ))}
+                  {stundenWoche.filter((s) => s.tag === i).map((s) => block(s))}
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
       </div>
 
       {hinweis && (
