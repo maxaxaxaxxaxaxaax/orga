@@ -99,34 +99,8 @@
   cursor: pointer;
 }
 
-/* Ruhiger Toast: kurze Rueckmeldung, oben mittig, blendet von selbst aus.
-   (Waehrend der Planung ist die obere Navleiste aus, also kein Konflikt.) */
-.ep-hinweis {
-  position: fixed;
-  top: 18px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 60;
-  max-width: 90vw;
-  padding: 10px 18px;
-  background: var(--accent);
-  color: var(--on-accent);
-  font-size: 0.88rem;
-  font-weight: 600;
-  border-radius: 999px;
-  box-shadow: var(--shadow-lg);
-  animation: ep-hinweis-rein 0.25s ease both;
-}
-@keyframes ep-hinweis-rein {
-  from {
-    opacity: 0;
-    transform: translate(-50%, -8px);
-  }
-  to {
-    opacity: 1;
-    transform: translate(-50%, 0);
-  }
-}
+/* Der Toast (.ep-hinweis) ist zentral in index.css definiert, damit er nicht
+   doppelt (und konfliktierend) existiert. */
 /* Sekundär: ausgewogene Verteilung vorschlagen. Ruhiger Outline-Knopf, damit er
    den primären "Weiter" nicht überstrahlt, aber als Einstieg sichtbar ist. */
 .ep-vorschlag {

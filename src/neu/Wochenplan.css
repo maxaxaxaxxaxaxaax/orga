@@ -439,20 +439,8 @@
   font-size: 0.7rem;
 }
 
-/* Toast (geteilt mit Etappenplan). */
-.ep-hinweis {
-  position: fixed;
-  left: 50%;
-  bottom: 88px;
-  transform: translateX(-50%);
-  background: var(--text);
-  color: var(--bg);
-  font-size: 0.85rem;
-  padding: 9px 16px;
-  border-radius: 999px;
-  box-shadow: var(--shadow-lg);
-  z-index: 60;
-}
+/* Der Toast (.ep-hinweis) ist zentral in index.css definiert (vorher stand er
+   hier und im Etappenplan doppelt: top vs. bottom hat den Toast riesig gestreckt). */
 
 @media (pointer: coarse) {
   .wp-akt,
