@@ -322,31 +322,6 @@
   font-size: 0.88rem;
 }
 
-/* Liste/Raster-Umschalter */
-.ab-ansicht-knopf {
-  flex-shrink: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  border: 1px solid var(--line);
-  background: var(--card);
-  color: var(--text-2);
-  border-radius: var(--r-sm, 9px);
-  cursor: pointer;
-  transition: border-color 0.14s ease, color 0.14s ease, background 0.14s ease;
-}
-.ab-ansicht-knopf:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-}
-.ab-ansicht-knopf.an {
-  background: var(--accent-soft);
-  border-color: var(--accent);
-  color: var(--accent);
-}
-
 /* Sortieren-Dropdown */
 .ab-sort {
   position: relative;
@@ -460,17 +435,6 @@
   font-size: 0.9rem;
   color: var(--muted);
   font-style: italic;
-}
-/* Rasteransicht: zwei Spalten statt einer langen Liste. */
-.ab-liste-raster {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
-}
-@media (max-width: 560px) {
-  .ab-liste-raster {
-    grid-template-columns: 1fr;
-  }
 }
 
 /* Lernweg-Detail als Overlay */

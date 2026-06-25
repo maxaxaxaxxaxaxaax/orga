@@ -64,16 +64,6 @@ function IcKi(p) {
     </svg>
   );
 }
-function IcGrid(p) {
-  return (
-    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}>
-      <rect x="3" y="3" width="7" height="7" rx="1.5" />
-      <rect x="14" y="3" width="7" height="7" rx="1.5" />
-      <rect x="3" y="14" width="7" height="7" rx="1.5" />
-      <rect x="14" y="14" width="7" height="7" rx="1.5" />
-    </svg>
-  );
-}
 function FolderIcon({ color, offen }) {
   if (offen) {
     // Geöffneter Ordner: hintere Wand + nach vorne geklappte, oben breitere Lasche.
@@ -154,7 +144,6 @@ export default function Ablage() {
   const [suche, setSuche] = useState("");
   const [sort, setSort] = useState("neu"); // neu | az
   const [sortOffen, setSortOffen] = useState(false);
-  const [raster, setRaster] = useState(false); // Liste | Raster
   const [katOffen, setKatOffen] = useState(() => new Set()); // offene Kompetenzbereiche
   const [uploadOffen, setUploadOffen] = useState(false);
   const [eigene, setEigene] = useState(ladeEigene);
@@ -381,16 +370,6 @@ export default function Ablage() {
               />
             </div>
             <div className="ab-liste-werkzeuge">
-              <button
-                type="button"
-                className={"ab-ansicht-knopf" + (raster ? " an" : "")}
-                onClick={() => setRaster((v) => !v)}
-                aria-pressed={raster}
-                aria-label={raster ? "Als Liste zeigen" : "Als Raster zeigen"}
-                title={raster ? "Als Liste zeigen" : "Als Raster zeigen"}
-              >
-                <IcGrid />
-              </button>
               <div className="ab-sort">
                 <button
                   type="button"
@@ -432,7 +411,7 @@ export default function Ablage() {
           {rows.length === 0 ? (
             <p className="ab-liste-leer">Nichts gefunden.</p>
           ) : (
-            <ul className={"ab-liste" + (raster ? " ab-liste-raster" : "")}>
+            <ul className="ab-liste">
               {rows.map((r) => {
                 const Inhalt = (
                   <>
