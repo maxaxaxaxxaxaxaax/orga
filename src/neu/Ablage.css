@@ -1,96 +1,47 @@
+/* Ablage im Mockup-Layout: links Fächer (bunte Ordner) + Kompetenzen, rechts die
+   Materialien mit Typ-Chips, Suche/Sortierung und Liste. Nutzt die globalen
+   CSS-Variablen (Hell). */
 .ab-screen {
   min-height: 100vh;
   box-sizing: border-box;
-  /* Oben Platz für die schwebende Nav-Leiste (oben rechts). Unten keine
-     Weg-Leiste auf der Ablage, daher knapp. */
-  padding: 74px 44px 40px;
+  /* oben Platz für die schwebende Nav-Pille; unten keine Weg-Leiste auf der Ablage */
+  padding: 70px 28px 28px;
   background: var(--bg);
   color: var(--text);
+  font-family: var(--font-satoshi);
+}
+.ab-screen :is(h1, h2, h3) {
+  font-family: var(--font-satoshi);
 }
 @media (max-width: 560px) {
   .ab-screen {
-    padding-left: 16px;
-    padding-right: 16px;
+    padding-left: 14px;
+    padding-right: 14px;
   }
 }
-.ab-kopf {
-  display: flex;
-  align-items: flex-start;
-  gap: 16px;
-}
 
-/* Werkzeuge gehören zum Inhalt: eine Zeile auf Ordner-Breite, direkt über den
-   Karten. Suche füllt, "+ Material" sitzt rechtsbündig zu den Ordnern. */
-.ab-werkzeuge {
-  margin-top: 20px;
+/* Werkzeugzeile oben */
+.ab-top {
   display: flex;
   align-items: center;
-  gap: 10px;
-  max-width: 1100px;
+  gap: 14px;
+  margin-bottom: 16px;
 }
-.ab-eyebrow {
-  margin: 0 0 4px;
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-.ab-titel {
-  margin: 0;
-  font-size: 2.4rem;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-}
-.ab-zurueck {
-  align-self: flex-start;
-  margin-bottom: 8px;
-  border: none;
-  background: transparent;
-  color: var(--text-2);
-  font-size: 0.86rem;
-  font-weight: 600;
-  padding: 0;
-  cursor: pointer;
-}
-.ab-zurueck:hover {
-  color: var(--accent);
-}
-.ab-hochladen {
-  flex-shrink: 0;
-  margin-left: auto;
-  border: 1px solid var(--line);
-  background: var(--card);
-  color: var(--text-2);
-  font-size: 0.88rem;
-  font-weight: 600;
-  padding: 10px 16px;
-  border-radius: 999px;
-  cursor: pointer;
-}
-.ab-hochladen:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-}
-
-/* Suchfeld: der schnelle Zugang zu allen Lernwegen und Materialien. */
 .ab-suche {
   flex: 1;
+  min-width: 0;
   display: flex;
   align-items: center;
   gap: 8px;
-  max-width: 480px;
   padding: 10px 16px;
   background: var(--card);
   border: 1px solid var(--line);
   border-radius: 999px;
-}
-.ab-suche:focus-within {
-  border-color: var(--accent);
+  box-shadow: var(--shadow-sm);
 }
 .ab-suche svg {
-  width: 16px;
-  height: 16px;
+  width: 17px;
+  height: 17px;
   flex-shrink: 0;
   color: var(--muted);
 }
@@ -98,397 +49,274 @@
   flex: 1;
   min-width: 0;
   border: none;
-  background: transparent;
   outline: none;
+  background: transparent;
+  font: inherit;
   font-size: 0.92rem;
   color: var(--text);
 }
 .ab-suche input::placeholder {
   color: var(--muted);
 }
-.ab-suche-leeren {
+.ab-add {
   flex-shrink: 0;
-  width: 22px;
-  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
   border: none;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: 0.92rem;
+  font-weight: 700;
+  padding: 11px 20px;
   border-radius: 999px;
-  background: var(--bg);
-  color: var(--text-2);
-  font-size: 0.7rem;
   cursor: pointer;
+  box-shadow: 0 4px 14px -4px var(--accent-shadow);
+  transition: background 0.15s ease, transform 0.12s ease;
 }
-.ab-suche-leeren:hover {
-  color: var(--text);
+.ab-add:hover {
+  background: var(--accent-strong);
+}
+.ab-add:active {
+  transform: scale(0.97);
 }
 
-/* Treffer: flache Zeilen mit Haarlinien, gruppiert nach Typ. */
-.ab-treffer {
-  margin-top: 20px;
-  max-width: 760px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-.ab-treffer-leer {
-  margin: 0;
-  font-size: 0.9rem;
-  color: var(--muted);
-  font-style: italic;
-}
-.ab-treffer-label {
-  margin: 0 0 4px;
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-.ab-treffer-liste {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-.ab-treffer-zeile {
-  width: 100%;
-  display: flex;
-  align-items: baseline;
-  gap: 12px;
-  padding: 9px 2px;
-  border: none;
-  border-bottom: 1px solid color-mix(in srgb, var(--line) 60%, transparent);
-  background: transparent;
-  cursor: pointer;
-  text-align: left;
-}
-.ab-treffer-liste li:last-child .ab-treffer-zeile {
-  border-bottom: none;
-}
-.ab-treffer-zeile:hover .ab-treffer-titel {
-  color: var(--accent);
-}
-.ab-treffer-punkt {
-  flex-shrink: 0;
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  align-self: center;
-}
-.ab-treffer-art {
-  flex-shrink: 0;
-  width: 110px;
-  font-size: 0.68rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--muted);
-}
-.ab-treffer-titel {
-  flex: 1;
-  min-width: 0;
-  font-size: 0.9rem;
-  color: var(--text);
-  line-height: 1.3;
-}
-.ab-treffer-info {
-  flex-shrink: 0;
-  max-width: 240px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-size: 0.76rem;
-  color: var(--muted);
-}
-.ab-treffer-datum {
-  flex-shrink: 0;
-  min-width: 56px;
-  text-align: right;
-  font-size: 0.76rem;
-  color: var(--muted);
-  font-variant-numeric: tabular-nums;
-}
-
-/* Schritt 1: Fach-Wahl als ruhiges Karten-Raster. */
-.ab-faecher-grid {
-  margin-top: 24px;
+/* Zwei Spalten */
+.ab-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 14px;
-  max-width: 1100px;
-}
-.ab-fachkarte {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  text-align: left;
-  padding: 20px 18px;
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-top: 3px solid var(--c);
-  border-radius: var(--r-md, 12px);
-  cursor: pointer;
-  transition: border-color 0.12s ease, box-shadow 0.12s ease,
-    transform 0.08s ease;
-}
-.ab-fachkarte:hover {
-  border-color: color-mix(in srgb, var(--c) 45%, var(--line));
-  box-shadow: var(--shadow-sm);
-  transform: translateY(-1px);
-}
-.ab-fachkarte-name {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: color-mix(in srgb, var(--c) 72%, var(--text));
-}
-.ab-fachkarte-meta {
-  font-size: 0.8rem;
-  color: var(--muted);
-}
-
-/* Schritt 2: Master-Detail. Links die Lernwege, rechts die Detail-Fläche. */
-.ab-spalten {
-  margin-top: 24px;
-  display: grid;
-  grid-template-columns: minmax(230px, 300px) minmax(0, 1fr);
-  gap: 20px;
+  grid-template-columns: minmax(280px, 340px) minmax(0, 1fr);
+  gap: 18px;
   align-items: start;
-  max-width: 1100px;
 }
-@media (max-width: 860px) {
-  .ab-spalten {
+@media (max-width: 760px) {
+  .ab-grid {
     grid-template-columns: 1fr;
   }
 }
 
-/* Wrapper um Umschalter + Spalten: der Umschalter steht UEBER dem Grid, nicht
-   darin (sonst belegt er eine Grid-Zelle und das Detail rutscht nach unten). */
-.ab-bereich {
-  margin-top: 24px;
-  max-width: 1100px;
+.ab-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg, 20px);
+  padding: 18px 20px;
+  box-shadow: var(--shadow-sm);
 }
-.ab-bereich .ab-spalten {
-  margin-top: 0;
-}
-/* Im Netz-Modus bekommt das Netz die breite Spalte, das Detail die schmale,
-   beide oben buendig. */
-.ab-spalten-netz {
-  grid-template-columns: minmax(0, 1fr) minmax(230px, 300px);
+.ab-card-titel {
+  margin: 0 0 14px;
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text);
 }
 
-/* Master-Liste: ruhige Zeilen, ein Aktiv-Zustand, bleibt beim Scrollen stehen. */
-.ab-liste {
-  position: sticky;
-  top: 24px;
+.ab-links {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  padding: 6px;
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: var(--r-md, 12px);
+  gap: 18px;
 }
-@media (max-width: 860px) {
-  .ab-liste {
-    position: static;
-  }
+
+/* Fächer als Ordner */
+.ab-ordner-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px 6px;
 }
-.ab-zeile {
-  position: relative;
+.ab-ordner {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
-  border: none;
-  border-radius: var(--r-sm, 8px);
+  gap: 4px;
+  padding: 8px 4px 6px;
+  border: 1px solid transparent;
+  border-radius: var(--r-md, 14px);
   background: transparent;
   cursor: pointer;
-  text-align: left;
+  transition: background 0.14s ease, border-color 0.14s ease;
+}
+.ab-ordner:hover {
+  background: var(--card-2);
+}
+.ab-ordner.aktiv {
+  background: var(--accent-soft);
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--line));
+}
+.ab-ordner svg {
+  filter: drop-shadow(0 4px 6px rgba(54, 44, 26, 0.14));
+}
+.ab-ordner-name {
+  font-size: 0.78rem;
+  color: var(--text-2);
+  text-align: center;
+  white-space: nowrap;
   overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
-/* Dünne Schritt-Fortschrittsleiste am unteren Rand (angefangener Lernweg). */
-.ab-zeile-balken {
-  position: absolute;
-  left: 12px;
-  right: 12px;
-  bottom: 3px;
-  height: 2px;
-  background: var(--line);
-  border-radius: 1px;
-}
-.ab-zeile-balken-fuell {
-  display: block;
-  height: 100%;
-  background: color-mix(in srgb, var(--c) 60%, var(--accent));
-  border-radius: 1px;
-}
-.ab-zeile:hover {
-  background: var(--bg);
-}
-.ab-zeile.aktiv {
-  background: color-mix(in srgb, var(--c) 10%, var(--card));
-}
-.ab-zeile.aktiv .ab-zeile-titel {
-  color: color-mix(in srgb, var(--c) 70%, var(--text));
-  font-weight: 700;
-}
-.ab-zeile-status {
-  flex-shrink: 0;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  border: 1.5px solid var(--line-strong);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.62rem;
-  font-weight: 700;
-  color: #fff;
-}
-.ab-zeile-status.fertig {
-  background: var(--ok-text);
-  border-color: var(--ok-text);
-}
-.ab-zeile-titel {
-  flex: 1;
-  min-width: 0;
-  font-size: 0.9rem;
-  font-weight: 600;
+.ab-ordner.aktiv .ab-ordner-name {
   color: var(--text);
-  line-height: 1.3;
+  font-weight: 600;
 }
-/* Material-Zähler rechts in der Lernweg-Liste. */
-.ab-zeile-zahl {
-  flex-shrink: 0;
-  font-size: 0.74rem;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  color: var(--muted);
-  background: color-mix(in srgb, var(--text) 8%, transparent);
-  border-radius: 999px;
-  padding: 1px 8px;
-}
-/* Expliziter "Alle Materialien"-Eintrag: kein Status-Punkt, nur ruhiger Spacer. */
-.ab-zeile-alle {
-  margin-bottom: 2px;
-}
-.ab-zeile-alle .ab-zeile-status {
-  border: none;
-  background: transparent;
-}
-/* Detail-Fläche: hier wohnt alles zum gewählten Lernweg. */
-.ab-detail {
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-top: 3px solid var(--c);
-  border-radius: var(--r-md, 12px);
-  padding: 20px 22px;
-  min-width: 0;
-}
-.ab-detail-kopf {
-  padding-bottom: 14px;
-  margin-bottom: 16px;
-  border-bottom: 1px solid var(--line);
-}
-.ab-detail-fach {
-  font-size: 0.7rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: color-mix(in srgb, var(--c) 78%, var(--text));
-}
-.ab-detail-titel {
-  margin: 4px 0 0;
-  display: flex;
-  align-items: baseline;
-  flex-wrap: wrap;
-  gap: 10px;
-  font-size: 1.25rem;
-  font-weight: 700;
-  line-height: 1.2;
-}
-.ab-detail-fertig {
-  font-size: 0.74rem;
-  font-weight: 700;
-  color: var(--ok-text);
-}
-.ab-detail-meta {
-  margin: 5px 0 0;
-  font-size: 0.82rem;
-  color: var(--muted);
-  font-variant-numeric: tabular-nums;
-}
-.ab-detail-leer {
+
+/* Kompetenzen (Platzhalter) */
+.ab-kompetenzen-leer {
   margin: 0;
-  font-size: 0.9rem;
+  font-size: 0.86rem;
   color: var(--muted);
   font-style: italic;
 }
 
-/* Material-Übersicht (ohne Auswahl) */
-/* Werkzeugleiste der "Alle Materialien"-Ansicht: Gruppieren + Sortieren. */
-.ab-mat-werkzeuge {
+/* Materialien */
+.ab-materialien {
+  min-width: 0;
+}
+.ab-mat-fach {
+  margin: -8px 0 14px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+/* Typ-Chips */
+.ab-chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px 22px;
-  margin: 0 0 16px;
+  gap: 8px;
+  margin-bottom: 18px;
 }
-.ab-mat-steller {
-  display: flex;
+.ab-chip {
+  display: inline-flex;
   align-items: center;
   gap: 6px;
-}
-.ab-mat-steller-label {
-  font-size: 0.72rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--muted);
-  margin-right: 2px;
-}
-.ab-mat-chip {
-  border: 1px solid var(--line-strong);
-  background: var(--card);
-  color: var(--text-2);
+  border: 1px solid transparent;
+  background: var(--accent-soft);
+  color: var(--accent);
   font-size: 0.82rem;
   font-weight: 600;
-  padding: 5px 12px;
+  padding: 7px 14px;
   border-radius: 999px;
   cursor: pointer;
-  transition: border-color 0.12s ease, color 0.12s ease, background 0.12s ease;
+  transition: background 0.14s ease, border-color 0.14s ease, color 0.14s ease;
 }
-.ab-mat-chip:hover {
+.ab-chip:hover {
+  background: color-mix(in srgb, var(--accent) 16%, var(--card));
+}
+.ab-chip-icon {
+  width: 15px;
+  height: 15px;
+}
+.ab-chip.an {
+  background: var(--card);
   border-color: var(--accent);
   color: var(--accent);
 }
-.ab-mat-chip.an {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--on-accent);
-}
-/* Unterregister-Block: Überschrift mit Anzahl, dann die Materialien. */
-.ab-register {
-  margin-bottom: 18px;
-}
-.ab-register-titel {
+
+/* Listenkopf: Label links, Suche + Sortieren rechts */
+.ab-liste-kopf {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin: 0 0 8px;
-  font-size: 0.74rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--muted);
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
 }
-.ab-register-zahl {
+.ab-liste-label {
+  font-size: 1rem;
   font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  color: var(--muted);
-  background: color-mix(in srgb, var(--text) 8%, transparent);
-  border-radius: 999px;
-  padding: 0 7px;
-  font-size: 0.7rem;
+  color: var(--text);
 }
-.ab-mats {
+.ab-liste-werkzeuge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.ab-suche-klein {
+  flex: 0 1 260px;
+  padding: 8px 14px;
+  box-shadow: none;
+}
+.ab-suche-klein input {
+  font-size: 0.88rem;
+}
+
+/* Liste/Raster-Umschalter */
+.ab-ansicht-knopf {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--line);
+  background: var(--card);
+  color: var(--text-2);
+  border-radius: var(--r-sm, 9px);
+  cursor: pointer;
+  transition: border-color 0.14s ease, color 0.14s ease, background 0.14s ease;
+}
+.ab-ansicht-knopf:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.ab-ansicht-knopf.an {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Sortieren-Dropdown */
+.ab-sort {
+  position: relative;
+  flex-shrink: 0;
+}
+.ab-sort-knopf {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  background: transparent;
+  color: var(--accent);
+  font-size: 0.88rem;
+  font-weight: 600;
+  padding: 8px 6px;
+  cursor: pointer;
+}
+.ab-sort-menue {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 4px);
+  z-index: 20;
+  list-style: none;
+  margin: 0;
+  padding: 6px;
+  min-width: 130px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md, 14px);
+  box-shadow: var(--shadow-lg);
+}
+.ab-sort-opt {
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: transparent;
+  color: var(--text-2);
+  font-size: 0.88rem;
+  font-weight: 600;
+  padding: 8px 10px;
+  border-radius: var(--r-sm, 9px);
+  cursor: pointer;
+}
+.ab-sort-opt:hover {
+  background: var(--card-2);
+  color: var(--text);
+}
+.ab-sort-opt.an {
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+/* Material-Liste */
+.ab-liste {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -496,170 +324,132 @@
   flex-direction: column;
   gap: 8px;
 }
-.ab-mat {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  padding: 10px 12px;
-  background: var(--bg);
-  border: 1px solid var(--line);
-  border-radius: var(--r-sm, 8px);
-}
-.ab-mat-klick {
-  width: 100%;
-  font: inherit;
-  text-align: left;
-  cursor: pointer;
-}
-.ab-mat-klick:hover {
-  border-color: var(--accent);
-}
-.ab-mat-klick:hover .ab-mat-titel {
-  color: var(--accent);
-}
-.ab-mat-art {
-  flex-shrink: 0;
-  font-size: 0.66rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--accent);
-  background: var(--accent-soft);
-  padding: 3px 8px;
-  border-radius: 999px;
-}
-.ab-mat-text {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-}
-.ab-mat-titel {
-  font-size: 0.9rem;
-  color: var(--text);
-  line-height: 1.3;
-}
-.ab-mat-sub {
-  font-size: 0.74rem;
-  color: var(--muted);
-}
-/* Aktivitäts-Hinweis: zeigt vorab die Übungsform (Quiz, Karteikarten ...).
-   Sitzt rechts und wird beim Hover der Karte zum Akzent: lädt zum Öffnen ein. */
-.ab-mat-aktiv {
-  flex-shrink: 0;
-  align-self: center;
-  font-size: 0.7rem;
-  font-weight: 700;
-  color: var(--accent);
-  background: var(--accent-soft);
-  border: 1px solid transparent;
-  padding: 3px 9px 3px 8px;
-  border-radius: 999px;
-  white-space: nowrap;
-}
-.ab-mat-aktiv::before {
-  content: "▸ ";
-}
-.ab-mat-aktiv.lesen {
-  color: var(--muted);
-  background: transparent;
-  border-color: var(--line);
-}
-.ab-mat-klick:hover .ab-mat-aktiv {
-  border-color: var(--accent);
-}
-
-@media (max-width: 760px) {
-  .ab-screen {
-    padding: 24px 18px 110px;
-  }
-  .ab-titel {
-    font-size: 1.9rem;
-  }
-}
-
-.ab-kat { display: flex; flex-direction: column; }
-.ab-kat-kopf {
-  display: flex; align-items: center; gap: 8px;
-  padding: 8px 10px; border: none; background: none; cursor: pointer;
-  color: var(--text-2); font-weight: 700; font-size: 0.82rem; text-align: left;
-}
-.ab-kat-kopf:hover { color: var(--text); }
-.ab-kat-name { flex: 1; }
-.ab-kat-stand { color: var(--muted); font-weight: 600; }
-.ab-kat-pfeil { width: 1em; color: var(--muted); }
-
-.ab-gesamt { padding: 8px 10px 12px; }
-.ab-gesamt-text { display: block; font-size: 0.78rem; color: var(--text-2); margin-bottom: 6px; }
-.ab-gesamt-balken { display: block; height: 6px; border-radius: 999px; background: var(--line); overflow: hidden; }
-.ab-gesamt-fuell { display: block; height: 100%; background: var(--accent); }
-
-.ab-zeile-aktiv {
-  flex-shrink: 0;
-  font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;
-  color: var(--ok-text); background: var(--ok-bg); border: 1px solid var(--ok-text);
-  padding: 1px 6px; border-radius: 999px;
-  margin-left: 6px;
-}
-
-/* Subkategorie-Ebene: zwischen Kategorie und Lernweg, eingerueckt und leichter. */
-.ab-sub {
-  display: flex;
-  flex-direction: column;
-}
-.ab-sub-kopf {
+.ab-zeile {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 5px 10px 5px 22px;
-  border: none;
-  background: none;
-  cursor: pointer;
-  color: var(--muted);
-  font-weight: 600;
-  font-size: 0.76rem;
+  gap: 12px;
+  width: 100%;
   text-align: left;
+  font: inherit;
+  color: inherit;
+  padding: 13px 16px;
+  background: color-mix(in srgb, var(--accent) 4%, var(--card));
+  border: 1px solid color-mix(in srgb, var(--accent) 9%, var(--line));
+  border-radius: var(--r-md, 14px);
 }
-.ab-sub-kopf:hover {
-  color: var(--text-2);
+.ab-zeile-klick {
+  cursor: pointer;
+  transition: background 0.14s ease, border-color 0.14s ease,
+    transform 0.1s ease;
 }
-.ab-sub-name {
+.ab-zeile-klick:hover {
+  background: var(--accent-soft);
+  border-color: color-mix(in srgb, var(--accent) 28%, var(--line));
+}
+.ab-zeile-klick:active {
+  transform: scale(0.995);
+}
+.ab-zeile-icon {
+  flex-shrink: 0;
+  display: inline-flex;
+  color: var(--accent);
+}
+.ab-zeile-titel {
   flex: 1;
+  min-width: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-.ab-sub-zahl {
+.ab-zeile-datum {
+  flex-shrink: 0;
+  font-size: 0.82rem;
   color: var(--muted);
+  font-variant-numeric: tabular-nums;
 }
-.ab-sub-pfeil {
-  width: 0.9em;
+.ab-liste-leer {
+  margin: 0;
+  padding: 18px 4px;
+  font-size: 0.9rem;
+  color: var(--muted);
+  font-style: italic;
 }
-.ab-sub .ab-zeile {
-  padding-left: 24px;
+/* Rasteransicht: zwei Spalten statt einer langen Liste. */
+.ab-liste-raster {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+@media (max-width: 560px) {
+  .ab-liste-raster {
+    grid-template-columns: 1fr;
+  }
 }
 
-/* Ansichts-Umschalter Liste/Netz: Pillen-Reiter ueber der linken Spalte.
-   Die aktive Pille wird mit der Fachfarbe (--c, von .ab-spalten) getoent und
-   umrandet, der Text bleibt aber die Theme-Textfarbe, damit er auf jeder
-   Fachfarbe (auch hellen wie Englisch-Amber) gut lesbar ist. */
-.ab-ansicht-schalter {
+/* Lernweg-Detail als Overlay */
+.ab-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 210;
   display: flex;
-  gap: 6px;
-  margin: 0 0 10px;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(20, 16, 10, 0.4);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
 }
-.ab-ansicht-chip {
-  border: 1px solid var(--line, rgba(0, 0, 0, 0.12));
-  background: transparent;
-  border-radius: 999px;
-  padding: 4px 14px;
-  font-size: 14px;
+.ab-overlay-karte {
+  width: min(720px, 100%);
+  max-height: 86vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg, 20px);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+}
+.ab-overlay-kopf {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--line);
+}
+.ab-overlay-titel {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.ab-overlay-zu {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--line-strong);
+  background: var(--card);
+  color: var(--text-2);
+  font-size: 0.9rem;
   cursor: pointer;
-  color: var(--text-2, #6b6b6b);
 }
-.ab-ansicht-chip.an {
-  background: color-mix(in srgb, var(--c, #4263eb) 20%, transparent);
-  color: var(--text, #1d1d1f);
-  border-color: var(--c, #4263eb);
+.ab-overlay-zu:hover {
+  border-color: var(--accent);
+  color: var(--accent);
 }
-.ab-netz-spalte {
-  display: block;
+.ab-overlay-inhalt {
+  padding: 18px 20px;
+  overflow-y: auto;
+}
+
+@media (pointer: coarse) {
+  .ab-chip,
+  .ab-sort-knopf {
+    min-height: 40px;
+  }
 }
