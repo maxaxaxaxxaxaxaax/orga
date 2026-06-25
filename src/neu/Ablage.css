@@ -20,12 +20,20 @@
   }
 }
 
-/* Werkzeugzeile oben */
+/* Werkzeugzeile oben: gleiches Spaltenraster wie der Inhalt, damit die Suche
+   genau so breit ist wie die Fächer-Spalte und "+ Hinzufügen" über den
+   Materialien rechts sitzt. */
 .ab-top {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(280px, 340px) minmax(0, 1fr);
+  gap: 18px;
   align-items: center;
-  gap: 14px;
   margin-bottom: 16px;
+}
+@media (max-width: 760px) {
+  .ab-top {
+    grid-template-columns: 1fr auto;
+  }
 }
 .ab-suche {
   flex: 1;
@@ -60,6 +68,7 @@
 }
 .ab-add {
   flex-shrink: 0;
+  justify-self: end;
   display: inline-flex;
   align-items: center;
   gap: 7px;
