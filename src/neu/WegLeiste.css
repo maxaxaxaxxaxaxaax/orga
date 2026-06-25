@@ -49,15 +49,8 @@
   max-width: calc(100% - 28px);
   animation: weg-rein-oben 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) both;
 }
-.weg-oben .weg-inner {
-  padding: 0;
-  background: none;
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
-  border: none;
-  border-radius: 0;
-  box-shadow: none;
-}
+/* Box wie in der Übersicht: die Schritt-Leiste nutzt dieselbe Glas-Pille
+   (.weg-inner) wie die Mach-Phase, kein eigenes Stripping mehr. */
 /* dünne Verbindungslinie zwischen den Schritten (Stepper-Charakter) */
 .weg-oben .weg-schritte > li:not(:last-child)::after {
   content: "";
