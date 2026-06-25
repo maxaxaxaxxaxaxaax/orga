@@ -6,8 +6,8 @@
   height: 100vh;
   width: 100%;
   box-sizing: border-box;
-  /* Oben Platz für die "Mein Weg"-Leiste, unten für die Nav. */
-  padding: 70px 40px 78px;
+  /* Oben Platz für die schlanke Schritt-Leiste; unten nur etwas Luft. */
+  padding: 70px 40px 28px;
   display: flex;
   flex-direction: column;
   overflow: hidden; /* bewusst: nichts scrollt, die Etappe muss reinpassen */

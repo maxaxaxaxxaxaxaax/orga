@@ -19,7 +19,10 @@ export default function WegLeiste({ onGo }) {
   const { phase, schritte, jetzt, aufgabe } = stand;
 
   return (
-    <nav className="weg" aria-label="Mein Weg">
+    <nav
+      className={"weg" + (phase === "planung" ? " weg-oben" : "")}
+      aria-label="Mein Weg"
+    >
       <div className="weg-inner">
         {phase === "planung" ? (
           // Planungsphase: nur die Schritt-Anzeige (wo stehe ich gerade).

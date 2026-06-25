@@ -31,6 +31,48 @@
   }
 }
 
+/* Planungsphase: schlanke Schritt-Leiste OBEN, ohne Kasten. Nur die drei
+   Schritte (Etappe planen / Woche planen / Übersicht) als ruhige Breadcrumb im
+   freien Bereich über dem Planer. Die Mach-Phase (aktuelles Ziel) bleibt unten
+   als Glas-Pille. */
+.weg-oben {
+  top: 14px;
+  bottom: auto;
+  width: auto;
+  max-width: calc(100% - 28px);
+  animation: weg-rein-oben 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.weg-oben .weg-inner {
+  padding: 0;
+  background: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+}
+/* dünne Verbindungslinie zwischen den Schritten (Stepper-Charakter) */
+.weg-oben .weg-schritte > li:not(:last-child)::after {
+  content: "";
+  flex-shrink: 0;
+  align-self: center;
+  width: 20px;
+  height: 1.5px;
+  margin: 0 2px;
+  border-radius: 999px;
+  background: var(--line-strong);
+}
+@keyframes weg-rein-oben {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -10px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
 .weg-schritte {
   flex: 1;
   min-width: 0;
