@@ -82,6 +82,24 @@ export default function Etappenplan({ onWeiter }) {
     return () => clearTimeout(t);
   }, [hinweis]);
 
+  // Sicherheitsnetz fürs Ziehen: egal wie ein Drag endet (abgelegt, abgebrochen,
+  // außerhalb eines Ziels losgelassen, Fenster verliert den Fokus), den Drag-
+  // Zustand zurücksetzen. Verhindert hängende Markierungen und greift zusammen mit
+  // dem verzögerten Ablegen gegen ein steckengebliebenes Vorschaubild.
+  useEffect(() => {
+    const aufraeumen = () => {
+      setGezogenId(null);
+      setUeber(null);
+    };
+    const aufEsc = (e) => e.key === "Escape" && aufraeumen();
+    window.addEventListener("dragend", aufraeumen);
+    window.addEventListener("keydown", aufEsc);
+    return () => {
+      window.removeEventListener("dragend", aufraeumen);
+      window.removeEventListener("keydown", aufEsc);
+    };
+  }, []);
+
   const wochen = wochenBereiche(ETAPPE, etappeWochen);
 
   const proFach = kbFaecher.map((fach) => ({
@@ -268,8 +286,10 @@ export default function Etappenplan({ onWeiter }) {
             onDrop={(e) => {
               e.preventDefault();
               const id = e.dataTransfer.getData("text/plain");
-              if (id) zurueckInVorrat(id);
               setUeber(null);
+              // Erst nach Abschluss des nativen Drags umsortieren, damit der
+              // gezogene Chip nicht mitten im Drag verschwindet (sonst Geisterbild).
+              if (id) setTimeout(() => zurueckInVorrat(id), 0);
             }}
             onClick={() => gewaehltId != null && setGewaehltId(null)}
           >
@@ -330,8 +350,9 @@ export default function Etappenplan({ onWeiter }) {
               onDrop={(e) => {
                 e.preventDefault();
                 const id = e.dataTransfer.getData("text/plain");
-                if (id) setzeWoche(id, w.idx);
                 setUeber(null);
+                // Siehe oben: Zuordnung erst nach dem Drag setzen.
+                if (id) setTimeout(() => setzeWoche(id, w.idx), 0);
               }}
               onClick={() => tippZuWoche(w.idx)}
             >

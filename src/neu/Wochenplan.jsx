@@ -104,6 +104,24 @@ export default function Wochenplan({ onZurueck, onWeiter, onEtappeAnpassen, woch
     return () => clearTimeout(t);
   }, [hinweis]);
 
+  // Sicherheitsnetz fürs Ziehen: egal wie ein Drag endet, die Hover-Markierung
+  // zurücksetzen (Escape räumt zusätzlich eine getippte Auswahl ab). Zusammen mit
+  // dem verzögerten Ablegen unten verhindert das ein hängendes Vorschaubild.
+  useEffect(() => {
+    const aufDragEnde = () => setUeber(null);
+    const aufEsc = (e) => {
+      if (e.key !== "Escape") return;
+      setUeber(null);
+      setGewaehltId(null);
+    };
+    window.addEventListener("dragend", aufDragEnde);
+    window.addEventListener("keydown", aufEsc);
+    return () => {
+      window.removeEventListener("dragend", aufDragEnde);
+      window.removeEventListener("keydown", aufEsc);
+    };
+  }, []);
+
   const wocheKbs = koennensbeweise.filter(
     (k) => wochenZuordnung[k.id] === aktiveWoche
   );
@@ -255,8 +273,10 @@ export default function Wochenplan({ onZurueck, onWeiter, onEtappeAnpassen, woch
   function dropInVorrat(e) {
     e.preventDefault();
     const [id, quelle] = (e.dataTransfer.getData("text/plain") || "").split("|");
-    if (id && quelle) entferneUhr(id, quelle);
     setUeber(null);
+    // Erst nach Abschluss des nativen Drags entfernen, sonst kann ein Geisterbild
+    // des gezogenen Chips hängen bleiben (dragend wird nicht mehr zugestellt).
+    if (id && quelle) setTimeout(() => entferneUhr(id, quelle), 0);
   }
 
   // Ein Block im Kalender (eine Stunde des Tages).
@@ -311,8 +331,9 @@ export default function Wochenplan({ onZurueck, onWeiter, onEtappeAnpassen, woch
           const [id, quelle] = (
             e.dataTransfer.getData("text/plain") || ""
           ).split("|");
-          if (id) platziereUhr(id, sid, quelle || null);
           setUeber(null);
+          // Siehe dropInVorrat: Platzieren erst nach dem nativen Drag.
+          if (id) setTimeout(() => platziereUhr(id, sid, quelle || null), 0);
         }}
         onClick={(e) => {
           e.stopPropagation();
