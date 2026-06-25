@@ -2,9 +2,10 @@ import { useEffect, useState } from "react";
 import { wegStatus } from "./weg";
 import "./WegLeiste.css";
 
-// Schwebende "Mein Weg"-Leiste oben mittig (symmetrisch zur Nav unten). Zeigt die
-// drei Schritte mit Status und die eine nächste Aktion. Schritte sind auch
-// Navigation. Aktualisiert sich live über das "neu:planung"-Event, sobald sich
+// Schwebende "Mein Weg"-Leiste unten mittig: reine Standanzeige, kein Aktions-
+// knopf. In der Planung die drei Schritte mit Status (der aktuelle hervorgehoben,
+// Klick springt dorthin), in der Mach-Phase das aktuelle Ziel mit Schritt-
+// Fortschritt. Aktualisiert sich live über das "neu:planung"-Event, sobald sich
 // der Planungs- oder Erledigt-Stand ändert (z.B. ein Ziel abgehakt wird).
 export default function WegLeiste({ onGo }) {
   const [stand, setStand] = useState(wegStatus);
@@ -21,9 +22,8 @@ export default function WegLeiste({ onGo }) {
     <nav className="weg" aria-label="Mein Weg">
       <div className="weg-inner">
         {phase === "planung" ? (
-          // Planungsphase: der Drei-Schritte-Weg plus die nächste Aktion.
-          <>
-            <ol className="weg-schritte">
+          // Planungsphase: nur die Schritt-Anzeige (wo stehe ich gerade).
+          <ol className="weg-schritte">
               {schritte.map((s) => (
                 <li key={s.id}>
                   <button
@@ -44,26 +44,12 @@ export default function WegLeiste({ onGo }) {
                 </li>
               ))}
             </ol>
-            <button
-              type="button"
-              className="weg-jetzt"
-              onClick={() => onGo(jetzt.ziel, jetzt.kbId)}
-            >
-              <span className="weg-jetzt-label">Jetzt</span>
-              <span className="weg-jetzt-text">{jetzt.text}</span>
-              <span className="weg-jetzt-pfeil" aria-hidden="true">
-                →
-              </span>
-            </button>
-          </>
         ) : aufgabe ? (
-          // Mach-Phase: das aktuelle Ziel mit Schritt-Fortschritt, ein Klick
-          // öffnet es im Fokus.
-          <button
-            type="button"
+          // Mach-Phase: das aktuelle Ziel mit Schritt-Fortschritt, nur als
+          // Anzeige (wo stehe ich gerade), kein Knopf.
+          <div
             className="weg-aufgabe"
-            onClick={() => onGo(jetzt.ziel, jetzt.kbId)}
-            title={`${aufgabe.fach}: ${aufgabe.titel} — ${aufgabe.fertigeAnzahl} von ${aufgabe.gesamt} Schritten`}
+            title={`${aufgabe.fach}: ${aufgabe.titel}, ${aufgabe.fertigeAnzahl} von ${aufgabe.gesamt} Schritten`}
           >
             <span className="weg-aufgabe-text">
               <span className="weg-aufgabe-fach">{aufgabe.fach}</span>
@@ -88,13 +74,7 @@ export default function WegLeiste({ onGo }) {
                 </span>
               </>
             )}
-            <span className="weg-aufgabe-cta">
-              {jetzt.text}
-              <span className="weg-jetzt-pfeil" aria-hidden="true">
-                →
-              </span>
-            </span>
-          </button>
+          </div>
         ) : (
           // Endzustand: alles geschafft oder nichts geplant.
           <span className={"weg-leer" + (jetzt.fertig ? " fertig" : "")}>

@@ -36,6 +36,7 @@
   min-width: 0;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 2px;
   list-style: none;
   margin: 0;
@@ -115,67 +116,19 @@
   font-weight: 600;
 }
 
-.weg-jetzt {
-  flex-shrink: 0;
-  max-width: 40%;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  border: none;
-  background: var(--accent);
-  color: var(--on-accent);
-  padding: 8px 14px;
-  border-radius: 999px;
-  cursor: pointer;
-  box-shadow: 0 4px 12px -3px var(--accent-shadow);
-  transition: background 0.15s ease, transform 0.12s ease;
-}
-.weg-jetzt:hover {
-  background: var(--accent-strong);
-}
-.weg-jetzt:active {
-  transform: scale(0.97);
-}
-.weg-jetzt-label {
-  flex-shrink: 0;
-  font-size: 0.6rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  opacity: 0.78;
-}
-.weg-jetzt-text {
-  font-size: 0.84rem;
-  font-weight: 600;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.weg-jetzt-pfeil {
-  flex-shrink: 0;
-  font-weight: 700;
-}
-
-/* Mach-Phase: das aktuelle Ziel mit Schritt-Fortschritt. Eine Fläche, ein Klick
-   öffnet den Fokus. */
+/* Mach-Phase: das aktuelle Ziel mit Schritt-Fortschritt, reine Anzeige (zeigt,
+   wo ich gerade stehe), kein Knopf. */
 .weg-aufgabe {
   flex: 1;
   min-width: 0;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 12px;
-  border: none;
-  background: transparent;
-  padding: 5px 6px 5px 10px;
-  border-radius: 999px;
-  cursor: pointer;
+  padding: 7px 10px;
   text-align: left;
-  transition: background 0.15s ease;
-}
-.weg-aufgabe:hover {
-  background: color-mix(in srgb, var(--text) 6%, transparent);
 }
 .weg-aufgabe-text {
-  flex: 1;
   min-width: 0;
   display: flex;
   align-items: baseline;
@@ -223,23 +176,6 @@
   font-variant-numeric: tabular-nums;
   color: var(--muted);
 }
-.weg-aufgabe-cta {
-  flex-shrink: 0;
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  background: var(--accent);
-  color: var(--on-accent);
-  font-size: 0.78rem;
-  font-weight: 600;
-  padding: 7px 13px;
-  border-radius: 999px;
-  box-shadow: 0 4px 12px -3px var(--accent-shadow);
-  transition: background 0.15s ease;
-}
-.weg-aufgabe:hover .weg-aufgabe-cta {
-  background: var(--accent-strong);
-}
 .weg-leer {
   flex: 1;
   display: inline-flex;
@@ -264,9 +200,6 @@
   .weg-schritt:not(.aktuell) .weg-text {
     display: none;
   }
-  .weg-jetzt-text {
-    max-width: 110px;
-  }
   .weg-aufgabe-fach {
     display: none;
   }
@@ -283,9 +216,6 @@
   }
   .weg-inner {
     gap: 6px;
-  }
-  .weg-jetzt-label {
-    display: none;
   }
   .weg-aufgabe-zahl {
     display: none;
