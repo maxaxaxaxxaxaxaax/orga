@@ -206,11 +206,6 @@ export default function Heute({ onFokus }) {
     day: "numeric",
     month: "long",
   });
-  const kurzTag = tagDatum.toLocaleDateString("de-DE", { weekday: "short" });
-
-  const stunde = new Date().getHours();
-  const gruss =
-    stunde < 11 ? "Guten Morgen" : stunde < 17 ? "Hallo" : "Guten Abend";
 
   // Heute geplant: Ziele mit mindestens einer Stunde an diesem Tag, sortiert
   // nach der fruehesten Stunde des Tages (folgt dem zeitlichen Tagesrhythmus).
@@ -340,40 +335,6 @@ export default function Heute({ onFokus }) {
 
   return (
     <div className="hu-screen">
-      <header className="hu-kopf">
-        <div className="hu-kopf-text">
-          <p className="hu-eyebrow">Übersicht</p>
-          <h1 className="hu-titel">{gruss}, Max.</h1>
-          <p className="hu-sub">{datumText}</p>
-        </div>
-        <div
-          className="hu-tag-nav"
-          role="group"
-          aria-label="Tag wählen"
-          title="Anderen Tag simulieren, um zu testen, was an dem Tag passiert"
-        >
-          <button
-            type="button"
-            className="hu-tag-pfeil"
-            onClick={() => springeZuTag(tag - 1)}
-            disabled={tag === 0}
-            aria-label="Einen Tag früher simulieren"
-          >
-            ‹
-          </button>
-          <span className="hu-tag-label">{kurzTag}</span>
-          <button
-            type="button"
-            className="hu-tag-pfeil"
-            onClick={() => springeZuTag(tag + 1)}
-            disabled={tag === 4}
-            aria-label="Einen Tag später simulieren"
-          >
-            ›
-          </button>
-        </div>
-      </header>
-
       <div className="hu-grid">
         <div className="hu-main">
           <div className="hu-oben">
