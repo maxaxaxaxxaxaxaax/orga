@@ -217,8 +217,6 @@ export default function Ablage() {
     return (b.datum || "").localeCompare(a.datum || "");
   });
 
-  const aktivChip = CHIPS.find((c) => c.key === chip) || CHIPS[0];
-
   function uploadSpeichern(m) {
     speichereEigenes(m);
     setEigene(ladeEigene());
@@ -369,21 +367,20 @@ export default function Ablage() {
           </div>
 
           <div className="ab-liste-kopf">
-            <span className="ab-liste-label">{aktivChip.label}</span>
+            <div className="ab-suche ab-suche-klein">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+                <circle cx="11" cy="11" r="7" />
+                <path d="M21 21l-4.35-4.35" />
+              </svg>
+              <input
+                type="text"
+                value={suche}
+                onChange={(e) => setSuche(e.target.value)}
+                placeholder="Suche"
+                aria-label="Materialien durchsuchen"
+              />
+            </div>
             <div className="ab-liste-werkzeuge">
-              <div className="ab-suche ab-suche-klein">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
-                  <circle cx="11" cy="11" r="7" />
-                  <path d="M21 21l-4.35-4.35" />
-                </svg>
-                <input
-                  type="text"
-                  value={suche}
-                  onChange={(e) => setSuche(e.target.value)}
-                  placeholder="Suche"
-                  aria-label="Materialien durchsuchen"
-                />
-              </div>
               <button
                 type="button"
                 className={"ab-ansicht-knopf" + (raster ? " an" : "")}

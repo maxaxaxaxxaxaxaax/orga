@@ -300,27 +300,21 @@
   color: var(--accent);
 }
 
-/* Listenkopf: Label links, Suche + Sortieren rechts */
+/* Listenkopf: Suche links (wo früher "Alle" stand), Raster + Sortieren rechts */
 .ab-liste-kopf {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 12px;
-  flex-wrap: wrap;
   margin-bottom: 12px;
-}
-.ab-liste-label {
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--text);
 }
 .ab-liste-werkzeuge {
   display: flex;
   align-items: center;
   gap: 10px;
+  flex-shrink: 0;
 }
 .ab-suche-klein {
-  flex: 0 1 260px;
+  flex: 1;
   padding: 8px 14px;
   box-shadow: none;
 }
