@@ -265,6 +265,43 @@
   font-weight: 600;
   color: var(--accent);
 }
+/* Kopf mit Liste/Netz-Umschalter */
+.ab-mat-kopf {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.ab-ansicht {
+  flex-shrink: 0;
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  background: var(--card-2);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+}
+.ab-ansicht-chip {
+  border: none;
+  background: transparent;
+  color: var(--text-2);
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.14s ease, color 0.14s ease;
+}
+.ab-ansicht-chip:hover {
+  color: var(--text);
+}
+.ab-ansicht-chip.an {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+.ab-netz {
+  margin-top: 4px;
+}
 
 /* Typ-Chips */
 .ab-chips {

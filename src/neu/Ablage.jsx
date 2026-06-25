@@ -4,9 +4,11 @@ import { koennensbeweise, kbFarbe } from "../data/koennensbeweise";
 import { ladeEigene, speichereEigenes } from "./eigeneMaterialien";
 import { istOeffenbar } from "./interaktiv";
 import { FACH_STRUKTUR } from "../data/fachStruktur";
+import { lade, ERLEDIGT_KEY } from "./planung";
 import MaterialUpload from "./MaterialUpload";
 import MaterialAnsicht from "./MaterialAnsicht";
 import KbInhalt from "./KbInhalt";
+import Netz from "./Netz";
 import "./Ablage.css";
 
 // Ablage: links die Fächer als bunte Ordner (plus später Kompetenzen), rechts die
@@ -149,9 +151,11 @@ export default function Ablage() {
   const [eigene, setEigene] = useState(ladeEigene);
   const [offenesMaterial, setOffenesMaterial] = useState(null);
   const [offenerLernweg, setOffenerLernweg] = useState(null);
+  const [ansicht, setAnsicht] = useState("liste"); // liste | netz
 
   const fach = faecher.find((f) => f.id === fachId) || null;
   const struktur = fach ? FACH_STRUKTUR[fach.id] : null;
+  const erledigt = lade(ERLEDIGT_KEY);
   function toggleKat(kat) {
     setKatOffen((prev) => {
       const next = new Set(prev);
@@ -336,9 +340,49 @@ export default function Ablage() {
 
         {/* Rechte Spalte: Materialien */}
         <section className="ab-card ab-materialien">
-          <h2 className="ab-card-titel">Materialien</h2>
-          <p className="ab-mat-fach">{fach ? `${fach.fach} Gesamt` : ""}</p>
+          <div className="ab-mat-kopf">
+            <div>
+              <h2 className="ab-card-titel">Materialien</h2>
+              <p className="ab-mat-fach">{fach ? `${fach.fach} Gesamt` : ""}</p>
+            </div>
+            {struktur && (
+              <div className="ab-ansicht" role="tablist" aria-label="Ansicht">
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={ansicht === "liste"}
+                  className={"ab-ansicht-chip" + (ansicht === "liste" ? " an" : "")}
+                  onClick={() => setAnsicht("liste")}
+                >
+                  Liste
+                </button>
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={ansicht === "netz"}
+                  className={"ab-ansicht-chip" + (ansicht === "netz" ? " an" : "")}
+                  onClick={() => setAnsicht("netz")}
+                >
+                  Netz
+                </button>
+              </div>
+            )}
+          </div>
 
+          {ansicht === "netz" && struktur ? (
+            <div className="ab-netz">
+              <Netz
+                fach={fach}
+                struktur={struktur}
+                erledigt={erledigt}
+                onSelect={(themaId) => {
+                  const t = fach.themen.find((x) => x.id === themaId);
+                  if (t) setOffenerLernweg({ id: t.kbId, label: t.label });
+                }}
+              />
+            </div>
+          ) : (
+            <>
           <div className="ab-chips" role="tablist" aria-label="Material-Typ">
             {CHIPS.map((c) => (
               <button
@@ -441,6 +485,8 @@ export default function Ablage() {
                 );
               })}
             </ul>
+          )}
+            </>
           )}
         </section>
       </div>
