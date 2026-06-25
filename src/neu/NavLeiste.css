@@ -61,18 +61,9 @@
   color: var(--on-accent);
   box-shadow: 0 4px 12px -2px var(--accent-shadow);
 }
-.nav-punkt svg {
-  width: 17px;
-  height: 17px;
-  flex-shrink: 0;
-}
-
-/* Schmale Screens (Handy): nur Icons, größere Tap-Flächen. */
+/* Schmale Screens (Handy): etwas kompaktere Tap-Flächen. */
 @media (max-width: 560px) {
-  .nav-punkt-label {
-    display: none;
-  }
   .nav-punkt {
-    padding: 12px 15px;
+    padding: 10px 14px;
   }
 }
