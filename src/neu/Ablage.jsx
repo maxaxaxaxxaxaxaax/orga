@@ -270,6 +270,7 @@ export default function Ablage() {
             </div>
           </section>
 
+          {ansicht === "netz" && (
           <section className="ab-card ab-kompetenzen">
             <h2 className="ab-card-titel">Kompetenzen</h2>
             {!fach ? (
@@ -336,6 +337,7 @@ export default function Ablage() {
               </ul>
             )}
           </section>
+          )}
         </div>
 
         {/* Rechte Spalte: Materialien */}
