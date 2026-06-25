@@ -38,8 +38,20 @@
   }
 }
 
-/* ---- Linke Spalte ------------------------------------------------------- */
+/* ---- Linke Spalte -------------------------------------------------------
+   Container ist nur noch ein transparenter Stapel: oben die feste Kopf-Box,
+   darunter der scrollende Fächer-Bereich. Jede Fach-Gruppe ist eine eigene
+   Karte. */
 .wp-seite {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+  max-height: 100%;
+}
+/* Feste Kopf-Box ("Plane deine Woche"): bleibt stehen, scrollt nicht mit. */
+.wp-seite-fest {
+  flex-shrink: 0;
   background: var(--card);
   border: 1px solid var(--line);
   border-radius: var(--r-md, 12px);
@@ -47,12 +59,14 @@
   display: flex;
   flex-direction: column;
   gap: 14px;
-  min-height: 0;
-  max-height: 100%;
+  box-shadow: var(--shadow-sm);
 }
-.wp-seite.ueber {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 2px var(--accent-soft);
+/* Beim Zurückziehen in den Vorrat den scrollenden Bereich markieren. */
+.wp-seite.ueber .wp-seite-liste {
+  outline: 2px dashed var(--accent);
+  outline-offset: -2px;
+  border-radius: var(--r-md, 12px);
+  background: var(--accent-soft);
 }
 .wp-seite-kopf {
   display: flex;
@@ -160,20 +174,23 @@
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
   margin: 0 -4px;
-  padding: 0 4px;
+  padding: 2px 4px;
 }
 .wp-seite-leer {
   margin: 0;
   font-size: 0.84rem;
   color: var(--muted);
 }
+/* Jedes Fach ist eine eigene Karte. */
 .wp-fachgruppe {
   flex-shrink: 0;
+  background: var(--card);
   border: 1px solid var(--line);
-  border-radius: var(--r-sm, 8px);
+  border-radius: var(--r-md, 12px);
   overflow: hidden;
+  box-shadow: var(--shadow-sm);
 }
 .wp-fachgruppe-kopf {
   display: flex;

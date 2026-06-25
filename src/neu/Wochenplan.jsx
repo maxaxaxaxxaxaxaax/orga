@@ -399,63 +399,72 @@ export default function Wochenplan({ onZurueck, onWeiter, onEtappeAnpassen, woch
           onDragLeave={() => setUeber((u) => (u === "pool" ? null : u))}
           onDrop={dropInVorrat}
         >
-          <div className="wp-seite-kopf">
-            <span className="wp-seite-icon" aria-hidden="true">
-              🗓
-            </span>
-            <div>
-              <h1 className="wp-seite-titel">Plane deine Woche</h1>
-              <p className="wp-seite-sub">
-                {langDatum(ETAPPE.von)} bis {langDatum(ETAPPE.bis)}
-              </p>
+          {/* Feste Kopf-Box: bleibt stehen, während die Fächer darunter scrollen */}
+          <div className="wp-seite-fest">
+            <div className="wp-seite-kopf">
+              <span className="wp-seite-icon" aria-hidden="true">
+                🗓
+              </span>
+              <div>
+                <h1 className="wp-seite-titel">Plane deine Woche</h1>
+                <p className="wp-seite-sub">
+                  {langDatum(ETAPPE.von)} bis {langDatum(ETAPPE.bis)}
+                </p>
+              </div>
             </div>
-          </div>
 
-          <div className="wp-seite-status">
-            <span className={"wp-status-rest" + (wocheFertig ? " fertig" : "")}>
-              {wocheFertig ? "Alle Uhren verteilt ✓" : `noch ${vorrat.length} offen`}
-            </span>
-            {wochenLast > 0 && (
-              <span className="wp-status-last" data-stand={lastStand}>
-                {wochenLast} von {wochenZielCluster} Uhren
+            <div className="wp-seite-status">
+              <span className={"wp-status-rest" + (wocheFertig ? " fertig" : "")}>
+                {wocheFertig
+                  ? "Alle Uhren verteilt ✓"
+                  : `noch ${vorrat.length} offen`}
               </span>
-            )}
-          </div>
+              {wochenLast > 0 && (
+                <span className="wp-status-last" data-stand={lastStand}>
+                  {wochenLast} von {wochenZielCluster} Uhren
+                </span>
+              )}
+            </div>
 
-          <div className="wp-seite-aktionen">
-            <button
-              type="button"
-              className="wp-akt"
-              onClick={vorschlagVerteilen}
-              disabled={vorrat.length === 0}
-              title="Die offenen Uhren ausgewogen auf die Stunden verteilen"
-            >
-              Für mich vorschlagen
-            </button>
-            {resetConfirm ? (
-              <span className="wp-reset-confirm">
-                <button type="button" className="wp-akt warn" onClick={planZuruecksetzen}>
-                  Wirklich neu
-                </button>
-                <button
-                  type="button"
-                  className="wp-akt"
-                  onClick={() => setResetConfirm(false)}
-                >
-                  Abbrechen
-                </button>
-              </span>
-            ) : (
+            <div className="wp-seite-aktionen">
               <button
                 type="button"
                 className="wp-akt"
-                onClick={() => setResetConfirm(true)}
-                disabled={!wocheHatPlatziert}
-                title="Die Stunden dieser Woche löschen (Lernstand bleibt)"
+                onClick={vorschlagVerteilen}
+                disabled={vorrat.length === 0}
+                title="Die offenen Uhren ausgewogen auf die Stunden verteilen"
               >
-                Zurücksetzen
+                Für mich vorschlagen
               </button>
-            )}
+              {resetConfirm ? (
+                <span className="wp-reset-confirm">
+                  <button
+                    type="button"
+                    className="wp-akt warn"
+                    onClick={planZuruecksetzen}
+                  >
+                    Wirklich neu
+                  </button>
+                  <button
+                    type="button"
+                    className="wp-akt"
+                    onClick={() => setResetConfirm(false)}
+                  >
+                    Abbrechen
+                  </button>
+                </span>
+              ) : (
+                <button
+                  type="button"
+                  className="wp-akt"
+                  onClick={() => setResetConfirm(true)}
+                  disabled={!wocheHatPlatziert}
+                  title="Die Stunden dieser Woche löschen (Lernstand bleibt)"
+                >
+                  Zurücksetzen
+                </button>
+              )}
+            </div>
           </div>
 
           <div className="wp-seite-liste">
