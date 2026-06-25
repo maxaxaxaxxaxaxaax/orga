@@ -38,13 +38,13 @@
   }
 }
 
-/* Planungsphase: schlanke Schritt-Leiste OBEN, ohne Kasten. Nur die drei
-   Schritte (Etappe planen / Woche planen / Übersicht) als ruhige Breadcrumb im
-   freien Bereich über dem Planer. Die Mach-Phase (aktuelles Ziel) bleibt unten
-   als Glas-Pille. */
+/* Planungsphase: schlanke Schritt-Leiste UNTEN mittig, ohne Kasten. Nur die drei
+   Schritte (Etappe planen / Woche planen / Übersicht) als ruhige Breadcrumb am
+   unteren Rand des Planers. Die Mach-Phase (aktuelles Ziel) sitzt ebenfalls
+   unten als Glas-Pille. */
 .weg-oben {
-  top: 14px;
-  bottom: auto;
+  top: auto;
+  bottom: 14px;
   width: auto;
   max-width: calc(100% - 28px);
   animation: weg-rein-oben 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) both;
@@ -72,7 +72,7 @@
 @keyframes weg-rein-oben {
   from {
     opacity: 0;
-    transform: translate(-50%, -10px);
+    transform: translate(-50%, 10px);
   }
   to {
     opacity: 1;
