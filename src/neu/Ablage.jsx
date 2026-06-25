@@ -74,7 +74,23 @@ function IcGrid(p) {
     </svg>
   );
 }
-function FolderIcon({ color }) {
+function FolderIcon({ color, offen }) {
+  if (offen) {
+    // Geöffneter Ordner: hintere Wand + nach vorne geklappte, oben breitere Lasche.
+    return (
+      <svg viewBox="0 0 64 52" width="58" height="47" aria-hidden="true">
+        <path
+          d="M6 10a4 4 0 0 1 4-4h12l5 5h25a4 4 0 0 1 4 4v17H6V10z"
+          fill={color}
+          opacity="0.45"
+        />
+        <path
+          d="M1 22h62l-6.4 21.6A4 4 0 0 1 52.8 47H11.2a4 4 0 0 1-3.8-2.7L1 22z"
+          fill={color}
+        />
+      </svg>
+    );
+  }
   return (
     <svg viewBox="0 0 64 52" width="58" height="47" aria-hidden="true">
       <path
@@ -253,7 +269,10 @@ export default function Ablage() {
                   }}
                   aria-pressed={f.id === fachId}
                 >
-                  <FolderIcon color={kbFarbe[f.fach] || f.farbe || "#868e96"} />
+                  <FolderIcon
+                    color={kbFarbe[f.fach] || f.farbe || "#868e96"}
+                    offen={f.id === fachId}
+                  />
                   <span className="ab-ordner-name">{f.fach}</span>
                 </button>
               ))}
