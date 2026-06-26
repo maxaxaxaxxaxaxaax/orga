@@ -183,14 +183,24 @@ export default function Satzbau({ daten }) {
       {geprueft && (
         <div className={"sb-feedback " + (warRichtig ? "ok" : "no")}>
           {warRichtig ? (
-            <p className="sb-feedback-text">Richtig gebaut. ✓</p>
+            <>
+              <p className="sb-feedback-text">Richtig gebaut. ✓</p>
+              {satz.erklaerung && (
+                <p className="sb-erklaerung">{satz.erklaerung}</p>
+              )}
+            </>
           ) : (
             <>
               <p className="sb-feedback-text">Noch nicht ganz.</p>
               {loesungGezeigt && (
-                <p className="sb-loesung">
-                  Richtig: <strong>{ziel}</strong>
-                </p>
+                <>
+                  <p className="sb-loesung">
+                    Richtig: <strong>{ziel}</strong>
+                  </p>
+                  {satz.erklaerung && (
+                    <p className="sb-erklaerung">{satz.erklaerung}</p>
+                  )}
+                </>
               )}
             </>
           )}

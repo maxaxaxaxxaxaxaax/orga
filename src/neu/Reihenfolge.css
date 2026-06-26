@@ -179,6 +179,13 @@
   line-height: 1.5;
   color: var(--text);
 }
+/* Begruendung, warum diese Reihenfolge stimmt (das Warum, nicht nur das Was). */
+.rf-erklaerung {
+  margin: 8px 0 0;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--text-2);
+}
 
 .rf-leer {
   margin: 0;

@@ -107,6 +107,15 @@
   color: var(--text-2);
   line-height: 1.3;
 }
+/* Begruendung des gefundenen Paars (das Warum) bzw. lenkender Tipp bei falsch. */
+.zu-hinweis.ok {
+  color: var(--ok-text);
+  font-weight: 600;
+}
+.zu-hinweis.falsch {
+  color: var(--danger-text);
+  font-weight: 600;
+}
 
 .zu-leer {
   margin: 0;

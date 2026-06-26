@@ -149,6 +149,16 @@
   font-size: 0.9rem;
   color: var(--text);
 }
+/* Begruendung der Wortstellung (das Warum), bei richtig und in der Loesung. */
+.sb-erklaerung {
+  margin: 6px 0 0;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: var(--text-2);
+}
+.sb-feedback.ok .sb-erklaerung {
+  color: var(--ok-text);
+}
 .sb-aktionen {
   display: flex;
   flex-wrap: wrap;

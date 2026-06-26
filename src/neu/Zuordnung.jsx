@@ -25,6 +25,9 @@ export default function Zuordnung({ daten }) {
   const [geloest, setGeloest] = useState([]); // Indizes bereits gefundener Paare
   const [aktivLinks, setAktivLinks] = useState(null); // angetippter linker Index
   const [fehler, setFehler] = useState(null); // rechter Index, der eben falsch war
+  // Begruendung des zuletzt richtig gefundenen Paars: bleibt stehen, bis der
+  // Schueler das naechste Paar angeht (das "Warum" statt nur "einrasten").
+  const [letzteErklaerung, setLetzteErklaerung] = useState(null);
 
   if (paare.length === 0) {
     return <p className="zu-leer">Für diese Übung gibt es noch keine Paare.</p>;
@@ -35,14 +38,16 @@ export default function Zuordnung({ daten }) {
   function waehleLinks(i) {
     if (geloest.includes(i)) return;
     setFehler(null);
+    setLetzteErklaerung(null);
     setAktivLinks(i === aktivLinks ? null : i);
   }
 
   function waehleRechts(i) {
     if (geloest.includes(i) || aktivLinks === null) return;
     if (i === aktivLinks) {
-      // Richtiges Paar: einrasten.
+      // Richtiges Paar: einrasten und das Warum zeigen (falls hinterlegt).
       setGeloest((g) => [...g, i]);
+      setLetzteErklaerung(paare[i].erklaerung || null);
       setAktivLinks(null);
       setFehler(null);
     } else {
@@ -55,6 +60,7 @@ export default function Zuordnung({ daten }) {
     setGeloest([]);
     setAktivLinks(null);
     setFehler(null);
+    setLetzteErklaerung(null);
   }
 
   if (fertig) {
@@ -124,11 +130,22 @@ export default function Zuordnung({ daten }) {
         </div>
       </div>
 
-      <p className="zu-hinweis" role="status">
+      <p
+        className={
+          "zu-hinweis" +
+          (fehler !== null ? " falsch" : "") +
+          (fehler === null && letzteErklaerung ? " ok" : "")
+        }
+        role="status"
+      >
         {fehler !== null
-          ? "Passt nicht. Versuch eine andere Karte."
+          ? aktivLinks !== null && paare[aktivLinks].tipp
+            ? paare[aktivLinks].tipp
+            : "Passt nicht. Schau nochmal, was wirklich zusammengehört."
           : aktivLinks !== null
           ? "Jetzt rechts das passende Gegenstück antippen."
+          : letzteErklaerung
+          ? "✓ " + letzteErklaerung
           : "Links eine Karte antippen, dann rechts zuordnen."}
       </p>
     </div>

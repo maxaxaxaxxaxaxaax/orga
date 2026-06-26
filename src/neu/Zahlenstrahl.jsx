@@ -187,6 +187,7 @@ export default function Zahlenstrahl({ daten }) {
               ? "Genau getroffen! ✓"
               : `Nicht ganz: du warst bei ${klick}, gesucht war ${aufgabe.ziel}.`}
           </p>
+          {aufgabe.warum && <p className="zs-warum">{aufgabe.warum}</p>}
           <button type="button" className="zs-weiter" onClick={weiter}>
             {s.pos + 1 < s.queue.length
               ? "Weiter →"

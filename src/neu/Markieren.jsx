@@ -142,7 +142,7 @@ export default function Markieren({ daten }) {
         </div>
       ) : falschIdx !== null ? (
         <p className="mk-hinweis" role="status">
-          Noch nicht das richtige Wort, versuch es nochmal.
+          {satz.tipp || "Noch nicht das richtige Wort, versuch es nochmal."}
         </p>
       ) : null}
     </div>

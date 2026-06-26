@@ -177,6 +177,13 @@
   font-size: 0.9rem;
   color: var(--text);
 }
+/* Verbale Begruendung (das Warum), z.B. warum die Gegenzahl von 8 die -8 ist. */
+.zs-warum {
+  margin: 0 0 8px;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--text-2);
+}
 .zs-weiter {
   border: none;
   background: var(--accent);

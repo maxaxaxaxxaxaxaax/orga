@@ -163,14 +163,16 @@ export default function Bildzuordnung({ daten }) {
 
       {geloest ? (
         <div className="bz-feedback ok">
-          <p className="bz-feedback-text">Richtig. ✓</p>
+          <p className="bz-feedback-text">
+            {frage.erklaerung ? "✓ " + frage.erklaerung : "Richtig. ✓"}
+          </p>
           <button type="button" className="bz-weiter" onClick={weiter}>
             {index + 1 >= gesamt ? "Fertig" : "Weiter"}
           </button>
         </div>
       ) : falschId ? (
         <p className="bz-hinweis" role="status">
-          Nicht ganz, versuch einen anderen Raum.
+          {frage.tipp || "Nicht ganz, versuch einen anderen Raum."}
         </p>
       ) : null}
     </div>

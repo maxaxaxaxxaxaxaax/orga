@@ -8,23 +8,23 @@
 export const SATZBAU = {
   e7: {
     saetze: [
-      { woerter: ["If", "it", "rains,", "we", "will", "stay", "at", "home."], uebersetzung: "Wenn es regnet, bleiben wir zu Hause." },
-      { woerter: ["I", "will", "help", "you", "if", "you", "ask", "me."], uebersetzung: "Ich helfe dir, wenn du mich fragst." },
-      { woerter: ["She", "will", "be", "happy", "if", "she", "wins."], uebersetzung: "Sie wird glücklich sein, wenn sie gewinnt." },
-      { woerter: ["Can", "you", "recommend", "a", "good", "restaurant?"], uebersetzung: "Kannst du ein gutes Restaurant empfehlen?" },
-      { woerter: ["The", "entrance", "fee", "is", "five", "euros."], uebersetzung: "Der Eintrittspreis beträgt fünf Euro." },
-      { woerter: ["If", "you", "study", "hard,", "you", "will", "pass", "the", "exam."], uebersetzung: "Wenn du fleißig lernst, bestehst du die Prüfung." },
+      { woerter: ["If", "it", "rains,", "we", "will", "stay", "at", "home."], uebersetzung: "Wenn es regnet, bleiben wir zu Hause.", erklaerung: "if-clause Typ I: die Bedingung steht im Simple Present (it rains), die Folge im will-future (we will stay). Steht der if-Satz vorne, kommt ein Komma." },
+      { woerter: ["I", "will", "help", "you", "if", "you", "ask", "me."], uebersetzung: "Ich helfe dir, wenn du mich fragst.", erklaerung: "Steht der if-Satz hinten, fällt das Komma weg. Trotzdem: Bedingung im Present (you ask), Folge im will-future (I will help)." },
+      { woerter: ["She", "will", "be", "happy", "if", "she", "wins."], uebersetzung: "Sie wird glücklich sein, wenn sie gewinnt.", erklaerung: "Folge im will-future (she will be), Bedingung im Present (she wins). if-Satz hinten, also kein Komma." },
+      { woerter: ["Can", "you", "recommend", "a", "good", "restaurant?"], uebersetzung: "Kannst du ein gutes Restaurant empfehlen?", erklaerung: "Höfliche Frage mit can: Can + Subjekt + Grundform (recommend). Das Adjektiv good steht direkt vor dem Nomen restaurant." },
+      { woerter: ["The", "entrance", "fee", "is", "five", "euros."], uebersetzung: "Der Eintrittspreis beträgt fünf Euro.", erklaerung: "Aussagesatz: Subjekt (the entrance fee) + Verb (is) + Rest. entrance fee ist ein zusammengesetztes Nomen, entrance beschreibt fee." },
+      { woerter: ["If", "you", "study", "hard,", "you", "will", "pass", "the", "exam."], uebersetzung: "Wenn du fleißig lernst, bestehst du die Prüfung.", erklaerung: "if-Satz vorne mit Komma: Present (you study), dann Folge im will-future (you will pass). hard ist hier Adverb und beschreibt study." },
     ],
   },
   // Everyday English: höfliche Fragen und Bitten als Satzbau (passend zu e6).
   e8: {
     saetze: [
-      { woerter: ["Excuse", "me,", "where", "is", "the", "museum?"], uebersetzung: "Entschuldigung, wo ist das Museum?" },
-      { woerter: ["Could", "you", "tell", "me", "the", "way", "to", "the", "station?"], uebersetzung: "Könntest du mir den Weg zum Bahnhof sagen?" },
-      { woerter: ["Can", "you", "recommend", "a", "nice", "cafe?"], uebersetzung: "Kannst du ein nettes Café empfehlen?" },
-      { woerter: ["What", "time", "does", "the", "shop", "open?"], uebersetzung: "Wann öffnet der Laden?" },
-      { woerter: ["I", "would", "like", "two", "tickets,", "please."], uebersetzung: "Ich hätte gern zwei Tickets, bitte." },
-      { woerter: ["Thank", "you", "very", "much", "for", "your", "help."], uebersetzung: "Vielen Dank für deine Hilfe." },
+      { woerter: ["Excuse", "me,", "where", "is", "the", "museum?"], uebersetzung: "Entschuldigung, wo ist das Museum?", erklaerung: "Höflicher Einstieg Excuse me, dann die Frage: Fragewort where + is + Subjekt (the museum)." },
+      { woerter: ["Could", "you", "tell", "me", "the", "way", "to", "the", "station?"], uebersetzung: "Könntest du mir den Weg zum Bahnhof sagen?", erklaerung: "Höfliche Bitte mit could: Could + you + Grundform (tell). Nach tell kommt me (wem) und dann the way (was)." },
+      { woerter: ["Can", "you", "recommend", "a", "nice", "cafe?"], uebersetzung: "Kannst du ein nettes Café empfehlen?", erklaerung: "Can + you + Grundform (recommend). Das Adjektiv nice steht vor dem Nomen cafe." },
+      { woerter: ["What", "time", "does", "the", "shop", "open?"], uebersetzung: "Wann öffnet der Laden?", erklaerung: "Frage im Present mit Hilfsverb does: What time + does + Subjekt (the shop) + Grundform (open). Das Verb bleibt in der Grundform, weil does schon die Person zeigt." },
+      { woerter: ["I", "would", "like", "two", "tickets,", "please."], uebersetzung: "Ich hätte gern zwei Tickets, bitte.", erklaerung: "would like heißt höflich ich hätte gern. Danach die Menge (two tickets), please am Ende macht die Bitte freundlich." },
+      { woerter: ["Thank", "you", "very", "much", "for", "your", "help."], uebersetzung: "Vielen Dank für deine Hilfe.", erklaerung: "Feste Wendung: Thank you (very much) for + Nomen (your help). for nennt den Grund des Dankes." },
     ],
   },
 };
@@ -35,12 +35,12 @@ export const SATZBAU = {
 export const MARKIEREN = {
   l6: {
     saetze: [
-      { woerter: ["Magistra", "discipulam", "laborare", "videt."], ziel: 1, frage: "Klicke den Akkusativ an (im ACI wird er zum Subjekt).", uebersetzung: "Die Lehrerin sieht, dass die Schülerin arbeitet.", erklaerung: "discipulam ist Akkusativ und wird im dass-Satz zum Subjekt." },
-      { woerter: ["Magistra", "discipulam", "laborare", "videt."], ziel: 2, frage: "Klicke den Infinitiv an (er wird zum Prädikat).", uebersetzung: "Die Lehrerin sieht, dass die Schülerin arbeitet.", erklaerung: "laborare ist der Infinitiv und wird zu arbeitet." },
-      { woerter: ["Audio", "te", "cantare."], ziel: 1, frage: "Klicke den Akkusativ an.", uebersetzung: "Ich höre, dass du singst.", erklaerung: "te ist der Akkusativ (von du) und wird zum Subjekt des dass-Satzes." },
-      { woerter: ["Audio", "te", "cantare."], ziel: 2, frage: "Klicke den Infinitiv an.", uebersetzung: "Ich höre, dass du singst.", erklaerung: "cantare ist der Infinitiv und wird zu singst." },
-      { woerter: ["Puto", "magistrum", "venire."], ziel: 1, frage: "Klicke den Akkusativ an.", uebersetzung: "Ich glaube, dass der Lehrer kommt.", erklaerung: "magistrum ist der Akkusativ und wird zum Subjekt." },
-      { woerter: ["Puto", "magistrum", "venire."], ziel: 2, frage: "Klicke den Infinitiv an.", uebersetzung: "Ich glaube, dass der Lehrer kommt.", erklaerung: "venire ist der Infinitiv und wird zu kommt." },
+      { woerter: ["Magistra", "discipulam", "laborare", "videt."], ziel: 1, frage: "Klicke den Akkusativ an (im ACI wird er zum Subjekt).", uebersetzung: "Die Lehrerin sieht, dass die Schülerin arbeitet.", tipp: "Der Akkusativ endet hier auf -am. Welches Wort hört so auf?", erklaerung: "discipulam ist Akkusativ und wird im dass-Satz zum Subjekt." },
+      { woerter: ["Magistra", "discipulam", "laborare", "videt."], ziel: 2, frage: "Klicke den Infinitiv an (er wird zum Prädikat).", uebersetzung: "Die Lehrerin sieht, dass die Schülerin arbeitet.", tipp: "Der Infinitiv endet auf -re (hier -are). Welches Wort passt?", erklaerung: "laborare ist der Infinitiv und wird zu arbeitet." },
+      { woerter: ["Audio", "te", "cantare."], ziel: 1, frage: "Klicke den Akkusativ an.", uebersetzung: "Ich höre, dass du singst.", tipp: "Der Akkusativ ist hier ein kurzes Wort: die Akkusativform von du.", erklaerung: "te ist der Akkusativ (von du) und wird zum Subjekt des dass-Satzes." },
+      { woerter: ["Audio", "te", "cantare."], ziel: 2, frage: "Klicke den Infinitiv an.", uebersetzung: "Ich höre, dass du singst.", tipp: "Such die Form, die auf -re endet.", erklaerung: "cantare ist der Infinitiv und wird zu singst." },
+      { woerter: ["Puto", "magistrum", "venire."], ziel: 1, frage: "Klicke den Akkusativ an.", uebersetzung: "Ich glaube, dass der Lehrer kommt.", tipp: "Der Akkusativ endet hier auf -um.", erklaerung: "magistrum ist der Akkusativ und wird zum Subjekt." },
+      { woerter: ["Puto", "magistrum", "venire."], ziel: 2, frage: "Klicke den Infinitiv an.", uebersetzung: "Ich glaube, dass der Lehrer kommt.", tipp: "Der Infinitiv endet auf -re (hier -ire).", erklaerung: "venire ist der Infinitiv und wird zu kommt." },
     ],
   },
 };
@@ -58,12 +58,12 @@ export const BILDZUORDNUNG = {
       { id: "ausgang", label: "Ausgang" },
     ],
     fragen: [
-      { frage: "Where is the entrance?", raum: "eingang" },
-      { frage: "Where are the toilets?", raum: "toiletten" },
-      { frage: "Where is the gift shop?", raum: "laden" },
-      { frage: "Where is the exit?", raum: "ausgang" },
-      { frage: "Where is the café?", raum: "cafe" },
-      { frage: "Where is the information desk?", raum: "info" },
+      { frage: "Where is the entrance?", raum: "eingang", tipp: "entrance kommt von to enter, also hineingehen.", erklaerung: "entrance heißt Eingang, dort gehst du hinein." },
+      { frage: "Where are the toilets?", raum: "toiletten", tipp: "toilets klingt fast wie das deutsche Wort.", erklaerung: "toilets heißt Toiletten." },
+      { frage: "Where is the gift shop?", raum: "laden", tipp: "shop heißt Laden, gift heißt Geschenk.", erklaerung: "a gift shop ist ein Laden für Geschenke, also der Laden." },
+      { frage: "Where is the exit?", raum: "ausgang", tipp: "exit ist das Gegenteil von entrance.", erklaerung: "exit heißt Ausgang, dort gehst du hinaus." },
+      { frage: "Where is the café?", raum: "cafe", tipp: "café ist fast wie im Deutschen.", erklaerung: "café ist das Café." },
+      { frage: "Where is the information desk?", raum: "info", tipp: "a desk ist ein Schalter oder Tresen.", erklaerung: "the information desk ist die Information, der Schalter für Auskünfte." },
     ],
   },
 };
@@ -415,6 +415,8 @@ export const REIHENFOLGE = {
       "Einsetzen: 4 + 4",
       "Zusammenrechnen: 4 + 4 = 8",
     ],
+    erklaerung:
+      "Die Reihenfolge folgt zwei Regeln: erst Klammern, dann Punkt vor Strich. Deshalb kommt 3 − 5 zuerst, dann die Mal-Rechnung −2 · (−2), und erst ganz am Ende das Plus.",
   },
   d5: {
     aufgabe: "Bring die Stationen der Weltreise in die richtige Reihenfolge (von London aus immer nach Osten).",
@@ -848,7 +850,7 @@ export const AUSWAHLQUIZ = {
         frage: '"Magistra discipulam laborare videt." Welches Wort ist der Akkusativ (Subjekt des ACI)?',
         optionen: [
           "magistra",
-          { text: "discipulam", erklaerung: "" },
+          { text: "discipulam", erklaerung: "Richtig: discipulam endet auf -am, das ist Akkusativ Singular. Im ACI wird genau dieser Akkusativ zum Subjekt des dass-Satzes." },
           { text: "laborare", erklaerung: "laborare ist der Infinitiv, nicht der Akkusativ." },
           { text: "videt", erklaerung: "videt ist das auslösende Verb (sehen)." },
         ],
@@ -858,7 +860,7 @@ export const AUSWAHLQUIZ = {
       {
         frage: '"Magistra discipulam laborare videt." Wie übersetzt du den Satz?',
         optionen: [
-          { text: "Die Lehrerin sieht, dass die Schülerin arbeitet.", erklaerung: "" },
+          { text: "Die Lehrerin sieht, dass die Schülerin arbeitet.", erklaerung: "Richtig: magistra (Nominativ) ist das Subjekt im Hauptsatz, der Akkusativ discipulam wird zum Subjekt des dass-Satzes, laborare wird zu arbeitet." },
           { text: "Die Schülerin sieht, dass die Lehrerin arbeitet.", erklaerung: "Vertauscht: magistra (Nominativ) sieht, discipulam (Akkusativ) arbeitet." },
           { text: "Die Lehrerin und die Schülerin arbeiten.", erklaerung: "Das ist kein dass-Satz, der ACI geht verloren." },
           { text: "Die Lehrerin sieht die arbeitende Schülerin.", erklaerung: "Nah dran, aber der ACI wird mit dass aufgelöst." },
@@ -874,12 +876,12 @@ export const ZUORDNUNG = {
   e6: {
     aufgabe: "Ordne jede englische Phrase ihrer deutschen Bedeutung zu.",
     paare: [
-      { links: "Could you tell me ...?", rechts: "Könnten Sie mir sagen ...?" },
-      { links: "Excuse me, where is ...?", rechts: "Entschuldigung, wo ist ...?" },
-      { links: "Do you know how to get to ...?", rechts: "Wissen Sie, wie man zu ... kommt?" },
-      { links: "May I ask you something?", rechts: "Darf ich Sie etwas fragen?" },
-      { links: "Could you say that again, please?", rechts: "Könnten Sie das bitte wiederholen?" },
-      { links: "What time does ... open?", rechts: "Wann öffnet ...?" },
+      { links: "Could you tell me ...?", rechts: "Könnten Sie mir sagen ...?", tipp: "could macht die Bitte höflich, tell heißt sagen.", erklaerung: "Could you ...? ist eine sehr höfliche Bitte, tell me heißt mir sagen." },
+      { links: "Excuse me, where is ...?", rechts: "Entschuldigung, wo ist ...?", tipp: "where heißt wo.", erklaerung: "Excuse me leitet höflich ein, where is fragt nach dem Ort." },
+      { links: "Do you know how to get to ...?", rechts: "Wissen Sie, wie man zu ... kommt?", tipp: "to get to heißt irgendwo hinkommen.", erklaerung: "how to get to ... heißt wie man zu ... kommt." },
+      { links: "May I ask you something?", rechts: "Darf ich Sie etwas fragen?", tipp: "may fragt um Erlaubnis (dürfen).", erklaerung: "May I ...? heißt Darf ich ...?, something heißt etwas." },
+      { links: "Could you say that again, please?", rechts: "Könnten Sie das bitte wiederholen?", tipp: "again heißt nochmal.", erklaerung: "say that again heißt das nochmal sagen, also wiederholen." },
+      { links: "What time does ... open?", rechts: "Wann öffnet ...?", tipp: "what time heißt um welche Uhrzeit.", erklaerung: "What time does ... open? fragt nach der Öffnungszeit." },
     ],
   },
   d1: {

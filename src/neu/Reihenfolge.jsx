@@ -140,6 +140,9 @@ export default function Reihenfolge({ daten }) {
                   <li key={i}>{s}</li>
                 ))}
               </ol>
+              {daten.erklaerung && (
+                <p className="rf-erklaerung">{daten.erklaerung}</p>
+              )}
             </div>
           ) : (
             <button
