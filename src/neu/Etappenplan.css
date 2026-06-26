@@ -23,67 +23,6 @@
   }
 }
 
-/* Werkzeugzeile: Suche (Vorrat-Breite) links, Vorschlag rechts */
-.ep-top {
-  flex-shrink: 0;
-  display: grid;
-  grid-template-columns: minmax(280px, 340px) minmax(0, 1fr);
-  gap: 18px;
-  align-items: center;
-  margin-bottom: 18px;
-}
-.ep-suche {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 16px;
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  box-shadow: var(--shadow-sm);
-}
-.ep-suche svg {
-  width: 17px;
-  height: 17px;
-  flex-shrink: 0;
-  color: var(--muted);
-}
-.ep-suche input {
-  flex: 1;
-  min-width: 0;
-  border: none;
-  outline: none;
-  background: transparent;
-  font: inherit;
-  font-size: 0.92rem;
-  color: var(--text);
-}
-.ep-suche input::placeholder {
-  color: var(--muted);
-}
-.ep-vorschlag-knopf {
-  justify-self: end;
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  border: none;
-  background: var(--accent);
-  color: var(--on-accent);
-  font-size: 0.92rem;
-  font-weight: 700;
-  padding: 11px 20px;
-  border-radius: 999px;
-  cursor: pointer;
-  box-shadow: 0 4px 14px -4px var(--accent-shadow);
-  transition: background 0.15s ease, transform 0.12s ease;
-}
-.ep-vorschlag-knopf:hover {
-  background: var(--accent-strong);
-}
-.ep-vorschlag-knopf:active {
-  transform: scale(0.97);
-}
-
 /* Zwei Spalten: Vorrat links, Wochen rechts */
 .ep-layout {
   flex: 1;
@@ -107,11 +46,8 @@
     height: auto;
     overflow: visible;
   }
-  .ep-top,
   .ep-layout {
     grid-template-columns: 1fr;
-  }
-  .ep-layout {
     grid-template-rows: auto;
   }
   .ep-vorrat {
@@ -121,10 +57,6 @@
   .ep-wochen-grid {
     overflow-y: visible;
     max-height: none;
-  }
-  .ep-vorschlag-knopf {
-    justify-self: stretch;
-    justify-content: center;
   }
 }
 
@@ -156,83 +88,77 @@
   color: var(--muted);
   font-variant-numeric: tabular-nums;
 }
-.ep-kopf-text {
-  margin: 6px 0 0;
-  font-size: 0.9rem;
-  line-height: 1.4;
-  color: var(--text-2);
-}
-.ep-kopf-aktionen {
-  margin-top: 14px;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px;
-}
-.ep-fortschritt {
-  margin-right: auto;
-  font-size: 0.82rem;
-  font-weight: 600;
-  color: var(--muted);
-}
-.ep-fortschritt.fertig {
-  color: var(--ok-text);
-}
-.ep-reset {
-  border: none;
-  background: transparent;
-  color: var(--muted);
-  font-size: 0.84rem;
-  font-weight: 600;
-  padding: 8px 10px;
-  border-radius: 999px;
-  cursor: pointer;
-}
-.ep-reset:hover:not(:disabled) {
-  color: var(--text);
-}
-.ep-reset:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-.ep-reset-confirm {
+/* Untere "Etappenplanung"-Leiste: schwebende Pille, führt durch den Schritt.
+   Teal-getönt wie im Mockup; lokal über Variablen, damit anpassbar. */
+.ep-bar {
+  --ep-teal: #0d9488;
+  --ep-teal-strong: #0b7d72;
+  position: fixed;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 60;
   display: inline-flex;
-  gap: 6px;
+  align-items: center;
+  gap: 14px;
+  max-width: calc(100% - 28px);
+  padding: 8px 8px 8px 18px;
+  background: color-mix(in srgb, var(--ep-teal) 14%, var(--card));
+  border: 1px solid color-mix(in srgb, var(--ep-teal) 30%, var(--line));
+  border-radius: 999px;
+  box-shadow: var(--shadow-lg);
+  -webkit-backdrop-filter: blur(18px) saturate(1.6);
+  backdrop-filter: blur(18px) saturate(1.6);
 }
-.ep-reset-ja {
-  border: 1px solid var(--danger-line);
-  background: var(--danger-bg);
-  color: var(--danger-text);
-  font-size: 0.82rem;
+.ep-bar-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.92rem;
   font-weight: 700;
-  padding: 7px 12px;
-  border-radius: 999px;
-  cursor: pointer;
+  color: var(--ep-teal-strong);
+  white-space: nowrap;
 }
-.ep-reset-nein {
-  border: 1px solid var(--line-strong);
-  background: var(--card);
-  color: var(--text);
-  font-size: 0.82rem;
-  font-weight: 600;
-  padding: 7px 12px;
-  border-radius: 999px;
-  cursor: pointer;
+.ep-bar-sep {
+  width: 1px;
+  height: 22px;
+  background: color-mix(in srgb, var(--ep-teal) 30%, var(--line));
 }
-.ep-weiter {
+.ep-bar-text {
+  font-size: 0.9rem;
+  color: var(--text-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ep-bar-aktion,
+.ep-bar-weiter {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
   border: none;
-  background: var(--accent);
-  color: var(--on-accent);
-  font-size: 0.86rem;
+  background: var(--ep-teal);
+  color: #ffffff;
+  font-size: 0.92rem;
   font-weight: 700;
-  padding: 9px 18px;
+  padding: 10px 20px;
   border-radius: 999px;
   cursor: pointer;
+  transition: background 0.15s ease, transform 0.12s ease;
 }
-.ep-weiter:disabled {
-  background: var(--line-strong);
-  color: var(--muted);
-  cursor: not-allowed;
+.ep-bar-aktion:hover,
+.ep-bar-weiter:hover {
+  background: var(--ep-teal-strong);
+}
+.ep-bar-aktion:active,
+.ep-bar-weiter:active {
+  transform: scale(0.97);
+}
+@media (max-width: 560px) {
+  .ep-bar-text {
+    display: none;
+  }
 }
 
 /* Vorrat-Liste: Fach-Karten */
@@ -282,15 +208,6 @@
   font-size: 1rem;
   font-weight: 700;
   color: var(--text);
-}
-.ep-fachgruppe-zahl {
-  font-size: 0.7rem;
-  font-weight: 700;
-  color: var(--text-2);
-  background: var(--bg);
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  padding: 0 7px;
 }
 .ep-fachgruppe-pfeil {
   margin-left: auto;
@@ -414,9 +331,8 @@
 }
 
 @media (pointer: coarse) {
-  .ep-reset,
-  .ep-weiter,
-  .ep-vorschlag-knopf {
+  .ep-bar-aktion,
+  .ep-bar-weiter {
     min-height: 40px;
   }
 }

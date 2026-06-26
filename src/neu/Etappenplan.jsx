@@ -69,8 +69,6 @@ export default function Etappenplan({ onWeiter }) {
   const [ueber, setUeber] = useState(null); // Drop-Ziel ("w0".."w5" | "pool")
   const [gewaehltId, setGewaehltId] = useState(null); // angetippter Chip (Touch)
   const [hinweis, setHinweis] = useState(null);
-  const [resetConfirm, setResetConfirm] = useState(false);
-  const [suche, setSuche] = useState("");
   const [zuFaecher, setZuFaecher] = useState(() => new Set()); // eingeklappte Fächer
 
   useEffect(() => {
@@ -97,20 +95,16 @@ export default function Etappenplan({ onWeiter }) {
   }, []);
 
   const wochen = wochenBereiche(ETAPPE, etappeWochen);
-  const q = suche.trim().toLowerCase();
 
-  const proFach = kbFaecher
-    .map((fach) => ({
-      fach,
-      farbe: kbFarbe[fach] || "#868e96",
-      kbs: koennensbeweise.filter(
-        (k) =>
-          k.fach === fach &&
-          zuordnung[k.id] == null &&
-          (!q || k.titel.toLowerCase().includes(q))
-      ),
-    }))
-    .filter((sp) => sp.kbs.length > 0);
+  // Alle Fächer bleiben als Überschriften stehen (auch wenn alles verteilt ist),
+  // wie im Mockup. Leere Fächer zeigen nur den Kopf.
+  const proFach = kbFaecher.map((fach) => ({
+    fach,
+    farbe: kbFarbe[fach] || "#868e96",
+    kbs: koennensbeweise.filter(
+      (k) => k.fach === fach && zuordnung[k.id] == null
+    ),
+  }));
 
   const proWoche = wochen.map((w, i) => ({
     ...w,
@@ -181,13 +175,6 @@ export default function Etappenplan({ onWeiter }) {
     setHinweis("Ausgewogen verteilt: leichteste Woche zuerst. Du kannst frei anpassen.");
   }
 
-  function planZuruecksetzen() {
-    setZuordnung({});
-    setGewaehltId(null);
-    setResetConfirm(false);
-    setHinweis("Plan zurückgesetzt. Verteile deine Ziele neu.");
-  }
-
   // Ein bunter KB-Chip (Vollton in Fachfarbe), ziehbar und antippbar.
   function chip(k, platziert) {
     const farbe = kbFarbe[k.fach] || "#868e96";
@@ -228,31 +215,6 @@ export default function Etappenplan({ onWeiter }) {
       className="ep-screen"
       onClick={() => gewaehltId != null && setGewaehltId(null)}
     >
-      {/* Werkzeugzeile: Suche (Vorrat-Breite) + Für mich vorschlagen */}
-      <div className="ep-top">
-        <div className="ep-suche">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
-            <circle cx="11" cy="11" r="7" />
-            <path d="M21 21l-4.35-4.35" />
-          </svg>
-          <input
-            type="text"
-            value={suche}
-            onChange={(e) => setSuche(e.target.value)}
-            placeholder="Suche"
-            aria-label="Könnensbeweise durchsuchen"
-          />
-        </div>
-        <button
-          type="button"
-          className="ep-vorschlag-knopf"
-          onClick={vorschlagVerteilung}
-          title="Die noch offenen Ziele ausgewogen auf die Wochen verteilen"
-        >
-          <span aria-hidden="true">✦</span> Für mich vorschlagen
-        </button>
-      </div>
-
       <div className="ep-layout">
         {/* Linke Spalte: Vorrat */}
         <aside
@@ -279,93 +241,37 @@ export default function Etappenplan({ onWeiter }) {
             <p className="ep-kopf-meta">
               {zeitraum(ETAPPE)} · {koennensbeweise.length} Könnensbeweise
             </p>
-            <p className="ep-kopf-text">
-              Ziehe die Könnensbeweise in die jeweiligen Wochen.
-            </p>
-            <div className="ep-kopf-aktionen">
-              <span
-                className={"ep-fortschritt" + (alleZugeordnet ? " fertig" : "")}
-              >
-                {alleZugeordnet ? "Alle verteilt ✓" : `noch ${offen} offen`}
-              </span>
-              {resetConfirm ? (
-                <span className="ep-reset-confirm">
-                  <button
-                    type="button"
-                    className="ep-reset-ja"
-                    onClick={planZuruecksetzen}
-                  >
-                    Ja, neu
-                  </button>
-                  <button
-                    type="button"
-                    className="ep-reset-nein"
-                    onClick={() => setResetConfirm(false)}
-                  >
-                    Abbrechen
-                  </button>
-                </span>
-              ) : (
-                <button
-                  type="button"
-                  className="ep-reset"
-                  onClick={() => setResetConfirm(true)}
-                  disabled={offen === koennensbeweise.length}
-                >
-                  Zurücksetzen
-                </button>
-              )}
-              <button
-                type="button"
-                className="ep-weiter"
-                onClick={onWeiter}
-                disabled={!alleZugeordnet}
-                title={
-                  alleZugeordnet
-                    ? "Weiter zur Wochenplanung"
-                    : "Erst alle Könnensbeweise in Wochen ziehen"
-                }
-              >
-                Weiter →
-              </button>
-            </div>
           </div>
 
           <div className="ep-vorrat-liste">
-            {proFach.length === 0 ? (
-              <p className="ep-vorrat-leer">
-                {q ? "Nichts gefunden." : "Alle Könnensbeweise verteilt."}
-              </p>
-            ) : (
-              proFach.map((sp) => {
-                const zu = zuFaecher.has(sp.fach);
-                return (
-                  <section
-                    className="ep-fachgruppe"
-                    key={sp.fach}
-                    style={{ "--c": sp.farbe }}
+            {proFach.map((sp) => {
+              const leer = sp.kbs.length === 0;
+              const zu = leer || zuFaecher.has(sp.fach);
+              return (
+                <section
+                  className={"ep-fachgruppe" + (leer ? " leer" : "")}
+                  key={sp.fach}
+                  style={{ "--c": sp.farbe }}
+                >
+                  <button
+                    type="button"
+                    className="ep-fachgruppe-kopf"
+                    onClick={() => toggleFach(sp.fach)}
+                    aria-expanded={!zu}
                   >
-                    <button
-                      type="button"
-                      className="ep-fachgruppe-kopf"
-                      onClick={() => toggleFach(sp.fach)}
-                      aria-expanded={!zu}
-                    >
-                      <span className="ep-fachgruppe-name">{sp.fach}</span>
-                      <span className="ep-fachgruppe-zahl">{sp.kbs.length}</span>
-                      <span className="ep-fachgruppe-pfeil" aria-hidden="true">
-                        {zu ? "▸" : "▾"}
-                      </span>
-                    </button>
-                    {!zu && (
-                      <div className="ep-fachgruppe-chips">
-                        {sp.kbs.map((k) => chip(k, false))}
-                      </div>
-                    )}
-                  </section>
-                );
-              })
-            )}
+                    <span className="ep-fachgruppe-name">{sp.fach}</span>
+                    <span className="ep-fachgruppe-pfeil" aria-hidden="true">
+                      {zu ? "▸" : "▾"}
+                    </span>
+                  </button>
+                  {!zu && (
+                    <div className="ep-fachgruppe-chips">
+                      {sp.kbs.map((k) => chip(k, false))}
+                    </div>
+                  )}
+                </section>
+              );
+            })}
           </div>
         </aside>
 
@@ -410,6 +316,34 @@ export default function Etappenplan({ onWeiter }) {
             );
           })}
         </div>
+      </div>
+
+      {/* Untere Leiste: führt durch den Schritt. Ist alles verteilt, fällt der
+         Hinweis weg und es erscheint "Weiter" (wie im Mockup). */}
+      <div className="ep-bar">
+        <span className="ep-bar-label">
+          <span aria-hidden="true">🗓</span> Etappenplanung
+        </span>
+        <span className="ep-bar-sep" aria-hidden="true" />
+        {alleZugeordnet ? (
+          <button type="button" className="ep-bar-weiter" onClick={onWeiter}>
+            Weiter
+          </button>
+        ) : (
+          <>
+            <span className="ep-bar-text">
+              Ziehe die Lernwege in die jeweiligen Wochen
+            </span>
+            <button
+              type="button"
+              className="ep-bar-aktion"
+              onClick={vorschlagVerteilung}
+              title="Die noch offenen Ziele ausgewogen auf die Wochen verteilen"
+            >
+              <span aria-hidden="true">✦</span> Für mich einsortieren
+            </button>
+          </>
+        )}
       </div>
 
       {hinweis && (

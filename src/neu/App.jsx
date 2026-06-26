@@ -105,8 +105,9 @@ export default function App() {
     meldeAenderung();
   }
   // Der Weg begleitet die Reihenfolge (Planung + Heute + Plan), nicht das
-  // Nachschlage-Werkzeug Ablage.
-  const zeigeWeg = screen !== "ablage";
+  // Nachschlage-Werkzeug Ablage. Auf dem Etappenplan-Screen blendet er sich aus:
+  // dort führt die eigene "Etappenplanung"-Leiste unten durch den Schritt.
+  const zeigeWeg = screen !== "ablage" && screen !== "etappenplan";
   // Während des Planens (Etappe, Woche) bleibt die obere Navbar weg: voller
   // Fokus auf den Planungsschritt, kein Wegspringen.
   const zeigeNav = screen !== "etappenplan" && screen !== "wochenplan";
