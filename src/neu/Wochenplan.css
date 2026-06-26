@@ -1,42 +1,41 @@
-/* Woche planen als Kalender: links Lernwege je Fach, rechts die Woche als Raster. */
+/* Woche planen im selben Layout wie der Etappenplan: links die Kopf-Karte
+   (ep-kopf-karte) plus die Fach-Karten (ep-fachgruppe), rechts die Woche als
+   Kalender-Raster. Unten dieselbe schwebende Schritt-Pille (ep-bar). Die
+   gemeinsamen ep-* Klassen kommen aus Etappenplan.css (global gebündelt). */
 .wp-screen {
-  max-width: 1180px;
-  margin: 0 auto;
   height: 100dvh;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  /* oben Platz fuer die Nav-Pille (Plan-Tab); unten fuer die schwebende Leiste */
-  padding: 70px 18px 76px;
+  /* oben Platz fuer die Nav-Pille (Plan-Tab), unten fuer die schwebende Leiste */
+  padding: 70px 28px 88px;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-satoshi);
 }
-/* Werkzeugzeile oben (wie im Etappenplan): Suche links auf Spaltenbreite,
-   "Fuer mich vorschlagen" rechts. */
-.wp-top {
-  flex-shrink: 0;
-  display: grid;
-  grid-template-columns: minmax(240px, 300px) minmax(0, 1fr);
-  gap: 20px;
-  align-items: center;
-  margin-bottom: 16px;
+/* Wizard-Schritt: keine obere Nav, dafuer die "Wochenplanung"-Pille unten.
+   Oben darf der Kalender naeher an den Rand, wie im Etappenplan. */
+.wp-screen.wp-wizard {
+  padding-top: 28px;
 }
 .wp-layout {
   flex: 1;
   min-height: 0;
   display: grid;
-  grid-template-columns: minmax(240px, 300px) minmax(0, 1fr);
+  grid-template-columns: minmax(280px, 340px) minmax(0, 1fr);
   grid-template-rows: minmax(0, 1fr);
-  gap: 20px;
+  gap: 18px;
   align-items: stretch;
 }
 @media (max-width: 860px) {
   .wp-screen {
     height: auto;
     overflow: visible;
-    padding: 70px 14px 76px;
+    padding: 70px 14px 88px;
   }
-  .wp-top {
-    grid-template-columns: 1fr auto;
+  .wp-screen.wp-wizard {
+    padding-top: 18px;
   }
   .wp-layout {
     grid-template-columns: 1fr;
@@ -50,94 +49,98 @@
     max-height: none;
   }
 }
+@media (max-width: 560px) {
+  .wp-screen {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+}
 
 /* ---- Linke Spalte -------------------------------------------------------
-   Container ist nur noch ein transparenter Stapel: oben die feste Kopf-Box,
-   darunter der scrollende Fächer-Bereich. Jede Fach-Gruppe ist eine eigene
-   Karte. */
+   Transparenter Stapel: oben die Kopf-Karte (ep-kopf-karte), darunter der
+   scrollende Fächer-Bereich. Jede Fach-Gruppe ist eine ep-fachgruppe-Karte. */
 .wp-seite {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
+  min-width: 0;
   min-height: 0;
   max-height: 100%;
-}
-/* Feste Kopf-Box ("Plane deine Woche"): bleibt stehen, scrollt nicht mit. */
-.wp-seite-fest {
-  flex-shrink: 0;
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: var(--r-md, 12px);
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  box-shadow: var(--shadow-sm);
 }
 /* Beim Zurückziehen in den Vorrat den scrollenden Bereich markieren. */
 .wp-seite.ueber .wp-seite-liste {
   outline: 2px dashed var(--accent);
-  outline-offset: -2px;
-  border-radius: var(--r-md, 12px);
-  background: var(--accent-soft);
+  outline-offset: 4px;
+  border-radius: var(--r-md, 14px);
 }
-.wp-seite-kopf {
+.wp-seite-liste {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
   display: flex;
-  align-items: flex-start;
-  gap: 10px;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0 -4px;
+  padding: 0 4px;
 }
-.wp-seite-icon {
-  font-size: 1.2rem;
-  line-height: 1.4;
-}
-.wp-seite-titel {
+.wp-seite-leer {
   margin: 0;
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: var(--text);
-}
-.wp-seite-sub {
-  margin: 2px 0 0;
-  font-size: 0.82rem;
+  padding: 6px 2px;
+  font-size: 0.86rem;
   color: var(--muted);
+  font-style: italic;
 }
-.wp-seite-erklaer {
-  margin: 0;
-  font-size: 0.84rem;
-  line-height: 1.4;
-  color: var(--text-2);
+
+/* ---- Rechte Spalte: Kalender ------------------------------------------- */
+.wp-kal {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg, 20px);
+  padding: 18px 20px 20px;
+  min-width: 0;
+  min-height: 0;
+  max-height: 100%;
+  overflow: auto;
+  box-shadow: var(--shadow-sm);
 }
-.wp-seite-status {
+.wp-kal-kopf {
   display: flex;
+  align-items: center;
+  justify-content: space-between;
   flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+/* Monat links, dezenter Pfeil (rein optisch, wie im Mockup). */
+.wp-kal-titel {
+  display: flex;
   align-items: center;
   gap: 8px;
 }
-.wp-status-rest {
-  font-size: 0.8rem;
+.wp-kal-monat {
+  margin: 0;
+  font-size: 1.4rem;
   font-weight: 700;
-  color: var(--text-2);
+  letter-spacing: -0.01em;
+  color: var(--text);
 }
-.wp-status-rest.fertig {
-  color: var(--ok-text);
-}
-.wp-status-last {
-  font-size: 0.72rem;
-  font-weight: 600;
+.wp-kal-monat-pfeil {
   color: var(--muted);
-  background: var(--bg);
-  border: 1px solid var(--line);
+  font-size: 0.9rem;
+}
+.wp-kal-jetzt {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+  background: var(--accent-soft);
   border-radius: 999px;
-  padding: 2px 9px;
+  padding: 2px 8px;
 }
-.wp-status-last[data-stand="knapp"],
-.wp-status-last[data-stand="viel"] {
-  color: var(--warn-text);
-  border-color: var(--warn-line);
-  background: var(--warn-bg);
-}
-.wp-seite-aktionen {
+.wp-kal-nav {
   display: flex;
+  align-items: center;
   flex-wrap: wrap;
   gap: 8px;
 }
@@ -168,119 +171,14 @@
   display: inline-flex;
   gap: 6px;
 }
-.wp-weiter {
-  border: none;
-  background: var(--accent);
-  color: var(--on-accent);
-  font-size: 0.86rem;
-  font-weight: 700;
-  padding: 8px 18px;
-  border-radius: 999px;
-  cursor: pointer;
-}
-.wp-weiter:hover:not(:disabled) {
-  background: var(--accent-strong);
-}
-.wp-weiter:disabled {
-  background: var(--line-strong);
-  color: var(--muted);
-  cursor: not-allowed;
-}
-
-.wp-seite-liste {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin: 0 -4px;
-  padding: 2px 4px;
-}
-.wp-seite-leer {
-  margin: 0;
-  font-size: 0.84rem;
-  color: var(--muted);
-}
-/* Jedes Fach ist eine eigene Karte. */
-.wp-fachgruppe {
-  flex-shrink: 0;
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: var(--r-md, 12px);
-  overflow: hidden;
-  box-shadow: var(--shadow-sm);
-}
-.wp-fachgruppe-kopf {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  width: 100%;
-  padding: 9px 12px;
-  border: none;
-  border-left: 3px solid var(--c);
-  background: color-mix(in srgb, var(--c) 8%, var(--card));
-  cursor: pointer;
-  text-align: left;
-}
-.wp-fachgruppe-name {
-  font-size: 0.92rem;
-  font-weight: 700;
-  color: var(--text);
-}
-.wp-fachgruppe-zahl {
-  font-size: 0.7rem;
-  font-weight: 700;
-  color: var(--text-2);
-  background: var(--bg);
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  padding: 0 7px;
-}
-.wp-fachgruppe-pfeil {
-  margin-left: auto;
-  color: var(--muted);
-  font-size: 0.8rem;
-}
-.wp-fachgruppe-chips {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 10px;
-}
-
-/* ---- Rechte Spalte: Kalender ------------------------------------------- */
-.wp-kal {
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: var(--r-md, 12px);
-  padding: 14px 16px 18px;
-  min-width: 0;
-  min-height: 0;
-  max-height: 100%;
-  overflow: auto;
-}
-.wp-kal-kopf {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 14px;
-}
-.wp-kal-nav {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
 .wp-kal-pfeil {
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
   border: 1px solid var(--line);
   background: var(--card);
   color: var(--text-2);
   border-radius: 50%;
-  font-size: 1rem;
+  font-size: 1.05rem;
   cursor: pointer;
 }
 .wp-kal-pfeil:hover:not(:disabled) {
@@ -290,27 +188,6 @@
 .wp-kal-pfeil:disabled {
   opacity: 0.4;
   cursor: not-allowed;
-}
-.wp-kal-monat {
-  margin: 0;
-  font-size: 1.15rem;
-  font-weight: 700;
-  color: var(--text);
-}
-.wp-kal-jetzt {
-  font-size: 0.68rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--accent);
-  background: var(--accent-soft);
-  border-radius: 999px;
-  padding: 2px 8px;
-}
-.wp-kal-kopf-buttons {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
 }
 
 .wp-kal-grid {
@@ -325,16 +202,17 @@
 .wp-kal-tag-head {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  padding-bottom: 8px;
+  align-items: flex-start;
+  padding: 0 2px 8px;
 }
 .wp-kal-tag-datum {
-  font-size: 1rem;
+  font-size: 1.3rem;
   font-weight: 700;
   color: var(--text);
+  font-variant-numeric: tabular-nums;
 }
 .wp-kal-tag-name {
-  font-size: 0.74rem;
+  font-size: 0.8rem;
   color: var(--muted);
 }
 .wp-kal-body {
@@ -475,12 +353,32 @@
   font-size: 0.7rem;
 }
 
-/* Der Toast (.ep-hinweis) ist zentral in index.css definiert (vorher stand er
-   hier und im Etappenplan doppelt: top vs. bottom hat den Toast riesig gestreckt). */
+/* ---- Untere Pille: Zurück-Knopf (nur Wizard) --------------------------
+   Sitzt links in der gemeinsamen ep-bar, vor dem Label. */
+.wp-bar-zurueck {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: none;
+  background: transparent;
+  color: var(--ep-teal-strong, #0b7d72);
+  font-size: 0.9rem;
+  font-weight: 700;
+  padding: 8px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.wp-bar-zurueck:hover {
+  background: color-mix(in srgb, var(--ep-teal, #0d9488) 14%, transparent);
+}
+
+/* Der Toast (.ep-hinweis) ist zentral in index.css definiert. */
 
 @media (pointer: coarse) {
   .wp-akt,
-  .wp-kal-pfeil {
+  .wp-kal-pfeil,
+  .wp-bar-zurueck {
     min-height: 40px;
   }
 }

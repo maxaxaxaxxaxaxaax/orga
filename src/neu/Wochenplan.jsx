@@ -1,10 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-  koennensbeweise,
-  wochenZielCluster,
-  kbFaecher,
-  kbFarbe,
-} from "../data/koennensbeweise";
+import { koennensbeweise, kbFaecher, kbFarbe } from "../data/koennensbeweise";
 import { lernwegFuerKb } from "../data/wissen";
 import { ladeSchritte } from "./lernschritte";
 import {
@@ -20,19 +15,19 @@ import KbChip from "./KbChip";
 import { meldeAenderung, ladeStunden } from "./planung";
 import "./Wochenplan.css";
 
-// Woche planen als Kalender-Raster: links die Lernwege je Fach (zum Platzieren),
+// Woche planen als Kalender-Raster, im selben Layout wie der Etappenplan:
+// links die "Plane deine Woche"-Karte plus die Lernwege je Fach (zum Platzieren),
 // rechts die Woche als Zeitachse. Stundenplan-Stunden, die nicht belegbar sind
 // (Nebenfächer, Projekte, Pause), liegen ausgegraut als Kontext; die belegbaren
 // Stunden (Hauptfächer + Studierzeit) sind die "Freiarbeit"-Slots, auf die man
 // die Uhren der Etappenziele legt. Eine Uhr = eine Stunde. Drag-and-drop (Laptop)
-// und Tippen (Touch) funktionieren beide. Die Planungs-Logik ist unverändert,
-// nur die Darstellung ist neu.
+// und Tippen (Touch) funktionieren beide. Unten führt dieselbe schwebende Pille
+// wie im Etappenplan durch den Schritt ("Wochenplanung" -> "Weiter").
 
 const ETAPPE = etappen.find((e) => e.id === 4) || etappen[0];
 const WOCHEN_KEY = "neu.etappenplan.zuordnung"; // kbId -> Wochen-Index (read-only)
 const STUNDEN_KEY = "neu.wochenplan.stunden"; // kbId -> [Stunden-ID, ...] (je 1 Uhr)
 const TAGE = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag"];
-const TAGE_KURZ = ["Mo", "Di", "Mi", "Do", "Fr"];
 
 // Zeitachse des Kalenders.
 const MIN = (hhmm) => {
@@ -92,7 +87,11 @@ export default function Wochenplan({ onZurueck, onWeiter, onEtappeAnpassen, woch
   const [resetConfirm, setResetConfirm] = useState(false);
   const [aktiveWoche, setAktiveWoche] = useState(woche);
   const [zuFaecher, setZuFaecher] = useState(() => new Set()); // eingeklappte Fächer
-  const [suche, setSuche] = useState("");
+
+  // Wizard (Planungsschritt mit "Weiter") oder stehende Plan-Übersicht (Plan-Tab,
+  // mit "Etappe anpassen"). Steuert, ob die Schritt-Pille unten erscheint oder die
+  // Werkzeuge oben im Kalenderkopf liegen.
+  const istWizard = !!onWeiter;
 
   useEffect(() => {
     localStorage.setItem(STUNDEN_KEY, JSON.stringify(stunden));
@@ -132,13 +131,6 @@ export default function Wochenplan({ onZurueck, onWeiter, onEtappeAnpassen, woch
       koennensbeweise.map((k) => wochenZuordnung[k.id]).filter((w) => w != null)
     ),
   ].sort((a, b) => a - b);
-  const wocheVollstaendig = (w) => {
-    const kbs = koennensbeweise.filter((k) => wochenZuordnung[k.id] === w);
-    return (
-      kbs.length > 0 &&
-      kbs.every((k) => k.cluster - (stunden[k.id]?.length || 0) <= 0)
-    );
-  };
   const schrittFortschritt = (kbId) => {
     const lw = lernwegFuerKb(kbId);
     const schritte = lw?.thema?.schritte || [];
@@ -150,32 +142,28 @@ export default function Wochenplan({ onZurueck, onWeiter, onEtappeAnpassen, woch
     return { fertig, gesamt: schritte.length };
   };
   const vorrat = wocheKbs.filter((k) => restVon(k) > 0);
-  const wocheFertig = wocheKbs.length > 0 && vorrat.length === 0;
+  const wocheVerplant = wocheKbs.length > 0 && vorrat.length === 0;
   const wocheHatPlatziert = wocheKbs.some((k) => (stunden[k.id] || []).length > 0);
-  const aktuelleWocheFertig = wocheVollstaendig(woche);
-  const wochenLast = wocheKbs.reduce((s, k) => s + k.cluster, 0);
-  const lastStand =
-    wochenLast > wochenZielCluster + 4
-      ? "viel"
-      : wochenLast > wochenZielCluster
-        ? "knapp"
-        : "ok";
   const montag = wochenStart(ETAPPE, aktiveWoche);
   const monatLabel = montag.toLocaleDateString("de-DE", {
     month: "long",
     year: "numeric",
   });
 
-  // Vorrat nach Fach gruppieren (stabile Fach-Reihenfolge), optional per Suche gefiltert.
-  const q = suche.trim().toLowerCase();
-  const vorratNachFach = kbFaecher
-    .map((fach) => ({
-      fach,
-      kbs: vorrat.filter(
-        (k) => k.fach === fach && (!q || k.titel.toLowerCase().includes(q))
-      ),
-    }))
-    .filter((g) => g.kbs.length > 0);
+  // Vorrat nach Fach gruppieren (stabile Fach-Reihenfolge). Jedes Fach, das in
+  // dieser Woche Ziele hat, bleibt als Kopf stehen; ist alles verplant, klappt es
+  // wie im Etappenplan zum reinen Kopf zusammen (kein Verschwinden).
+  const proFach = kbFaecher
+    .map((fach) => {
+      const alle = wocheKbs.filter((k) => k.fach === fach);
+      return {
+        fach,
+        farbe: kbFarbe[fach] || "#868e96",
+        kbs: alle.filter((k) => restVon(k) > 0),
+        anzahl: alle.length,
+      };
+    })
+    .filter((g) => g.anzahl > 0);
 
   function dragStart(e, id, quelleSlot) {
     e.dataTransfer.setData("text/plain", id + "|" + (quelleSlot || ""));
@@ -394,34 +382,12 @@ export default function Wochenplan({ onZurueck, onWeiter, onEtappeAnpassen, woch
   };
 
   return (
-    <div className="wp-screen" onClick={() => gewaehltId != null && setGewaehltId(null)}>
-      {/* Werkzeugzeile wie im Etappenplan: Suche links, Vorschlag rechts */}
-      <div className="wp-top">
-        <div className="ep-suche">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
-            <circle cx="11" cy="11" r="7" />
-            <path d="M21 21l-4.35-4.35" />
-          </svg>
-          <input
-            type="text"
-            value={suche}
-            onChange={(e) => setSuche(e.target.value)}
-            placeholder="Suche"
-            aria-label="Ziele durchsuchen"
-          />
-        </div>
-        <button
-          type="button"
-          className="ep-vorschlag-knopf"
-          onClick={vorschlagVerteilen}
-          disabled={vorrat.length === 0}
-          title="Die offenen Uhren ausgewogen auf die Stunden verteilen"
-        >
-          <span aria-hidden="true">✦</span> Für mich vorschlagen
-        </button>
-      </div>
+    <div
+      className={"wp-screen" + (istWizard ? " wp-wizard" : "")}
+      onClick={() => gewaehltId != null && setGewaehltId(null)}
+    >
       <div className="wp-layout">
-        {/* Linke Spalte: Lernwege je Fach, zum Platzieren */}
+        {/* Linke Spalte: Kopf-Karte + Lernwege je Fach, zum Platzieren */}
         <aside
           className={"wp-seite" + (ueber === "pool" ? " ueber" : "")}
           onDragOver={(e) => {
@@ -431,113 +397,48 @@ export default function Wochenplan({ onZurueck, onWeiter, onEtappeAnpassen, woch
           onDragLeave={() => setUeber((u) => (u === "pool" ? null : u))}
           onDrop={dropInVorrat}
         >
-          {/* Feste Kopf-Box: bleibt stehen, während die Fächer darunter scrollen */}
-          <div className="wp-seite-fest">
-            <div className="wp-seite-kopf">
-              <span className="wp-seite-icon" aria-hidden="true">
+          {/* Gleiche Kopf-Karte wie im Etappenplan (ep-kopf-karte). */}
+          <div className="ep-kopf-karte">
+            <h1 className="ep-kopf-titel">
+              <span className="ep-kopf-icon" aria-hidden="true">
                 🗓
               </span>
-              <div>
-                <h1 className="wp-seite-titel">Plane deine Woche</h1>
-                <p className="wp-seite-sub">
-                  {langDatum(ETAPPE.von)} bis {langDatum(ETAPPE.bis)}
-                </p>
-              </div>
-            </div>
-            <p className="wp-seite-erklaer">
-              Zieh die Ziele der Woche in deine freien Stunden.
+              Plane deine Woche
+            </h1>
+            <p className="ep-kopf-meta">
+              {langDatum(ETAPPE.von)} - {langDatum(ETAPPE.bis)}
             </p>
-
-            <div className="wp-seite-status">
-              <span className={"wp-status-rest" + (wocheFertig ? " fertig" : "")}>
-                {wocheFertig
-                  ? "Alle Uhren verteilt ✓"
-                  : `noch ${vorrat.length} offen`}
-              </span>
-              {wochenLast > 0 && (
-                <span className="wp-status-last" data-stand={lastStand}>
-                  {wochenLast} von {wochenZielCluster} Uhren
-                </span>
-              )}
-            </div>
-
-            <div className="wp-seite-aktionen">
-              {resetConfirm ? (
-                <span className="wp-reset-confirm">
-                  <button
-                    type="button"
-                    className="wp-akt warn"
-                    onClick={planZuruecksetzen}
-                  >
-                    Wirklich neu
-                  </button>
-                  <button
-                    type="button"
-                    className="wp-akt"
-                    onClick={() => setResetConfirm(false)}
-                  >
-                    Abbrechen
-                  </button>
-                </span>
-              ) : (
-                <button
-                  type="button"
-                  className="wp-akt"
-                  onClick={() => setResetConfirm(true)}
-                  disabled={!wocheHatPlatziert}
-                  title="Die Stunden dieser Woche löschen (Lernstand bleibt)"
-                >
-                  Zurücksetzen
-                </button>
-              )}
-              {onWeiter && (
-                <button
-                  type="button"
-                  className="wp-weiter"
-                  onClick={onWeiter}
-                  disabled={!aktuelleWocheFertig}
-                  title={
-                    aktuelleWocheFertig
-                      ? "Weiter zur Übersicht"
-                      : "Erst alle Uhren der laufenden Woche verteilen"
-                  }
-                >
-                  Weiter →
-                </button>
-              )}
-            </div>
           </div>
 
           <div className="wp-seite-liste">
-            {vorratNachFach.length === 0 ? (
-              <p className="wp-seite-leer">
-                {wocheKbs.length === 0
-                  ? "Keine Ziele in dieser Woche."
-                  : "Alle Uhren dieser Woche sind verteilt."}
-              </p>
+            {proFach.length === 0 ? (
+              <p className="wp-seite-leer">Keine Ziele in dieser Woche.</p>
             ) : (
-              vorratNachFach.map((g) => {
-                const zu = zuFaecher.has(g.fach);
+              proFach.map((g) => {
+                const leer = g.kbs.length === 0;
+                const zu = leer || zuFaecher.has(g.fach);
                 return (
                   <section
-                    className="wp-fachgruppe"
+                    className={"ep-fachgruppe" + (leer ? " leer" : "")}
                     key={g.fach}
-                    style={{ "--c": kbFarbe[g.fach] || "#868e96" }}
+                    style={{ "--c": g.farbe }}
                   >
                     <button
                       type="button"
-                      className="wp-fachgruppe-kopf"
+                      className="ep-fachgruppe-kopf"
                       onClick={() => toggleFach(g.fach)}
                       aria-expanded={!zu}
                     >
-                      <span className="wp-fachgruppe-name">{g.fach}</span>
-                      <span className="wp-fachgruppe-zahl">{g.kbs.length}</span>
-                      <span className="wp-fachgruppe-pfeil" aria-hidden="true">
+                      <span className="ep-fachgruppe-name">{g.fach}</span>
+                      <span className="ep-fachgruppe-pfeil" aria-hidden="true">
                         {zu ? "▸" : "▾"}
                       </span>
                     </button>
                     {!zu && (
-                      <div className="wp-fachgruppe-chips">
+                      // Im Vorrat der geteilte KbChip (zeigt Rest-Uhren +
+                      // Schritt-Fortschritt): bewusst reicher als der Vollton-Chip
+                      // im Etappenplan, weil hier Stunde für Stunde geplant wird.
+                      <div className="ep-fachgruppe-chips">
                         {g.kbs.map((k) => (
                           <KbChip
                             k={k}
@@ -562,51 +463,102 @@ export default function Wochenplan({ onZurueck, onWeiter, onEtappeAnpassen, woch
         {/* Rechte Spalte: die Woche als Kalender */}
         <section className="wp-kal">
           <header className="wp-kal-kopf">
-            <div className="wp-kal-nav">
-              <button
-                type="button"
-                className="wp-kal-pfeil"
-                onClick={() => gehWoche(-1)}
-                disabled={aktiverIdx <= 0}
-                aria-label="Woche zurück"
-              >
-                ‹
-              </button>
+            <div className="wp-kal-titel">
               <h2 className="wp-kal-monat">{monatLabel}</h2>
-              <button
-                type="button"
-                className="wp-kal-pfeil"
-                onClick={() => gehWoche(1)}
-                disabled={aktiverIdx < 0 || aktiverIdx >= wochenMitKbs.length - 1}
-                aria-label="Woche vor"
-              >
-                ›
-              </button>
+              <span className="wp-kal-monat-pfeil" aria-hidden="true">
+                ⌄
+              </span>
               {aktiveWoche === woche && wochenMitKbs.length > 1 && (
                 <span className="wp-kal-jetzt">diese Woche</span>
               )}
             </div>
-            <div className="wp-kal-kopf-buttons">
-              {onEtappeAnpassen && (
-                <button type="button" className="wp-akt" onClick={onEtappeAnpassen}>
-                  Etappe anpassen
-                </button>
-              )}
-              {onZurueck && (
-                <button type="button" className="wp-akt" onClick={onZurueck}>
-                  ← Etappenplan
-                </button>
+            <div className="wp-kal-nav">
+              {/* In der stehenden Plan-Übersicht liegen die Werkzeuge oben
+                 (im Wizard übernimmt das die Pille unten). */}
+              {!istWizard && (
+                <>
+                  <button
+                    type="button"
+                    className="wp-akt"
+                    onClick={vorschlagVerteilen}
+                    disabled={vorrat.length === 0}
+                    title="Die offenen Uhren ausgewogen auf die Stunden verteilen"
+                  >
+                    <span aria-hidden="true">✦</span> Für mich einsortieren
+                  </button>
+                  {onEtappeAnpassen && (
+                    <button
+                      type="button"
+                      className="wp-akt"
+                      onClick={onEtappeAnpassen}
+                    >
+                      Etappe anpassen
+                    </button>
+                  )}
+                  {resetConfirm ? (
+                    <span className="wp-reset-confirm">
+                      <button
+                        type="button"
+                        className="wp-akt warn"
+                        onClick={planZuruecksetzen}
+                      >
+                        Wirklich neu
+                      </button>
+                      <button
+                        type="button"
+                        className="wp-akt"
+                        onClick={() => setResetConfirm(false)}
+                      >
+                        Abbrechen
+                      </button>
+                    </span>
+                  ) : (
+                    <button
+                      type="button"
+                      className="wp-akt"
+                      onClick={() => setResetConfirm(true)}
+                      disabled={!wocheHatPlatziert}
+                      title="Die Stunden dieser Woche löschen (Lernstand bleibt)"
+                    >
+                      Zurücksetzen
+                    </button>
+                  )}
+                  {/* Wochen-Navigation nur in der stehenden Übersicht: der Wizard
+                     bleibt fest auf der zu planenden Woche (planung.js wertet nur
+                     diese). So kann man den Schritt nicht von einer fremden Woche
+                     aus fälschlich abschließen. */}
+                  <button
+                    type="button"
+                    className="wp-kal-pfeil"
+                    onClick={() => gehWoche(-1)}
+                    disabled={aktiverIdx <= 0}
+                    aria-label="Woche zurück"
+                  >
+                    ‹
+                  </button>
+                  <button
+                    type="button"
+                    className="wp-kal-pfeil"
+                    onClick={() => gehWoche(1)}
+                    disabled={
+                      aktiverIdx < 0 || aktiverIdx >= wochenMitKbs.length - 1
+                    }
+                    aria-label="Woche vor"
+                  >
+                    ›
+                  </button>
+                </>
               )}
             </div>
           </header>
 
           <div className="wp-kal-grid">
             <div className="wp-kal-head">
-              <div className="wp-kal-gutter-head" />
+              <div aria-hidden="true" />
               {TAGE.map((name, i) => (
                 <div className="wp-kal-tag-head" key={i}>
                   <span className="wp-kal-tag-datum">{tagDatum(montag, i)}</span>
-                  <span className="wp-kal-tag-name">{TAGE_KURZ[i]}</span>
+                  <span className="wp-kal-tag-name">{name}</span>
                 </div>
               ))}
             </div>
@@ -638,6 +590,49 @@ export default function Wochenplan({ onZurueck, onWeiter, onEtappeAnpassen, woch
           </div>
         </section>
       </div>
+
+      {/* Untere Leiste wie im Etappenplan: führt durch den Schritt. Ist die Woche
+         voll verplant, fällt der Hinweis weg und es erscheint "Weiter". Nur im
+         Wizard; die stehende Plan-Übersicht hat die Werkzeuge oben + die Nav. */}
+      {istWizard && (
+        <div className="ep-bar">
+          {onZurueck && (
+            <button
+              type="button"
+              className="wp-bar-zurueck"
+              onClick={onZurueck}
+              title="Zurück zum Etappenplan"
+            >
+              <span aria-hidden="true">‹</span> Etappe
+            </button>
+          )}
+          <span className="ep-bar-label">
+            <span aria-hidden="true">🗓</span> Wochenplanung
+          </span>
+          <span className="ep-bar-sep" aria-hidden="true" />
+          {wocheVerplant ? (
+            <button type="button" className="ep-bar-weiter" onClick={onWeiter}>
+              Weiter
+            </button>
+          ) : wocheKbs.length === 0 ? (
+            <span className="ep-bar-text">Keine Ziele in dieser Woche</span>
+          ) : (
+            <>
+              <span className="ep-bar-text">
+                Verteile die Uhren auf deine freien Stunden
+              </span>
+              <button
+                type="button"
+                className="ep-bar-aktion"
+                onClick={vorschlagVerteilen}
+                title="Die offenen Uhren ausgewogen auf die Stunden verteilen"
+              >
+                <span aria-hidden="true">✦</span> Für mich einsortieren
+              </button>
+            </>
+          )}
+        </div>
+      )}
 
       {hinweis && (
         <div className="ep-hinweis" role="status" aria-live="polite" aria-atomic="true">
