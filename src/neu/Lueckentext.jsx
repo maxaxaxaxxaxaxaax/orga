@@ -20,7 +20,7 @@ function loesungText(loesung) {
   return Array.isArray(loesung) ? loesung[0] : String(loesung);
 }
 
-export default function Lueckentext({ daten }) {
+export default function Lueckentext({ daten, onAbgeschlossen }) {
   const saetze = daten?.saetze || [];
 
   // Sessions-Maschine: aktueller Durchgang, Warteschlange, Position, falsche zum
@@ -106,6 +106,7 @@ export default function Lueckentext({ daten }) {
       });
     } else {
       setFertig(true);
+      onAbgeschlossen?.();
     }
     setEingabe("");
     setGeprueft(false);

@@ -43,24 +43,27 @@ function Textinhalt({ text }) {
 
 // Dispatcher: wählt die passende Darstellung für ein Material. Interaktive
 // Formate zuerst, dann Volltext, sonst ein ruhiger Platzhalter.
-export default function MaterialInhalt({ material }) {
+export default function MaterialInhalt({ material, onAbgeschlossen }) {
   const eintrag = interaktivFuerMaterial(material.id);
   if (eintrag?.typ === "karteikarten")
-    return <Karteikarten daten={eintrag.daten} />;
+    return <Karteikarten daten={eintrag.daten} onAbgeschlossen={onAbgeschlossen} />;
   if (eintrag?.typ === "zahlenstrahl")
-    return <Zahlenstrahl daten={eintrag.daten} />;
+    return <Zahlenstrahl daten={eintrag.daten} onAbgeschlossen={onAbgeschlossen} />;
   if (eintrag?.typ === "merkblatt") return <Merkblatt daten={eintrag.daten} />;
   if (eintrag?.typ === "lueckentext")
-    return <Lueckentext daten={eintrag.daten} />;
-  if (eintrag?.typ === "zuordnung") return <Zuordnung daten={eintrag.daten} />;
+    return <Lueckentext daten={eintrag.daten} onAbgeschlossen={onAbgeschlossen} />;
+  if (eintrag?.typ === "zuordnung")
+    return <Zuordnung daten={eintrag.daten} onAbgeschlossen={onAbgeschlossen} />;
   if (eintrag?.typ === "reihenfolge")
-    return <Reihenfolge daten={eintrag.daten} />;
+    return <Reihenfolge daten={eintrag.daten} onAbgeschlossen={onAbgeschlossen} />;
   if (eintrag?.typ === "auswahlquiz")
-    return <Auswahlquiz daten={eintrag.daten} />;
-  if (eintrag?.typ === "satzbau") return <Satzbau daten={eintrag.daten} />;
+    return <Auswahlquiz daten={eintrag.daten} onAbgeschlossen={onAbgeschlossen} />;
+  if (eintrag?.typ === "satzbau")
+    return <Satzbau daten={eintrag.daten} onAbgeschlossen={onAbgeschlossen} />;
   if (eintrag?.typ === "bildzuordnung")
-    return <Bildzuordnung daten={eintrag.daten} />;
-  if (eintrag?.typ === "markieren") return <Markieren daten={eintrag.daten} />;
+    return <Bildzuordnung daten={eintrag.daten} onAbgeschlossen={onAbgeschlossen} />;
+  if (eintrag?.typ === "markieren")
+    return <Markieren daten={eintrag.daten} onAbgeschlossen={onAbgeschlossen} />;
   if (material.inhalt) return <Textinhalt text={material.inhalt} />;
   return (
     <p className="ma-leer">Für dieses Material gibt es noch keine Vorschau.</p>

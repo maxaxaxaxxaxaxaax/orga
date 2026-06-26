@@ -27,7 +27,7 @@ function baueQueue(fragen) {
   }));
 }
 
-export default function Auswahlquiz({ daten }) {
+export default function Auswahlquiz({ daten, onAbgeschlossen }) {
   const fragen = (daten && daten.fragen) || [];
 
   const [s, setS] = useState(() => ({
@@ -110,6 +110,7 @@ export default function Auswahlquiz({ daten }) {
       });
     } else {
       setFertig(true);
+      onAbgeschlossen?.();
     }
     setGewaehlt(null);
   }

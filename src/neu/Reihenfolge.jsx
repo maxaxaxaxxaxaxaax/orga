@@ -22,7 +22,7 @@ function mischen(n) {
   return idx;
 }
 
-export default function Reihenfolge({ daten }) {
+export default function Reihenfolge({ daten, onAbgeschlossen }) {
   const schritte = (daten && daten.schritte) || [];
   const [order, setOrder] = useState(() => mischen(schritte.length));
   const [geprueft, setGeprueft] = useState(false);
@@ -48,6 +48,7 @@ export default function Reihenfolge({ daten }) {
 
   function pruefen() {
     setGeprueft(true);
+    if (alleRichtig) onAbgeschlossen?.();
   }
 
   function nochmal() {

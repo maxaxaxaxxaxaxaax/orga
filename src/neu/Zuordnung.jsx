@@ -17,7 +17,7 @@ function mischen(liste) {
   return kopie;
 }
 
-export default function Zuordnung({ daten }) {
+export default function Zuordnung({ daten, onAbgeschlossen }) {
   const paare = (daten && daten.paare) || [];
 
   // Rechte Spalte: einmalig gemischte Reihenfolge der Indizes der Paare.
@@ -50,6 +50,7 @@ export default function Zuordnung({ daten }) {
       setLetzteErklaerung(paare[i].erklaerung || null);
       setAktivLinks(null);
       setFehler(null);
+      if (geloest.length + 1 === paare.length) onAbgeschlossen?.(); // letztes Paar
     } else {
       // Falsch: kurzer Hinweis, Auswahl bleibt für neuen Versuch.
       setFehler(i);

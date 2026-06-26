@@ -159,6 +159,15 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
   const [aktivesMaterial, setAktivesMaterial] = useState(
     () => aufgabenMats[0] || (genKey ? QUIZ : materialien[0]) || null
   );
+  // Welche Übungen hat der Schüler in dieser Sitzung ganz durchgearbeitet?
+  // Erst dann lässt sich der Schritt abschließen (durch das Material arbeiten).
+  const [fertigeMaterialien, setFertigeMaterialien] = useState(() => new Set());
+  function markiereMaterialFertig(id) {
+    if (!id) return;
+    setFertigeMaterialien((prev) =>
+      prev.has(id) ? prev : new Set(prev).add(id)
+    );
+  }
 
   // Lernzeit im Fokus messen: beim Schliessen die verstrichene Zeit aufs Ziel
   // buchen (speist die realistische Zeitschätzung).
@@ -348,6 +357,17 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
   if (q) railRows = railRows.filter((r) => r.m.titel.toLowerCase().includes(q));
 
   const aktivId = aktivesMaterial?.id || null;
+
+  // "Schritt geschafft" erst, wenn die Übung(en) des Schritts durchgearbeitet
+  // sind. Hat der Schritt keine interaktive Übung (nur Lese-Material), geht es
+  // direkt. Sonst muss mindestens eine Übung abgeschlossen sein.
+  const gatebareIds = [
+    ...aufgabenMats.map((m) => m.id),
+    ...(genKey ? ["__quiz__"] : []),
+  ];
+  const kannWeiter =
+    gatebareIds.length === 0 ||
+    gatebareIds.some((id) => fertigeMaterialien.has(id));
 
   return (
     <div className="fokus" role="dialog" aria-modal="true" aria-label="Fokus">
@@ -564,7 +584,10 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
                     <span className="fokus-material-aktiv">Quiz</span>
                   </div>
                   <div className="fokus-material-inhalt">
-                    <Quiz generatorKey={genKey} />
+                    <Quiz
+                      generatorKey={genKey}
+                      onAbgeschlossen={() => markiereMaterialFertig("__quiz__")}
+                    />
                   </div>
                 </div>
               ) : aktivesMaterial ? (
@@ -585,7 +608,10 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
                     )}
                   </div>
                   <div className="fokus-material-inhalt">
-                    <MaterialInhalt material={aktivesMaterial} />
+                    <MaterialInhalt
+                      material={aktivesMaterial}
+                      onAbgeschlossen={() => markiereMaterialFertig(aktivId)}
+                    />
                   </div>
                 </div>
               ) : (
@@ -647,6 +673,11 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
                     <span className="fokus-sl-text">
                       {schritte[aktuell]?.text}
                     </span>
+                    {!kannWeiter && (
+                      <span className="fokus-sl-hinweis">
+                        Arbeite die Übung erst ganz durch, dann geht es weiter.
+                      </span>
+                    )}
                   </div>
                   <div className="fokus-sl-nav">
                     {istMathe && (
@@ -675,6 +706,12 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
                       type="button"
                       className="fokus-sl-weiter"
                       onClick={schrittGeschafft}
+                      disabled={!kannWeiter}
+                      title={
+                        kannWeiter
+                          ? undefined
+                          : "Arbeite die Übung erst ganz durch"
+                      }
                     >
                       Schritt geschafft →
                     </button>

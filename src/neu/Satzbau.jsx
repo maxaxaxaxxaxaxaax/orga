@@ -18,7 +18,7 @@ function mischen(liste) {
   return k;
 }
 
-export default function Satzbau({ daten }) {
+export default function Satzbau({ daten, onAbgeschlossen }) {
   const saetze = daten?.saetze || [];
   const gesamt = saetze.length;
 
@@ -109,6 +109,7 @@ export default function Satzbau({ daten }) {
   function weiter() {
     if (index + 1 >= gesamt) {
       setFertig(true);
+      onAbgeschlossen?.();
       return;
     }
     const next = index + 1;

@@ -8,7 +8,7 @@ import "./Zahlenstrahl.css";
 // Ganzzahl ein, sofort Feedback (die richtige Stelle wird mitgezeigt). Falsch
 // getroffene Aufgaben kommen am Ende erneut dran, bis sie sitzen (Mastery). Eine
 // Serie zeigt den eigenen Schwung.
-export default function Zahlenstrahl({ daten }) {
+export default function Zahlenstrahl({ daten, onAbgeschlossen }) {
   const von = daten?.von ?? -10;
   const bis = daten?.bis ?? 10;
   const aufgaben = daten?.aufgaben || [];
@@ -101,6 +101,7 @@ export default function Zahlenstrahl({ daten }) {
       });
     } else {
       setFertig(true);
+      onAbgeschlossen?.();
     }
     setKlick(null);
   }

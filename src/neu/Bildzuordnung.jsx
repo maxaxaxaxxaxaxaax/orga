@@ -19,7 +19,7 @@ function platz(i) {
 const RAUM_W = 104;
 const RAUM_H = 84;
 
-export default function Bildzuordnung({ daten }) {
+export default function Bildzuordnung({ daten, onAbgeschlossen }) {
   const raeume = daten?.raeume || [];
   const fragen = daten?.fragen || [];
   const gesamt = fragen.length;
@@ -86,6 +86,7 @@ export default function Bildzuordnung({ daten }) {
   function weiter() {
     if (index + 1 >= gesamt) {
       setFertig(true);
+      onAbgeschlossen?.();
       return;
     }
     setIndex((i) => i + 1);

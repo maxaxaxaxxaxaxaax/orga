@@ -8,7 +8,7 @@ import "./Markieren.css";
 // Optionen, das ist die eigentliche Pruefungs-Faehigkeit. Falsch = Wort blinkt
 // rot, neu versuchen; richtig = gruen, weiter. Pro Satz muss es sitzen
 // (Mastery), mit Serie und Abschluss-Bilanz.
-export default function Markieren({ daten }) {
+export default function Markieren({ daten, onAbgeschlossen }) {
   const saetze = daten?.saetze || [];
   const gesamt = saetze.length;
 
@@ -74,6 +74,7 @@ export default function Markieren({ daten }) {
   function weiter() {
     if (index + 1 >= gesamt) {
       setFertig(true);
+      onAbgeschlossen?.();
       return;
     }
     setIndex((i) => i + 1);

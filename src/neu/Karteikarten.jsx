@@ -12,7 +12,7 @@ import "./Karteikarten.css";
 // Bewusst ohne strenges Auto-Grading: der Schüler vergleicht selbst und
 // entscheidet "Kann ich" oder "Nochmal" (Selbstregulation, siehe VISION).
 // Reiner Übungsmodus, kein Tracking nach außen.
-export default function Karteikarten({ daten }) {
+export default function Karteikarten({ daten, onAbgeschlossen }) {
   const karten = daten?.karten || [];
   const [rest, setRest] = useState(karten);
   const [gedreht, setGedreht] = useState(false); // Lösung sichtbar (umgedreht / aufgedeckt)
@@ -53,6 +53,7 @@ export default function Karteikarten({ daten }) {
   const vorderseite = umgekehrt ? karte.hinten : karte.vorne;
   const rueckseite = umgekehrt ? karte.vorne : karte.hinten;
   function kannIch() {
+    if (rest.length <= 1) onAbgeschlossen?.(); // letzte Karte: Stapel durch
     setRest(rest.slice(1));
     setGekonnt((g) => g + 1);
     setGedreht(false);

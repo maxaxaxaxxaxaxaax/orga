@@ -36,7 +36,7 @@ function loesungText(aufgabe) {
     : String(aufgabe.loesung);
 }
 
-export default function Quiz({ generatorKey }) {
+export default function Quiz({ generatorKey, onAbgeschlossen }) {
   // Die ganze Sessions-Mechanik in einem State, damit eine Runde konsistent
   // weiterläuft (Durchgang, Warteschlange, Position, falsche zum Nacharbeiten).
   const [s, setS] = useState(() => {
@@ -123,6 +123,7 @@ export default function Quiz({ generatorKey }) {
       });
     } else {
       setFertig(true);
+      onAbgeschlossen?.();
     }
     setGewaehlt(null);
     setEingabe("");
