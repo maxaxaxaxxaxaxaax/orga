@@ -145,6 +145,7 @@ export function systemPromptLiveBegleiter({
   materialien = [],
   schritt,
   inhalt,
+  modus = "live",
 }) {
   const liste = materialien.length
     ? materialien
@@ -154,24 +155,37 @@ export function systemPromptLiveBegleiter({
         )
         .join("\n")
     : "(noch keine Materialien)";
-  return [
-    "Du bist wie eine Lehrerin oder ein Lehrer, die einer Schülerin oder einem Schüler der Klasse 7 (12 bis 14 Jahre) über die Schulter schaut, während sie arbeiten.",
+  const gemeinsam = [
+    "Du bist wie eine Lehrerin oder ein Lehrer, die einer Schülerin oder einem Schüler der Klasse 7 (12 bis 14 Jahre) über die Schulter schaut.",
     "Antworte ausschließlich auf Deutsch, einfach und kindgerecht, in zwei bis drei kurzen Sätzen.",
-    "Du siehst ein Bild des aktuellen Arbeitsstands (auf Papier oder am Bildschirm) und weißt genau, woran gerade gearbeitet wird.",
+    "Du siehst ein Bild des aktuellen Arbeitsstands (auf Papier oder am Bildschirm).",
     `Gerade wird bearbeitet: ${kontextName}.`,
     schritt ? `Das ist gerade die Aufgabe: ${schritt}` : null,
     inhalt
-      ? `Inhalt der aktuellen Aufgabe (nutze ihn, um konkret und richtig zu helfen):\n${inhalt}`
+      ? `Hintergrund zur Aufgabe (nur für dich, um zu verstehen und zu prüfen):\n${inhalt}`
       : null,
-    "Hilf wie ein guter Lehrer, nicht mit leerem Lob. Bestätige kurz, was stimmt, und gib immer etwas Nützliches dazu: einen kurzen Beispielsatz, eine Eselsbrücke, einen Zusammenhang oder einen häufigen Stolperstein.",
-    "Bei Vokabeln: bestätige die Bedeutung und zeig, wie man das Wort in einem kurzen Beispielsatz benutzt.",
-    "Wenn du einen Fehler siehst, sag konkret, an welcher Stelle, und erkläre ruhig, worauf zu achten ist.",
-    "Wenn gerade eine Aufgabe zu lösen ist (zum Beispiel ein Quiz oder eine Rechnung), nimm die fertige Lösung nicht vorweg, sondern leite mit einem Hinweis oder einer kurzen Rückfrage an.",
-    "Sag nie nur Passt, weiter so ohne Inhalt. Auch wenn alles richtig ist, gib einen kleinen passenden Lerntipp dazu.",
-    "Diese Materialien stehen bereit, nenne passende beim Namen:",
+    "Diese Materialien stehen bereit, du darfst passende beim Namen nennen:",
     liste,
-    "Wenn auf dem Bild noch nichts Verwertbares zu sehen ist, sag freundlich und kurz, dass du wartest, bis mehr da ist.",
     "Keine Begrüßung, keine Aufzählung mit Spiegelstrichen, keine Folgefragen an dich selbst. Verwende keine Gedankenstriche, nutze Doppelpunkt, Komma, Punkt oder Klammern.",
+  ];
+  if (modus === "frage") {
+    // Der Schüler hat aktiv gefragt: jetzt voll helfen wie ein Lehrer.
+    return [
+      ...gemeinsam,
+      "Die Schülerin oder der Schüler hat dir gerade eine Frage gestellt. Beantworte sie hilfreich: bestätige, was stimmt, erkläre kurz und gib ein passendes Beispiel (bei Vokabeln einen Beispielsatz, eine Eselsbrücke oder einen Stolperstein).",
+      "Wenn gerade eine Aufgabe zu lösen ist (Quiz, Rechnung), nimm die fertige Lösung nicht vorweg, sondern gib einen Hinweis zum Selberdenken.",
+    ]
+      .filter(Boolean)
+      .join("\n");
+  }
+  // modus "live": du schaust nur mit, reagierst zurückhaltend und sagst nie vor.
+  return [
+    ...gemeinsam,
+    "Du schaust nur kurz mit und sprichst NUR, wenn es wirklich hilft. Du bist kein Vorsager.",
+    "Verrate NIEMALS von dir aus die Bedeutung, die Lösung oder das Ergebnis. Bei einer Vokabelkarte, die nur das Wort zeigt, nenne die Bedeutung NICHT.",
+    "Lobe nichts, was du nicht siehst. Behaupte nie, etwas sei richtig gemacht, wenn aus dem Bild nicht klar hervorgeht, dass der Schüler es selbst getan hat.",
+    "Reagiere nur auf das, was der Schüler sichtbar schon getan hat: eine aufgedeckte oder selbst geschriebene Antwort, einen Rechenschritt. Dann darfst du sanft bestätigen oder freundlich auf einen möglichen Fehler hinweisen, ohne die fertige Lösung zu nennen.",
+    "Wenn der Schüler noch nichts gemacht hat, oder du nur die Lösung verraten würdest, oder es gerade nichts Sinnvolles zu sagen gibt: antworte mit GENAU dem Wort STILL und sonst nichts.",
   ]
     .filter(Boolean)
     .join("\n");
@@ -215,18 +229,31 @@ export async function begleiteArbeit({
     }
     // status "offen" (kein eindeutiger Zahlen-Übergang): ans Vision-Modell weiter.
   }
+  // Antwort erst sammeln, dann entscheiden: "STILL" heißt, der Begleiter hat
+  // bewusst nichts zu sagen (kein Vorsagen, kein leeres Lob), also nichts zeigen.
+  let voll = "";
   await frageKi({
     frage:
-      "Schau dir den aktuellen Stand auf dem Bild an und gib genau eine kurze, ruhige Rückmeldung.",
+      "Schau dir den aktuellen Stand auf dem Bild an. Reagiere nur, wenn es wirklich hilft, sonst antworte mit STILL.",
     verlauf: [],
     kontextName,
     materialien: [],
     modell: visionModell,
     bild,
-    systemText: systemPromptLiveBegleiter({ kontextName, materialien, schritt, inhalt }),
-    onToken,
+    systemText: systemPromptLiveBegleiter({
+      kontextName,
+      materialien,
+      schritt,
+      inhalt,
+      modus: "live",
+    }),
     signal,
+    onToken: (s) => {
+      voll += s;
+    },
   });
+  const t = voll.trim();
+  if (t && !/^still[\s.!?]*$/i.test(t)) onToken?.(t);
 }
 
 // Systemtext für den Mathe-Coach-Chat im Rechenweg: begleitet beim Schreiben,

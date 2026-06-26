@@ -203,6 +203,7 @@ export default function LiveCoach({
           materialien,
           schritt,
           inhalt,
+          modus: "frage",
         }),
         signal: ac.signal,
         onToken: (s) => {
