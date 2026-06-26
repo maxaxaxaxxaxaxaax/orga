@@ -28,6 +28,7 @@ import {
   istOeffenbar,
   aktivitaetLabel,
   istAufgabeMaterial,
+  materialKontext,
 } from "./interaktiv";
 import { CHIPS, iconFuerMaterial, chipFuerMaterial } from "./materialTypen";
 import Quiz from "./Quiz";
@@ -219,11 +220,18 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
   ]
     .filter(Boolean)
     .join(" ");
+  // Konkreter Inhalt der gerade offenen Aufgabe, damit der Coach nicht nur den
+  // Titel kennt (z.B. die Vokabel mit Bedeutung), sondern wirklich helfen kann.
+  const aufgabenInhalt =
+    aktivesMaterial?.id === "__quiz__"
+      ? "Eine generierte Übung (Quiz) zum aktuellen Schritt."
+      : materialKontext(aktivesMaterial);
   const coachSystem = systemPromptCoach({
     kontextName,
     materialien,
     schritt: aktSchrittText,
     zeit: zeitText || null,
+    inhalt: aufgabenInhalt,
   });
 
   function weiter() {
@@ -781,6 +789,7 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
                 kontextName={kontextName}
                 materialien={materialien}
                 schritt={aktSchrittText}
+                inhalt={aufgabenInhalt}
                 istMathe={istMathe}
                 visionModell={visionModell}
                 mitteRef={mitteRef}

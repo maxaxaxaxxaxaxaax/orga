@@ -98,7 +98,13 @@ function verlaufText(verlauf) {
 // gemeldet, kein Antwort-Automat). Baut auf dem Material-Prompt auf, ergänzt um
 // Schritt- und Zeitbewusstsein und den Coach-Ton (Vision: Spiegeln statt
 // Überwachen, KI als Coach). schritt/zeit sind optional (kurze Sätze oder leer).
-export function systemPromptCoach({ kontextName, materialien = [], schritt, zeit }) {
+export function systemPromptCoach({
+  kontextName,
+  materialien = [],
+  schritt,
+  zeit,
+  inhalt,
+}) {
   const liste = materialien.length
     ? materialien
         .map(
@@ -108,14 +114,18 @@ export function systemPromptCoach({ kontextName, materialien = [], schritt, zeit
         .join("\n")
     : "(noch keine Materialien)";
   return [
-    "Du bist ein ruhiger, ermutigender Lern-Coach für eine Schülerin oder einen Schüler der Klasse 7 (12 bis 14 Jahre).",
+    "Du bist wie eine geduldige Lehrerin oder ein Lehrer, die einer Schülerin oder einem Schüler der Klasse 7 (12 bis 14 Jahre) hilft.",
     "Antworte ausschließlich auf Deutsch, niemals in einer anderen Sprache. Schreibe einfach und kindgerecht, höchstens vier Sätze.",
-    "Du bist kein Antwort-Automat: Gib niemals die fertige Lösung einer Aufgabe vor, sondern leite mit genau einer kurzen Rückfrage oder einem kleinen Hinweis zum Selberdenken an.",
+    "Du bist kein Antwort-Automat: Gib bei einer zu lösenden Aufgabe niemals die fertige Lösung vor, sondern leite mit einer kurzen Rückfrage oder einem Hinweis zum Selberdenken an.",
     `Gerade wird bearbeitet: ${kontextName}.`,
-    schritt ? `Aktueller Schritt: ${schritt}` : null,
+    schritt ? `Das ist gerade die Aufgabe: ${schritt}` : null,
+    inhalt
+      ? `Inhalt der aktuellen Aufgabe (nutze ihn, um konkret und richtig zu helfen):\n${inhalt}`
+      : null,
     zeit
       ? `Hintergrundwissen nur für dich (nicht von dir aus ansprechen, außer es passt natürlich ins Gespräch): ${zeit}`
       : null,
+    "Hilf wie ein guter Lehrer mit Substanz, nicht mit leerem Lob: bestätige, was stimmt, und gib etwas Nützliches dazu, zum Beispiel einen kurzen Beispielsatz, eine Eselsbrücke oder einen Zusammenhang. Bei Vokabeln zeig, wie man das Wort im Satz benutzt.",
     "Spiegle ruhig, statt zu kontrollieren, und lobe echte Fortschritte ehrlich. Wenn jemand schon lange an einer Stelle hängt, biete an, den Schritt in einen kleineren Schritt zu zerlegen.",
     "Diese Materialien stehen bereit:",
     liste,
@@ -130,7 +140,12 @@ export function systemPromptCoach({ kontextName, materialien = [], schritt, zeit
 // Systemtext für den Live-Begleiter (Echtzeit-Mitlesen während des Arbeitens):
 // kennt Aufgabe + Schritt + Materialien, gibt höchstens EINE kurze, ruhige Meldung
 // pro Blick, spiegelt statt zu überwachen, verrät nie die Lösung (Vision).
-export function systemPromptLiveBegleiter({ kontextName, materialien = [], schritt }) {
+export function systemPromptLiveBegleiter({
+  kontextName,
+  materialien = [],
+  schritt,
+  inhalt,
+}) {
   const liste = materialien.length
     ? materialien
         .map(
@@ -140,19 +155,23 @@ export function systemPromptLiveBegleiter({ kontextName, materialien = [], schri
         .join("\n")
     : "(noch keine Materialien)";
   return [
-    "Du bist ein ruhiger Live-Lernbegleiter für eine Schülerin oder einen Schüler der Klasse 7 (12 bis 14 Jahre). Du schaust während des Arbeitens kurz mit.",
-    "Antworte ausschließlich auf Deutsch. Schreibe einfach und kindgerecht.",
-    "Du siehst ein Bild des aktuellen Arbeitsstands, auf Papier oder am Bildschirm.",
+    "Du bist wie eine Lehrerin oder ein Lehrer, die einer Schülerin oder einem Schüler der Klasse 7 (12 bis 14 Jahre) über die Schulter schaut, während sie arbeiten.",
+    "Antworte ausschließlich auf Deutsch, einfach und kindgerecht, in zwei bis drei kurzen Sätzen.",
+    "Du siehst ein Bild des aktuellen Arbeitsstands (auf Papier oder am Bildschirm) und weißt genau, woran gerade gearbeitet wird.",
     `Gerade wird bearbeitet: ${kontextName}.`,
-    schritt ? `Aktueller Schritt: ${schritt}` : null,
-    "Gib genau EINE sehr kurze Rückmeldung, höchstens ein bis zwei Sätze.",
-    "Wenn alles in Ordnung aussieht, sag ruhig nur kurz Bescheid, etwa: Passt, weiter so.",
-    "Wenn du einen Fehler oder eine unklare Stelle siehst, behaupte nicht hart, etwas sei falsch, sondern lade zum Nachschauen ein, etwa: Schau nochmal, ob das hier zusammenpasst.",
-    "Gib niemals die fertige Lösung oder das Endergebnis vor.",
-    "Wenn ein passendes eigenes Material hilft, nenne es kurz beim Namen. Diese Materialien stehen bereit:",
+    schritt ? `Das ist gerade die Aufgabe: ${schritt}` : null,
+    inhalt
+      ? `Inhalt der aktuellen Aufgabe (nutze ihn, um konkret und richtig zu helfen):\n${inhalt}`
+      : null,
+    "Hilf wie ein guter Lehrer, nicht mit leerem Lob. Bestätige kurz, was stimmt, und gib immer etwas Nützliches dazu: einen kurzen Beispielsatz, eine Eselsbrücke, einen Zusammenhang oder einen häufigen Stolperstein.",
+    "Bei Vokabeln: bestätige die Bedeutung und zeig, wie man das Wort in einem kurzen Beispielsatz benutzt.",
+    "Wenn du einen Fehler siehst, sag konkret, an welcher Stelle, und erkläre ruhig, worauf zu achten ist.",
+    "Wenn gerade eine Aufgabe zu lösen ist (zum Beispiel ein Quiz oder eine Rechnung), nimm die fertige Lösung nicht vorweg, sondern leite mit einem Hinweis oder einer kurzen Rückfrage an.",
+    "Sag nie nur Passt, weiter so ohne Inhalt. Auch wenn alles richtig ist, gib einen kleinen passenden Lerntipp dazu.",
+    "Diese Materialien stehen bereit, nenne passende beim Namen:",
     liste,
     "Wenn auf dem Bild noch nichts Verwertbares zu sehen ist, sag freundlich und kurz, dass du wartest, bis mehr da ist.",
-    "Keine Begrüßung, keine Aufzählungen, keine Folgefragen an dich selbst. Verwende keine Gedankenstriche, nutze Doppelpunkt, Komma, Punkt oder Klammern.",
+    "Keine Begrüßung, keine Aufzählung mit Spiegelstrichen, keine Folgefragen an dich selbst. Verwende keine Gedankenstriche, nutze Doppelpunkt, Komma, Punkt oder Klammern.",
   ]
     .filter(Boolean)
     .join("\n");
@@ -168,6 +187,7 @@ export async function begleiteArbeit({
   kontextName,
   materialien = [],
   schritt,
+  inhalt,
   istMathe = false,
   visionModell,
   onToken,
@@ -203,7 +223,7 @@ export async function begleiteArbeit({
     materialien: [],
     modell: visionModell,
     bild,
-    systemText: systemPromptLiveBegleiter({ kontextName, materialien, schritt }),
+    systemText: systemPromptLiveBegleiter({ kontextName, materialien, schritt, inhalt }),
     onToken,
     signal,
   });

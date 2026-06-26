@@ -326,3 +326,71 @@ export function aktivitaetLabel(material) {
 export function istOeffenbar(material) {
   return !!material.inhalt || !!INTERAKTIV[material.id];
 }
+
+// Konkreter Inhalt einer Aufgabe als kompakter Text für die KI (damit der Coach
+// nicht nur den Titel kennt, sondern weiß, woran konkret gearbeitet wird, z.B.
+// welche Vokabel mit welcher Bedeutung). Defensiv: unbekannte Formen fallen auf
+// das Typ-Label zurück. Längen sind gedeckelt, damit der Prompt klein bleibt.
+export function materialKontext(material) {
+  if (!material) return "";
+  const e = INTERAKTIV[material.id];
+  if (e) {
+    const d = e.daten || {};
+    const label = TYP_LABEL[e.typ] || "Übung";
+    if (e.typ === "karteikarten" && Array.isArray(d.karten)) {
+      const k = d.karten
+        .slice(0, 14)
+        .map(
+          (c) =>
+            `${c.vorne} = ${c.hinten}${c.beispiel ? ` (Beispiel: ${c.beispiel})` : ""}`
+        )
+        .join("; ");
+      return `Vokabelkarten${d.hinweis ? ` (${d.hinweis})` : ""}: ${k}`;
+    }
+    if (e.typ === "zahlenstrahl" && Array.isArray(d.aufgaben)) {
+      return `Zahlenstrahl von ${d.von} bis ${d.bis}. Aufgaben: ${d.aufgaben
+        .map((a) => a.frage)
+        .slice(0, 8)
+        .join(" | ")}`;
+    }
+    if (e.typ === "merkblatt" && Array.isArray(d.abschnitte)) {
+      return `Merkblatt${d.titel ? `: ${d.titel}` : ""}. Abschnitte: ${d.abschnitte
+        .map((a) => a.titel)
+        .filter(Boolean)
+        .join(", ")}`;
+    }
+    if (Array.isArray(d.saetze)) {
+      const s = d.saetze
+        .slice(0, 8)
+        .map((x) =>
+          x.uebersetzung || (Array.isArray(x.woerter) ? x.woerter.join(" ") : "")
+        )
+        .filter(Boolean)
+        .join(" | ");
+      return `${label}: ${s}`;
+    }
+    if (Array.isArray(d.fragen)) {
+      const f = d.fragen
+        .slice(0, 8)
+        .map((x) => x.frage)
+        .filter(Boolean)
+        .join(" | ");
+      return `${label}: ${f}`;
+    }
+    if (Array.isArray(d.paare)) {
+      const p = d.paare
+        .slice(0, 10)
+        .map((x) => `${x.links} = ${x.rechts}`)
+        .join("; ");
+      return `Zuordnung: ${p}`;
+    }
+    if (Array.isArray(d.schritte)) {
+      return `${label}${d.aufgabe ? `: ${d.aufgabe}` : ""}. Schritte: ${d.schritte
+        .slice(0, 10)
+        .join(" -> ")}`;
+    }
+    return label;
+  }
+  if (material.inhalt) return String(material.inhalt).slice(0, 600);
+  return "";
+}

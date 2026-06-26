@@ -1,18 +1,20 @@
 import { useEffect, useRef, useState } from "react";
-import { begleiteArbeit } from "./kiClient";
+import { begleiteArbeit, frageKi, systemPromptLiveBegleiter } from "./kiClient";
 import { domBild } from "./domBild";
 import { useLiveLoop } from "./useLiveLoop";
 import "./LiveCoach.css";
 
 // Live-Coach: ein bewusst einschaltbarer Modus, der beim Arbeiten mitliest und im
-// Takt eine kurze, ruhige Rückmeldung gibt. Eine Quelle "Bildschirm" (liest die
-// digitale Arbeitsfläche in der Mitte über domBild) und eine Quelle "Kamera"
-// (beobachtet den analogen Tisch, Stand-in für die spätere Tisch-Kamera). Beide
-// füttern dieselbe Engine (useLiveLoop). VISION-Leitplanken: Default AUS (der
-// Schüler startet selbst), lokal über Ollama, nur der Schüler sieht es, nichts
-// wird gespeichert, der Coach spiegelt statt zu überwachen und verrät nie die
-// Lösung.
+// Takt eine kurze, lehrerhafte Rückmeldung gibt (bestätigen plus etwas Nützliches,
+// kein leeres Lob). Quelle "Bildschirm" liest die digitale Arbeitsfläche in der
+// Mitte über domBild, Quelle "Kamera" beobachtet den analogen Tisch (Webcam als
+// Stand-in für die spätere Tisch-Kamera). Beide füttern dieselbe Engine. Unten ein
+// Antwortfeld für echten Dialog: man kann zurückfragen, der Coach sieht den
+// aktuellen Frame und kennt den konkreten Aufgaben-Inhalt. VISION-Leitplanken:
+// Default AUS (der Schüler startet selbst), lokal über Ollama, nur der Schüler
+// sieht es, nichts wird gespeichert, spiegeln statt überwachen, nie die Lösung.
 const TAKT_MS = 7000;
+const FEED_MAX = 8;
 
 const STATUS_TEXT = {
   schaut: "Ich schaue gerade kurz hin …",
@@ -27,6 +29,7 @@ export default function LiveCoach({
   kontextName,
   materialien,
   schritt,
+  inhalt,
   istMathe,
   visionModell,
   mitteRef,
@@ -38,12 +41,15 @@ export default function LiveCoach({
   const [feed, setFeed] = useState([]); // ephemer, gedeckelt, nichts gespeichert
   const [status, setStatus] = useState(null);
   const [kameraFehler, setKameraFehler] = useState(null);
+  const [frageEntwurf, setFrageEntwurf] = useState("");
+  const [antwortet, setAntwortet] = useState(false);
 
   const videoRef = useRef(null);
   const streamRef = useRef(null);
   const grabCanvasRef = useRef(null);
   const idRef = useRef(0);
   const feedEndeRef = useRef(null);
+  const replyAbortRef = useRef(null);
 
   // Kamera-Stream nur holen, wenn Quelle Kamera UND aktiv (Datensparsamkeit: die
   // Kamera-LED leuchtet nur, wenn der Schüler den Live-Modus mit Kamera bewusst
@@ -79,6 +85,9 @@ export default function LiveCoach({
     };
   }, [quelle, aktiv]);
 
+  // Laufende Antwort beim Schließen abbrechen.
+  useEffect(() => () => replyAbortRef.current?.abort(), []);
+
   // Neue Meldung ans Feed-Ende scrollen.
   useEffect(() => {
     feedEndeRef.current?.scrollIntoView({ block: "end" });
@@ -107,6 +116,7 @@ export default function LiveCoach({
       kontextName,
       materialien,
       schritt,
+      inhalt,
       istMathe,
       visionModell,
       onToken,
@@ -117,7 +127,7 @@ export default function LiveCoach({
   function meldung(text) {
     idRef.current += 1;
     const id = idRef.current;
-    setFeed((f) => [...f, { id, text }].slice(-6));
+    setFeed((f) => [...f, { id, von: "coach", text }].slice(-FEED_MAX));
   }
 
   useLiveLoop({
@@ -138,7 +148,6 @@ export default function LiveCoach({
   }
   function starten() {
     setKameraFehler(null);
-    setFeed([]);
     setPausiert(false);
     setAktiv(true);
   }
@@ -146,6 +155,85 @@ export default function LiveCoach({
     setAktiv(false);
     setPausiert(false);
     setStatus(null);
+  }
+
+  // Dialog: der Schüler fragt zurück. Der Coach sieht den aktuellen Frame (falls
+  // vorhanden) und kennt den konkreten Aufgaben-Inhalt über den Systemtext.
+  async function senden(e) {
+    if (e) e.preventDefault();
+    const f = frageEntwurf.trim();
+    if (!f || !visionModell || antwortet) return;
+    setFrageEntwurf("");
+    idRef.current += 1;
+    const duId = idRef.current;
+    idRef.current += 1;
+    const coachId = idRef.current;
+    const verlauf = feed.map((m) => ({
+      von: m.von === "du" ? "ich" : "ki",
+      text: m.text,
+    }));
+    setFeed((prev) =>
+      [
+        ...prev,
+        { id: duId, von: "du", text: f },
+        { id: coachId, von: "coach", text: "" },
+      ].slice(-FEED_MAX)
+    );
+    setAntwortet(true);
+    replyAbortRef.current?.abort();
+    const ac = new AbortController();
+    replyAbortRef.current = ac;
+    let bild;
+    try {
+      bild = await grabFrame();
+    } catch {
+      bild = null;
+    }
+    try {
+      let voll = "";
+      await frageKi({
+        frage: f,
+        verlauf,
+        kontextName,
+        materialien: [],
+        modell: visionModell,
+        bild,
+        systemText: systemPromptLiveBegleiter({
+          kontextName,
+          materialien,
+          schritt,
+          inhalt,
+        }),
+        signal: ac.signal,
+        onToken: (s) => {
+          voll += s;
+          setFeed((prev) =>
+            prev.map((m) => (m.id === coachId ? { ...m, text: voll } : m))
+          );
+        },
+      });
+      if (!voll.trim()) {
+        setFeed((prev) =>
+          prev.map((m) =>
+            m.id === coachId
+              ? { ...m, text: "Ich kann gerade nicht antworten, versuch es gleich nochmal." }
+              : m
+          )
+        );
+      }
+    } catch (err) {
+      if (err.name !== "AbortError") {
+        setFeed((prev) =>
+          prev.map((m) =>
+            m.id === coachId
+              ? { ...m, text: "Ich kann gerade nicht antworten, versuch es gleich nochmal." }
+              : m
+          )
+        );
+      }
+    } finally {
+      setAntwortet(false);
+    }
   }
 
   return (
@@ -202,12 +290,7 @@ export default function LiveCoach({
                 kameraFehler ? (
                   <p className="lc-fehler">{kameraFehler}</p>
                 ) : aktiv ? (
-                  <video
-                    ref={videoRef}
-                    className="lc-video"
-                    playsInline
-                    muted
-                  />
+                  <video ref={videoRef} className="lc-video" playsInline muted />
                 ) : (
                   <p className="lc-vorschau-hint">
                     Richte die Kamera auf dein Blatt und starte den Live-Coach.
@@ -227,11 +310,7 @@ export default function LiveCoach({
                 </button>
               ) : (
                 <>
-                  <button
-                    type="button"
-                    className="lc-stop"
-                    onClick={stoppen}
-                  >
+                  <button type="button" className="lc-stop" onClick={stoppen}>
                     Stopp
                   </button>
                   <button
@@ -256,18 +335,41 @@ export default function LiveCoach({
             <div className="lc-feed" role="log" aria-live="polite">
               {feed.length === 0 ? (
                 <p className="lc-feed-leer">
-                  Sobald du arbeitest, melde ich mich hier, wenn etwas auffällt.
+                  Starte den Live-Coach oder frag mich direkt etwas zur Aufgabe.
                 </p>
               ) : (
                 feed.map((m) => (
-                  <div key={m.id} className="lc-meldung">
-                    <span className="lc-meldung-label">Live-Coach</span>
-                    <p className="lc-meldung-text">{m.text}</p>
+                  <div key={m.id} className={"lc-meldung lc-" + m.von}>
+                    <span className="lc-meldung-label">
+                      {m.von === "du" ? "Du" : "Live-Coach"}
+                    </span>
+                    <p className="lc-meldung-text">
+                      {m.text || (antwortet ? "…" : "")}
+                    </p>
                   </div>
                 ))
               )}
               <div ref={feedEndeRef} />
             </div>
+
+            <form className="lc-frage" onSubmit={senden}>
+              <input
+                type="text"
+                value={frageEntwurf}
+                onChange={(e) => setFrageEntwurf(e.target.value)}
+                placeholder="Frag den Coach etwas zur Aufgabe"
+                aria-label="Frage an den Live-Coach"
+                disabled={antwortet}
+              />
+              <button
+                type="submit"
+                className="lc-frage-senden"
+                aria-label="Senden"
+                disabled={antwortet || !frageEntwurf.trim()}
+              >
+                →
+              </button>
+            </form>
           </>
         )}
       </div>
