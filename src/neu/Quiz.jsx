@@ -16,6 +16,12 @@ function baueSession(key) {
   return aufgaben.map((a) => ({ aufgabe: a, optionen: macheOptionen(a, key) }));
 }
 
+// Eine Option ist entweder ein einfacher String oder ein Objekt
+// { text, warum } (Mathe-Distraktoren mit Fehlvorstellungs-Begruendung).
+function optText(opt) {
+  return typeof opt === "string" ? opt : opt.text;
+}
+
 function istRichtig(aufgabe, antwort) {
   const a = String(antwort).trim().toLowerCase();
   if (Array.isArray(aufgabe.loesung)) {
@@ -152,20 +158,21 @@ export default function Quiz({ generatorKey }) {
       {hatOptionen ? (
         <div className="qz-optionen">
           {optionen.map((opt, i) => {
+            const text = optText(opt);
             let cls = "qz-option";
             if (beantwortet) {
-              if (istRichtig(aufgabe, opt)) cls += " richtig";
-              else if (opt === gewaehlt) cls += " falsch";
+              if (istRichtig(aufgabe, text)) cls += " richtig";
+              else if (text === gewaehlt) cls += " falsch";
             }
             return (
               <button
                 key={i}
                 type="button"
                 className={cls}
-                onClick={() => antworten(opt)}
+                onClick={() => antworten(text)}
                 disabled={beantwortet}
               >
-                {opt}
+                {text}
               </button>
             );
           })}
@@ -206,7 +213,19 @@ export default function Quiz({ generatorKey }) {
               <p className="qz-feedback-text">
                 Nicht ganz. Richtig: <strong>{loesungText(aufgabe)}</strong>
               </p>
-              {aufgabe.hint && <p className="qz-hint">{aufgabe.hint}</p>}
+              {(() => {
+                // Wenn die gewaehlte Option eine eigene Begruendung traegt
+                // (Fehlvorstellung), zeig genau die. Sonst den allgemeinen Tipp.
+                const gewaehlteOpt = (optionen || []).find(
+                  (o) => optText(o) === gewaehlt
+                );
+                const warum =
+                  gewaehlteOpt && typeof gewaehlteOpt === "object"
+                    ? gewaehlteOpt.warum
+                    : null;
+                const text = warum || aufgabe.hint;
+                return text ? <p className="qz-hint">{text}</p> : null;
+              })()}
             </>
           )}
           <button type="button" className="qz-weiter" onClick={weiter}>

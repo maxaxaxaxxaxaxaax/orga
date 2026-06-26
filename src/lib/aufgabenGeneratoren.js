@@ -244,13 +244,13 @@ function ACILateinGen(vorhandene = []) {
         return {
           frage,
           loesung: v.de,
-          hint: `Auslöser- oder Inhaltsvokabel: ${v.de[0]}.`,
+          hint: "Denk an die Grundbedeutung. Die fünf ACI-Auslöser sind videre, audire, dicere, putare, scire.",
         };
       }
       return {
         frage,
         loesung: [v.lat],
-        hint: `Lateinisch endet oft auf -re oder -ire.`,
+        hint: "Verben enden im Wörterbuch auf -re oder -ire (Infinitiv).",
       };
     }
   }
@@ -534,28 +534,36 @@ function mischen(array) {
   return a;
 }
 
-function eindeutig(arr) {
-  return [...new Map(arr.map((x) => [String(x).toLowerCase(), x])).values()];
-}
-
-// Mathe: erzeugt plausible Distraktoren um die richtige Zahl herum.
+// Mathe: erzeugt plausible Distraktoren um die richtige Zahl herum und gibt jedem
+// eine Begruendung mit, die genau die typische Fehlvorstellung benennt (wie bei
+// den handgemachten Auswahlquizzen). So lernt der Schueler aus dem konkreten
+// Fehler, statt nur "leider falsch" zu lesen. Rueckgabe: Objekte { text, warum }.
 function optionenZahlen(aufgabe) {
-  const richtige = aufgabe.loesung;
-  const kandidaten = [
-    richtige,
-    richtige + 1,
-    richtige - 1,
-    richtige + 2,
-    richtige - 2,
-    -richtige,
-    richtige * -1 + 1,
-    Math.abs(richtige),
-  ];
-  const optionen = eindeutig(kandidaten).slice(0, 6);
-  // Behalte mindestens die richtige + 3 Distraktoren
-  const ohneRichtige = optionen.filter((o) => o !== richtige);
-  const auswahl = [richtige, ...ohneRichtige.slice(0, 3)];
-  return mischen(auswahl).map(String);
+  const r = aufgabe.loesung;
+  const distraktoren = [];
+  const add = (wert, warum) => {
+    if (wert === r) return; // nie die richtige als Distraktor
+    if (distraktoren.some((d) => d.wert === wert)) return;
+    distraktoren.push({ wert, warum });
+  };
+  // Reihenfolge = Lehrwert: erst die Vorzeichen-Fehler, dann Verzaehler.
+  if (r !== 0)
+    add(
+      -r,
+      "Vorzeichen-Fehler: der Betrag stimmt, aber das Vorzeichen ist falsch. Geh die Vorzeichenregel noch einmal durch.",
+    );
+  if (r < 0)
+    add(
+      Math.abs(r),
+      "Hier wurde das Minus vergessen: das Ergebnis liegt unter Null, ist also negativ.",
+    );
+  add(r + 1, "Knapp daneben: am Zahlenstrahl um eins verzaehlt. Zaehl die Schritte noch einmal.");
+  add(r - 1, "Knapp daneben: am Zahlenstrahl um eins verzaehlt. Zaehl die Schritte noch einmal.");
+  add(r + 2, "Daneben: rechne Schritt fuer Schritt nach.");
+  add(r - 2, "Daneben: rechne Schritt fuer Schritt nach.");
+  const auswahl = distraktoren.slice(0, 3);
+  const optionen = mischen([{ wert: r }, ...auswahl]);
+  return optionen.map((o) => ({ text: String(o.wert), warum: o.warum }));
 }
 
 // Latein: nutzt die existierenden Vokabel-/Satz-Pools für Distraktoren.
