@@ -1,4 +1,6 @@
-/* Fokus-Modus: ruhiges Vollbild, ein Schritt pro Seite. Liegt über allem. */
+/* Fokus: Vollbild-Arbeitsumgebung. Kopf + Fortschrittsbalken oben, darunter der
+   dreispaltige Körper: Werkzeug-Toolbar (links), Material (Mitte), passende
+   Materialien (rechts). Liegt über allem. Helles Schema, Farben über Variablen. */
 .fokus {
   position: fixed;
   inset: 0;
@@ -16,12 +18,14 @@
     opacity: 1;
   }
 }
+
+/* ---- Kopf + Balken ----------------------------------------------------- */
 .fokus-kopf {
   flex-shrink: 0;
   display: flex;
   align-items: center;
   gap: 14px;
-  padding: 16px 20px;
+  padding: 14px 20px;
 }
 .fokus-zu {
   flex-shrink: 0;
@@ -42,12 +46,23 @@
 .fokus-kb {
   flex: 1;
   min-width: 0;
-  font-size: 0.84rem;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 0.92rem;
   font-weight: 600;
-  color: var(--text-2);
+  color: var(--text);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+.fokus-kb-eyebrow {
+  flex-shrink: 0;
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent);
 }
 .fokus-zaehler {
   flex-shrink: 0;
@@ -55,6 +70,29 @@
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   color: var(--muted);
+}
+.fokus-kopf-hilfe,
+.fokus-wechsel {
+  flex-shrink: 0;
+  border: 1px solid var(--line-strong);
+  background: var(--card);
+  color: var(--text-2);
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 7px 13px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: border-color 0.12s ease, color 0.12s ease;
+}
+.fokus-kopf-hilfe:hover,
+.fokus-wechsel:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.fokus-kopf-hilfe.aktiv {
+  border-color: var(--ok-text);
+  color: var(--ok-text);
+  background: var(--ok-bg);
 }
 .fokus-balken {
   flex-shrink: 0;
@@ -71,72 +109,230 @@
   transition: width 0.35s cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 
-/* Bühne: zentriert, ruhig, viel Luft. */
-.fokus-buehne {
+/* ---- Körper: dreispaltiges Raster -------------------------------------- */
+.fokus-koerper {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: auto 1fr clamp(280px, 24vw, 360px);
+  grid-template-areas: "tools mitte rail";
+  gap: 16px;
+  padding: 8px 20px 18px;
+  box-sizing: border-box;
+}
+
+/* ---- Werkzeug-Toolbar (links) ----------------------------------------- */
+.fokus-werkzeuge {
+  grid-area: tools;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  box-shadow: var(--shadow-sm);
+  align-self: start;
+}
+.fokus-wz {
+  position: relative;
+  width: 46px;
+  height: 46px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-2);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.14s ease, color 0.14s ease, border-color 0.14s ease;
+}
+.fokus-wz:hover {
+  background: var(--bg);
+  color: var(--accent);
+}
+.fokus-wz.aktiv {
+  background: var(--accent);
+  color: var(--on-accent);
+  border-color: var(--accent);
+}
+.fokus-wz-zahl {
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 3px;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: var(--on-accent);
+  background: var(--accent);
+  border: 1.5px solid var(--card);
+  border-radius: 999px;
+}
+.fokus-wz.aktiv .fokus-wz-zahl {
+  background: var(--on-accent);
+  color: var(--accent);
+}
+.fokus-wz-spacer {
+  flex: 1;
+  min-height: 8px;
+}
+
+/* ---- Mitte: aktives Material + Schritt-Steuerung ----------------------- */
+.fokus-mitte {
+  grid-area: mitte;
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.fokus-mitte-inhalt {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  width: 100%;
-  max-width: 640px;
-  margin: 0 auto;
-  padding: 32px 24px 48px;
-  box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+}
+.fokus-material {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg, 16px);
+  overflow: hidden;
+}
+.fokus-material-kopf {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--line);
+}
+.fokus-mat-art {
+  flex-shrink: 0;
+  font-size: 0.66rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+  background: var(--accent-soft);
+  padding: 3px 8px;
+  border-radius: 999px;
+}
+.fokus-material-titel {
+  flex: 1;
+  min-width: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.fokus-material-aktiv {
+  flex-shrink: 0;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--accent);
+  background: var(--accent-soft);
+  padding: 3px 9px;
+  border-radius: 999px;
+}
+.fokus-material-inhalt {
+  flex: 1;
+  padding: 18px;
+}
+.fokus-mitte-leer {
+  margin: auto;
+  max-width: 30rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 40px 24px;
+}
+.fokus-mitte-leer-titel {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.5rem;
+  line-height: 1.2;
+  color: var(--text);
 }
 .fokus-eyebrow {
   margin: 0;
-  font-size: 0.78rem;
+  font-size: 0.74rem;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--accent);
 }
-.fokus-titel {
-  margin: 0;
-  font-family: var(--font-display);
-  font-weight: 600;
-  font-size: 2rem;
-  line-height: 1.12;
-  letter-spacing: -0.01em;
-  color: var(--text);
-}
 .fokus-info {
   margin: 0;
-  font-size: 1rem;
+  font-size: 0.96rem;
   line-height: 1.5;
   color: var(--text-2);
 }
 
-/* Selbsteinschätzung des aktuellen Schritts: ruhig, freiwillig, ein Tap. */
-.fokus-gefuehl {
+/* Schmale Schritt-Steuerung am unteren Rand der Mitte. */
+.fokus-schrittleiste {
+  flex-shrink: 0;
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  gap: 10px;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 10px 14px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg, 16px);
 }
-.fokus-gefuehl-frage {
-  font-size: 0.82rem;
-  color: var(--text-2);
+.fokus-sl-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
 }
-.fokus-gefuehl-knoepfe {
+.fokus-sl-nr {
+  font-size: 0.66rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+}
+.fokus-sl-text {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.fokus-sl-gefuehl {
   display: inline-flex;
   gap: 6px;
+  flex-shrink: 0;
 }
 .fokus-gefuehl-knopf {
   padding: 5px 12px;
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   font-weight: 600;
   color: var(--text-2);
-  background: var(--card);
+  background: var(--bg);
   border: 1px solid var(--line);
   border-radius: 999px;
   cursor: pointer;
-  transition:
-    background 0.15s ease,
-    border-color 0.15s ease,
-    color 0.15s ease;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
 .fokus-gefuehl-knopf:hover {
   border-color: var(--line-strong);
@@ -156,116 +352,532 @@
   border-color: var(--warn-line);
   color: var(--warn-text);
 }
-
-/* Rechenweg-Starter: bei Mathe-Zielen den handschriftlichen Rechenweg oeffnen. */
-.fokus-rechenweg {
-  align-self: flex-start;
+.fokus-sl-nav {
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  flex-shrink: 0;
+}
+.fokus-sl-rechenweg {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   border: 1px solid var(--accent);
   background: var(--accent-soft);
   color: var(--accent-strong);
-  font-size: 0.9rem;
+  font-size: 0.82rem;
   font-weight: 600;
-  padding: 9px 15px;
+  padding: 8px 13px;
   border-radius: 999px;
   cursor: pointer;
 }
-.fokus-rechenweg:hover {
-  background: color-mix(in srgb, var(--accent) 18%, var(--card));
+.fokus-sl-rechenweg:hover {
+  background: color-mix(in srgb, var(--accent) 16%, var(--card));
 }
-.fokus-rechenweg-stift {
-  font-size: 1.05rem;
-}
-.fokus-rechenweg-badge {
+.fokus-sl-badge {
   font-size: 0.7rem;
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  padding: 1px 7px;
+}
+.fokus-sl-zurueck {
+  border: 1px solid var(--line-strong);
+  background: var(--card);
+  color: var(--text-2);
+  font-size: 0.84rem;
+  font-weight: 600;
+  padding: 9px 14px;
   border-radius: 999px;
+  cursor: pointer;
+  transition: border-color 0.12s ease, color 0.12s ease;
+}
+.fokus-sl-zurueck:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.fokus-sl-weiter {
+  border: none;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: 0.9rem;
+  font-weight: 700;
+  padding: 10px 18px;
+  border-radius: 999px;
+  cursor: pointer;
+  box-shadow: 0 6px 16px -7px var(--accent-shadow);
+  transition: background 0.15s ease, transform 0.12s ease;
+}
+.fokus-sl-weiter:hover {
+  background: var(--accent-strong);
+}
+.fokus-sl-weiter:active {
+  transform: scale(0.98);
+}
+
+/* ---- Panel-Werkzeug (Chat / Notizen), links über der Mitte ------------- */
+.fokus-panel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: min(400px, 100%);
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg, 16px);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  animation: fokus-panel-rein 0.22s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+@keyframes fokus-panel-rein {
+  from {
+    opacity: 0;
+    transform: translateX(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+.fokus-panel-kopf {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+}
+.fokus-panel-titel {
+  flex: 1;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.fokus-panel-tabs {
+  flex: 1;
+  display: inline-flex;
+  gap: 4px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 3px;
+}
+.fokus-panel-tab {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: var(--text-2);
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 6px 8px;
+  border-radius: 999px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.14s ease, color 0.14s ease;
+}
+.fokus-panel-tab.an {
   background: var(--accent);
   color: var(--on-accent);
 }
+.fokus-panel-zu {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: var(--card);
+  color: var(--text-2);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+.fokus-panel-zu:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
 
-.fokus-block {
+/* MaterialChat im Panel: füllt die Höhe, Verlauf scrollt. */
+.fokus-panel-mc {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+}
+.fokus-panel-mc > .mc {
+  flex: 1;
+  min-height: 0;
+  margin-top: 0;
+  max-width: none;
+  border: none;
+  border-radius: 0;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+}
+.fokus-panel-mc .mc-verlauf {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* Lerncoach-Tab + Notizen teilen ruhige Bausteine. */
+.fokus-panel-lerncoach,
+.fokus-panel > .fokus-lc-info {
+  padding: 0;
+}
+.fokus-panel-lerncoach {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  overflow-y: auto;
+}
+.fokus-lc-info {
+  margin: 0;
+  padding: 14px 14px 0;
+  font-size: 0.86rem;
+  line-height: 1.45;
+  color: var(--text-2);
+}
+.fokus-panel-lerncoach .fokus-lc-info {
+  padding: 0;
+}
+.fokus-lc-feld {
+  width: 100%;
+  box-sizing: border-box;
+  resize: vertical;
+  font: inherit;
+  font-size: 0.9rem;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-sm, 8px);
+  padding: 10px 12px;
+}
+.fokus-lc-feld:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.fokus-lc-senden {
+  align-self: flex-start;
+  border: none;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: 0.88rem;
+  font-weight: 700;
+  padding: 9px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.fokus-lc-senden:hover:not(:disabled) {
+  background: var(--accent-strong);
+}
+.fokus-lc-senden:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.fokus-lc-status {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
-.fokus-label {
+.fokus-hilfe-info {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--ok-text);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.fokus-hilfe-haken {
+  font-weight: 700;
+}
+.fokus-hilfe-frage {
+  margin: 0;
+  font-size: 0.9rem;
+  font-style: italic;
+  line-height: 1.45;
+  color: var(--text-2);
+}
+
+/* Notizen-Werkzeug. */
+.fokus-panel[aria-label="Notizen"] {
+  padding: 0;
+}
+.fokus-notiz-neu {
+  display: flex;
+  gap: 8px;
+  padding: 0 14px;
+}
+.fokus-notiz-neu input {
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+  font-size: 0.9rem;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  padding: 9px 14px;
+}
+.fokus-notiz-neu input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.fokus-notiz-add {
+  flex-shrink: 0;
+  border: none;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 0.84rem;
+  font-weight: 700;
+  padding: 8px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.fokus-notiz-add:hover:not(:disabled) {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+.fokus-notiz-add:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.fokus-notiz-leer {
+  margin: 4px 14px;
+  font-size: 0.86rem;
+  color: var(--muted);
+}
+.fokus-notiz-liste {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 0 14px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.fokus-notiz {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm, 8px);
+}
+.fokus-notiz-text {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.fokus-notiz-kontext {
   font-size: 0.72rem;
+  color: var(--muted);
+}
+.fokus-notiz-weg {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: 999px;
+  background: var(--card);
+  color: var(--muted);
+  font-size: 0.7rem;
+  cursor: pointer;
+}
+.fokus-notiz-weg:hover {
+  color: var(--danger-text, var(--text));
+}
+
+/* ---- Rechte Leiste: passende Materialien ------------------------------ */
+.fokus-rail {
+  grid-area: rail;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg, 16px);
+  padding: 14px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+.fokus-rail-kopf {
+  flex-shrink: 0;
+}
+.fokus-rail-fach {
+  font-size: 0.66rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--muted);
+  color: var(--accent);
 }
-/* Aufgaben-Block: das, was man bearbeitet, klar abgesetzt und prominent. */
-.fokus-aufgaben {
-  border: 1px solid var(--accent);
-  border-radius: var(--r-md, 12px);
-  padding: 14px;
-  background: color-mix(in srgb, var(--accent) 5%, var(--card));
-}
-.fokus-block-hint {
-  font-size: 0.72rem;
+.fokus-rail-titel {
+  margin: 2px 0 0;
+  font-size: 1.02rem;
   font-weight: 600;
-  color: var(--muted);
-  text-transform: none;
-  letter-spacing: 0;
+  color: var(--text);
 }
-/* Nachschlage-Material: ruhiger, einklappbarer Block unter den Aufgaben. */
-.fokus-nachschlagen {
+.fokus-rail-chips {
+  flex-shrink: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.fokus-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   border: 1px solid var(--line);
-  border-radius: var(--r-md, 12px);
-  padding: 4px 14px;
-  background: var(--card);
+  background: var(--bg);
+  color: var(--text-2);
+  font-size: 0.74rem;
+  font-weight: 600;
+  padding: 5px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: border-color 0.12s ease, color 0.12s ease, background 0.12s ease;
 }
-.fokus-nachschlagen-kopf {
+.fokus-chip:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.fokus-chip.an {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+}
+.fokus-chip-icon {
+  width: 14px;
+  height: 14px;
+}
+.fokus-rail-suche {
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   gap: 8px;
-  width: 100%;
-  padding: 10px 0;
-  border: none;
-  background: none;
-  cursor: pointer;
-  text-align: left;
-}
-.fokus-nachschlagen-zahl {
-  flex-shrink: 0;
-  font-size: 0.7rem;
-  font-weight: 700;
-  color: var(--text-2);
+  padding: 8px 12px;
   background: var(--bg);
   border: 1px solid var(--line);
   border-radius: 999px;
-  padding: 1px 8px;
 }
-.fokus-nachschlagen-pfeil {
-  margin-left: auto;
+.fokus-rail-suche svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
   color: var(--muted);
-  font-size: 0.8rem;
 }
-.fokus-nachschlagen .fokus-mats {
-  padding-bottom: 10px;
+.fokus-rail-suche input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 0.88rem;
+  color: var(--text);
 }
-/* Kopfzeile des Material-Blocks: Label links, "anhaengen" rechts. */
-.fokus-label-zeile {
+.fokus-rail-suche input::placeholder {
+  color: var(--muted);
+}
+.fokus-rail-liste {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.fokus-rail-mat {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm, 8px);
+  text-align: left;
+  font: inherit;
+  color: var(--text);
+}
+.fokus-rail-klick {
+  cursor: pointer;
+  transition: border-color 0.12s ease, background 0.12s ease;
+}
+.fokus-rail-klick:hover {
+  border-color: var(--accent);
+}
+.fokus-rail-mat.aktiv {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+.fokus-rail-icon {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent);
+}
+.fokus-rail-mat-titel {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.88rem;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.fokus-rail-mat-typ {
+  flex-shrink: 0;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--muted);
+}
+.fokus-rail-mat.aktiv .fokus-rail-mat-typ {
+  color: var(--accent);
+}
+.fokus-rail-nichts {
+  font-size: 0.86rem;
+  color: var(--muted);
+  padding: 6px 2px;
+}
+.fokus-rail-add {
+  flex-shrink: 0;
+  align-self: stretch;
+  text-align: center;
+}
+.fokus-rail-leer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
+}
+
+/* Gemeinsame Bausteine: Material-Lücke, Hinweis, Knöpfe. */
+.fokus-mat-leer {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--muted);
 }
 .fokus-mat-add {
-  flex-shrink: 0;
   border: 1px solid var(--line-strong);
   background: var(--card);
   color: var(--text-2);
-  font-size: 0.78rem;
+  font-size: 0.82rem;
   font-weight: 600;
-  padding: 5px 12px;
+  padding: 8px 14px;
   border-radius: 999px;
   cursor: pointer;
   transition: border-color 0.12s ease, color 0.12s ease;
@@ -274,100 +886,89 @@
   border-color: var(--accent);
   color: var(--accent);
 }
-.fokus-mat-leer {
-  margin: 0;
-  font-size: 0.84rem;
-  color: var(--muted);
-}
-.fokus-mats {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.fokus-mat {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 11px 13px;
+.fokus-luecke-aktion {
+  border: 1px solid var(--line-strong);
   background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: var(--r-sm, 8px);
-  text-align: left;
-  font: inherit;
-}
-.fokus-mat-klick {
-  cursor: pointer;
-  transition: border-color 0.12s ease;
-}
-.fokus-mat-klick:hover {
-  border-color: var(--accent);
-}
-.fokus-mat-art {
-  flex-shrink: 0;
-  font-size: 0.66rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--accent);
-  background: var(--accent-soft);
-  padding: 3px 8px;
+  color: var(--text-2);
+  font-size: 0.84rem;
+  font-weight: 600;
+  padding: 9px 14px;
   border-radius: 999px;
+  cursor: pointer;
+  text-align: left;
 }
-.fokus-mat-titel {
-  font-size: 0.9rem;
+.fokus-luecke-aktion:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.fokus-luecke-gesendet {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--ok-text);
+}
+.fokus-hinweis {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md, 12px);
+  padding: 12px 14px;
+}
+.fokus-hinweis p {
+  margin: 0 0 6px;
+  font-size: 0.88rem;
+  line-height: 1.5;
   color: var(--text);
 }
-/* Aktivitäts-Hinweis rechts: zeigt vorab die Übungsform. */
-.fokus-mat-aktiv {
-  flex-shrink: 0;
-  margin-left: auto;
-  font-size: 0.7rem;
-  font-weight: 700;
-  color: var(--accent);
-  background: var(--accent-soft);
-  border: 1px solid transparent;
-  padding: 3px 9px 3px 8px;
-  border-radius: 999px;
-  white-space: nowrap;
+.fokus-hinweis p:last-child {
+  margin-bottom: 0;
 }
-.fokus-mat-aktiv::before {
-  content: "▸ ";
-}
-.fokus-mat-aktiv.lesen {
-  color: var(--muted);
+.fokus-textlink {
+  border: none;
   background: transparent;
-  border-color: var(--line);
+  color: var(--muted);
+  font-size: 0.82rem;
+  text-decoration: underline;
+  cursor: pointer;
 }
-.fokus-mat-klick:hover .fokus-mat-aktiv {
-  border-color: var(--accent);
-}
-.fokus-quiz {
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: var(--r-md, 12px);
-  padding: 14px;
-}
-.fokus-quiz-label {
-  margin-bottom: 10px;
-}
-/* Interaktive Übung direkt offen im Material-Block (ohne Klick). */
-.fokus-mat-offen {
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: var(--r-md, 12px);
-  padding: 12px 13px;
-}
-.fokus-mat-offen-kopf {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 10px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid var(--line);
+.fokus-textlink:hover {
+  color: var(--text-2);
 }
 
+/* ---- Abschluss-Screen (zentriert) ------------------------------------- */
+.fokus-abschluss {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.fokus-abschluss-karte {
+  width: 100%;
+  max-width: 540px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  text-align: center;
+}
+.fokus-abschluss-karte .fokus-fuss {
+  justify-content: center;
+}
+.fokus-titel {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 2rem;
+  line-height: 1.12;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
 .fokus-fuss {
-  margin-top: 8px;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -393,7 +994,6 @@
 .fokus-weiter:active {
   transform: scale(0.98);
 }
-.fokus-zurueck,
 .fokus-sekundaer {
   flex-shrink: 0;
   border: 1px solid var(--line-strong);
@@ -406,20 +1006,12 @@
   cursor: pointer;
   transition: border-color 0.12s ease, color 0.12s ease;
 }
-.fokus-zurueck:hover,
 .fokus-sekundaer:hover {
   border-color: var(--accent);
   color: var(--accent);
 }
-.fokus-danach {
-  margin: 0;
-  font-size: 0.84rem;
-  color: var(--muted);
-}
-/* Ruhiger Hinweis im Abschluss, dass ein offener Hilferuf weiterlaeuft. */
 .fokus-hilfe-laeuft {
   margin: 0;
-  max-width: 30rem;
   font-size: 0.9rem;
   line-height: 1.45;
   color: var(--warn-text);
@@ -427,330 +1019,42 @@
   border-radius: var(--r-sm, 8px);
   padding: 10px 14px;
 }
-/* Stille Frage / Hilfe an den Lerncoach: ruhig unten, klappt erst auf Wunsch auf. */
-.fokus-hilfe-bereich {
-  align-self: center;
-  width: 100%;
-  max-width: 440px;
-  margin-top: 6px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-}
-.fokus-hilfe {
-  border: none;
-  background: transparent;
-  color: var(--muted);
-  font-size: 0.84rem;
-  text-decoration: underline;
-  cursor: pointer;
-}
-.fokus-hilfe:hover {
-  color: var(--text-2);
-}
-.fokus-hilfe-panel {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  text-align: left;
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: var(--r-md, 12px);
-  padding: 14px;
-}
-.fokus-hilfe-label {
-  font-size: 0.84rem;
-  line-height: 1.4;
-  color: var(--text-2);
-}
-.fokus-hilfe-feld {
-  width: 100%;
-  box-sizing: border-box;
-  resize: vertical;
-  font: inherit;
-  font-size: 0.9rem;
-  color: var(--text);
-  background: var(--bg);
-  border: 1px solid var(--line-strong);
-  border-radius: var(--r-sm, 8px);
-  padding: 9px 11px;
-}
-.fokus-hilfe-feld:focus {
-  outline: none;
-  border-color: var(--accent);
-}
-.fokus-hilfe-aktionen {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.fokus-hilfe-senden {
-  border: none;
-  background: var(--accent);
-  color: var(--on-accent);
-  font-size: 0.88rem;
-  font-weight: 600;
-  padding: 9px 16px;
-  border-radius: 999px;
-  cursor: pointer;
-  transition: background 0.15s ease;
-}
-.fokus-hilfe-senden:hover {
-  background: var(--accent-strong);
-}
-.fokus-hilfe-abbrechen {
-  border: none;
-  background: transparent;
-  color: var(--muted);
-  font-size: 0.86rem;
-  cursor: pointer;
-}
-.fokus-hilfe-abbrechen:hover {
-  color: var(--text-2);
-}
-.fokus-hilfe-status {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  text-align: center;
-}
-.fokus-hilfe-info {
-  margin: 0;
-  font-size: 0.88rem;
-  font-weight: 600;
-  color: var(--ok-text);
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-.fokus-hilfe-haken {
-  font-weight: 700;
-}
-.fokus-hilfe-frage {
-  margin: 0;
-  max-width: 100%;
-  font-size: 0.88rem;
-  font-style: italic;
-  line-height: 1.4;
-  color: var(--text-2);
-}
-.fokus-hilfe-zurueck {
-  border: none;
-  background: transparent;
-  color: var(--muted);
-  font-size: 0.82rem;
-  text-decoration: underline;
-  cursor: pointer;
-}
-.fokus-hilfe-zurueck:hover {
-  color: var(--text-2);
-}
 
-/* Gedanke parken: leiser Zweit-Link, klappt ein kleines Eingabefeld auf. */
-.fokus-park-link {
-  border: none;
-  background: transparent;
-  color: var(--muted);
-  font-size: 0.84rem;
-  text-decoration: underline;
-  cursor: pointer;
+/* ---- Schmaler: Materialien-Leiste unter die Mitte --------------------- */
+@media (max-width: 1024px) {
+  .fokus-koerper {
+    grid-template-columns: auto 1fr;
+    grid-template-rows: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "tools mitte"
+      "rail rail";
+  }
+  .fokus-rail {
+    max-height: 40vh;
+  }
 }
-.fokus-park-link:hover {
-  color: var(--text-2);
-}
-.fokus-park-panel {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.fokus-park-feld {
-  width: 100%;
-  box-sizing: border-box;
-  font: inherit;
-  font-size: 0.9rem;
-  color: var(--text);
-  background: var(--bg);
-  border: 1px solid var(--line-strong);
-  border-radius: var(--r-sm, 8px);
-  padding: 9px 11px;
-}
-.fokus-park-feld:focus {
-  outline: none;
-  border-color: var(--accent);
-}
-.fokus-park-aktionen {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.fokus-park-save {
-  border: none;
-  background: var(--accent-soft);
-  color: var(--accent);
-  font-size: 0.86rem;
-  font-weight: 700;
-  padding: 8px 14px;
-  border-radius: 999px;
-  cursor: pointer;
-}
-.fokus-park-save:hover {
-  background: var(--accent);
-  color: var(--on-accent);
-}
-.fokus-park-zu {
-  border: none;
-  background: transparent;
-  color: var(--muted);
-  font-size: 0.86rem;
-  cursor: pointer;
-}
-.fokus-park-zu:hover {
-  color: var(--text-2);
-}
-.fokus-park-zahl {
-  margin-left: auto;
-  font-size: 0.78rem;
-  color: var(--muted);
-}
-
-/* Arbeitsmodus-Umschalter: Digital (am Gerät) oder Am Tisch (analog). */
-.fokus-modus {
-  align-self: center;
-  display: inline-flex;
-  gap: 4px;
-  padding: 4px;
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: 999px;
-}
-.fokus-modus-knopf {
-  border: none;
-  background: transparent;
-  color: var(--text-2);
-  font-size: 0.84rem;
-  font-weight: 600;
-  padding: 6px 16px;
-  border-radius: 999px;
-  cursor: pointer;
-  transition:
-    background 0.15s ease,
-    color 0.15s ease;
-}
-.fokus-modus-knopf:hover {
-  color: var(--text);
-}
-.fokus-modus-knopf.aktiv {
-  background: var(--accent);
-  color: var(--on-accent);
-}
-
-/* Material-Lücke: ruhige Zeile mit Coach-Anfrage und KI-Hinweis. */
-.fokus-luecke {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 10px;
-}
-.fokus-luecke-aktion {
-  border: 1px solid var(--line-strong);
-  background: var(--card);
-  color: var(--text-2);
-  font-size: 0.84rem;
-  font-weight: 600;
-  padding: 8px 15px;
-  border-radius: 999px;
-  cursor: pointer;
-}
-.fokus-luecke-aktion:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-}
-.fokus-luecke-gesendet {
-  margin: 0;
-  display: inline-flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 6px;
-  font-size: 0.86rem;
-  font-weight: 600;
-  color: var(--ok-text);
-}
-.fokus-luecke-zurueck {
-  border: none;
-  background: transparent;
-  color: var(--muted);
-  font-size: 0.82rem;
-  text-decoration: underline;
-  cursor: pointer;
-}
-.fokus-luecke-zurueck:hover {
-  color: var(--text-2);
-}
-/* KI-Hinweis: zeigt nur auf Vorhandenes (kein neuer Inhalt). */
-.fokus-hinweis {
-  flex-basis: 100%;
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: var(--r-md, 12px);
-  padding: 12px 14px;
-}
-.fokus-hinweis p {
-  margin: 0 0 6px;
-  font-size: 0.9rem;
-  line-height: 1.5;
-  color: var(--text);
-}
-.fokus-hinweis p:last-child {
-  margin-bottom: 0;
-}
-
-/* Am-Tisch-Modus: ruhige Begleitung zum analogen Arbeiten. */
-.fokus-tisch {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-.fokus-digitalisieren {
-  align-self: flex-start;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  border: none;
-  background: var(--accent);
-  color: var(--on-accent);
-  font-size: 0.92rem;
-  font-weight: 700;
-  padding: 11px 20px;
-  border-radius: 999px;
-  cursor: pointer;
-}
-.fokus-digitalisieren:hover {
-  background: var(--accent-strong);
-}
-.fokus-tisch-ref {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.fokus-tisch-liste {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.fokus-tisch-mat {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 11px 13px;
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: var(--r-sm, 8px);
+@media (max-width: 720px) {
+  .fokus-werkzeuge {
+    flex-direction: row;
+    border-radius: 999px;
+    align-self: stretch;
+  }
+  .fokus-koerper {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      "tools"
+      "mitte"
+      "rail";
+  }
+  .fokus-wz-spacer {
+    flex: 1;
+    min-height: 0;
+  }
+  .fokus-schrittleiste {
+    gap: 10px;
+  }
+  .fokus-sl-gefuehl {
+    order: 3;
+  }
 }

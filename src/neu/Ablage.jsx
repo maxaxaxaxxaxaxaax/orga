@@ -5,6 +5,8 @@ import { ladeEigene, speichereEigenes } from "./eigeneMaterialien";
 import { istOeffenbar } from "./interaktiv";
 import { FACH_STRUKTUR } from "../data/fachStruktur";
 import { lade, ERLEDIGT_KEY } from "./planung";
+import { IcLernweg } from "./materialIcons";
+import { CHIPS, chipFuerMaterial, iconFuerMaterial } from "./materialTypen";
 import MaterialUpload from "./MaterialUpload";
 import MaterialAnsicht from "./MaterialAnsicht";
 import KbInhalt from "./KbInhalt";
@@ -14,58 +16,9 @@ import "./Ablage.css";
 // Ablage: links die Fächer als bunte Ordner (plus später Kompetenzen), rechts die
 // Materialien des gewählten Fachs, gefiltert über Typ-Chips (Alle, Tafelaufschriebe,
 // Aufgaben, Lernwege, Notizen, KI, Buchseiten), mit Suche und Sortierung. Jede Zeile
-// trägt ein Typ-Icon, Titel und Datum.
+// trägt ein Typ-Icon, Titel und Datum. Icons/Chips kommen aus materialIcons (geteilt
+// mit dem Fokus).
 
-// ---- Icons --------------------------------------------------------------
-function IcLernweg(p) {
-  return (
-    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}>
-      <circle cx="6" cy="6" r="2.3" />
-      <circle cx="18" cy="18" r="2.3" />
-      <path d="M6 8.3v3.4a4 4 0 0 0 4 4h5.4" />
-    </svg>
-  );
-}
-function IcAufgabe(p) {
-  return (
-    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}>
-      <path d="M12 20h9" />
-      <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />
-    </svg>
-  );
-}
-function IcTafel(p) {
-  return (
-    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}>
-      <rect x="3" y="4" width="18" height="13" rx="1.5" />
-      <path d="M8 21l2-4M16 21l-2-4" />
-    </svg>
-  );
-}
-function IcNotiz(p) {
-  return (
-    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}>
-      <path d="M6 3h8l4 4v14a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z" />
-      <path d="M14 3v4h4M8 12h8M8 16h6" />
-    </svg>
-  );
-}
-function IcBuch(p) {
-  return (
-    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}>
-      <path d="M12 6c-1.5-1.2-3.5-2-6-2H3v14h3c2.5 0 4.5.8 6 2 1.5-1.2 3.5-2 6-2h3V4h-3c-2.5 0-4.5.8-6 2z" />
-      <path d="M12 6v14" />
-    </svg>
-  );
-}
-function IcKi(p) {
-  return (
-    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}>
-      <path d="M12 3l1.8 4.2L18 9l-4.2 1.8L12 15l-1.8-4.2L6 9l4.2-1.8z" />
-      <path d="M18 15l.9 2.1L21 18l-2.1.9L18 21l-.9-2.1L15 18l2.1-.9z" />
-    </svg>
-  );
-}
 function FolderIcon({ color, offen }) {
   if (offen) {
     // Geöffneter Ordner: hintere Wand + nach vorne geklappte, oben breitere Lasche.
@@ -97,36 +50,6 @@ function FolderIcon({ color, offen }) {
     </svg>
   );
 }
-
-// ---- Typ-Zuordnung ------------------------------------------------------
-// Material-Art -> Filter-Chip.
-const ART_CHIP = {
-  tafelnotiz: "tafel",
-  aufschrieb: "tafel",
-  arbeitsblatt: "aufgaben",
-  notiz: "notizen",
-  lernzettel: "notizen",
-  zusammenfassung: "notizen",
-  pdf: "buch",
-  bild: "buch",
-};
-const CHIP_ICON = {
-  lernwege: IcLernweg,
-  tafel: IcTafel,
-  aufgaben: IcAufgabe,
-  notizen: IcNotiz,
-  ki: IcKi,
-  buch: IcBuch,
-};
-const CHIPS = [
-  { key: "alle", label: "Alle", Icon: null },
-  { key: "tafel", label: "Tafelaufschriebe", Icon: IcTafel },
-  { key: "aufgaben", label: "Aufgaben", Icon: IcAufgabe },
-  { key: "lernwege", label: "Lernwege", Icon: IcLernweg },
-  { key: "notizen", label: "Notizen", Icon: IcNotiz },
-  { key: "ki", label: "KI", Icon: IcKi },
-  { key: "buch", label: "Buchseiten", Icon: IcBuch },
-];
 
 function datumLang(iso) {
   if (!iso) return "";
@@ -185,17 +108,14 @@ export default function Ablage() {
     Icon: IcLernweg,
     onOpen: () => setOffenerLernweg({ id: t.kbId, label: t.label }),
   }));
-  const matRows = materialien.map((m) => {
-    const chipKey = ART_CHIP[m.art] || "notizen";
-    return {
-      key: "m-" + m.id,
-      chip: chipKey,
-      titel: m.titel,
-      datum: m.datum || null,
-      Icon: CHIP_ICON[chipKey] || IcNotiz,
-      onOpen: istOeffenbar(m) ? () => setOffenesMaterial(m) : null,
-    };
-  });
+  const matRows = materialien.map((m) => ({
+    key: "m-" + m.id,
+    chip: chipFuerMaterial(m),
+    titel: m.titel,
+    datum: m.datum || null,
+    Icon: iconFuerMaterial(m),
+    onOpen: istOeffenbar(m) ? () => setOffenesMaterial(m) : null,
+  }));
 
   let rows = [...lernwegRows, ...matRows];
   if (chip !== "alle") rows = rows.filter((r) => r.chip === chip);

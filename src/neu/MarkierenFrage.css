@@ -1,0 +1,254 @@
+/* Stift-Werkzeug: Vollbild über dem Fokus, Screenshot des Materials mit
+   Marker-Ebene und einer Frage an den KI-Coach. */
+.mf {
+  position: fixed;
+  inset: 0;
+  z-index: 260;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  padding: 16px 20px 20px;
+  box-sizing: border-box;
+  gap: 12px;
+  /* Marker-Farbe als Variable (anpassbar), wird in JS ausgelesen. */
+  --mf-marker: rgba(245, 197, 24, 0.4);
+  animation: mf-rein 0.2s ease both;
+}
+@keyframes mf-rein {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.mf-kopf {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.mf-zu {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: var(--card);
+  color: var(--text-2);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: border-color 0.12s ease, color 0.12s ease;
+}
+.mf-zu:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.mf-titel {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.mf-werkzeuge {
+  display: inline-flex;
+  gap: 8px;
+}
+.mf-werkzeug {
+  border: 1px solid var(--line-strong);
+  background: var(--card);
+  color: var(--text-2);
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 7px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: border-color 0.12s ease, color 0.12s ease;
+}
+.mf-werkzeug:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.mf-werkzeug:not(:disabled):hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.mf-hinweis {
+  flex-shrink: 0;
+  margin: 0;
+  font-size: 0.86rem;
+  line-height: 1.4;
+  color: var(--text-2);
+}
+
+/* Arbeitsfläche: Hintergrund-Bild + transparente Marker-Ebene. */
+.mf-flaeche {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md, 12px);
+  overflow: hidden;
+}
+.mf-bg {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  user-select: none;
+  pointer-events: none;
+}
+.mf-bg-leer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
+  height: 100%;
+  padding: 24px;
+  box-sizing: border-box;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+.mf-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  cursor: crosshair;
+  touch-action: none;
+}
+.mf-laedt {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+/* Coach-Antwort unter der Fläche. */
+.mf-antwort {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md, 12px);
+  padding: 12px 14px;
+  max-height: 28vh;
+  overflow-y: auto;
+}
+.mf-antwort-label {
+  font-size: 0.66rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--accent);
+}
+.mf-antwort-text {
+  margin: 0;
+  font-size: 0.94rem;
+  line-height: 1.5;
+  color: var(--text);
+  white-space: pre-wrap;
+}
+.mf-cursor {
+  display: inline-block;
+  width: 7px;
+  height: 1.05em;
+  margin-left: 2px;
+  vertical-align: -0.15em;
+  background: var(--accent);
+  border-radius: 1px;
+  animation: mf-blink 1s steps(2) infinite;
+}
+@keyframes mf-blink {
+  to {
+    opacity: 0;
+  }
+}
+.mf-denkt {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+}
+.mf-denkt span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--muted);
+  animation: mf-puls 1.2s ease-in-out infinite;
+}
+.mf-denkt span:nth-child(2) {
+  animation-delay: 0.15s;
+}
+.mf-denkt span:nth-child(3) {
+  animation-delay: 0.3s;
+}
+@keyframes mf-puls {
+  0%,
+  60%,
+  100% {
+    opacity: 0.3;
+  }
+  30% {
+    opacity: 1;
+  }
+}
+
+/* Frage-Zeile. */
+.mf-eingabe {
+  flex-shrink: 0;
+  display: flex;
+  gap: 8px;
+}
+.mf-eingabe input {
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+  font-size: 0.94rem;
+  color: var(--text);
+  background: var(--card);
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  padding: 11px 16px;
+}
+.mf-eingabe input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.mf-eingabe input:disabled {
+  opacity: 0.6;
+}
+.mf-senden {
+  flex-shrink: 0;
+  border: none;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: 0.92rem;
+  font-weight: 700;
+  padding: 11px 20px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.mf-senden:hover:not(:disabled) {
+  background: var(--accent-strong);
+}
+.mf-senden:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.mf-keinki {
+  flex-shrink: 0;
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.4;
+  color: var(--muted);
+}

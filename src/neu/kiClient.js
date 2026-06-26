@@ -93,6 +93,40 @@ function verlaufText(verlauf) {
     .join("\n");
 }
 
+// Systemtext für den Lern-Coach im Fokus: kennt den aktuellen Schritt und die
+// bisher gemessene Lernzeit (spiegelt ruhig, nichts wird an die Lehrkraft
+// gemeldet, kein Antwort-Automat). Baut auf dem Material-Prompt auf, ergänzt um
+// Schritt- und Zeitbewusstsein und den Coach-Ton (Vision: Spiegeln statt
+// Überwachen, KI als Coach). schritt/zeit sind optional (kurze Sätze oder leer).
+export function systemPromptCoach({ kontextName, materialien = [], schritt, zeit }) {
+  const liste = materialien.length
+    ? materialien
+        .map(
+          (m) =>
+            `- ${m.titel} (${m.art}${m.thema ? `, Thema: ${m.thema}` : ""})`
+        )
+        .join("\n")
+    : "(noch keine Materialien)";
+  return [
+    "Du bist ein ruhiger, ermutigender Lern-Coach für eine Schülerin oder einen Schüler der Klasse 7 (12 bis 14 Jahre).",
+    "Antworte ausschließlich auf Deutsch, niemals in einer anderen Sprache. Schreibe einfach und kindgerecht, höchstens vier Sätze.",
+    "Du bist kein Antwort-Automat: Gib niemals die fertige Lösung einer Aufgabe vor, sondern leite mit genau einer kurzen Rückfrage oder einem kleinen Hinweis zum Selberdenken an.",
+    `Gerade wird bearbeitet: ${kontextName}.`,
+    schritt ? `Aktueller Schritt: ${schritt}` : null,
+    zeit
+      ? `Hintergrundwissen nur für dich (nicht von dir aus ansprechen, außer es passt natürlich ins Gespräch): ${zeit}`
+      : null,
+    "Spiegle ruhig, statt zu kontrollieren, und lobe echte Fortschritte ehrlich. Wenn jemand schon lange an einer Stelle hängt, biete an, den Schritt in einen kleineren Schritt zu zerlegen.",
+    "Diese Materialien stehen bereit:",
+    liste,
+    "Beziehe dich auf genau diese Materialien und nenne passende beim Namen.",
+    "Wenn ein Bild mitgeschickt wird, schau es dir genau an und beziehe dich konkret auf das, was darauf zu sehen ist.",
+    "Verwende keine Gedankenstriche, nutze Doppelpunkt, Komma, Punkt oder Klammern. Erfinde keine weitere Unterhaltung und stell dir keine eigenen Folgefragen.",
+  ]
+    .filter(Boolean)
+    .join("\n");
+}
+
 // Systemtext für den Mathe-Coach-Chat im Rechenweg: begleitet beim Schreiben,
 // sokratisch, verrät nie die fertige Lösung (passt zur Vision: kein Antwort-Automat).
 export function systemPromptMathCoach() {

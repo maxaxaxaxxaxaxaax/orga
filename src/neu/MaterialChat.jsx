@@ -22,6 +22,7 @@ export default function MaterialChat({
   materialien,
   kiModell,
   visionModell,
+  systemText,
   onHeften,
 }) {
   const ctx = { kontextName, materialien };
@@ -69,6 +70,7 @@ export default function MaterialChat({
         materialien,
         modell,
         bild: dasBild,
+        systemText,
         onToken: (stueck) => {
           setDenkt(false);
           setzeLetzte((m) => ({ ...m, text: m.text + stueck }));
