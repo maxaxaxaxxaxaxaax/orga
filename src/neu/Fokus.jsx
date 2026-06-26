@@ -101,6 +101,11 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
   const [stand, setStand] = useState(() => ladeSchritte(kb.id));
   const [abgeschlossen, setAbgeschlossen] = useState(false);
   const [gefuehl, setGefuehl] = useState(() => ladeGefuehl(kb.id));
+  // Nach jedem Schritt eine kurze Selbsteinschätzung, bevor es weitergeht.
+  const [reflektiereSchritt, setReflektiereSchritt] = useState(null);
+  // Abschluss: gemessene Zeit (einmal erfasst) und die bestätigte/korrigierte Zeit.
+  const [gemessenMin, setGemessenMin] = useState(null);
+  const [zeitMin, setZeitMin] = useState(null);
 
   // Welches geöffnete Panel-Werkzeug? Nur eins offen, erneuter Klick schließt.
   const [werkzeug, setWerkzeug] = useState(null); // "chat" | "notizen" | null
@@ -137,6 +142,10 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
 
   // Screenshot-Ziel fürs Stift-Werkzeug: die Material-Fläche in der Mitte.
   const mitteRef = useRef(null);
+  // Lernzeit dieser Sitzung (zum Anzeigen und Bestätigen am Ende). Start wird im
+  // Effekt gesetzt (Date.now() gehört nicht in den Render).
+  const startRef = useRef(0);
+  const gebuchtRef = useRef(false);
 
   const materialien = lw
     ? [
@@ -153,9 +162,20 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
 
   // Lernzeit im Fokus messen: beim Schliessen die verstrichene Zeit aufs Ziel
   // buchen (speist die realistische Zeitschätzung).
+  // Lernzeit buchen: am Ende bestätigt der Schüler die Zeit (bucheZeit). Schliesst
+  // er vorher, wird die gemessene Zeit beim Schliessen gebucht. gebuchtRef
+  // verhindert doppeltes Buchen.
+  function bucheZeit(sekunden) {
+    if (gebuchtRef.current) return;
+    gebuchtRef.current = true;
+    addSekunden(kb.id, sekunden);
+  }
   useEffect(() => {
     const start = Date.now();
-    return () => addSekunden(kb.id, (Date.now() - start) / 1000);
+    startRef.current = start;
+    return () => {
+      if (!gebuchtRef.current) addSekunden(kb.id, (Date.now() - start) / 1000);
+    };
   }, [kb.id]);
 
   // Lokale Modelle einmal proben (mit aktiv-Guard gegen späte Antworten).
@@ -193,6 +213,18 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
   const proz = schritte.length
     ? Math.round((fertigeAnzahl / schritte.length) * 100)
     : 100;
+
+  // Beim Erreichen des Abschlusses die gemessene Zeit einmal festhalten (in
+  // Minuten), als Vorschlag zum Bestätigen oder Korrigieren.
+  useEffect(() => {
+    if (alleFertig && gemessenMin === null) {
+      const m = Math.max(1, Math.round((Date.now() - startRef.current) / 60000));
+      setGemessenMin(m);
+      setZeitMin(m);
+    }
+    // nur einmal beim Erreichen des Abschlusses
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [alleFertig]);
 
   // Coach-Kontext: Schritt + Zeit. Der KI-Coach kennt beides, spiegelt aber nur
   // ruhig (nichts wird an die Lehrkraft gemeldet, keine fertige Lösung).
@@ -234,11 +266,23 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
     inhalt: aufgabenInhalt,
   });
 
-  function weiter() {
+  // Schritt abschliessen: erst die kurze Selbsteinschätzung zeigen, dann erst
+  // abhaken und weitergehen (ein klares, einziges Weiter).
+  function schrittGeschafft() {
     if (aktuell < 0) return;
-    const next = { ...stand, [aktuell]: true };
+    setReflektiereSchritt(aktuell);
+  }
+  function bestaetigeSchritt(wert) {
+    const i = reflektiereSchritt;
+    if (i == null) return;
+    if (wert) {
+      setzeGefuehl(kb.id, i, wert);
+      setGefuehl((g) => ({ ...g, [i]: wert }));
+    }
+    const next = { ...stand, [i]: true };
     setStand(next);
     speichereSchritte(kb.id, next);
+    setReflektiereSchritt(null);
   }
   function zurueck() {
     const i = (aktuell === -1 ? schritte.length : aktuell) - 1;
@@ -246,17 +290,6 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
     const next = { ...stand, [i]: false };
     setStand(next);
     speichereSchritte(kb.id, next);
-  }
-  function waehleGefuehl(wert) {
-    if (aktuell < 0) return;
-    const neuWert = gefuehl[aktuell] === wert ? null : wert;
-    setzeGefuehl(kb.id, aktuell, neuWert);
-    setGefuehl((g) => {
-      const next = { ...g };
-      if (neuWert == null) delete next[aktuell];
-      else next[aktuell] = neuWert;
-      return next;
-    });
   }
 
   function hilfeOeffnen() {
@@ -398,6 +431,33 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
                 Wenn du dich sicher fühlst, melde den Könnensbeweis bei {COACH}{" "}
                 zur Abnahme an. Sonst hakst du ihn nur für heute ab.
               </p>
+              <div className="fokus-zeit">
+                <span className="fokus-zeit-label">
+                  Wie lange hast du gebraucht?
+                </span>
+                <div className="fokus-zeit-feld">
+                  <input
+                    type="number"
+                    min="1"
+                    max="240"
+                    value={zeitMin ?? gemessenMin ?? 1}
+                    onChange={(e) =>
+                      setZeitMin(
+                        Math.max(1, Math.min(240, Number(e.target.value) || 1))
+                      )
+                    }
+                    aria-label="Minuten"
+                  />
+                  <span className="fokus-zeit-einheit">Minuten</span>
+                </div>
+                {gemessenMin != null && (
+                  <p className="fokus-zeit-hint">
+                    Die App hat etwa {gemessenMin}{" "}
+                    {gemessenMin === 1 ? "Minute" : "Minuten"} gemessen. Passt das,
+                    oder korrigiere es kurz.
+                  </p>
+                )}
+              </div>
               {hilfe && (
                 <p className="fokus-hilfe-laeuft" role="status">
                   Dein Hilferuf an {COACH} läuft noch. {COACH} kümmert sich
@@ -409,6 +469,7 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
                   type="button"
                   className="fokus-weiter"
                   onClick={() => {
+                    bucheZeit((zeitMin ?? gemessenMin ?? 1) * 60);
                     setzeAbnahme(kb.id, true);
                     onFertig(kb.id);
                     setAbgeschlossen(true);
@@ -420,6 +481,7 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
                   type="button"
                   className="fokus-sekundaer"
                   onClick={() => {
+                    bucheZeit((zeitMin ?? gemessenMin ?? 1) * 60);
                     onFertig(kb.id);
                     setAbgeschlossen(true);
                   }}
@@ -542,67 +604,83 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
             </div>
 
             <div className="fokus-schrittleiste">
-              <div className="fokus-sl-info">
-                <span className="fokus-sl-nr">
-                  Schritt {aktuell + 1} / {schritte.length}
-                </span>
-                <span className="fokus-sl-text" title={schritte[aktuell]?.text}>
-                  {schritte[aktuell]?.text}
-                </span>
-              </div>
-              <div
-                className="fokus-sl-gefuehl"
-                role="group"
-                aria-label="Wie läuft dieser Schritt?"
-              >
-                {GEFUEHLE.map((g) => (
-                  <button
-                    key={g}
-                    type="button"
-                    className={
-                      "fokus-gefuehl-knopf" +
-                      (gefuehl[aktuell] === g ? " gewaehlt" : "")
-                    }
-                    data-g={g}
-                    onClick={() => waehleGefuehl(g)}
-                    aria-pressed={gefuehl[aktuell] === g}
-                    title={GEFUEHL_LABEL[g]}
+              {reflektiereSchritt != null ? (
+                <div className="fokus-sl-reflexion">
+                  <span className="fokus-sl-reflexion-frage">
+                    Wie lief dieser Schritt?
+                  </span>
+                  <div
+                    className="fokus-sl-gefuehl"
+                    role="group"
+                    aria-label="Wie lief dieser Schritt?"
                   >
-                    {GEFUEHL_LABEL[g]}
+                    {GEFUEHLE.map((g) => (
+                      <button
+                        key={g}
+                        type="button"
+                        className={
+                          "fokus-gefuehl-knopf" +
+                          (gefuehl[reflektiereSchritt] === g ? " gewaehlt" : "")
+                        }
+                        data-g={g}
+                        onClick={() => bestaetigeSchritt(g)}
+                        title={GEFUEHL_LABEL[g]}
+                      >
+                        {GEFUEHL_LABEL[g]}
+                      </button>
+                    ))}
+                  </div>
+                  <button
+                    type="button"
+                    className="fokus-sl-skip"
+                    onClick={() => bestaetigeSchritt(null)}
+                  >
+                    ohne Angabe weiter →
                   </button>
-                ))}
-              </div>
-              <div className="fokus-sl-nav">
-                {istMathe && (
-                  <button
-                    type="button"
-                    className="fokus-sl-rechenweg"
-                    onClick={() => setRechenwegOffen(true)}
-                    title="Rechenweg mit Coach"
-                  >
-                    ✎ Rechenweg
-                    {hatRechenweg(kb.id, "rechenweg") && (
-                      <span className="fokus-sl-badge">✓</span>
+                </div>
+              ) : (
+                <>
+                  <div className="fokus-sl-info">
+                    <span className="fokus-sl-nr">
+                      Schritt {aktuell + 1} von {schritte.length}
+                    </span>
+                    <span className="fokus-sl-text">
+                      {schritte[aktuell]?.text}
+                    </span>
+                  </div>
+                  <div className="fokus-sl-nav">
+                    {istMathe && (
+                      <button
+                        type="button"
+                        className="fokus-sl-rechenweg"
+                        onClick={() => setRechenwegOffen(true)}
+                        title="Rechenweg mit Coach"
+                      >
+                        ✎ Rechenweg
+                        {hatRechenweg(kb.id, "rechenweg") && (
+                          <span className="fokus-sl-badge">✓</span>
+                        )}
+                      </button>
                     )}
-                  </button>
-                )}
-                {aktuell > 0 && (
-                  <button
-                    type="button"
-                    className="fokus-sl-zurueck"
-                    onClick={zurueck}
-                  >
-                    ← zurück
-                  </button>
-                )}
-                <button
-                  type="button"
-                  className="fokus-sl-weiter"
-                  onClick={weiter}
-                >
-                  Geschafft, weiter →
-                </button>
-              </div>
+                    {aktuell > 0 && (
+                      <button
+                        type="button"
+                        className="fokus-sl-zurueck"
+                        onClick={zurueck}
+                      >
+                        ← zurück
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      className="fokus-sl-weiter"
+                      onClick={schrittGeschafft}
+                    >
+                      Schritt geschafft →
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
 
             {/* Panel-Werkzeug: links angedockt über der Mitte */}
