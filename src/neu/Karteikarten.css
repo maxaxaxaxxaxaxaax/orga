@@ -118,6 +118,88 @@
   line-height: 1.4;
   color: var(--text-2);
 }
+/* Aktiv-Abruf-Modus: Frage oben, erst selbst eingeben, dann aufdecken. */
+.kk-abfrage {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 170px;
+}
+.kk-frageseite {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 24px;
+  box-sizing: border-box;
+  min-height: 96px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md, 12px);
+  box-shadow: var(--shadow-sm);
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.kk-abfrage-eingabe {
+  display: flex;
+  gap: 8px;
+}
+.kk-abfrage-feld {
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+  font-size: 0.95rem;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  padding: 10px 16px;
+}
+.kk-abfrage-feld:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.kk-aufdecken {
+  flex-shrink: 0;
+  border: none;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: 0.9rem;
+  font-weight: 700;
+  padding: 10px 18px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.kk-aufdecken:hover {
+  background: var(--accent-strong);
+}
+.kk-aufgedeckt {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  text-align: center;
+  padding: 18px 20px;
+  background: var(--accent-soft);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md, 12px);
+}
+.kk-aufgedeckt .kk-loesung {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.kk-deine {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-2);
+}
+.kk-deine-label {
+  font-weight: 700;
+  color: var(--muted);
+}
 .kk-tipp {
   margin: 0;
   text-align: center;
