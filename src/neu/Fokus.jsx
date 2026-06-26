@@ -37,6 +37,7 @@ import MaterialChat from "./MaterialChat";
 import Rechenweg from "./Rechenweg";
 import Aufschrieb from "./Aufschrieb";
 import MarkierenFrage from "./MarkierenFrage";
+import LiveCoach from "./LiveCoach";
 import { hatRechenweg } from "./rechenwegSpeicher";
 import "./Fokus.css";
 
@@ -78,6 +79,14 @@ function IcKamera(p) {
     <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}>
       <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
       <circle cx="12" cy="13" r="4" />
+    </svg>
+  );
+}
+function IcLive(p) {
+  return (
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}>
+      <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z" />
+      <circle cx="12" cy="12" r="3" />
     </svg>
   );
 }
@@ -445,6 +454,16 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
             </button>
             <button
               type="button"
+              className={"fokus-wz" + (werkzeug === "live" ? " aktiv" : "")}
+              onClick={() => toggleWerkzeug("live")}
+              aria-pressed={werkzeug === "live"}
+              aria-label="Live-Coach"
+              title="Live-Coach: schaut beim Arbeiten mit"
+            >
+              <IcLive aria-hidden="true" />
+            </button>
+            <button
+              type="button"
               className="fokus-wz"
               onClick={oeffneMarkieren}
               aria-label="Markieren und fragen"
@@ -755,6 +774,18 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
                   </ul>
                 )}
               </aside>
+            )}
+
+            {werkzeug === "live" && (
+              <LiveCoach
+                kontextName={kontextName}
+                materialien={materialien}
+                schritt={aktSchrittText}
+                istMathe={istMathe}
+                visionModell={visionModell}
+                mitteRef={mitteRef}
+                onClose={() => setWerkzeug(null)}
+              />
             )}
           </main>
 

@@ -127,6 +127,88 @@ export function systemPromptCoach({ kontextName, materialien = [], schritt, zeit
     .join("\n");
 }
 
+// Systemtext für den Live-Begleiter (Echtzeit-Mitlesen während des Arbeitens):
+// kennt Aufgabe + Schritt + Materialien, gibt höchstens EINE kurze, ruhige Meldung
+// pro Blick, spiegelt statt zu überwachen, verrät nie die Lösung (Vision).
+export function systemPromptLiveBegleiter({ kontextName, materialien = [], schritt }) {
+  const liste = materialien.length
+    ? materialien
+        .map(
+          (m) =>
+            `- ${m.titel} (${m.art}${m.thema ? `, Thema: ${m.thema}` : ""})`
+        )
+        .join("\n")
+    : "(noch keine Materialien)";
+  return [
+    "Du bist ein ruhiger Live-Lernbegleiter für eine Schülerin oder einen Schüler der Klasse 7 (12 bis 14 Jahre). Du schaust während des Arbeitens kurz mit.",
+    "Antworte ausschließlich auf Deutsch. Schreibe einfach und kindgerecht.",
+    "Du siehst ein Bild des aktuellen Arbeitsstands, auf Papier oder am Bildschirm.",
+    `Gerade wird bearbeitet: ${kontextName}.`,
+    schritt ? `Aktueller Schritt: ${schritt}` : null,
+    "Gib genau EINE sehr kurze Rückmeldung, höchstens ein bis zwei Sätze.",
+    "Wenn alles in Ordnung aussieht, sag ruhig nur kurz Bescheid, etwa: Passt, weiter so.",
+    "Wenn du einen Fehler oder eine unklare Stelle siehst, behaupte nicht hart, etwas sei falsch, sondern lade zum Nachschauen ein, etwa: Schau nochmal, ob das hier zusammenpasst.",
+    "Gib niemals die fertige Lösung oder das Endergebnis vor.",
+    "Wenn ein passendes eigenes Material hilft, nenne es kurz beim Namen. Diese Materialien stehen bereit:",
+    liste,
+    "Wenn auf dem Bild noch nichts Verwertbares zu sehen ist, sag freundlich und kurz, dass du wartest, bis mehr da ist.",
+    "Keine Begrüßung, keine Aufzählungen, keine Folgefragen an dich selbst. Verwende keine Gedankenstriche, nutze Doppelpunkt, Komma, Punkt oder Klammern.",
+  ]
+    .filter(Boolean)
+    .join("\n");
+}
+
+// Ein einzelner Blick des Live-Begleiters: sieht sich einen Frame an und gibt
+// eine kurze Meldung zurück (gestreamt über onToken). Reine Wiederverwendung:
+// bei Mathe zuerst die zuverlässige, deterministische Rechen-Prüfung (wie im
+// Rechenweg), sonst das Vision-Modell mit Begleiter-Ton. Kein wachsendes
+// Gedächtnis (verlauf leer), nichts wird gespeichert (Datensparsamkeit).
+export async function begleiteArbeit({
+  bild,
+  kontextName,
+  materialien = [],
+  schritt,
+  istMathe = false,
+  visionModell,
+  onToken,
+  signal,
+}) {
+  if (!visionModell) throw new Error("kein Vision-Modell");
+  if (istMathe) {
+    let transkript;
+    try {
+      transkript = await lieRechenweg({ bild, modell: visionModell, signal });
+    } catch (e) {
+      if (e.name === "AbortError") throw e;
+      transkript = "";
+    }
+    const det = pruefeArithmetik(transkript);
+    if (det.status === "richtig") {
+      onToken?.("Passt, dein Weg geht bisher auf. Mach ruhig weiter.");
+      return;
+    }
+    if (det.status === "falsch") {
+      onToken?.(
+        `Schau nochmal, wie aus „${det.vorher}“ dann „${det.nachher}“ wird, und rechne die Stelle langsam nach.`
+      );
+      return;
+    }
+    // status "offen" (kein eindeutiger Zahlen-Übergang): ans Vision-Modell weiter.
+  }
+  await frageKi({
+    frage:
+      "Schau dir den aktuellen Stand auf dem Bild an und gib genau eine kurze, ruhige Rückmeldung.",
+    verlauf: [],
+    kontextName,
+    materialien: [],
+    modell: visionModell,
+    bild,
+    systemText: systemPromptLiveBegleiter({ kontextName, materialien, schritt }),
+    onToken,
+    signal,
+  });
+}
+
 // Systemtext für den Mathe-Coach-Chat im Rechenweg: begleitet beim Schreiben,
 // sokratisch, verrät nie die fertige Lösung (passt zur Vision: kein Antwort-Automat).
 export function systemPromptMathCoach() {
