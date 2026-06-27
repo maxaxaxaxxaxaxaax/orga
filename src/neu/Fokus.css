@@ -823,18 +823,18 @@
 .fokus-rail-kopf {
   flex-shrink: 0;
 }
-.fokus-rail-fach {
-  font-size: 0.66rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--accent);
-}
 .fokus-rail-titel {
-  margin: 2px 0 0;
-  font-size: 1.02rem;
-  font-weight: 600;
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
   color: var(--text);
+}
+.fokus-rail-fach {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--accent);
 }
 /* Abschnitts-Label ("Zum Thema" / "Alle"). */
 .fokus-rail-sektion {

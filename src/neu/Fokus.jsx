@@ -826,8 +826,8 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
           {/* Rechte Leiste: passende Materialien */}
           <aside className="fokus-rail" aria-label="Passende Materialien">
             <div className="fokus-rail-kopf">
-              <span className="fokus-rail-fach">{kb.fach}</span>
               <h2 className="fokus-rail-titel">Passende Materialien</h2>
+              <span className="fokus-rail-fach">{kb.fach}</span>
             </div>
 
             {materialien.length === 0 ? (
