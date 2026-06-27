@@ -138,31 +138,8 @@ export default function Ablage() {
   }
 
   return (
+    <>
     <div className="ab-screen">
-      {/* Werkzeugzeile: Suche links, Hinzufügen rechts */}
-      <div className="ab-top">
-        <div className="ab-suche">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
-            <circle cx="11" cy="11" r="7" />
-            <path d="M21 21l-4.35-4.35" />
-          </svg>
-          <input
-            type="text"
-            value={suche}
-            onChange={(e) => setSuche(e.target.value)}
-            placeholder="Suche"
-            aria-label="Ablage durchsuchen"
-          />
-        </div>
-        <button
-          type="button"
-          className="ab-add"
-          onClick={() => setUploadOffen(true)}
-        >
-          <span aria-hidden="true">＋</span> Hinzufügen
-        </button>
-      </div>
-
       <div className="ab-grid">
         {/* Linke Spalte: Fächer + Kompetenzen */}
         <div className="ab-links">
@@ -452,5 +429,32 @@ export default function Ablage() {
         </div>
       )}
     </div>
+    {/* Untere Leiste (konsistent mit Weg-Leiste/Planung): Suche + Hinzufügen.
+        Bewusst außerhalb von .ab-screen: dessen screen-rein-Animation hält einen
+        Identity-Transform und würde die fixe Pille sonst an den (hohen) Screen
+        statt an den Viewport hängen. */}
+    <div className="ab-top">
+      <div className="ab-suche">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+          <circle cx="11" cy="11" r="7" />
+          <path d="M21 21l-4.35-4.35" />
+        </svg>
+        <input
+          type="text"
+          value={suche}
+          onChange={(e) => setSuche(e.target.value)}
+          placeholder="Suche"
+          aria-label="Ablage durchsuchen"
+        />
+      </div>
+      <button
+        type="button"
+        className="ab-add"
+        onClick={() => setUploadOffen(true)}
+      >
+        <span aria-hidden="true">✦</span> Hinzufügen
+      </button>
+    </div>
+    </>
   );
 }

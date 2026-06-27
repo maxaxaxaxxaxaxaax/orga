@@ -151,7 +151,7 @@ export default function KbInhalt({ kb, kompakt = false }) {
   const aufgabenBlock = hatAufgabe ? (
     <section className="ki-block ki-aufgaben" key="aufgaben">
       <h4 className="ki-block-titel">
-        Aufgaben
+        Arbeitsblatt
         <span className="ki-block-hint">zum Bearbeiten</span>
       </h4>
       {genKey &&
