@@ -454,12 +454,12 @@ export default function Wochenplan({ onZurueck, onWeiter, woche = 0 }) {
               {langDatum(ETAPPE.von)} - {langDatum(ETAPPE.bis)}
             </p>
 
-            {/* Plan-Übersicht: "Umplanen" verteilt die Woche neu. Erst danach
-               erscheint links daneben "Zurücksetzen" (wie im Figma). Im Wizard
+            {/* Plan-Übersicht: "Umplanen" verteilt die Woche neu. Danach wird der
+               Knopf zu "Zurücksetzen" (Umplanen wäre dann überflüssig). Im Wizard
                führt stattdessen die Pille unten durch. */}
             {!istWizard && (
               <div className="wp-aktionen">
-                {umgeplant && (
+                {umgeplant ? (
                   <button
                     type="button"
                     className="wp-zuruecksetzen"
@@ -468,15 +468,16 @@ export default function Wochenplan({ onZurueck, onWeiter, woche = 0 }) {
                   >
                     Zurücksetzen
                   </button>
+                ) : (
+                  <button
+                    type="button"
+                    className="wp-umplanen"
+                    onClick={umplanen}
+                    title="Die Woche automatisch neu verteilen"
+                  >
+                    Umplanen
+                  </button>
                 )}
-                <button
-                  type="button"
-                  className="wp-umplanen"
-                  onClick={umplanen}
-                  title="Die Woche automatisch neu verteilen"
-                >
-                  Umplanen
-                </button>
               </div>
             )}
           </div>

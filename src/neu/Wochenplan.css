@@ -157,7 +157,7 @@
   margin-top: 16px;
 }
 .wp-zuruecksetzen {
-  flex: 0 1 auto;
+  flex: 1 1 auto;
   border: 1px solid var(--line-strong);
   background: var(--card);
   color: var(--text-2);
