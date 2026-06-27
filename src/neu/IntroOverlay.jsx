@@ -1,29 +1,12 @@
 import { useEffect } from "react";
 import "./IntroOverlay.css";
 
-// Einmaliger Erststart-Hinweis: führt ruhig durch die drei Schritte des Wegs,
-// damit von Anfang an klar ist, wo es langgeht. Danach trägt die "Mein Weg"-
-// Leiste die Orientierung weiter. Wird nur gezeigt, bis er einmal weggeklickt ist.
-const SCHRITTE = [
-  {
-    nr: 1,
-    titel: "Etappe planen",
-    text: 'Verteile deine Könnensbeweise auf die Wochen. Ein Klick auf „Für mich vorschlagen" macht den Anfang.',
-  },
-  {
-    nr: 2,
-    titel: "Woche planen",
-    text: "Leg die Ziele dieser Woche auf die Tage. So weißt du, was wann dran ist.",
-  },
-  {
-    nr: 3,
-    titel: "Übersicht",
-    text: 'Tippe ein Ziel an: es öffnet sich im Fokus, und du machst es Schritt für Schritt. Mit „Jetzt" oben geht es direkt ins nächste.',
-  },
-];
-
+// Erststart-Hinweis auf dem Etappenplan: ein ruhiger, kurzer Anstupser, der den
+// Rhythmus der App nennt (erst planen, dann lernen). Liegt als kleine Karte über
+// dem leicht abgeblendeten Etappenplan und verschwindet, sobald "Starten"
+// gedrückt (oder Esc) ist. Danach trägt die Planungs-Leiste die Orientierung.
 export default function IntroOverlay({ onLos }) {
-  // Esc überspringt das Intro (= "Los geht's").
+  // Esc überspringt das Intro (= "Starten").
   useEffect(() => {
     const onKey = (e) => {
       if (e.key === "Escape") onLos();
@@ -40,29 +23,15 @@ export default function IntroOverlay({ onLos }) {
       aria-labelledby="intro-titel"
     >
       <div className="intro-karte">
-        <p className="intro-eyebrow">Willkommen, Max</p>
         <h2 className="intro-titel" id="intro-titel">
-          So läuft dein Weg
+          Starte mit der Planung der neuen Etappe
         </h2>
         <p className="intro-sub">
-          In drei Schritten von der Planung bis zum erledigten Tag. Oben in der
-          Leiste siehst du immer, wo du gerade stehst und was als Nächstes dran ist.
+          Eine neue Etappe hat begonnen, jetzt heißt es erstmal Planen und dann
+          Lernen.
         </p>
-        <ol className="intro-schritte">
-          {SCHRITTE.map((s) => (
-            <li key={s.nr} className="intro-schritt">
-              <span className="intro-marke" aria-hidden="true">
-                {s.nr}
-              </span>
-              <span className="intro-text">
-                <span className="intro-schritt-titel">{s.titel}</span>
-                <span className="intro-schritt-text">{s.text}</span>
-              </span>
-            </li>
-          ))}
-        </ol>
         <button type="button" className="intro-los" onClick={onLos}>
-          Los geht's →
+          Starten
         </button>
       </div>
     </div>
