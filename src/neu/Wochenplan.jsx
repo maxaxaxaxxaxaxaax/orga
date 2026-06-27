@@ -138,10 +138,6 @@ export default function Wochenplan({ onZurueck, onWeiter, onEtappeAnpassen, woch
   const zielVerplant =
     zielKbs.length > 0 &&
     zielKbs.every((k) => (stunden[k.id]?.length || 0) >= k.cluster);
-  // Sind über alle Wochen noch Uhren offen? Steuert den Vorschlag-Knopf.
-  const offeneGesamt = koennensbeweise.filter(
-    (k) => wochenZuordnung[k.id] != null && (stunden[k.id]?.length || 0) < k.cluster
-  ).length;
   const montag = wochenStart(ETAPPE, aktiveWoche);
   const monatLabel = montag.toLocaleDateString("de-DE", {
     month: "long",
@@ -151,6 +147,10 @@ export default function Wochenplan({ onZurueck, onWeiter, onEtappeAnpassen, woch
   // Vorrat nach Fach gruppieren (stabile Fach-Reihenfolge). Jedes Fach, das in
   // dieser Woche Ziele hat, bleibt als Kopf stehen; ist alles verplant, klappt es
   // wie im Etappenplan zum reinen Kopf zusammen (kein Verschwinden).
+  // Vorrat nach Fach gruppieren (stabile Reihenfolge). Nur Fächer, die in dieser
+  // Woche Ziele haben, erscheinen; ist davon alles verplant, klappt das Fach wie
+  // im Etappenplan zum reinen Kopf zusammen. Andere Wochen erreicht man über die
+  // Wochen-Navigation (dort liegen die übrigen Fächer).
   const proFach = kbFaecher
     .map((fach) => {
       const alle = wocheKbs.filter((k) => k.fach === fach);
@@ -412,11 +412,61 @@ export default function Wochenplan({ onZurueck, onWeiter, onEtappeAnpassen, woch
                 🗓
               </span>
               Plane deine Woche
+              <span className="wp-kopf-pfeil" aria-hidden="true">
+                ⌄
+              </span>
             </h1>
             <p className="ep-kopf-meta">
               {langDatum(ETAPPE.von)} - {langDatum(ETAPPE.bis)}
             </p>
           </div>
+
+          {/* Stehende Plan-Übersicht: Werkzeuge unter der Kopf-Karte (Löschen +
+             Umplanen). Im Wizard führt stattdessen die Pille unten durch. */}
+          {!istWizard && (
+            <div className="wp-aktionen">
+              {resetConfirm ? (
+                <>
+                  <button
+                    type="button"
+                    className="wp-loeschen warn"
+                    onClick={planZuruecksetzen}
+                  >
+                    Wirklich löschen
+                  </button>
+                  <button
+                    type="button"
+                    className="wp-loeschen"
+                    onClick={() => setResetConfirm(false)}
+                  >
+                    Abbrechen
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    className="wp-loeschen"
+                    onClick={() => setResetConfirm(true)}
+                    disabled={!wocheHatPlatziert}
+                    title="Die Stunden dieser Woche löschen (Lernstand bleibt)"
+                  >
+                    Löschen
+                  </button>
+                  {onEtappeAnpassen && (
+                    <button
+                      type="button"
+                      className="wp-umplanen"
+                      onClick={onEtappeAnpassen}
+                      title="Planung neu starten und die Etappe anpassen"
+                    >
+                      Umplanen
+                    </button>
+                  )}
+                </>
+              )}
+            </div>
+          )}
 
           <div className="wp-seite-liste">
             {proFach.length === 0 ? (
@@ -480,60 +530,9 @@ export default function Wochenplan({ onZurueck, onWeiter, onEtappeAnpassen, woch
               )}
             </div>
             <div className="wp-kal-nav">
-              {/* In der stehenden Plan-Übersicht liegen die Werkzeuge oben
-                 (im Wizard übernimmt das die Pille unten). */}
-              {!istWizard && (
-                <>
-                  <button
-                    type="button"
-                    className="wp-akt"
-                    onClick={vorschlagVerteilen}
-                    disabled={offeneGesamt === 0}
-                    title="Die offenen Uhren aller Wochen ausgewogen auf die Stunden verteilen"
-                  >
-                    <span aria-hidden="true">✦</span> Für mich einsortieren
-                  </button>
-                  {onEtappeAnpassen && (
-                    <button
-                      type="button"
-                      className="wp-akt"
-                      onClick={onEtappeAnpassen}
-                    >
-                      Etappe anpassen
-                    </button>
-                  )}
-                  {resetConfirm ? (
-                    <span className="wp-reset-confirm">
-                      <button
-                        type="button"
-                        className="wp-akt warn"
-                        onClick={planZuruecksetzen}
-                      >
-                        Wirklich neu
-                      </button>
-                      <button
-                        type="button"
-                        className="wp-akt"
-                        onClick={() => setResetConfirm(false)}
-                      >
-                        Abbrechen
-                      </button>
-                    </span>
-                  ) : (
-                    <button
-                      type="button"
-                      className="wp-akt"
-                      onClick={() => setResetConfirm(true)}
-                      disabled={!wocheHatPlatziert}
-                      title="Die Stunden dieser Woche löschen (Lernstand bleibt)"
-                    >
-                      Zurücksetzen
-                    </button>
-                  )}
-                </>
-              )}
-              {/* Wochen-Navigation in beiden Modi: so erreicht man alle Wochen der
-                 Etappe (und damit alle Fächer, die über die Wochen verteilt sind). */}
+              {/* Nur die Wochen-Navigation: so erreicht man alle Wochen der Etappe
+                 (und damit alle Fächer, die über die Wochen verteilt sind). Die
+                 Werkzeuge liegen jetzt links unter der Kopf-Karte (Löschen/Umplanen). */}
               <button
                 type="button"
                 className="wp-kal-pfeil"

@@ -144,32 +144,61 @@
   flex-wrap: wrap;
   gap: 8px;
 }
-.wp-akt {
+/* Dezenter Pfeil neben "Plane deine Woche" (rein optisch, wie im Mockup). */
+.wp-kopf-pfeil {
+  margin-left: 2px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+/* Werkzeuge unter der Kopf-Karte: Löschen (Umriss) + Umplanen (Teal-Pille). */
+.wp-aktionen {
+  --ep-teal: #0d9488;
+  --ep-teal-strong: #0b7d72;
+  flex-shrink: 0;
+  display: flex;
+  gap: 10px;
+}
+.wp-loeschen {
+  flex: 0 1 auto;
   border: 1px solid var(--line-strong);
   background: var(--card);
   color: var(--text-2);
-  font-size: 0.8rem;
-  font-weight: 600;
-  padding: 7px 12px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  padding: 10px 18px;
   border-radius: 999px;
   cursor: pointer;
 }
-.wp-akt:hover:not(:disabled) {
+.wp-loeschen:hover:not(:disabled) {
   border-color: var(--accent);
   color: var(--accent);
 }
-.wp-akt:disabled {
+.wp-loeschen:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
-.wp-akt.warn {
+.wp-loeschen.warn {
   border-color: var(--warn-line);
   color: var(--warn-text);
   background: var(--warn-bg);
 }
-.wp-reset-confirm {
-  display: inline-flex;
-  gap: 6px;
+.wp-umplanen {
+  flex: 1 1 auto;
+  border: none;
+  background: var(--ep-teal);
+  color: #ffffff;
+  font-size: 0.9rem;
+  font-weight: 700;
+  padding: 10px 18px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.12s ease;
+}
+.wp-umplanen:hover {
+  background: var(--ep-teal-strong);
+}
+.wp-umplanen:active {
+  transform: scale(0.98);
 }
 .wp-kal-pfeil {
   width: 32px;
@@ -382,7 +411,8 @@
 /* Der Toast (.ep-hinweis) ist zentral in index.css definiert. */
 
 @media (pointer: coarse) {
-  .wp-akt,
+  .wp-loeschen,
+  .wp-umplanen,
   .wp-kal-pfeil,
   .wp-bar-zurueck {
     min-height: 40px;
