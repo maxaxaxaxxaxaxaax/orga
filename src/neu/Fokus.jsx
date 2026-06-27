@@ -158,9 +158,10 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
   const genKey = generatorFuerKb(kb.id);
   const aufgabenMats = materialien.filter(istAufgabeMaterial);
 
-  const [aktivesMaterial, setAktivesMaterial] = useState(
-    () => aufgabenMats[0] || (genKey ? QUIZ : materialien[0]) || null
-  );
+  // Material in der Mitte: standardmäßig das des aktuellen Schritts. Eine manuell
+  // (rechts) gewählte Karte überschreibt das, bis der Schritt wechselt.
+  const [manuellesMaterial, setManuellesMaterial] = useState(null);
+  const [manuellFuerSchritt, setManuellFuerSchritt] = useState(-1);
   // Welche Übungen hat der Schüler in dieser Sitzung ganz durchgearbeitet?
   // Erst dann lässt sich der Schritt abschließen (durch das Material arbeiten).
   const [fertigeMaterialien, setFertigeMaterialien] = useState(() => new Set());
@@ -224,6 +225,30 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
   const proz = schritte.length
     ? Math.round((fertigeAnzahl / schritte.length) * 100)
     : 100;
+
+  // Material des aktuellen Schritts. Jeder Schritt hat sein eigenes (verstehen →
+  // üben → anwenden). Ohne material-Feld greift unten der alte Fallback.
+  const aktSchritt = aktuell >= 0 ? schritte[aktuell] : null;
+  const aktSchrittMatId = aktSchritt?.material || null;
+  const aktSchrittMaterial =
+    aktSchrittMatId === "__quiz__"
+      ? QUIZ
+      : aktSchrittMatId
+        ? materialien.find((m) => m.id === aktSchrittMatId) || null
+        : null;
+  // Abgeleitet: das Schritt-Material, außer es wurde für genau diesen Schritt
+  // manuell etwas anderes gewählt. So zeigt die Mitte automatisch, was der
+  // Schritt verlangt, ohne Effekt. Fallback (altes Modell): erste Übung.
+  const fallbackMaterial =
+    aufgabenMats[0] || (genKey ? QUIZ : materialien[0]) || null;
+  const aktivesMaterial =
+    manuellesMaterial && manuellFuerSchritt === aktuell
+      ? manuellesMaterial
+      : aktSchrittMaterial || fallbackMaterial;
+  function setAktivesMaterial(m) {
+    setManuellesMaterial(m);
+    setManuellFuerSchritt(aktuell);
+  }
 
   // Beim Erreichen des Abschlusses die gemessene Zeit einmal festhalten (in
   // Minuten), als Vorschlag zum Bestätigen oder Korrigieren.
@@ -401,10 +426,15 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
   // "Schritt geschafft" erst, wenn die Übung(en) des Schritts durchgearbeitet
   // sind. Hat der Schritt keine interaktive Übung (nur Lese-Material), geht es
   // direkt. Sonst muss mindestens eine Übung abgeschlossen sein.
-  const gatebareIds = [
-    ...aufgabenMats.map((m) => m.id),
-    ...(genKey ? ["__quiz__"] : []),
-  ];
+  // Gate pro Schritt: Hat der Schritt eine Übung als Material, muss genau die
+  // durchgearbeitet sein. Lese-Material (Lernzettel/Text) lässt direkt weiter.
+  // Ohne material-Feld (altes Modell) zählt wie früher jede Übung des Lernwegs.
+  const gatebareIds = aktSchritt?.material
+    ? aktSchrittMaterial &&
+      (aktSchrittMatId === "__quiz__" || istAufgabeMaterial(aktSchrittMaterial))
+      ? [aktSchrittMatId]
+      : []
+    : [...aufgabenMats.map((m) => m.id), ...(genKey ? ["__quiz__"] : [])];
   const kannWeiter =
     gatebareIds.length === 0 ||
     gatebareIds.some((id) => fertigeMaterialien.has(id));
