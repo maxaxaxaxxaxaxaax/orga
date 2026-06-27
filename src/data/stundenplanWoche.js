@@ -45,7 +45,7 @@ export const stundenWoche = [
   // Montag
   { tag: 0, von: "08:00", bis: "09:30", fach: "Deutsch", raum: "204", art: A },
   { tag: 0, von: "09:50", bis: "11:20", fach: "Mathematik", raum: "Cluster 7", art: "anker" },
-  { tag: 0, von: "11:40", bis: "13:10", fach: "Latein", raum: "118", art: A },
+  { tag: 0, von: "11:40", bis: "13:10", fach: "Französisch", raum: "119", art: A },
   { tag: 0, von: "13:10", bis: "13:55", fach: "Mittagessen", raum: "Mensa", art: "pause" },
   { tag: 0, von: "14:00", bis: "15:30", fach: "Studierzeit", raum: "Cluster 7", art: "studierzeit" },
 
@@ -57,19 +57,19 @@ export const stundenWoche = [
   { tag: 1, von: "14:00", bis: "15:30", fach: "ZEuS", raum: "Projektraum", art: "projekt" },
 
   // Mittwoch (kurzer Tag, endet ~13:15)
-  { tag: 2, von: "08:00", bis: "09:30", fach: "Griechisch", raum: "120", art: A },
+  { tag: 2, von: "08:00", bis: "09:30", fach: "Französisch", raum: "119", art: A },
   { tag: 2, von: "09:50", bis: "11:20", fach: "Deutsch", raum: "204", art: A },
   { tag: 2, von: "11:40", bis: "13:10", fach: "Geschichte", raum: "203", art: A },
 
   // Donnerstag (heute)
   { tag: 3, von: "08:00", bis: "09:30", fach: "Mathematik", raum: "Cluster 7", art: "anker" },
-  { tag: 3, von: "09:50", bis: "11:20", fach: "Latein", raum: "118", art: "anker" },
+  { tag: 3, von: "09:50", bis: "11:20", fach: "Englisch", raum: "118", art: "anker" },
   { tag: 3, von: "11:40", bis: "13:10", fach: "Sport", raum: "Halle", art: A },
   { tag: 3, von: "13:10", bis: "13:55", fach: "Mittagessen", raum: "Mensa", art: "pause" },
   { tag: 3, von: "14:00", bis: "15:30", fach: "Studierzeit", raum: "Cluster 7", art: "studierzeit" },
 
   // Freitag
-  { tag: 4, von: "08:00", bis: "09:30", fach: "Latein", raum: "118", art: "anker" },
+  { tag: 4, von: "08:00", bis: "09:30", fach: "Französisch", raum: "119", art: "anker" },
   { tag: 4, von: "09:50", bis: "11:20", fach: "Erdkunde", raum: "201", art: A },
   { tag: 4, von: "11:40", bis: "13:10", fach: "Religion", raum: "Kapelle", art: A },
   { tag: 4, von: "13:10", bis: "13:55", fach: "Mittagessen", raum: "Mensa", art: "pause" },
@@ -85,8 +85,6 @@ export const hauptfaecher = [
   "Mathematik",
   "Englisch",
   "Französisch",
-  "Latein",
-  "Griechisch",
 ];
 
 export function istBelegbar(stunde) {

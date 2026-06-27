@@ -8,7 +8,7 @@ import "./KlassenPuls.css";
 const PULS = {
   klasse: "7a",
   imClusterJetzt: 19,
-  beliebteFaecher: ["Latein", "Mathematik", "Englisch"],
+  beliebteFaecher: ["Französisch", "Mathematik", "Englisch"],
   hilferufeHeute: 4,
 };
 

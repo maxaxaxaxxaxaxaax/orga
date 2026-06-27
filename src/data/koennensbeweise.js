@@ -7,7 +7,7 @@ export const wochenZielCluster = 10;
 export const etappeWochen = 6;
 
 // Reihenfolge wie auf dem Schulplaner-Blatt.
-export const kbFaecher = ["Latein", "Englisch", "Deutsch", "Mathematik", "Griechisch"];
+export const kbFaecher = ["Mathematik", "Deutsch", "Englisch", "Französisch"];
 
 export const kbFarbe = {
   Latein: "#7048e8",
@@ -19,22 +19,26 @@ export const kbFarbe = {
 };
 
 export const kbThemen = {
-  Latein: "Lektion 14/15",
-  Englisch: "Unit 5/Band 2",
-  Deutsch: "Sachtexte „Reise um die Welt“",
   Mathematik: "Negative Zahlen und Rechendiplom",
-  Griechisch: "Lektion 1/2",
+  Deutsch: "Sachtexte „Reise um die Welt“",
+  Englisch: "Unit 5/Band 2",
+  Französisch: "Unité 3 / Les loisirs",
 };
 
 // Quelle: Foto des Theresianum-Schulplaner-Blatts „Meine Könnensbeweise (KB) in der
 // Etappe 7 A". Titel, Cluster-Anzahl und Themen 1:1 vom Blatt übernommen.
 export const koennensbeweise = [
-  // Latein - Lektion 14/15
-  { id: "7LA1", fach: "Latein", code: "7 L A1", titel: "Vokabeln L14", cluster: 1 },
-  { id: "7LA2", fach: "Latein", code: "7 L A2", titel: "ACI mit Übersetzung", cluster: 4 },
-  { id: "7LA3", fach: "Latein", code: "7 L A3", titel: "Adj. kons. Dekl. (Wdh. Dekl.)", cluster: 2 },
-  { id: "7LA4", fach: "Latein", code: "7 L A4", titel: "Vokabeln L15 / Pronomen", cluster: 2 },
-  { id: "7LA5", fach: "Latein", code: "7 L A5", titel: "Lektionstext 15", cluster: 2 },
+  // Mathematik - Negative Zahlen und Rechendiplom
+  { id: "7MA1", fach: "Mathematik", code: "7 M A1", titel: "Grundlagen negative Zahlen", cluster: 3 },
+  { id: "7MA2", fach: "Mathematik", code: "7 M A2", titel: "Addieren & Subtrahieren negativer Zahlen", cluster: 2 },
+  { id: "7MA3", fach: "Mathematik", code: "7 M A3", titel: "Multiplikation & Division negativer Zahlen", cluster: 2 },
+  { id: "7MA4", fach: "Mathematik", code: "7 M A4", titel: "Rechengesetze mit negativen Zahlen", cluster: 5 },
+  { id: "7MA5", fach: "Mathematik", code: "7 M A5", titel: "Rechendiplom", cluster: 4 },
+
+  // Deutsch - Sachtexte
+  { id: "7DA1", fach: "Deutsch", code: "7 D A1", titel: "Mini-Vortrag", cluster: 3 },
+  { id: "7DA2", fach: "Deutsch", code: "7 D A2", titel: "Lernplakat", cluster: 4 },
+  { id: "7DA3", fach: "Deutsch", code: "7 D A3/A4", titel: "Lapbook", cluster: 5 },
 
   // Englisch - Unit 5/Band 2
   { id: "7EA1", fach: "Englisch", code: "7 E A1", titel: "Revision simple past", cluster: 2 },
@@ -43,24 +47,12 @@ export const koennensbeweise = [
   { id: "7EA4", fach: "Englisch", code: "7 E A4", titel: "Vocabulary unit 5, pp. 94–99", cluster: 1 },
   { id: "7EA5", fach: "Englisch", code: "7 E A5", titel: "Everyday English: Dialog am Info-Center", cluster: 4 },
 
-  // Deutsch - Sachtexte
-  { id: "7DA1", fach: "Deutsch", code: "7 D A1", titel: "Mini-Vortrag", cluster: 3 },
-  { id: "7DA2", fach: "Deutsch", code: "7 D A2", titel: "Lernplakat", cluster: 4 },
-  { id: "7DA3", fach: "Deutsch", code: "7 D A3/A4", titel: "Lapbook", cluster: 5 },
-
-  // Mathematik - Negative Zahlen und Rechendiplom
-  { id: "7MA1", fach: "Mathematik", code: "7 M A1", titel: "Grundlagen negative Zahlen", cluster: 3 },
-  { id: "7MA2", fach: "Mathematik", code: "7 M A2", titel: "Addieren & Subtrahieren negativer Zahlen", cluster: 2 },
-  { id: "7MA3", fach: "Mathematik", code: "7 M A3", titel: "Multiplikation & Division negativer Zahlen", cluster: 2 },
-  { id: "7MA4", fach: "Mathematik", code: "7 M A4", titel: "Rechengesetze mit negativen Zahlen", cluster: 5 },
-  { id: "7MA5", fach: "Mathematik", code: "7 M A5", titel: "Rechendiplom", cluster: 4 },
-
-  // Griechisch - Lektion 1/2
-  { id: "7GA1", fach: "Griechisch", code: "7 G A1", titel: "Griechische Buchstaben und Lautlehre", cluster: 2 },
-  { id: "7GA2", fach: "Griechisch", code: "7 G A2", titel: "Vokabeln L 1", cluster: 1 },
-  { id: "7GA3", fach: "Griechisch", code: "7 G A3", titel: "a-Deklination im Singular", cluster: 2 },
-  { id: "7GA4", fach: "Griechisch", code: "7 G A4", titel: "Vokabeln L 2", cluster: 1 },
-  { id: "7GA5", fach: "Griechisch", code: "7 G A5", titel: "Übersetzung L 2", cluster: 2 },
+  // Französisch - Unité 3 / Les loisirs
+  { id: "7FA1", fach: "Französisch", code: "7 F A1", titel: "Vocabulaire Unité 3", cluster: 1 },
+  { id: "7FA2", fach: "Französisch", code: "7 F A2", titel: "Présent: verbes en -ir", cluster: 2 },
+  { id: "7FA3", fach: "Französisch", code: "7 F A3", titel: "Le passé composé avec avoir", cluster: 3 },
+  { id: "7FA4", fach: "Französisch", code: "7 F A4", titel: "Vocabulaire: les loisirs", cluster: 1 },
+  { id: "7FA5", fach: "Französisch", code: "7 F A5", titel: "Lektüre & Dialog: Au café", cluster: 3 },
 ];
 
 // Aufhol-Hilfe: zugeteilter Pflicht-KB. gesperrtesFach optional (null = nichts gesperrt).
