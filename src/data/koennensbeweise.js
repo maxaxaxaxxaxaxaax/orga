@@ -11,10 +11,11 @@ export const kbFaecher = ["Latein", "Englisch", "Deutsch", "Mathematik", "Griech
 
 export const kbFarbe = {
   Latein: "#7048e8",
-  Englisch: "#f59f00",
-  Deutsch: "#e8590c",
-  Mathematik: "#3b5bdb",
+  Englisch: "#FF7DA9",
+  Deutsch: "#61DA85",
+  Mathematik: "#7DC0FE",
   Griechisch: "#0c8599",
+  Französisch: "#FFE37D",
 };
 
 export const kbThemen = {

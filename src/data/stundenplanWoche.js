@@ -5,9 +5,10 @@
 // art: "angeleitet" | "anker" | "selbst" | "studierzeit" | "pause" | "projekt" | "neigung"
 
 export const fachFarbe = {
-  Deutsch: "#e8590c",
-  Mathematik: "#3b5bdb",
-  Englisch: "#f59f00",
+  Deutsch: "#61DA85",
+  Mathematik: "#7DC0FE",
+  Englisch: "#FF7DA9",
+  Französisch: "#FFE37D",
   Latein: "#7048e8",
   Griechisch: "#0c8599",
   Biologie: "#2f9e44",
