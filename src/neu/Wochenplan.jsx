@@ -130,9 +130,18 @@ export default function Wochenplan({ onZurueck, onWeiter, onEtappeAnpassen, woch
       koennensbeweise.map((k) => wochenZuordnung[k.id]).filter((w) => w != null)
     ),
   ].sort((a, b) => a - b);
-  const vorrat = wocheKbs.filter((k) => restVon(k) > 0);
-  const wocheVerplant = wocheKbs.length > 0 && vorrat.length === 0;
   const wocheHatPlatziert = wocheKbs.some((k) => (stunden[k.id] || []).length > 0);
+  // "Weiter" hängt an der zu planenden Woche (planung.js wertet nur diese), nicht
+  // an der gerade angezeigten: so kann man frei durch alle Wochen blättern, ohne
+  // den Schritt von einer fremden Woche aus fälschlich abzuschließen.
+  const zielKbs = koennensbeweise.filter((k) => wochenZuordnung[k.id] === woche);
+  const zielVerplant =
+    zielKbs.length > 0 &&
+    zielKbs.every((k) => (stunden[k.id]?.length || 0) >= k.cluster);
+  // Sind über alle Wochen noch Uhren offen? Steuert den Vorschlag-Knopf.
+  const offeneGesamt = koennensbeweise.filter(
+    (k) => wochenZuordnung[k.id] != null && (stunden[k.id]?.length || 0) < k.cluster
+  ).length;
   const montag = wochenStart(ETAPPE, aktiveWoche);
   const monatLabel = montag.toLocaleDateString("de-DE", {
     month: "long",
@@ -202,35 +211,41 @@ export default function Wochenplan({ onZurueck, onWeiter, onEtappeAnpassen, woch
     if (!kb || nachher >= kb.cluster) setGewaehltId(null);
   }
 
+  // Verteilt die offenen Uhren ALLER Wochen ausgewogen auf die freien Stunden
+  // (jede Woche für sich, da der Kalender pro Woche dieselben Slots zeigt). Ein
+  // Klick plant so die ganze Etappe; bereits gesetzte Uhren bleiben erhalten.
   function vorschlagVerteilen() {
     const slots = alleBelegbarenSlots();
     if (slots.length === 0) return;
     setStunden((prev) => {
       const next = { ...prev };
-      const last = {};
-      slots.forEach((sid) => (last[sid] = 0));
-      for (const k of wocheKbs) {
-        for (const sid of next[k.id] || []) if (last[sid] != null) last[sid]++;
-      }
-      for (const kb of wocheKbs) {
-        const have = new Set(next[kb.id] || []);
-        let fehlend = kb.cluster - have.size;
-        while (fehlend > 0) {
-          let best = null;
-          for (const sid of slots) {
-            if (have.has(sid)) continue;
-            if (best === null || last[sid] < last[best]) best = sid;
-          }
-          if (best === null) break;
-          have.add(best);
-          last[best]++;
-          fehlend--;
+      for (const w of wochenMitKbs) {
+        const wKbs = koennensbeweise.filter((k) => wochenZuordnung[k.id] === w);
+        const last = {};
+        slots.forEach((sid) => (last[sid] = 0));
+        for (const k of wKbs) {
+          for (const sid of next[k.id] || []) if (last[sid] != null) last[sid]++;
         }
-        next[kb.id] = [...have];
+        for (const kb of wKbs) {
+          const have = new Set(next[kb.id] || []);
+          let fehlend = kb.cluster - have.size;
+          while (fehlend > 0) {
+            let best = null;
+            for (const sid of slots) {
+              if (have.has(sid)) continue;
+              if (best === null || last[sid] < last[best]) best = sid;
+            }
+            if (best === null) break;
+            have.add(best);
+            last[best]++;
+            fehlend--;
+          }
+          next[kb.id] = [...have];
+        }
       }
       return next;
     });
-    setHinweis("Ausgewogen auf die Stunden verteilt. Du kannst frei anpassen.");
+    setHinweis("Alle Wochen ausgewogen auf die Stunden verteilt. Du kannst frei anpassen.");
   }
 
   function planZuruecksetzen() {
@@ -473,8 +488,8 @@ export default function Wochenplan({ onZurueck, onWeiter, onEtappeAnpassen, woch
                     type="button"
                     className="wp-akt"
                     onClick={vorschlagVerteilen}
-                    disabled={vorrat.length === 0}
-                    title="Die offenen Uhren ausgewogen auf die Stunden verteilen"
+                    disabled={offeneGesamt === 0}
+                    title="Die offenen Uhren aller Wochen ausgewogen auf die Stunden verteilen"
                   >
                     <span aria-hidden="true">✦</span> Für mich einsortieren
                   </button>
@@ -515,32 +530,28 @@ export default function Wochenplan({ onZurueck, onWeiter, onEtappeAnpassen, woch
                       Zurücksetzen
                     </button>
                   )}
-                  {/* Wochen-Navigation nur in der stehenden Übersicht: der Wizard
-                     bleibt fest auf der zu planenden Woche (planung.js wertet nur
-                     diese). So kann man den Schritt nicht von einer fremden Woche
-                     aus fälschlich abschließen. */}
-                  <button
-                    type="button"
-                    className="wp-kal-pfeil"
-                    onClick={() => gehWoche(-1)}
-                    disabled={aktiverIdx <= 0}
-                    aria-label="Woche zurück"
-                  >
-                    ‹
-                  </button>
-                  <button
-                    type="button"
-                    className="wp-kal-pfeil"
-                    onClick={() => gehWoche(1)}
-                    disabled={
-                      aktiverIdx < 0 || aktiverIdx >= wochenMitKbs.length - 1
-                    }
-                    aria-label="Woche vor"
-                  >
-                    ›
-                  </button>
                 </>
               )}
+              {/* Wochen-Navigation in beiden Modi: so erreicht man alle Wochen der
+                 Etappe (und damit alle Fächer, die über die Wochen verteilt sind). */}
+              <button
+                type="button"
+                className="wp-kal-pfeil"
+                onClick={() => gehWoche(-1)}
+                disabled={aktiverIdx <= 0}
+                aria-label="Woche zurück"
+              >
+                ‹
+              </button>
+              <button
+                type="button"
+                className="wp-kal-pfeil"
+                onClick={() => gehWoche(1)}
+                disabled={aktiverIdx < 0 || aktiverIdx >= wochenMitKbs.length - 1}
+                aria-label="Woche vor"
+              >
+                ›
+              </button>
             </div>
           </header>
 
@@ -602,12 +613,10 @@ export default function Wochenplan({ onZurueck, onWeiter, onEtappeAnpassen, woch
             <span aria-hidden="true">🗓</span> Wochenplanung
           </span>
           <span className="ep-bar-sep" aria-hidden="true" />
-          {wocheVerplant ? (
+          {zielVerplant ? (
             <button type="button" className="ep-bar-weiter" onClick={onWeiter}>
               Weiter
             </button>
-          ) : wocheKbs.length === 0 ? (
-            <span className="ep-bar-text">Keine Ziele in dieser Woche</span>
           ) : (
             <>
               <span className="ep-bar-text">
@@ -617,7 +626,7 @@ export default function Wochenplan({ onZurueck, onWeiter, onEtappeAnpassen, woch
                 type="button"
                 className="ep-bar-aktion"
                 onClick={vorschlagVerteilen}
-                title="Die offenen Uhren ausgewogen auf die Stunden verteilen"
+                title="Die offenen Uhren aller Wochen ausgewogen auf die Stunden verteilen"
               >
                 <span aria-hidden="true">✦</span> Für mich einsortieren
               </button>
