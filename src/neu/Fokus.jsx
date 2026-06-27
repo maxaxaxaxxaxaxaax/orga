@@ -51,6 +51,32 @@ import "./Fokus.css";
 // Synthetisches "Material" für die generierte Übung (Quiz) in der Mitte.
 const QUIZ = { id: "__quiz__" };
 
+// Live-Lernzeit: zeigt, wie lange man in dieser Sitzung schon an dem Ziel
+// arbeitet (m:ss). Eigene Komponente, damit nur sie im Sekundentakt rendert,
+// nicht der ganze Fokus. Spiegelt die eigene Zeit, misst sie nicht zur Kontrolle.
+function Lernzeit() {
+  const [sek, setSek] = useState(0);
+  useEffect(() => {
+    const start = Date.now();
+    const id = setInterval(() => {
+      setSek(Math.round((Date.now() - start) / 1000));
+    }, 1000);
+    return () => clearInterval(id);
+  }, []);
+  const m = Math.floor(sek / 60);
+  const s = sek % 60;
+  return (
+    <span className="fokus-zeit" title="So lange arbeitest du in dieser Sitzung schon an diesem Ziel">
+      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M9 2.5h6" />
+        <circle cx="12" cy="13" r="8" />
+        <path d="M12 9.5V13l2.4 1.6" />
+      </svg>
+      {m}:{String(s).padStart(2, "0")}
+    </span>
+  );
+}
+
 // ---- Werkzeug-Icons (Toolbar) -------------------------------------------
 function IcOrdner(p) {
   return (
@@ -454,6 +480,7 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
           <span className="fokus-kb-eyebrow">Lernweg</span>
           {kb.fach}: {kb.titel}
         </span>
+        <Lernzeit />
         <span className="fokus-zaehler">
           {alleFertig ? schritte.length : aktuell + 1} / {schritte.length}
         </span>

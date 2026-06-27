@@ -71,6 +71,20 @@
   font-variant-numeric: tabular-nums;
   color: var(--muted);
 }
+/* Live-Lernzeit dieser Sitzung: ruhig, gleicher Ton wie der Zähler. */
+.fokus-zeit {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+.fokus-zeit svg {
+  opacity: 0.85;
+}
 .fokus-kopf-hilfe,
 .fokus-wechsel {
   flex-shrink: 0;
