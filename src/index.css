@@ -10,22 +10,23 @@
   --font-satoshi: "Satoshi", "Hanken Grotesk", system-ui, -apple-system,
     "Segoe UI", sans-serif;
 
-  /* === Hell: warmes Cremepapier ("der digitale Schulplaner") ===
-     Tinte und Papier. Farbe trägt Bedeutung (Fach, Status), die Fläche bleibt warm-neutral. */
-  --bg: #f3efe5;
-  --card: #fffdf8;
-  --card-2: #f8f3e9;
-  --text: #211f1a;
-  --text-2: #5c574d;
-  --muted: #8c8578;
-  --line: #e7e1d4;
-  --line-strong: #d4ccbb;
+  /* === Hell: Figma-Designsystem (Bachelor-UI) ===
+     Ruhiges Grau als Fläche, weiße Karten, Teal als Primärfarbe. Farbe trägt
+     Bedeutung (Fach, Status). Werte 1:1 aus den Figma-Variablen. */
+  --bg: #f2f1f1; /* Semantic/color/background */
+  --card: #fafafa; /* Semantic/color/card/background */
+  --card-2: #f2f2f2; /* Semantic/color/fach/disabled */
+  --text: #001818; /* Font/color/contrast/high */
+  --text-2: #4a5553;
+  --muted: #889390;
+  --line: #e3e3e3; /* Semantic/color/card/border */
+  --line-strong: #dcdcdc; /* Semantic/color/card/element/border */
 
-  --accent: #243140; /* Tinte: tiefes Tinten-Navy */
-  --accent-strong: #18222e;
-  --accent-soft: #e7e8ec;
-  --accent-shadow: rgba(36, 49, 64, 0.26);
-  --on-accent: #faf7f0; /* helle Tinte auf gefüllter Akzentfläche */
+  --accent: #009094; /* Foundation/Green/green-600 (Teal, Primär) */
+  --accent-strong: #00575a; /* Foundation/Green/green-800 */
+  --accent-soft: #b0e1e2; /* Foundation/Green/green-100 */
+  --accent-shadow: rgba(0, 144, 148, 0.26);
+  --on-accent: #f8fefe; /* Font/color/contrast/white */
 
   --ok-bg: #e8f3e7;
   --ok-text: #2f7d4f;
@@ -50,7 +51,7 @@
   --shadow-lg: 0 10px 28px -10px rgba(54, 44, 26, 0.16),
     0 28px 64px -24px rgba(54, 44, 26, 0.22);
 
-  font-family: var(--font-text);
+  font-family: var(--font-satoshi);
   font-size: 15px;
   line-height: 1.55;
   color: var(--text);
@@ -155,9 +156,9 @@ button {
   font-family: inherit;
 }
 
-/* Hero-Titel in der Werkschrift, optisch ruhig gesetzt: das "Schulheft"-Gefühl. */
+/* Titel in Satoshi (Figma-Designsystem), ruhig gesetzt. */
 h1 {
-  font-family: var(--font-display);
+  font-family: var(--font-satoshi);
   font-optical-sizing: auto;
   font-weight: 600;
   letter-spacing: -0.012em;

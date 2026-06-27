@@ -152,11 +152,9 @@
 }
 /* Werkzeuge unter der Kopf-Karte: Löschen (Umriss) + Umplanen (Teal-Pille). */
 .wp-aktionen {
-  --ep-teal: #0d9488;
-  --ep-teal-strong: #0b7d72;
-  flex-shrink: 0;
   display: flex;
   gap: 10px;
+  margin-top: 16px;
 }
 .wp-loeschen {
   flex: 0 1 auto;
@@ -185,8 +183,8 @@
 .wp-umplanen {
   flex: 1 1 auto;
   border: none;
-  background: var(--ep-teal);
-  color: #ffffff;
+  background: var(--accent);
+  color: var(--on-accent);
   font-size: 0.9rem;
   font-weight: 700;
   padding: 10px 18px;
@@ -195,7 +193,7 @@
   transition: background 0.15s ease, transform 0.12s ease;
 }
 .wp-umplanen:hover {
-  background: var(--ep-teal-strong);
+  background: var(--accent-strong);
 }
 .wp-umplanen:active {
   transform: scale(0.98);

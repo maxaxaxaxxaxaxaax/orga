@@ -419,12 +419,11 @@ export default function Wochenplan({ onZurueck, onWeiter, onEtappeAnpassen, woch
             <p className="ep-kopf-meta">
               {langDatum(ETAPPE.von)} - {langDatum(ETAPPE.bis)}
             </p>
-          </div>
 
-          {/* Stehende Plan-Übersicht: Werkzeuge unter der Kopf-Karte (Löschen +
-             Umplanen). Im Wizard führt stattdessen die Pille unten durch. */}
-          {!istWizard && (
-            <div className="wp-aktionen">
+            {/* Plan-Übersicht: Werkzeuge direkt in der Karte (wie im Figma):
+               Löschen + Umplanen. Im Wizard führt die Pille unten durch. */}
+            {!istWizard && (
+              <div className="wp-aktionen">
               {resetConfirm ? (
                 <>
                   <button
@@ -465,8 +464,9 @@ export default function Wochenplan({ onZurueck, onWeiter, onEtappeAnpassen, woch
                   )}
                 </>
               )}
-            </div>
-          )}
+              </div>
+            )}
+          </div>
 
           <div className="wp-seite-liste">
             {proFach.length === 0 ? (

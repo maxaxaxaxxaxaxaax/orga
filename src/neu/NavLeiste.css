@@ -54,12 +54,11 @@
 .nav-punkt:active {
   transform: scale(0.95);
 }
-/* Aktiv: gefüllte Akzent-Pille mit lesbarem Kontrast in Hell und Dunkel. */
+/* Aktiv: helle Teal-Pille (Figma), dunkle Schrift. */
 .nav-punkt.aktiv,
 .nav-punkt.aktiv:hover {
-  background: var(--accent);
-  color: var(--on-accent);
-  box-shadow: 0 4px 12px -2px var(--accent-shadow);
+  background: var(--accent-soft);
+  color: var(--accent-strong);
 }
 /* Schmale Screens (Handy): etwas kompaktere Tap-Flächen. */
 @media (max-width: 560px) {

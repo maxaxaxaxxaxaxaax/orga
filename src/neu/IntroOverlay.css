@@ -24,8 +24,8 @@
 }
 .intro-karte {
   /* Teal wie die Planungs-Leiste, damit Intro und Schritt zusammengehören. */
-  --intro-teal: #0d9488;
-  --intro-teal-strong: #0b7d72;
+  --intro-teal: var(--accent);
+  --intro-teal-strong: var(--accent-strong);
   width: min(360px, 100%);
   box-sizing: border-box;
   background: var(--card);
