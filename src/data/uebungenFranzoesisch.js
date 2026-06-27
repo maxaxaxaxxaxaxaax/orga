@@ -1,7 +1,7 @@
 // Französisch-Übungen (Rollout): didaktische Übungen mit Fehler-Begründungen,
 // damit jeder Französisch-Lernweg neben dem Lernzettel auch etwas zum Üben hat.
 // Aufbau wie UEBUNGEN_EXTRA (nach Typ gruppiert), wird in interaktiv.js
-// eingemischt. Die IDs verweisen auf die Materialien f1..f7 in wissen.js, die
+// eingemischt. Die IDs verweisen auf die Materialien f1..f10 in wissen.js, die
 // über thema===label am jeweiligen Lernweg hängen. Antworten zum Tippen bewusst
 // ohne Akzente (der Lückentext prüft akzent-genau, deutsche Tastatur).
 export const UEBUNGEN_FRANZOESISCH = {
@@ -61,7 +61,7 @@ export const UEBUNGEN_FRANZOESISCH = {
     },
   },
 
-  // ---- 7FA3 Le passé composé avec avoir (Auswahlquiz f4) --------------------
+  // ---- Auswahlquiz: 7FA3 passé composé (f4) und 7FA4 les loisirs (f10) ------
   // Anwendung mit Begründung an jeder falschen Antwort (Gold-Standard).
   auswahlquiz: {
     f4: {
@@ -128,6 +128,60 @@ export const UEBUNGEN_FRANZOESISCH = {
         },
       ],
     },
+    f10: {
+      fragen: [
+        {
+          frage: "Fußball spielen: \"Le week-end, je ___ foot.\" Welche Form passt?",
+          optionen: [
+            "joue au",
+            { text: "joue du", erklaerung: "du (de + le) ist für Instrumente. Bei Ballsport heißt es jouer à, und à + le wird au: joue au foot." },
+            { text: "joue à le", erklaerung: "à + le verschmilzt immer zu au. Richtig ist also joue au foot." },
+          ],
+          richtig: 0,
+          erklaerung: "Bei Ballsport und Spielen: jouer à. à + le foot wird zu au foot.",
+        },
+        {
+          frage: "Gitarre spielen: \"Elle ___ guitare.\" Welche Form passt?",
+          optionen: [
+            "joue de la",
+            { text: "joue à la", erklaerung: "à ist für Ball und Spiele. Bei Instrumenten heißt es jouer de: joue de la guitare." },
+            { text: "joue la", erklaerung: "Zwischen jouer und dem Instrument muss de stehen: joue de la guitare." },
+          ],
+          richtig: 0,
+          erklaerung: "Bei Instrumenten: jouer de. Vor einem weiblichen Wort: de la guitare.",
+        },
+        {
+          frage: "Sport machen: \"Le mercredi, je ___ sport.\" Welche Form passt?",
+          optionen: [
+            "fais du",
+            { text: "joue du", erklaerung: "jouer ist für bestimmte Spiele oder Instrumente. Für Sport allgemein nimmt man faire: je fais du sport." },
+            { text: "fais de", erklaerung: "faire braucht den Teilungsartikel: de + le sport wird du sport. Also je fais du sport." },
+          ],
+          richtig: 0,
+          erklaerung: "Für eine Aktivität allgemein: faire de. de + le sport wird du sport: je fais du sport.",
+        },
+        {
+          frage: "Tanzen: \"Ma copine ___ danse.\" Welche Form passt?",
+          optionen: [
+            "fait de la",
+            { text: "fait du", erklaerung: "danse ist weiblich (la danse). de + la bleibt de la: fait de la danse, nicht du." },
+            { text: "joue de la", erklaerung: "Tanzen ist eine Aktivität, dafür nimmt man faire: elle fait de la danse." },
+          ],
+          richtig: 0,
+          erklaerung: "faire de vor einem weiblichen Wort: de la danse. Also elle fait de la danse.",
+        },
+        {
+          frage: "Karten spielen: \"Nous ___ cartes.\" Welche Form passt?",
+          optionen: [
+            "jouons aux",
+            { text: "jouons des", erklaerung: "Bei Spielen heißt es jouer à. à + les wird aux: jouons aux cartes." },
+            { text: "jouons à les", erklaerung: "à + les verschmilzt zu aux. Richtig ist jouons aux cartes." },
+          ],
+          richtig: 0,
+          erklaerung: "jouer à + les cartes. à + les wird aux: nous jouons aux cartes.",
+        },
+      ],
+    },
   },
 
   // ---- 7FA5 Lektüre & Dialog: Au café (Zuordnung f7) ------------------------
@@ -141,6 +195,21 @@ export const UEBUNGEN_FRANZOESISCH = {
         { links: "Vous avez de l'eau?", rechts: "Haben Sie Wasser?", tipp: "l'eau heißt das Wasser.", erklaerung: "Vous avez ...? heißt Haben Sie ...?" },
         { links: "Et avec ça?", rechts: "Und sonst noch etwas?", tipp: "wörtlich: und mit dem?", erklaerung: "Et avec ça? fragt, ob du noch etwas möchtest." },
         { links: "C'est tout, merci.", rechts: "Das ist alles, danke.", tipp: "tout heißt alles.", erklaerung: "Mit C'est tout sagst du, dass du nichts mehr möchtest." },
+      ],
+    },
+  },
+
+  // ---- 7FA3 passé composé: Sätze produktiv bauen (Satzbau f9) ---------------
+  satzbau: {
+    f9: {
+      sprache: "französischen",
+      saetze: [
+        { woerter: ["J'ai", "mangé", "une", "pizza."], uebersetzung: "Ich habe eine Pizza gegessen.", erklaerung: "passé composé: avoir (j'ai) plus participe passé. Bei -er-Verben endet es auf -é: mangé." },
+        { woerter: ["Tu", "as", "fini", "tes", "devoirs."], uebersetzung: "Du hast deine Hausaufgaben fertig gemacht.", erklaerung: "tu as (avoir) plus fini. Bei -ir-Verben endet das participe passé auf -i." },
+        { woerter: ["Nous", "avons", "regardé", "un", "film."], uebersetzung: "Wir haben einen Film geschaut.", erklaerung: "nous avons (avoir im Plural) plus regardé (regarder, -er wird -é)." },
+        { woerter: ["Elle", "a", "choisi", "un", "cadeau."], uebersetzung: "Sie hat ein Geschenk ausgesucht.", erklaerung: "il/elle a (avoir) plus choisi (choisir, -ir wird -i)." },
+        { woerter: ["Ils", "ont", "joué", "au", "foot."], uebersetzung: "Sie haben Fußball gespielt.", erklaerung: "ils ont (avoir im Plural) plus joué. jouer wird zu joué." },
+        { woerter: ["J'ai", "eu", "de", "la", "chance."], uebersetzung: "Ich habe Glück gehabt.", erklaerung: "avoir ist unregelmäßig: das participe passé ist eu. Also j'ai eu." },
       ],
     },
   },

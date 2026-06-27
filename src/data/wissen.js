@@ -202,6 +202,8 @@ export const faecher = [
       { id: "f5", thema: "Vocabulaire: les loisirs", titel: "Vokabelliste: les loisirs", art: "arbeitsblatt", bereich: "unterricht", datum: "2026-05-18" },
       { id: "f6", thema: "Lektüre & Dialog: Au café", titel: "Text: Au café", art: "arbeitsblatt", bereich: "unterricht", datum: "2026-05-20", inhalt: "Au café\n\nLéa: Bonjour madame, je voudrais un chocolat chaud, s'il vous plaît.\nLa serveuse: Très bien. Et pour toi?\nTom: Pour moi, une limonade, s'il vous plaît.\nLa serveuse: Voilà, un chocolat chaud et une limonade.\nLéa: Merci. C'est combien?\nLa serveuse: Ça fait quatre euros.\nTom: Voilà. Au revoir!\n\nNeue Wörter:\n- un chocolat chaud: eine heiße Schokolade\n- la serveuse: die Kellnerin\n- une limonade: eine Limonade\n- Ça fait quatre euros: das macht vier Euro" },
       { id: "f7", thema: "Lektüre & Dialog: Au café", titel: "Übung: phrases utiles au café", art: "arbeitsblatt", bereich: "selbstlernen", datum: "2026-05-21" },
+      { id: "f9", thema: "Le passé composé avec avoir", titel: "Übung: Sätze im passé composé bauen", art: "arbeitsblatt", bereich: "selbstlernen", datum: "2026-05-13" },
+      { id: "f10", thema: "Vocabulaire: les loisirs", titel: "Übung: jouer à, jouer de, faire du", art: "arbeitsblatt", bereich: "selbstlernen", datum: "2026-05-19" },
     ],
   },
 ];

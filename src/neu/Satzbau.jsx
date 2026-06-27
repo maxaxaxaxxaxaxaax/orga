@@ -140,7 +140,8 @@ export default function Satzbau({ daten, onAbgeschlossen }) {
       </UebungHinweis>
 
       <p className="sb-aufgabe">
-        Bau den englischen Satz: <strong>{satz.uebersetzung}</strong>
+        Bau den {daten?.sprache ? daten.sprache + " " : ""}Satz:{" "}
+        <strong>{satz.uebersetzung}</strong>
       </p>
 
       <div

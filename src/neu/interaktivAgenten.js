@@ -7,6 +7,7 @@
 // sichere, gaengige Saetze (if-clause I, will-future, Unit-5-Sprache).
 export const SATZBAU = {
   e7: {
+    sprache: "englischen",
     saetze: [
       { woerter: ["If", "it", "rains,", "we", "will", "stay", "at", "home."], uebersetzung: "Wenn es regnet, bleiben wir zu Hause.", erklaerung: "if-clause Typ I: die Bedingung steht im Simple Present (it rains), die Folge im will-future (we will stay). Steht der if-Satz vorne, kommt ein Komma." },
       { woerter: ["I", "will", "help", "you", "if", "you", "ask", "me."], uebersetzung: "Ich helfe dir, wenn du mich fragst.", erklaerung: "Steht der if-Satz hinten, fällt das Komma weg. Trotzdem: Bedingung im Present (you ask), Folge im will-future (I will help)." },
@@ -18,6 +19,7 @@ export const SATZBAU = {
   },
   // Everyday English: höfliche Fragen und Bitten als Satzbau (passend zu e6).
   e8: {
+    sprache: "englischen",
     saetze: [
       { woerter: ["Excuse", "me,", "where", "is", "the", "museum?"], uebersetzung: "Entschuldigung, wo ist das Museum?", erklaerung: "Höflicher Einstieg Excuse me, dann die Frage: Fragewort where + is + Subjekt (the museum)." },
       { woerter: ["Could", "you", "tell", "me", "the", "way", "to", "the", "station?"], uebersetzung: "Könntest du mir den Weg zum Bahnhof sagen?", erklaerung: "Höfliche Bitte mit could: Could + you + Grundform (tell). Nach tell kommt me (wem) und dann the way (was)." },
