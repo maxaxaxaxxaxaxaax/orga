@@ -351,6 +351,44 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
 
   const aktivId = aktivesMaterial?.id || null;
 
+  // "Zum Thema": die Übungen/Aufgaben des Schritts (das, was man jetzt tut).
+  const zumThemaRows = aufgabenMats.map((m) => ({
+    m,
+    Icon: iconFuerMaterial(m),
+  }));
+  // Eine Material-Zeile (geteilt von "Zum Thema" und "Alle").
+  const matZeile = ({ m, Icon }) => {
+    const inhalt = (
+      <>
+        <span className="fokus-rail-icon" aria-hidden="true">
+          <Icon />
+        </span>
+        <span className="fokus-rail-mat-titel">{m.titel}</span>
+        <span className="fokus-rail-mat-typ">
+          {aktivitaetLabel(m) || ART_LABEL[m.art] || m.art}
+        </span>
+      </>
+    );
+    return (
+      <li key={m.id}>
+        {istOeffenbar(m) ? (
+          <button
+            type="button"
+            className={
+              "fokus-rail-mat fokus-rail-klick" +
+              (aktivId === m.id ? " aktiv" : "")
+            }
+            onClick={() => setAktivesMaterial(m)}
+          >
+            {inhalt}
+          </button>
+        ) : (
+          <div className="fokus-rail-mat">{inhalt}</div>
+        )}
+      </li>
+    );
+  };
+
   // "Schritt geschafft" erst, wenn die Übung(en) des Schritts durchgearbeitet
   // sind. Hat der Schritt keine interaktive Übung (nur Lese-Material), geht es
   // direkt. Sonst muss mindestens eine Übung abgeschlossen sein.
@@ -857,26 +895,39 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
               </div>
             ) : (
               <>
-                <div
-                  className="fokus-rail-chips"
-                  role="tablist"
-                  aria-label="Material-Typ"
-                >
-                  {CHIPS.map((c) => (
-                    <button
-                      key={c.key}
-                      type="button"
-                      role="tab"
-                      aria-selected={chip === c.key}
-                      className={"fokus-chip" + (chip === c.key ? " an" : "")}
-                      onClick={() => setChip(c.key)}
-                    >
-                      {c.Icon && <c.Icon className="fokus-chip-icon" />}
-                      {c.label}
-                    </button>
-                  ))}
-                </div>
+                {(genKey || zumThemaRows.length > 0) && (
+                  <>
+                    <p className="fokus-rail-sektion">Zum Thema</p>
+                    <ul className="fokus-rail-liste fokus-rail-liste-thema">
+                      {genKey && (
+                        <li>
+                          <button
+                            type="button"
+                            className={
+                              "fokus-rail-mat fokus-rail-klick" +
+                              (aktivId === "__quiz__" ? " aktiv" : "")
+                            }
+                            onClick={() => setAktivesMaterial(QUIZ)}
+                          >
+                            <span
+                              className="fokus-rail-icon"
+                              aria-hidden="true"
+                            >
+                              ▸
+                            </span>
+                            <span className="fokus-rail-mat-titel">
+                              Dazu üben
+                            </span>
+                            <span className="fokus-rail-mat-typ">Quiz</span>
+                          </button>
+                        </li>
+                      )}
+                      {zumThemaRows.map(matZeile)}
+                    </ul>
+                  </>
+                )}
 
+                <p className="fokus-rail-sektion">Alle</p>
                 <div className="fokus-rail-suche">
                   <svg
                     viewBox="0 0 24 24"
@@ -897,58 +948,28 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
                     aria-label="Materialien durchsuchen"
                   />
                 </div>
+                <div
+                  className="fokus-rail-chips"
+                  role="tablist"
+                  aria-label="Material-Typ"
+                >
+                  {CHIPS.map((c) => (
+                    <button
+                      key={c.key}
+                      type="button"
+                      role="tab"
+                      aria-selected={chip === c.key}
+                      className={"fokus-chip" + (chip === c.key ? " an" : "")}
+                      onClick={() => setChip(c.key)}
+                    >
+                      {c.Icon && <c.Icon className="fokus-chip-icon" />}
+                      {c.label}
+                    </button>
+                  ))}
+                </div>
 
                 <ul className="fokus-rail-liste">
-                  {genKey && (chip === "alle" || chip === "aufgaben") && (
-                    <li>
-                      <button
-                        type="button"
-                        className={
-                          "fokus-rail-mat fokus-rail-klick" +
-                          (aktivId === "__quiz__" ? " aktiv" : "")
-                        }
-                        onClick={() => setAktivesMaterial(QUIZ)}
-                      >
-                        <span className="fokus-rail-icon" aria-hidden="true">
-                          ▸
-                        </span>
-                        <span className="fokus-rail-mat-titel">Dazu üben</span>
-                        <span className="fokus-rail-mat-typ">Quiz</span>
-                      </button>
-                    </li>
-                  )}
-                  {railRows.map(({ m, Icon }) => {
-                    const offenbar = istOeffenbar(m);
-                    const inhalt = (
-                      <>
-                        <span className="fokus-rail-icon" aria-hidden="true">
-                          <Icon />
-                        </span>
-                        <span className="fokus-rail-mat-titel">{m.titel}</span>
-                        <span className="fokus-rail-mat-typ">
-                          {aktivitaetLabel(m) || ART_LABEL[m.art] || m.art}
-                        </span>
-                      </>
-                    );
-                    return (
-                      <li key={m.id}>
-                        {offenbar ? (
-                          <button
-                            type="button"
-                            className={
-                              "fokus-rail-mat fokus-rail-klick" +
-                              (aktivId === m.id ? " aktiv" : "")
-                            }
-                            onClick={() => setAktivesMaterial(m)}
-                          >
-                            {inhalt}
-                          </button>
-                        ) : (
-                          <div className="fokus-rail-mat">{inhalt}</div>
-                        )}
-                      </li>
-                    );
-                  })}
+                  {railRows.map(matZeile)}
                   {railRows.length === 0 && (
                     <li className="fokus-rail-nichts">Nichts gefunden.</li>
                   )}
@@ -994,26 +1015,32 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
               </button>
             </div>
             {chatTab === "coach" ? (
-              <div className="fokus-panel-mc">
-                <MaterialChat
-                  kontextName={kontextName}
-                  materialien={materialien}
-                  kiModell={kiModell}
-                  visionModell={visionModell}
-                  systemText={coachSystem}
-                  onHeften={({ titel, inhalt }) => {
-                    speichereEigenes({
-                      titel,
-                      inhalt,
-                      fachId: lw?.fachId,
-                      thema: thema?.label || null,
-                      art: "lernzettel",
-                      bereich: "selbstlernen",
-                    });
-                    setEigeneStand((n) => n + 1);
-                  }}
-                />
-              </div>
+              <>
+                <div className="fokus-panel-mc">
+                  <MaterialChat
+                    kontextName={kontextName}
+                    materialien={materialien}
+                    kiModell={kiModell}
+                    visionModell={visionModell}
+                    systemText={coachSystem}
+                    onHeften={({ titel, inhalt }) => {
+                      speichereEigenes({
+                        titel,
+                        inhalt,
+                        fachId: lw?.fachId,
+                        thema: thema?.label || null,
+                        art: "lernzettel",
+                        bereich: "selbstlernen",
+                      });
+                      setEigeneStand((n) => n + 1);
+                    }}
+                  />
+                </div>
+                <p className="fokus-chats-hinweis">
+                  Was du hier schreibst, bleibt auf diesem Gerät. Nichts wird ins
+                  Internet geladen.
+                </p>
+              </>
             ) : (
               <div className="fokus-panel-lerncoach">
                 <p className="fokus-lc-info">

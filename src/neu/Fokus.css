@@ -805,6 +805,21 @@
   flex: 1;
   min-height: 0;
 }
+/* Datenschutz-Hinweis unten im Chats-Panel (lokale KI). */
+.fokus-chats-hinweis {
+  flex-shrink: 0;
+  margin: 0;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: var(--muted);
+}
+/* Sanfter Glas-Effekt auf den seitlichen Panels (Figma "Glas"). */
+.fokus-rail,
+.fokus-chats {
+  background: color-mix(in srgb, var(--card) 82%, transparent);
+  -webkit-backdrop-filter: blur(16px) saturate(1.3);
+  backdrop-filter: blur(16px) saturate(1.3);
+}
 .fokus-rail-kopf {
   flex-shrink: 0;
 }
@@ -820,6 +835,20 @@
   font-size: 1.02rem;
   font-weight: 600;
   color: var(--text);
+}
+/* Abschnitts-Label ("Zum Thema" / "Alle"). */
+.fokus-rail-sektion {
+  flex-shrink: 0;
+  margin: 2px 0 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+/* "Zum Thema" zeigt nur ein paar Empfehlungen: natürliche Höhe, kein Scroll;
+   die lange "Alle"-Liste darunter nimmt den Rest und scrollt. */
+.fokus-rail-liste-thema {
+  flex: 0 0 auto;
+  overflow: visible;
 }
 .fokus-rail-chips {
   flex-shrink: 0;
