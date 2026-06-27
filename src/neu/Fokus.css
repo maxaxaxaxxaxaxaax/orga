@@ -311,14 +311,25 @@
   min-width: 0;
   flex: 1;
 }
-.fokus-sl-nr {
-  font-size: 0.66rem;
+/* Kopfzeile der Schrittleiste: Fach-Eyebrow + Schritttext nebeneinander,
+   genau wie die Weg-Leiste (Bild "Loslegen"). */
+.fokus-sl-kopf {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+}
+.fokus-sl-fach {
+  flex-shrink: 0;
+  font-size: 0.62rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--muted);
+  color: var(--accent);
 }
 .fokus-sl-text {
+  flex: 1;
+  min-width: 0;
   font-size: 0.95rem;
   font-weight: 600;
   color: var(--text);
@@ -327,6 +338,32 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+/* Segment-Fortschritt + Zähler wie in der Weg-Leiste. */
+.fokus-sl-segmente {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+.fokus-sl-seg {
+  width: 16px;
+  height: 5px;
+  border-radius: 3px;
+  background: var(--line-strong);
+}
+.fokus-sl-seg.fertig {
+  background: var(--ok-text);
+}
+.fokus-sl-seg.aktuell {
+  background: var(--accent);
+}
+.fokus-sl-zahl {
+  flex-shrink: 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
 }
 /* Reflexion nach dem Schritt: zentriert, ruhig, ein Tap. */
 .fokus-sl-reflexion {
@@ -455,7 +492,9 @@
 /* Hinweis, wenn die Übung des Schritts noch nicht durchgearbeitet ist. */
 .fokus-sl-hinweis {
   font-size: 0.74rem;
-  color: var(--warn-text);
+  /* Ruhiger Hinweis statt Warnfarbe: er erklärt nur, warum der Knopf noch
+     wartet, und soll nicht alarmieren. */
+  color: var(--muted);
 }
 
 /* ---- Panel-Werkzeug (Chat / Notizen), links über der Mitte ------------- */

@@ -707,11 +707,11 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
               ) : (
                 <>
                   <div className="fokus-sl-info">
-                    <span className="fokus-sl-nr">
-                      Schritt {aktuell + 1} von {schritte.length}
-                    </span>
-                    <span className="fokus-sl-text">
-                      {schritte[aktuell]?.text}
+                    <span className="fokus-sl-kopf">
+                      <span className="fokus-sl-fach">{kb.fach}</span>
+                      <span className="fokus-sl-text">
+                        {schritte[aktuell]?.text}
+                      </span>
                     </span>
                     {!kannWeiter && (
                       <span className="fokus-sl-hinweis">
@@ -719,6 +719,21 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
                       </span>
                     )}
                   </div>
+                  <span className="fokus-sl-segmente" aria-hidden="true">
+                    {schritte.map((st, i) => (
+                      <span
+                        key={i}
+                        className={
+                          "fokus-sl-seg" +
+                          (i < aktuell ? " fertig" : "") +
+                          (i === aktuell ? " aktuell" : "")
+                        }
+                      />
+                    ))}
+                  </span>
+                  <span className="fokus-sl-zahl">
+                    {aktuell}/{schritte.length}
+                  </span>
                   <div className="fokus-sl-nav">
                     {istMathe && (
                       <button
