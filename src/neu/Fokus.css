@@ -797,6 +797,9 @@
   padding: 14px;
   box-sizing: border-box;
   overflow: hidden;
+  /* Endet auf Höhe der Schrittleiste, damit die Seitenpanels nicht weiter
+     nach unten reichen als der Inhalt der anderen Screens. */
+  margin-bottom: 64px;
 }
 
 /* ---- Rechtes Panel: Chats (Lerncoach = KI, Tutor = Mensch) ------------ */
@@ -814,6 +817,8 @@
   padding: 14px;
   box-sizing: border-box;
   overflow: hidden;
+  /* wie .fokus-rail: endet auf Höhe der Schrittleiste. */
+  margin-bottom: 64px;
 }
 .fokus-chats-kopf {
   flex-shrink: 0;
