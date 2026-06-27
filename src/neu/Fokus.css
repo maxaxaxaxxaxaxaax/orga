@@ -113,13 +113,8 @@
 .fokus-koerper {
   flex: 1;
   min-height: 0;
-  display: grid;
-  grid-template-columns:
-    auto
-    clamp(250px, 21vw, 320px)
-    minmax(0, 1fr)
-    clamp(250px, 21vw, 330px);
-  grid-template-areas: "tools rail mitte chats";
+  display: flex;
+  align-items: stretch;
   gap: 16px;
   padding: 8px 20px 18px;
   box-sizing: border-box;
@@ -127,7 +122,7 @@
 
 /* ---- Werkzeug-Toolbar (links) ----------------------------------------- */
 .fokus-werkzeuge {
-  grid-area: tools;
+  order: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -191,7 +186,8 @@
 
 /* ---- Mitte: aktives Material + Schritt-Steuerung ----------------------- */
 .fokus-mitte {
-  grid-area: mitte;
+  order: 3;
+  flex: 1;
   position: relative;
   min-width: 0;
   min-height: 0;
@@ -737,7 +733,9 @@
 
 /* ---- Rechte Leiste: passende Materialien ------------------------------ */
 .fokus-rail {
-  grid-area: rail;
+  order: 2;
+  width: clamp(250px, 21vw, 320px);
+  flex-shrink: 0;
   min-height: 0;
   display: flex;
   flex-direction: column;
@@ -752,7 +750,9 @@
 
 /* ---- Rechtes Panel: Chats (Lerncoach = KI, Tutor = Mensch) ------------ */
 .fokus-chats {
-  grid-area: chats;
+  order: 4;
+  width: clamp(250px, 21vw, 330px);
+  flex-shrink: 0;
   min-height: 0;
   display: flex;
   flex-direction: column;
@@ -766,6 +766,32 @@
 }
 .fokus-chats-kopf {
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.fokus-chats-toggle {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: var(--card);
+  color: var(--text-2);
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+.fokus-chats-toggle:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+/* Eingeklappt: nur der Kopf als Pille, oben rechts; die Mitte wird breiter. */
+.fokus-chats.zu {
+  width: auto;
+  align-self: flex-start;
+  border-radius: 999px;
+  padding: 10px 14px;
 }
 .fokus-chats-titel {
   font-family: var(--font-satoshi);
@@ -822,6 +848,39 @@
 }
 .fokus-rail-kopf {
   flex-shrink: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+.fokus-rail-kopf-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.fokus-rail-zu {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: var(--card);
+  color: var(--text-2);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+.fokus-rail-zu:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+/* Notizen im linken Panel. */
+.fokus-notiz-panel {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 .fokus-rail-titel {
   margin: 0;

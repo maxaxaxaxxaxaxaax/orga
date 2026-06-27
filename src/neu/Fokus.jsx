@@ -52,6 +52,13 @@ import "./Fokus.css";
 const QUIZ = { id: "__quiz__" };
 
 // ---- Werkzeug-Icons (Toolbar) -------------------------------------------
+function IcOrdner(p) {
+  return (
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}>
+      <path d="M3 7a2 2 0 0 1 2-2h4l2 2h6a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+    </svg>
+  );
+}
 function IcNotizen(p) {
   return (
     <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}>
@@ -100,9 +107,11 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
   const [gemessenMin, setGemessenMin] = useState(null);
   const [zeitMin, setZeitMin] = useState(null);
 
-  // Welches geöffnete Panel-Werkzeug? Nur eins offen, erneuter Klick schließt.
-  const [werkzeug, setWerkzeug] = useState(null); // "chat" | "notizen" | null
+  // Linkes Panel: über die Werkzeug-Leiste geöffnet. "materialien" | "notizen" |
+  // "live" | null (zu). Erneuter Klick auf dasselbe Icon schließt. Start: Materialien.
+  const [werkzeug, setWerkzeug] = useState("materialien");
   const [chatTab, setChatTab] = useState("coach"); // "coach" | "lerncoach"
+  const [chatsOffen, setChatsOffen] = useState(true); // rechtes Chats-Panel auf/zu
 
   // Vollbild-Werkzeuge mit eigenem Overlay.
   const [markierenOffen, setMarkierenOffen] = useState(false);
@@ -552,6 +561,16 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
           <nav className="fokus-werkzeuge" aria-label="Werkzeuge">
             <button
               type="button"
+              className={"fokus-wz" + (werkzeug === "materialien" ? " aktiv" : "")}
+              onClick={() => toggleWerkzeug("materialien")}
+              aria-pressed={werkzeug === "materialien"}
+              aria-label="Materialien"
+              title="Passende Materialien"
+            >
+              <IcOrdner aria-hidden="true" />
+            </button>
+            <button
+              type="button"
               className={"fokus-wz" + (werkzeug === "notizen" ? " aktiv" : "")}
               onClick={() => toggleWerkzeug("notizen")}
               aria-pressed={werkzeug === "notizen"}
@@ -743,71 +762,6 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
 
             {/* Panel-Werkzeug: links angedockt über der Mitte */}
 
-            {werkzeug === "notizen" && (
-              <aside className="fokus-panel" aria-label="Notizen">
-                <header className="fokus-panel-kopf">
-                  <span className="fokus-panel-titel">Notizen</span>
-                  <button
-                    type="button"
-                    className="fokus-panel-zu"
-                    onClick={() => setWerkzeug(null)}
-                    aria-label="Notizen schließen"
-                  >
-                    ✕
-                  </button>
-                </header>
-                <p className="fokus-lc-info">
-                  Park einen Gedanken kurz hier, ohne den Fokus zu verlieren. Du
-                  findest ihn später auf der Übersicht wieder.
-                </p>
-                <div className="fokus-notiz-neu">
-                  <input
-                    type="text"
-                    value={notizEntwurf}
-                    onChange={(e) => setNotizEntwurf(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") notizHinzufuegen();
-                    }}
-                    placeholder="Was dir gerade durch den Kopf geht …"
-                    aria-label="Neue Notiz"
-                  />
-                  <button
-                    type="button"
-                    className="fokus-notiz-add"
-                    onClick={notizHinzufuegen}
-                    disabled={!notizEntwurf.trim()}
-                  >
-                    Parken
-                  </button>
-                </div>
-                {notizen.length === 0 ? (
-                  <p className="fokus-notiz-leer">Noch nichts geparkt.</p>
-                ) : (
-                  <ul className="fokus-notiz-liste">
-                    {notizen.map((n, i) => (
-                      <li key={i} className="fokus-notiz">
-                        <div className="fokus-notiz-text">
-                          {n.text}
-                          {n.kontext && (
-                            <span className="fokus-notiz-kontext">
-                              {n.kontext}
-                            </span>
-                          )}
-                        </div>
-                        <button
-                          type="button"
-                          className="fokus-notiz-weg"
-                          onClick={() => notizEntfernen(i)}
-                          aria-label="Notiz entfernen"
-                        >
-                          ✕
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </aside>
-            )}
 
             {werkzeug === "live" && (
               <LiveCoach
@@ -823,14 +777,84 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
             )}
           </main>
 
-          {/* Rechte Leiste: passende Materialien */}
-          <aside className="fokus-rail" aria-label="Passende Materialien">
-            <div className="fokus-rail-kopf">
-              <h2 className="fokus-rail-titel">Passende Materialien</h2>
-              <span className="fokus-rail-fach">{kb.fach}</span>
-            </div>
+          {/* Linkes Panel: über die Werkzeug-Leiste geöffnet (Materialien oder
+             Notizen). Geschlossen, wenn werkzeug null/live ist. */}
+          {(werkzeug === "materialien" || werkzeug === "notizen") && (
+            <aside
+              className="fokus-rail"
+              aria-label={
+                werkzeug === "notizen" ? "Notizen" : "Passende Materialien"
+              }
+            >
+              <div className="fokus-rail-kopf">
+                <div className="fokus-rail-kopf-text">
+                  <h2 className="fokus-rail-titel">
+                    {werkzeug === "notizen" ? "Notizen" : "Passende Materialien"}
+                  </h2>
+                  {werkzeug === "materialien" && (
+                    <span className="fokus-rail-fach">{kb.fach}</span>
+                  )}
+                </div>
+                <button
+                  type="button"
+                  className="fokus-rail-zu"
+                  onClick={() => setWerkzeug(null)}
+                  aria-label="Panel schließen"
+                >
+                  ✕
+                </button>
+              </div>
 
-            {materialien.length === 0 ? (
+              {werkzeug === "notizen" ? (
+                <div className="fokus-notiz-panel">
+                  <div className="fokus-notiz-neu">
+                    <input
+                      type="text"
+                      value={notizEntwurf}
+                      onChange={(e) => setNotizEntwurf(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") notizHinzufuegen();
+                      }}
+                      placeholder="Mache dir Notizen …"
+                      aria-label="Neue Notiz"
+                    />
+                    <button
+                      type="button"
+                      className="fokus-notiz-add"
+                      onClick={notizHinzufuegen}
+                      disabled={!notizEntwurf.trim()}
+                    >
+                      Parken
+                    </button>
+                  </div>
+                  {notizen.length === 0 ? (
+                    <p className="fokus-notiz-leer">Noch nichts geparkt.</p>
+                  ) : (
+                    <ul className="fokus-notiz-liste">
+                      {notizen.map((n, i) => (
+                        <li key={i} className="fokus-notiz">
+                          <div className="fokus-notiz-text">
+                            {n.text}
+                            {n.kontext && (
+                              <span className="fokus-notiz-kontext">
+                                {n.kontext}
+                              </span>
+                            )}
+                          </div>
+                          <button
+                            type="button"
+                            className="fokus-notiz-weg"
+                            onClick={() => notizEntfernen(i)}
+                            aria-label="Notiz entfernen"
+                          >
+                            ✕
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              ) : materialien.length === 0 ? (
               <div className="fokus-rail-leer">
                 <p className="fokus-mat-leer">
                   Zu diesem Schritt gibt es noch kein eigenes Material.
@@ -984,14 +1008,29 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
                 </button>
               </>
             )}
-          </aside>
+            </aside>
+          )}
 
           {/* Rechtes Panel: Chats (dauerhaft). Tab "Lerncoach" = lokale KI,
              "Tutor" = Mensch (Fr. Berg) für Hilferufe. */}
-          <aside className="fokus-chats" aria-label="Chats">
+          <aside
+            className={"fokus-chats" + (chatsOffen ? "" : " zu")}
+            aria-label="Chats"
+          >
             <header className="fokus-chats-kopf">
               <span className="fokus-chats-titel">Chats</span>
+              <button
+                type="button"
+                className="fokus-chats-toggle"
+                onClick={() => setChatsOffen((o) => !o)}
+                aria-expanded={chatsOffen}
+                aria-label={chatsOffen ? "Chats einklappen" : "Chats ausklappen"}
+              >
+                {chatsOffen ? "⌄" : "⌃"}
+              </button>
             </header>
+            {chatsOffen && (
+              <>
             <div className="fokus-chats-tabs" role="tablist">
               <button
                 type="button"
@@ -1085,6 +1124,8 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
                   </>
                 )}
               </div>
+            )}
+              </>
             )}
           </aside>
         </div>
