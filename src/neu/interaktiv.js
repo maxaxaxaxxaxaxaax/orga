@@ -15,6 +15,7 @@ import {
   MARKIEREN,
 } from "./interaktivAgenten";
 import { UEBUNGEN_EXTRA } from "../data/uebungenExtra";
+import { UEBUNGEN_FRANZOESISCH } from "../data/uebungenFranzoesisch";
 
 export const INTERAKTIV = {
   // ---- Latein: Vokabel-Karteikarten -----------------------------------------
@@ -273,6 +274,10 @@ for (const [id, daten] of Object.entries(MARKIEREN))
   INTERAKTIV[id] = { typ: "markieren", daten };
 // Zusatz-Uebungen (Rollout): nach Typ gruppiert, generisch einmischen.
 for (const [typ, eintraege] of Object.entries(UEBUNGEN_EXTRA))
+  for (const [id, daten] of Object.entries(eintraege))
+    INTERAKTIV[id] = { typ, daten };
+// Franzoesisch-Uebungen (gleiche Struktur): pro Lernweg etwas zum Ueben.
+for (const [typ, eintraege] of Object.entries(UEBUNGEN_FRANZOESISCH))
   for (const [id, daten] of Object.entries(eintraege))
     INTERAKTIV[id] = { typ, daten };
 
