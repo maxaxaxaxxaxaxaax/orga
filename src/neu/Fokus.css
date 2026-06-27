@@ -285,17 +285,25 @@
   color: var(--text-2);
 }
 
-/* Schmale Schritt-Steuerung am unteren Rand der Mitte. */
+/* Schmale Schritt-Steuerung am unteren Rand der Mitte. Heller Glas-Look,
+   konsistent mit der Weg-Leiste und den unteren Leisten der anderen Seiten. */
 .fokus-schrittleiste {
   flex-shrink: 0;
   display: flex;
   align-items: center;
   gap: 14px;
-  flex-wrap: wrap;
-  padding: 10px 14px;
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: var(--r-lg, 16px);
+  flex-wrap: nowrap;
+  padding: 8px 8px 8px 20px;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--card) 52%, transparent),
+    color-mix(in srgb, var(--card) 34%, transparent)
+  );
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 999px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), var(--shadow-lg);
+  -webkit-backdrop-filter: blur(30px) saturate(1.9) brightness(1.03);
+  backdrop-filter: blur(30px) saturate(1.9) brightness(1.03);
 }
 .fokus-sl-info {
   display: flex;
@@ -315,6 +323,10 @@
   font-weight: 600;
   color: var(--text);
   line-height: 1.3;
+  /* Einzeilig: der Schritttext steht groß auch in der Mitte. */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 /* Reflexion nach dem Schritt: zentriert, ruhig, ein Tap. */
 .fokus-sl-reflexion {
@@ -1282,6 +1294,8 @@
   }
   .fokus-schrittleiste {
     gap: 10px;
+    /* eng: lieber umbrechen als die Pille überlaufen lassen. */
+    flex-wrap: wrap;
   }
   .fokus-sl-gefuehl {
     order: 3;
