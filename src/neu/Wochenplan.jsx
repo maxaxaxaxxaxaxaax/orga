@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
 import { koennensbeweise, kbFaecher, kbFarbe } from "../data/koennensbeweise";
-import { lernwegFuerKb } from "../data/wissen";
-import { ladeSchritte } from "./lernschritte";
 import {
   stundenWoche,
   fachFarbe,
@@ -12,6 +10,7 @@ import {
 } from "../data/stundenplanWoche";
 import { etappen } from "../data/etappen";
 import KbChip from "./KbChip";
+import { textAuf } from "./farbe";
 import { meldeAenderung, ladeStunden } from "./planung";
 import "./Wochenplan.css";
 
@@ -131,16 +130,6 @@ export default function Wochenplan({ onZurueck, onWeiter, onEtappeAnpassen, woch
       koennensbeweise.map((k) => wochenZuordnung[k.id]).filter((w) => w != null)
     ),
   ].sort((a, b) => a - b);
-  const schrittFortschritt = (kbId) => {
-    const lw = lernwegFuerKb(kbId);
-    const schritte = lw?.thema?.schritte || [];
-    if (!schritte.length) return null;
-    const stand = ladeSchritte(kbId);
-    const fertig = schritte.filter((st, i) =>
-      stand[i] != null ? stand[i] : !!st.fertig
-    ).length;
-    return { fertig, gesamt: schritte.length };
-  };
   const vorrat = wocheKbs.filter((k) => restVon(k) > 0);
   const wocheVerplant = wocheKbs.length > 0 && vorrat.length === 0;
   const wocheHatPlatziert = wocheKbs.some((k) => (stunden[k.id] || []).length > 0);
@@ -345,29 +334,33 @@ export default function Wochenplan({ onZurueck, onWeiter, onEtappeAnpassen, woch
             </span>
           </>
         ) : (
-          slotKbs.map((k) => (
-            <div
-              key={k.id}
-              className="wp-kb"
-              style={{ "--c": kbFarbe[k.fach] || "#868e96" }}
-              draggable
-              onDragStart={(e) => dragStart(e, k.id, sid)}
-              onDragEnd={dragEnde}
-              onClick={(e) => {
-                e.stopPropagation();
-                entferneUhr(k.id, sid);
-              }}
-              title={`${k.code} · antippen, um zurückzulegen`}
-            >
-              <span className="wp-kb-titel">{k.titel}</span>
-              <span className="wp-kb-meta">
-                <span className="wp-kb-uhr" aria-hidden="true">
-                  ◷
+          slotKbs.map((k) => {
+            const farbe = kbFarbe[k.fach] || "#868e96";
+            return (
+              <div
+                key={k.id}
+                className="wp-kb"
+                style={{ "--c": farbe, "--kbt": textAuf(farbe) }}
+                draggable
+                onDragStart={(e) => dragStart(e, k.id, sid)}
+                onDragEnd={dragEnde}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  entferneUhr(k.id, sid);
+                }}
+                title={`${k.code} · antippen, um zurückzulegen`}
+              >
+                <span className="wp-kb-titel">{k.titel}</span>
+                <span className="wp-kb-meta">
+                  <span className="wp-kb-uhr" aria-hidden="true">
+                    ◷
+                  </span>
+                  {k.cluster}
+                  {k.code && <span className="wp-kb-code">{k.code}</span>}
                 </span>
-                {k.cluster} · {k.fach}
-              </span>
-            </div>
-          ))
+              </div>
+            );
+          })
         )}
       </div>
     );
@@ -444,7 +437,6 @@ export default function Wochenplan({ onZurueck, onWeiter, onEtappeAnpassen, woch
                             k={k}
                             key={k.id}
                             zahl={restVon(k)}
-                            fortschritt={schrittFortschritt(k.id)}
                             gewaehlt={gewaehltId === k.id}
                             onTippen={waehle}
                             onDragStart={(e, id) => dragStart(e, id, null)}

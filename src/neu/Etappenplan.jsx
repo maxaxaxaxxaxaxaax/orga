@@ -8,6 +8,7 @@ import {
 } from "../data/koennensbeweise";
 import { etappen } from "../data/etappen";
 import { meldeAenderung } from "./planung";
+import { textAuf } from "./farbe";
 import "./Etappenplan.css";
 
 // Etappe planen: links der Vorrat (Könnensbeweise je Fach als bunte Chips) plus
@@ -42,17 +43,6 @@ function bereichText(von, bis) {
   const f = (d) =>
     d.toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit" });
   return `${f(von)} - ${f(bis)}`;
-}
-
-// Lesbare Textfarbe auf einer Vollton-Fachfarbe (hell -> dunkle Schrift).
-function textAuf(hex) {
-  const h = String(hex).replace("#", "");
-  if (h.length < 6) return "#ffffff";
-  const r = parseInt(h.slice(0, 2), 16);
-  const g = parseInt(h.slice(2, 4), 16);
-  const b = parseInt(h.slice(4, 6), 16);
-  const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-  return lum > 0.62 ? "#23201a" : "#ffffff";
 }
 
 function lade() {

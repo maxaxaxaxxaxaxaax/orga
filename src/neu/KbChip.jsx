@@ -1,65 +1,53 @@
 import { kbFarbe } from "../data/koennensbeweise";
+import { textAuf } from "./farbe";
 import "./KbChip.css";
 
-// Ein Etappenziel als Chip: auf allen Planungs-Screens dasselbe Aussehen.
-// Ziehbar (Laptop) UND antippbar (Touch): onTippen wählt einen Vorrat-Chip aus
-// (dann eine Woche/einen Tag antippen), onZurueck legt einen platzierten Chip
-// per Tippen zurück. gewaehlt = aktuell ausgewählt.
+// Ein Etappenziel als bunte Vollton-Kachel, exakt wie im Etappenplan (.ep-kb):
+// Titel oben, darunter eine Meta-Zeile (Uhr-Symbol, offene Uhren, Code). Ziehbar
+// (Laptop) und antippbar (Touch): onTippen wählt die Kachel aus, danach tippt man
+// eine Stunde an. gewaehlt = aktuell ausgewählt. zahl überschreibt die Uhren-Zahl
+// (im Wochenplan die noch offenen Stunden).
 export default function KbChip({
   k,
-  platziert,
-  mitFach,
   gewaehlt,
   onDragStart,
   onDragEnd,
-  onZurueck,
   onTippen,
-  zahl, // überschreibt die Cluster-Zahl: Zahl anzeigen, oder null = ausblenden
-  fortschritt, // optional { fertig, gesamt }: duenne Schritt-Fortschrittsleiste
+  zahl,
 }) {
   const zahlWert = zahl === undefined ? k.cluster : zahl;
-  const zeigeFortschritt =
-    fortschritt && fortschritt.gesamt > 0 && fortschritt.fertig > 0;
-  const klickbar = !!onTippen || (platziert && !!onZurueck);
-  function klick(e) {
-    e.stopPropagation();
-    if (onTippen) onTippen(k.id);
-    else if (platziert && onZurueck) onZurueck(k.id);
-  }
+  const farbe = kbFarbe[k.fach] || "#868e96";
   return (
-    <div
-      className={
-        "kbc" +
-        (platziert ? " kbc-platziert" : "") +
-        (gewaehlt ? " kbc-gewaehlt" : "")
-      }
+    <button
+      type="button"
+      className={"kbc" + (gewaehlt ? " kbc-gewaehlt" : "")}
+      style={{ "--c": farbe, "--kbt": textAuf(farbe) }}
       draggable
       onDragStart={(e) => onDragStart(e, k.id)}
       onDragEnd={onDragEnd}
-      onClick={klickbar ? klick : undefined}
+      onClick={
+        onTippen
+          ? (e) => {
+              e.stopPropagation();
+              onTippen(k.id);
+            }
+          : undefined
+      }
       aria-pressed={onTippen ? !!gewaehlt : undefined}
-      style={{ "--c": kbFarbe[k.fach] || "#868e96" }}
       title={
         gewaehlt
           ? `${k.code} · antippen zum Abwählen`
-          : platziert
-          ? `${k.code} · antippen, um zurückzulegen`
-          : onTippen
-          ? `${k.code} · antippen, dann eine Woche wählen`
-          : `${k.code} · ${k.cluster} Clusterstunden`
+          : `${k.code} · antippen, dann eine Stunde wählen`
       }
     >
-      {mitFach && <span className="kbc-fach">{k.fach}</span>}
       <span className="kbc-titel">{k.titel}</span>
-      {zahlWert != null && <span className="kbc-cluster">{zahlWert}</span>}
-      {zeigeFortschritt && (
-        <span className="kbc-fortschritt" aria-hidden="true">
-          <span
-            className="kbc-fortschritt-fuell"
-            style={{ width: (fortschritt.fertig / fortschritt.gesamt) * 100 + "%" }}
-          />
+      <span className="kbc-meta">
+        <span className="kbc-uhr" aria-hidden="true">
+          ◷
         </span>
-      )}
-    </div>
+        {zahlWert}
+        {k.code && <span className="kbc-code">{k.code}</span>}
+      </span>
+    </button>
   );
 }

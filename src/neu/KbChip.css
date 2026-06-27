@@ -1,84 +1,50 @@
-/* Geteilter KB-Chip: ein Etappenziel sieht überall gleich aus. */
+/* Geteilter KB-Chip: bunte Vollton-Kachel, identisch zu .ep-kb im Etappenplan,
+   damit ein Etappenziel in Etappen- und Wochenplanung gleich aussieht. */
 .kbc {
-  position: relative;
   display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 10px;
-  background: var(--bg);
-  border: 1px solid var(--line);
-  border-left: 3px solid var(--c);
-  border-radius: var(--r-sm, 8px);
+  flex-direction: column;
+  gap: 3px;
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: var(--c);
+  color: var(--kbt);
+  border-radius: var(--r-md, 14px);
+  padding: 10px 14px;
   cursor: grab;
+  box-shadow: var(--shadow-sm);
   user-select: none;
-  overflow: hidden;
-}
-/* Duenne Schritt-Fortschrittsleiste am unteren Rand (nur im Wochenplan-Vorrat). */
-.kbc-fortschritt {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 2px;
-  background: var(--line);
-}
-.kbc-fortschritt-fuell {
-  display: block;
-  height: 100%;
-  background: color-mix(in srgb, var(--c) 55%, var(--ok-text));
-}
-/* Touch-Geraete: groessere Tap-Flaeche, damit man den Chip sicher trifft. */
-@media (pointer: coarse) {
-  .kbc {
-    padding: 11px 12px;
-    gap: 10px;
-  }
 }
 .kbc:active {
   cursor: grabbing;
 }
-.kbc:hover {
-  border-color: color-mix(in srgb, var(--c) 45%, var(--line));
-  box-shadow: var(--shadow-sm);
-}
-/* Platziert (in Woche/Tag): Klick legt zurück. */
-.kbc-platziert:hover {
-  background: color-mix(in srgb, var(--c) 8%, var(--card));
-}
-/* Ausgewählt (Tippen-zum-Zuordnen): deutlicher Akzent-Ring. */
-.kbc-gewaehlt,
-.kbc-gewaehlt:hover {
-  background: var(--card);
-  border-color: var(--accent);
-  box-shadow: 0 0 0 2px var(--accent), var(--shadow-sm);
-}
-.kbc-fach {
-  flex-shrink: 0;
-  font-size: 0.64rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: color-mix(in srgb, var(--c) 75%, var(--text));
+/* Ausgewählt (Tippen-zum-Zuordnen): Ring wie im Etappenplan. */
+.kbc-gewaehlt {
+  outline: 2px solid var(--text);
+  outline-offset: 2px;
 }
 .kbc-titel {
-  flex: 1;
-  min-width: 0;
-  font-size: 0.8rem;
-  line-height: 1.3;
-  color: var(--text);
+  font-size: 0.92rem;
+  font-weight: 700;
+  line-height: 1.2;
 }
-.kbc-cluster {
-  flex-shrink: 0;
-  min-width: 20px;
-  height: 20px;
-  padding: 0 6px;
+.kbc-meta {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
+  gap: 6px;
   font-size: 0.74rem;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  color: color-mix(in srgb, var(--c) 75%, var(--text));
-  background: color-mix(in srgb, var(--c) 12%, var(--card));
-  border-radius: 999px;
+  font-weight: 600;
+  opacity: 0.85;
+}
+.kbc-uhr {
+  font-size: 0.8rem;
+}
+.kbc-code {
+  opacity: 0.85;
+}
+/* Touch-Geraete: etwas groessere Tap-Flaeche. */
+@media (pointer: coarse) {
+  .kbc {
+    padding: 12px 14px;
+  }
 }

@@ -315,7 +315,7 @@
   gap: 3px;
   background: transparent;
 }
-/* Platziertes Etappenziel im Slot. */
+/* Platziertes Etappenziel im Slot: bunte Vollton-Kachel wie im Etappenplan. */
 .wp-kb {
   flex: 1;
   min-height: 0;
@@ -323,19 +323,20 @@
   flex-direction: column;
   justify-content: center;
   gap: 2px;
-  background: color-mix(in srgb, var(--c) 16%, var(--card));
-  border-left: 3px solid var(--c);
-  border-radius: var(--r-sm, 8px);
-  padding: 5px 8px;
+  background: var(--c);
+  color: var(--kbt);
+  border-radius: var(--r-md, 14px);
+  padding: 6px 10px;
   cursor: grab;
+  box-shadow: var(--shadow-sm);
 }
 .wp-kb:active {
   cursor: grabbing;
 }
 .wp-kb-titel {
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: var(--text);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--kbt);
   line-height: 1.2;
   overflow: hidden;
   display: -webkit-box;
@@ -343,14 +344,19 @@
   -webkit-box-orient: vertical;
 }
 .wp-kb-meta {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 4px;
-  font-size: 0.66rem;
-  color: var(--text-2);
+  gap: 6px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--kbt);
+  opacity: 0.85;
 }
 .wp-kb-uhr {
-  font-size: 0.7rem;
+  font-size: 0.75rem;
+}
+.wp-kb-code {
+  opacity: 0.85;
 }
 
 /* ---- Untere Pille: Zurück-Knopf (nur Wizard) --------------------------
