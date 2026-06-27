@@ -52,13 +52,6 @@ import "./Fokus.css";
 const QUIZ = { id: "__quiz__" };
 
 // ---- Werkzeug-Icons (Toolbar) -------------------------------------------
-function IcChat(p) {
-  return (
-    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}>
-      <path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.4 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8A8.4 8.4 0 0 1 12.5 3 8.4 8.4 0 0 1 21 11.5z" />
-    </svg>
-  );
-}
 function IcNotizen(p) {
   return (
     <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}>
@@ -302,7 +295,7 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
   }
 
   function hilfeOeffnen() {
-    setWerkzeug("chat");
+    // Chat ist jetzt dauerhaft rechts: nur auf den Tutor-Tab (Mensch) wechseln.
     setChatTab("lerncoach");
     setEntwurf(frage);
   }
@@ -521,16 +514,6 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
           <nav className="fokus-werkzeuge" aria-label="Werkzeuge">
             <button
               type="button"
-              className={"fokus-wz" + (werkzeug === "chat" ? " aktiv" : "")}
-              onClick={() => toggleWerkzeug("chat")}
-              aria-pressed={werkzeug === "chat"}
-              aria-label="Chat mit Coach"
-              title="Chat: KI-Coach und Lerncoach"
-            >
-              <IcChat aria-hidden="true" />
-            </button>
-            <button
-              type="button"
               className={"fokus-wz" + (werkzeug === "notizen" ? " aktiv" : "")}
               onClick={() => toggleWerkzeug("notizen")}
               aria-pressed={werkzeug === "notizen"}
@@ -721,117 +704,6 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
             </div>
 
             {/* Panel-Werkzeug: links angedockt über der Mitte */}
-            {werkzeug === "chat" && (
-              <aside className="fokus-panel" aria-label="Chat">
-                <header className="fokus-panel-kopf">
-                  <div className="fokus-panel-tabs" role="tablist">
-                    <button
-                      type="button"
-                      role="tab"
-                      aria-selected={chatTab === "coach"}
-                      className={
-                        "fokus-panel-tab" + (chatTab === "coach" ? " an" : "")
-                      }
-                      onClick={() => setChatTab("coach")}
-                    >
-                      KI-Coach
-                    </button>
-                    <button
-                      type="button"
-                      role="tab"
-                      aria-selected={chatTab === "lerncoach"}
-                      className={
-                        "fokus-panel-tab" +
-                        (chatTab === "lerncoach" ? " an" : "")
-                      }
-                      onClick={() => setChatTab("lerncoach")}
-                    >
-                      Lerncoach ({COACH})
-                    </button>
-                  </div>
-                  <button
-                    type="button"
-                    className="fokus-panel-zu"
-                    onClick={() => setWerkzeug(null)}
-                    aria-label="Chat schließen"
-                  >
-                    ✕
-                  </button>
-                </header>
-
-                {chatTab === "coach" ? (
-                  <div className="fokus-panel-mc">
-                    <MaterialChat
-                      kontextName={kontextName}
-                      materialien={materialien}
-                      kiModell={kiModell}
-                      visionModell={visionModell}
-                      systemText={coachSystem}
-                      onHeften={({ titel, inhalt }) => {
-                        speichereEigenes({
-                          titel,
-                          inhalt,
-                          fachId: lw?.fachId,
-                          thema: thema?.label || null,
-                          art: "lernzettel",
-                          bereich: "selbstlernen",
-                        });
-                        setEigeneStand((n) => n + 1);
-                      }}
-                    />
-                  </div>
-                ) : (
-                  <div className="fokus-panel-lerncoach">
-                    <p className="fokus-lc-info">
-                      Hier erreichst du {COACH} (ein Mensch, kein Automat).
-                      Schreib kurz, woran es hängt: deine Frage wartet bis zum
-                      Tutorentermin, du musst dich nicht melden.
-                    </p>
-                    {hilfe ? (
-                      <div className="fokus-lc-status">
-                        <p className="fokus-hilfe-info">
-                          <span
-                            className="fokus-hilfe-haken"
-                            aria-hidden="true"
-                          >
-                            ✓
-                          </span>
-                          {COACH} ist informiert.
-                        </p>
-                        {frage && (
-                          <p className="fokus-hilfe-frage">„{frage}"</p>
-                        )}
-                        <button
-                          type="button"
-                          className="fokus-textlink"
-                          onClick={hilfeZuruecknehmen}
-                        >
-                          Hilferuf zurücknehmen
-                        </button>
-                      </div>
-                    ) : (
-                      <>
-                        <textarea
-                          className="fokus-lc-feld"
-                          rows={4}
-                          value={entwurf}
-                          onChange={(e) => setEntwurf(e.target.value)}
-                          placeholder="Zum Beispiel: Ich verstehe diesen Schritt nicht."
-                        />
-                        <button
-                          type="button"
-                          className="fokus-lc-senden"
-                          onClick={hilfeSenden}
-                          disabled={!entwurf.trim()}
-                        >
-                          An {COACH} senden
-                        </button>
-                      </>
-                    )}
-                  </div>
-                )}
-              </aside>
-            )}
 
             {werkzeug === "notizen" && (
               <aside className="fokus-panel" aria-label="Notizen">
@@ -1090,6 +962,102 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
                   + anhängen
                 </button>
               </>
+            )}
+          </aside>
+
+          {/* Rechtes Panel: Chats (dauerhaft). Tab "Lerncoach" = lokale KI,
+             "Tutor" = Mensch (Fr. Berg) für Hilferufe. */}
+          <aside className="fokus-chats" aria-label="Chats">
+            <header className="fokus-chats-kopf">
+              <span className="fokus-chats-titel">Chats</span>
+            </header>
+            <div className="fokus-chats-tabs" role="tablist">
+              <button
+                type="button"
+                role="tab"
+                aria-selected={chatTab === "coach"}
+                className={"fokus-chats-tab" + (chatTab === "coach" ? " an" : "")}
+                onClick={() => setChatTab("coach")}
+              >
+                Lerncoach
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={chatTab === "lerncoach"}
+                className={
+                  "fokus-chats-tab" + (chatTab === "lerncoach" ? " an" : "")
+                }
+                onClick={() => setChatTab("lerncoach")}
+              >
+                Tutor
+              </button>
+            </div>
+            {chatTab === "coach" ? (
+              <div className="fokus-panel-mc">
+                <MaterialChat
+                  kontextName={kontextName}
+                  materialien={materialien}
+                  kiModell={kiModell}
+                  visionModell={visionModell}
+                  systemText={coachSystem}
+                  onHeften={({ titel, inhalt }) => {
+                    speichereEigenes({
+                      titel,
+                      inhalt,
+                      fachId: lw?.fachId,
+                      thema: thema?.label || null,
+                      art: "lernzettel",
+                      bereich: "selbstlernen",
+                    });
+                    setEigeneStand((n) => n + 1);
+                  }}
+                />
+              </div>
+            ) : (
+              <div className="fokus-panel-lerncoach">
+                <p className="fokus-lc-info">
+                  Hier erreichst du {COACH} (ein Mensch, kein Automat). Schreib
+                  kurz, woran es hängt: deine Frage wartet bis zum Tutorentermin,
+                  du musst dich nicht melden.
+                </p>
+                {hilfe ? (
+                  <div className="fokus-lc-status">
+                    <p className="fokus-hilfe-info">
+                      <span className="fokus-hilfe-haken" aria-hidden="true">
+                        ✓
+                      </span>
+                      {COACH} ist informiert.
+                    </p>
+                    {frage && <p className="fokus-hilfe-frage">„{frage}"</p>}
+                    <button
+                      type="button"
+                      className="fokus-textlink"
+                      onClick={hilfeZuruecknehmen}
+                    >
+                      Hilferuf zurücknehmen
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <textarea
+                      className="fokus-lc-feld"
+                      rows={4}
+                      value={entwurf}
+                      onChange={(e) => setEntwurf(e.target.value)}
+                      placeholder="Zum Beispiel: Ich verstehe diesen Schritt nicht."
+                    />
+                    <button
+                      type="button"
+                      className="fokus-lc-senden"
+                      onClick={hilfeSenden}
+                      disabled={!entwurf.trim()}
+                    >
+                      An {COACH} senden
+                    </button>
+                  </>
+                )}
+              </div>
             )}
           </aside>
         </div>

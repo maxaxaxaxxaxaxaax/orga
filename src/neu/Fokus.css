@@ -114,8 +114,12 @@
   flex: 1;
   min-height: 0;
   display: grid;
-  grid-template-columns: auto 1fr clamp(280px, 24vw, 360px);
-  grid-template-areas: "tools mitte rail";
+  grid-template-columns:
+    auto
+    clamp(250px, 21vw, 320px)
+    minmax(0, 1fr)
+    clamp(250px, 21vw, 330px);
+  grid-template-areas: "tools rail mitte chats";
   gap: 16px;
   padding: 8px 20px 18px;
   box-sizing: border-box;
@@ -744,6 +748,62 @@
   padding: 14px;
   box-sizing: border-box;
   overflow: hidden;
+}
+
+/* ---- Rechtes Panel: Chats (Lerncoach = KI, Tutor = Mensch) ------------ */
+.fokus-chats {
+  grid-area: chats;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg, 16px);
+  padding: 14px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+.fokus-chats-kopf {
+  flex-shrink: 0;
+}
+.fokus-chats-titel {
+  font-family: var(--font-satoshi);
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+.fokus-chats-tabs {
+  flex-shrink: 0;
+  display: inline-flex;
+  gap: 4px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 4px;
+}
+.fokus-chats-tab {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: var(--text-2);
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 8px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.14s ease, color 0.14s ease;
+}
+.fokus-chats-tab.an {
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+}
+.fokus-chats .fokus-panel-mc,
+.fokus-chats .fokus-panel-lerncoach {
+  flex: 1;
+  min-height: 0;
 }
 .fokus-rail-kopf {
   flex-shrink: 0;
