@@ -51,6 +51,15 @@ import "./Fokus.css";
 // Synthetisches "Material" für die generierte Übung (Quiz) in der Mitte.
 const QUIZ = { id: "__quiz__" };
 
+// Zeit als m:ss, exakt (nicht auf Minuten gerundet). Geteilt von der laufenden
+// Lernzeit und der genauen Anzeige im Abschluss.
+function mmss(sek) {
+  const ganz = Math.max(0, Math.round(sek));
+  const m = Math.floor(ganz / 60);
+  const s = ganz % 60;
+  return `${m}:${String(s).padStart(2, "0")}`;
+}
+
 // Live-Lernzeit: zeigt, wie lange man in dieser Sitzung schon an dem Ziel
 // arbeitet (m:ss). Eigene Komponente, damit nur sie im Sekundentakt rendert,
 // nicht der ganze Fokus. Spiegelt die eigene Zeit, misst sie nicht zur Kontrolle.
@@ -63,16 +72,14 @@ function Lernzeit() {
     }, 1000);
     return () => clearInterval(id);
   }, []);
-  const m = Math.floor(sek / 60);
-  const s = sek % 60;
   return (
-    <span className="fokus-zeit" title="So lange arbeitest du in dieser Sitzung schon an diesem Ziel">
+    <span className="fokus-lernzeit" title="So lange arbeitest du in dieser Sitzung schon an diesem Ziel">
       <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
         <path d="M9 2.5h6" />
         <circle cx="12" cy="13" r="8" />
         <path d="M12 9.5V13l2.4 1.6" />
       </svg>
-      {m}:{String(s).padStart(2, "0")}
+      {mmss(sek)}
     </span>
   );
 }
@@ -129,9 +136,9 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
   const [gefuehl, setGefuehl] = useState(() => ladeGefuehl(kb.id));
   // Nach jedem Schritt eine kurze Selbsteinschätzung, bevor es weitergeht.
   const [reflektiereSchritt, setReflektiereSchritt] = useState(null);
-  // Abschluss: gemessene Zeit (einmal erfasst) und die bestätigte/korrigierte Zeit.
-  const [gemessenMin, setGemessenMin] = useState(null);
-  const [zeitMin, setZeitMin] = useState(null);
+  // Abschluss: die genau gemessene Lernzeit dieser Sitzung in Sekunden (einmal
+  // beim Erreichen des Abschlusses erfasst, nicht auf Minuten gerundet).
+  const [gemessenSek, setGemessenSek] = useState(null);
 
   // Linkes Panel: über die Werkzeug-Leiste geöffnet. "materialien" | "notizen" |
   // "live" | null (zu). Erneuter Klick auf dasselbe Icon schließt. Start: Materialien.
@@ -276,13 +283,11 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
     setManuellFuerSchritt(aktuell);
   }
 
-  // Beim Erreichen des Abschlusses die gemessene Zeit einmal festhalten (in
-  // Minuten), als Vorschlag zum Bestätigen oder Korrigieren.
+  // Beim Erreichen des Abschlusses die genaue Lernzeit einmal festhalten
+  // (Sekunden, ungerundet), damit der Abschluss sie exakt anzeigen kann.
   useEffect(() => {
-    if (alleFertig && gemessenMin === null) {
-      const m = Math.max(1, Math.round((Date.now() - startRef.current) / 60000));
-      setGemessenMin(m);
-      setZeitMin(m);
+    if (alleFertig && gemessenSek === null) {
+      setGemessenSek(Math.round((Date.now() - startRef.current) / 1000));
     }
     // nur einmal beim Erreichen des Abschlusses
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -549,31 +554,14 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
                 zur Abnahme an. Sonst hakst du ihn nur für heute ab.
               </p>
               <div className="fokus-zeit">
-                <span className="fokus-zeit-label">
-                  Wie lange hast du gebraucht?
+                <span className="fokus-zeit-label">So lange hast du gebraucht</span>
+                <span className="fokus-zeit-gross">
+                  {gemessenSek != null ? mmss(gemessenSek) : "0:00"}
                 </span>
-                <div className="fokus-zeit-feld">
-                  <input
-                    type="number"
-                    min="1"
-                    max="240"
-                    value={zeitMin ?? gemessenMin ?? 1}
-                    onChange={(e) =>
-                      setZeitMin(
-                        Math.max(1, Math.min(240, Number(e.target.value) || 1))
-                      )
-                    }
-                    aria-label="Minuten"
-                  />
-                  <span className="fokus-zeit-einheit">Minuten</span>
-                </div>
-                {gemessenMin != null && (
-                  <p className="fokus-zeit-hint">
-                    Die App hat etwa {gemessenMin}{" "}
-                    {gemessenMin === 1 ? "Minute" : "Minuten"} gemessen. Passt das,
-                    oder korrigiere es kurz.
-                  </p>
-                )}
+                <p className="fokus-zeit-hint">
+                  Genau gemessen in dieser Sitzung (Minuten:Sekunden). Die Zeit
+                  bleibt auf diesem Gerät und hilft nur dir bei der Einschätzung.
+                </p>
               </div>
               {hilfe && (
                 <p className="fokus-hilfe-laeuft" role="status">
@@ -586,7 +574,7 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
                   type="button"
                   className="fokus-weiter"
                   onClick={() => {
-                    bucheZeit((zeitMin ?? gemessenMin ?? 1) * 60);
+                    bucheZeit(gemessenSek ?? 0);
                     setzeAbnahme(kb.id, true);
                     onFertig(kb.id);
                     setAbgeschlossen(true);
@@ -598,7 +586,7 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
                   type="button"
                   className="fokus-sekundaer"
                   onClick={() => {
-                    bucheZeit((zeitMin ?? gemessenMin ?? 1) * 60);
+                    bucheZeit(gemessenSek ?? 0);
                     onFertig(kb.id);
                     setAbgeschlossen(true);
                   }}

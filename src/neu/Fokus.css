@@ -72,7 +72,7 @@
   color: var(--muted);
 }
 /* Live-Lernzeit dieser Sitzung: ruhig, gleicher Ton wie der Zähler. */
-.fokus-zeit {
+.fokus-lernzeit {
   flex-shrink: 0;
   display: inline-flex;
   align-items: center;
@@ -82,7 +82,7 @@
   font-variant-numeric: tabular-nums;
   color: var(--muted);
 }
-.fokus-zeit svg {
+.fokus-lernzeit svg {
   opacity: 0.85;
 }
 .fokus-kopf-hilfe,
@@ -1226,6 +1226,14 @@
   font-size: 0.92rem;
   font-weight: 600;
   color: var(--text);
+}
+/* Genaue Lernzeit im Abschluss (m:ss), prominent und ungerundet. */
+.fokus-zeit-gross {
+  font-size: 2rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
+  color: var(--accent-strong);
 }
 .fokus-zeit-feld {
   display: inline-flex;
