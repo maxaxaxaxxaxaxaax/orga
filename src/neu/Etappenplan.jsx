@@ -104,6 +104,9 @@ export default function Etappenplan({ onWeiter }) {
 
   const offen = koennensbeweise.filter((k) => zuordnung[k.id] == null).length;
   const alleZugeordnet = offen === 0;
+  // Ist schon etwas verteilt? Dann bietet die Leiste "Neu planen" an (neu und
+  // ausgewogen verteilen), wie beim ersten Planen, sobald etwas steht.
+  const hatPlan = offen < koennensbeweise.length;
 
   function onDragStart(e, id) {
     e.dataTransfer.setData("text/plain", id);
@@ -163,6 +166,31 @@ export default function Etappenplan({ onWeiter }) {
     }
     setZuordnung(z);
     setHinweis("Ausgewogen verteilt: leichteste Woche zuerst. Du kannst frei anpassen.");
+  }
+
+  // Neu planen: alles verwerfen und frisch ausgewogen verteilen (Pflicht-/
+  // Startzuordnung bleibt). Wie beim ersten Planen, nur eben noch einmal.
+  function umplanen() {
+    const summen = Array(etappeWochen).fill(0);
+    const z = {};
+    for (const [id, w] of Object.entries(startZuordnung)) {
+      z[id] = w;
+      summen[w] += koennensbeweise.find((k) => k.id === id)?.cluster || 0;
+    }
+    const rest = koennensbeweise
+      .filter((k) => z[k.id] == null)
+      .slice()
+      .sort((a, b) => b.cluster - a.cluster);
+    for (const kb of rest) {
+      let best = 0;
+      for (let i = 1; i < etappeWochen; i++) {
+        if (summen[i] < summen[best]) best = i;
+      }
+      z[kb.id] = best;
+      summen[best] += kb.cluster;
+    }
+    setZuordnung(z);
+    setHinweis("Etappe neu verteilt: leichteste Woche zuerst. Du kannst frei anpassen.");
   }
 
   // Ein bunter KB-Chip (Vollton in Fachfarbe), ziehbar und antippbar.
@@ -315,11 +343,7 @@ export default function Etappenplan({ onWeiter }) {
           <span aria-hidden="true">🗓</span> Etappenplanung
         </span>
         <span className="ep-bar-sep" aria-hidden="true" />
-        {alleZugeordnet ? (
-          <button type="button" className="ep-bar-weiter" onClick={onWeiter}>
-            Weiter
-          </button>
-        ) : (
+        {!hatPlan ? (
           <>
             <span className="ep-bar-text">
               Ziehe die Lernwege in die jeweiligen Wochen
@@ -332,6 +356,31 @@ export default function Etappenplan({ onWeiter }) {
             >
               <span aria-hidden="true">✦</span> Für mich einsortieren
             </button>
+          </>
+        ) : (
+          <>
+            <button
+              type="button"
+              className="ep-bar-umplanen"
+              onClick={umplanen}
+              title="Die Etappe neu und ausgewogen verteilen"
+            >
+              <span aria-hidden="true">↻</span> Neu planen
+            </button>
+            {alleZugeordnet ? (
+              <button type="button" className="ep-bar-weiter" onClick={onWeiter}>
+                Weiter
+              </button>
+            ) : (
+              <button
+                type="button"
+                className="ep-bar-aktion"
+                onClick={vorschlagVerteilung}
+                title="Die noch offenen Ziele ausgewogen auf die Wochen verteilen"
+              >
+                <span aria-hidden="true">✦</span> Für mich einsortieren
+              </button>
+            )}
           </>
         )}
       </div>

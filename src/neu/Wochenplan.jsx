@@ -138,6 +138,9 @@ export default function Wochenplan({ onZurueck, onWeiter, woche = 0 }) {
   const zielVerplant =
     zielKbs.length > 0 &&
     zielKbs.every((k) => (stunden[k.id]?.length || 0) >= k.cluster);
+  // Ist in dieser Woche schon etwas verteilt? Dann bietet die Leiste "Umplanen"
+  // (neu verteilen) an, wie beim ersten Planen, sobald etwas steht.
+  const hatPlan = wocheKbs.some((k) => (stunden[k.id]?.length || 0) > 0);
   const montag = wochenStart(ETAPPE, aktiveWoche);
   const monatLabel = montag.toLocaleDateString("de-DE", {
     month: "long",
@@ -626,21 +629,7 @@ export default function Wochenplan({ onZurueck, onWeiter, woche = 0 }) {
             <span aria-hidden="true">🗓</span> Wochenplanung
           </span>
           <span className="ep-bar-sep" aria-hidden="true" />
-          {zielVerplant ? (
-            <>
-              <button
-                type="button"
-                className="wp-bar-umplanen"
-                onClick={umplanen}
-                title="Die Woche neu und ausgewogen verteilen"
-              >
-                <span aria-hidden="true">↻</span> Umplanen
-              </button>
-              <button type="button" className="ep-bar-weiter" onClick={onWeiter}>
-                Weiter
-              </button>
-            </>
-          ) : (
+          {!hatPlan ? (
             <>
               <span className="ep-bar-text">
                 Verteile die Uhren auf deine freien Stunden
@@ -653,6 +642,35 @@ export default function Wochenplan({ onZurueck, onWeiter, woche = 0 }) {
               >
                 <span aria-hidden="true">✦</span> Für mich einsortieren
               </button>
+            </>
+          ) : (
+            <>
+              <button
+                type="button"
+                className="ep-bar-umplanen"
+                onClick={umplanen}
+                title="Die Woche neu und ausgewogen verteilen"
+              >
+                <span aria-hidden="true">↻</span> Neu planen
+              </button>
+              {zielVerplant ? (
+                <button
+                  type="button"
+                  className="ep-bar-weiter"
+                  onClick={onWeiter}
+                >
+                  Weiter
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  className="ep-bar-aktion"
+                  onClick={vorschlagVerteilen}
+                  title="Die offenen Uhren ausgewogen auf die Stunden verteilen"
+                >
+                  <span aria-hidden="true">✦</span> Für mich einsortieren
+                </button>
+              )}
             </>
           )}
         </div>

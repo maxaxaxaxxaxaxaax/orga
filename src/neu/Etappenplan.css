@@ -160,6 +160,27 @@
 .ep-bar-weiter:active {
   transform: scale(0.97);
 }
+/* Sekundär-Aktion in der Planungs-Leiste: "Neu planen" (Etappe/Woche neu
+   verteilen). Ruhiger Outline-Knopf, von Etappen- und Wochenplan geteilt. */
+.ep-bar-umplanen {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--line-strong);
+  background: var(--card);
+  color: var(--text-2);
+  font-size: 0.92rem;
+  font-weight: 700;
+  padding: 9px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: border-color 0.12s ease, color 0.12s ease;
+}
+.ep-bar-umplanen:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
 @media (max-width: 560px) {
   .ep-bar-text {
     display: none;
