@@ -627,9 +627,19 @@ export default function Wochenplan({ onZurueck, onWeiter, woche = 0 }) {
           </span>
           <span className="ep-bar-sep" aria-hidden="true" />
           {zielVerplant ? (
-            <button type="button" className="ep-bar-weiter" onClick={onWeiter}>
-              Weiter
-            </button>
+            <>
+              <button
+                type="button"
+                className="wp-bar-umplanen"
+                onClick={umplanen}
+                title="Die Woche neu und ausgewogen verteilen"
+              >
+                <span aria-hidden="true">↻</span> Umplanen
+              </button>
+              <button type="button" className="ep-bar-weiter" onClick={onWeiter}>
+                Weiter
+              </button>
+            </>
           ) : (
             <>
               <span className="ep-bar-text">

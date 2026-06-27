@@ -108,10 +108,17 @@ export default function App() {
   // Nachschlage-Werkzeug Ablage. In den Planungs-Wizards (Etappe, Woche) blendet
   // er sich aus: dort führt die eigene Planungs-Leiste unten durch den Schritt.
   const zeigeWeg =
-    screen !== "ablage" && screen !== "etappenplan" && screen !== "wochenplan";
-  // Während des Planens (Etappe, Woche) bleibt die obere Navbar weg: voller
-  // Fokus auf den Planungsschritt, kein Wegspringen.
-  const zeigeNav = screen !== "etappenplan" && screen !== "wochenplan";
+    screen !== "ablage" &&
+    screen !== "etappenplan" &&
+    screen !== "wochenplan" &&
+    screen !== "plan";
+  // Während des Planens (Etappe, Woche, Neu-Planen) bleibt die obere Navbar weg:
+  // voller Fokus auf den Planungsschritt. Neu planen sieht so aus wie das erste
+  // Planen, die Planungs-Leiste unten führt heraus ("Weiter" / "‹ Etappe").
+  const zeigeNav =
+    screen !== "etappenplan" &&
+    screen !== "wochenplan" &&
+    screen !== "plan";
 
   let inhalt;
   if (screen === "wochenplan") {
@@ -124,7 +131,14 @@ export default function App() {
   } else if (screen === "heute") {
     inhalt = <Heute onFokus={setFokusKbId} />;
   } else if (screen === "plan") {
-    inhalt = <Wochenplan onEtappeAnpassen={() => setScreen("etappenplan")} />;
+    // Neu planen sieht aus wie das erste Planen: dieselbe Planungs-Leiste unten
+    // (Wizard-Stil). Da die Woche schon gefüllt ist, bietet die Leiste "Umplanen".
+    inhalt = (
+      <Wochenplan
+        onZurueck={() => setScreen("etappenplan")}
+        onWeiter={() => setScreen("heute")}
+      />
+    );
   } else if (screen === "ablage") {
     inhalt = <Ablage />;
   } else {
