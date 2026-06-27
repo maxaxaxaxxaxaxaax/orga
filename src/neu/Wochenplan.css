@@ -156,7 +156,7 @@
   gap: 10px;
   margin-top: 16px;
 }
-.wp-loeschen {
+.wp-zuruecksetzen {
   flex: 0 1 auto;
   border: 1px solid var(--line-strong);
   background: var(--card);
@@ -167,18 +167,9 @@
   border-radius: 999px;
   cursor: pointer;
 }
-.wp-loeschen:hover:not(:disabled) {
+.wp-zuruecksetzen:hover {
   border-color: var(--accent);
   color: var(--accent);
-}
-.wp-loeschen:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-.wp-loeschen.warn {
-  border-color: var(--warn-line);
-  color: var(--warn-text);
-  background: var(--warn-bg);
 }
 .wp-umplanen {
   flex: 1 1 auto;
@@ -409,7 +400,7 @@
 /* Der Toast (.ep-hinweis) ist zentral in index.css definiert. */
 
 @media (pointer: coarse) {
-  .wp-loeschen,
+  .wp-zuruecksetzen,
   .wp-umplanen,
   .wp-kal-pfeil,
   .wp-bar-zurueck {

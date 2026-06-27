@@ -77,13 +77,14 @@ function alleBelegbarenSlots() {
   return slots;
 }
 
-export default function Wochenplan({ onZurueck, onWeiter, onEtappeAnpassen, woche = 0 }) {
+export default function Wochenplan({ onZurueck, onWeiter, woche = 0 }) {
   const wochenZuordnung = lade(WOCHEN_KEY); // kbId -> Woche
   const [stunden, setStunden] = useState(ladeStunden); // kbId -> [Slot-IDs]
   const [ueber, setUeber] = useState(null); // aktuelles Drop-Ziel (Hover)
   const [gewaehltId, setGewaehltId] = useState(null); // angetippter Chip (Touch)
   const [hinweis, setHinweis] = useState(null); // kurze Rueckmeldung (Toast)
-  const [resetConfirm, setResetConfirm] = useState(false);
+  // Plan-Übersicht: erst nach einem "Umplanen" erscheint daneben "Zurücksetzen".
+  const [umgeplant, setUmgeplant] = useState(false);
   const [aktiveWoche, setAktiveWoche] = useState(woche);
   const [zuFaecher, setZuFaecher] = useState(() => new Set()); // eingeklappte Fächer
 
@@ -130,7 +131,6 @@ export default function Wochenplan({ onZurueck, onWeiter, onEtappeAnpassen, woch
       koennensbeweise.map((k) => wochenZuordnung[k.id]).filter((w) => w != null)
     ),
   ].sort((a, b) => a - b);
-  const wocheHatPlatziert = wocheKbs.some((k) => (stunden[k.id] || []).length > 0);
   // "Weiter" hängt an der zu planenden Woche (planung.js wertet nur diese), nicht
   // an der gerade angezeigten: so kann man frei durch alle Wochen blättern, ohne
   // den Schritt von einer fremden Woche aus fälschlich abzuschließen.
@@ -248,6 +248,7 @@ export default function Wochenplan({ onZurueck, onWeiter, onEtappeAnpassen, woch
     setHinweis("Alle Wochen ausgewogen auf die Stunden verteilt. Du kannst frei anpassen.");
   }
 
+  // Zurücksetzen: die Stunden der angezeigten Woche leeren (Lernstand bleibt).
   function planZuruecksetzen() {
     setStunden((prev) => {
       const next = { ...prev };
@@ -255,8 +256,40 @@ export default function Wochenplan({ onZurueck, onWeiter, onEtappeAnpassen, woch
       return next;
     });
     setGewaehltId(null);
-    setResetConfirm(false);
+    setUmgeplant(false);
     setHinweis("Stunden dieser Woche zurückgesetzt. Dein Lernstand bleibt.");
+  }
+
+  // Umplanen: die angezeigte Woche frisch und ausgewogen neu verteilen (erst
+  // leeren, dann auffüllen). Danach erscheint daneben "Zurücksetzen".
+  function umplanen() {
+    const slots = alleBelegbarenSlots();
+    if (slots.length === 0) return;
+    setStunden((prev) => {
+      const next = { ...prev };
+      const last = {};
+      slots.forEach((sid) => (last[sid] = 0));
+      for (const kb of wocheKbs) {
+        const have = new Set();
+        let fehlend = kb.cluster;
+        while (fehlend > 0) {
+          let best = null;
+          for (const sid of slots) {
+            if (have.has(sid)) continue;
+            if (best === null || last[sid] < last[best]) best = sid;
+          }
+          if (best === null) break;
+          have.add(best);
+          last[best]++;
+          fehlend--;
+        }
+        next[kb.id] = [...have];
+      }
+      return next;
+    });
+    setGewaehltId(null);
+    setUmgeplant(true);
+    setHinweis("Woche neu verteilt. Du kannst frei anpassen.");
   }
 
   function toggleFach(fach) {
@@ -387,6 +420,7 @@ export default function Wochenplan({ onZurueck, onWeiter, onEtappeAnpassen, woch
     if (ni < 0 || ni >= wochenMitKbs.length) return;
     setAktiveWoche(wochenMitKbs[ni]);
     setGewaehltId(null);
+    setUmgeplant(false);
   };
 
   return (
@@ -420,50 +454,29 @@ export default function Wochenplan({ onZurueck, onWeiter, onEtappeAnpassen, woch
               {langDatum(ETAPPE.von)} - {langDatum(ETAPPE.bis)}
             </p>
 
-            {/* Plan-Übersicht: Werkzeuge direkt in der Karte (wie im Figma):
-               Löschen + Umplanen. Im Wizard führt die Pille unten durch. */}
+            {/* Plan-Übersicht: "Umplanen" verteilt die Woche neu. Erst danach
+               erscheint links daneben "Zurücksetzen" (wie im Figma). Im Wizard
+               führt stattdessen die Pille unten durch. */}
             {!istWizard && (
               <div className="wp-aktionen">
-              {resetConfirm ? (
-                <>
+                {umgeplant && (
                   <button
                     type="button"
-                    className="wp-loeschen warn"
+                    className="wp-zuruecksetzen"
                     onClick={planZuruecksetzen}
+                    title="Die Stunden dieser Woche zurücksetzen (Lernstand bleibt)"
                   >
-                    Wirklich löschen
+                    Zurücksetzen
                   </button>
-                  <button
-                    type="button"
-                    className="wp-loeschen"
-                    onClick={() => setResetConfirm(false)}
-                  >
-                    Abbrechen
-                  </button>
-                </>
-              ) : (
-                <>
-                  <button
-                    type="button"
-                    className="wp-loeschen"
-                    onClick={() => setResetConfirm(true)}
-                    disabled={!wocheHatPlatziert}
-                    title="Die Stunden dieser Woche löschen (Lernstand bleibt)"
-                  >
-                    Löschen
-                  </button>
-                  {onEtappeAnpassen && (
-                    <button
-                      type="button"
-                      className="wp-umplanen"
-                      onClick={onEtappeAnpassen}
-                      title="Planung neu starten und die Etappe anpassen"
-                    >
-                      Umplanen
-                    </button>
-                  )}
-                </>
-              )}
+                )}
+                <button
+                  type="button"
+                  className="wp-umplanen"
+                  onClick={umplanen}
+                  title="Die Woche automatisch neu verteilen"
+                >
+                  Umplanen
+                </button>
               </div>
             )}
           </div>
