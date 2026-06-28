@@ -391,25 +391,8 @@
   opacity: 0.85;
 }
 
-/* ---- Untere Pille: Zurück-Knopf (nur Wizard) --------------------------
-   Sitzt links in der gemeinsamen ep-bar, vor dem Label. */
-.wp-bar-zurueck {
-  flex-shrink: 0;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  border: none;
-  background: transparent;
-  color: var(--ep-teal-strong, #0b7d72);
-  font-size: 0.9rem;
-  font-weight: 700;
-  padding: 8px 10px;
-  border-radius: 999px;
-  cursor: pointer;
-}
-.wp-bar-zurueck:hover {
-  background: color-mix(in srgb, var(--ep-teal, #0d9488) 14%, transparent);
-}
+/* Der Zurück-Knopf (.ep-bar-zurueck) in der unteren Pille liegt in
+   Etappenplan.css, von Etappen- und Wochenplan geteilt. */
 
 /* Der Toast (.ep-hinweis) ist zentral in index.css definiert.
    ".ep-bar-umplanen" (Neu planen) liegt in Etappenplan.css, von beiden geteilt. */
@@ -418,7 +401,7 @@
   .wp-zuruecksetzen,
   .wp-umplanen,
   .wp-kal-pfeil,
-  .wp-bar-zurueck,
+  .ep-bar-zurueck,
   .ep-bar-umplanen {
     min-height: 40px;
   }

@@ -190,7 +190,12 @@ export default function App() {
   } else if (screen === "ablage") {
     inhalt = <Ablage />;
   } else {
-    inhalt = <Etappenplan onWeiter={() => setScreen("wochenplan")} />;
+    inhalt = (
+      <Etappenplan
+        onWeiter={() => setScreen("wochenplan")}
+        onZurueck={() => setScreen("heute")}
+      />
+    );
   }
 
   const fokusKb = fokusKbId

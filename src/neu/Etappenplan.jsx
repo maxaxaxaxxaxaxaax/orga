@@ -54,7 +54,7 @@ function lade() {
   }
 }
 
-export default function Etappenplan({ onWeiter }) {
+export default function Etappenplan({ onWeiter, onZurueck }) {
   const [zuordnung, setZuordnung] = useState(lade); // kbId -> Wochen-Index
   const [ueber, setUeber] = useState(null); // Drop-Ziel ("w0".."w5" | "pool")
   const [gewaehltId, setGewaehltId] = useState(null); // angetippter Chip (Touch)
@@ -355,10 +355,33 @@ export default function Etappenplan({ onWeiter }) {
       {/* Untere Leiste: führt durch den Schritt. Ist alles verteilt, fällt der
          Hinweis weg und es erscheint "Weiter" (wie im Mockup). */}
       <div className="ep-bar">
+        {onZurueck && (
+          <button
+            type="button"
+            className="ep-bar-zurueck"
+            onClick={onZurueck}
+            aria-label="Zurück zur Übersicht"
+            title="Zurück zur Übersicht"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              width="20"
+              height="20"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M15 5l-7 7 7 7" />
+            </svg>
+          </button>
+        )}
+        {onZurueck && <span className="ep-bar-sep" aria-hidden="true" />}
         <span className="ep-bar-label">
           <span aria-hidden="true">🗓</span> Etappenplanung
         </span>
-        <span className="ep-bar-sep" aria-hidden="true" />
         {!hatPlan ? (
           <>
             <span className="ep-bar-text">

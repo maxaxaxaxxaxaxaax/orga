@@ -623,17 +623,30 @@ export default function Wochenplan({ onZurueck, onWeiter, woche = 0 }) {
           {onZurueck && (
             <button
               type="button"
-              className="wp-bar-zurueck"
+              className="ep-bar-zurueck"
               onClick={onZurueck}
+              aria-label="Zurück zum Etappenplan"
               title="Zurück zum Etappenplan"
             >
-              <span aria-hidden="true">‹</span> Etappe
+              <svg
+                viewBox="0 0 24 24"
+                width="20"
+                height="20"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M15 5l-7 7 7 7" />
+              </svg>
             </button>
           )}
+          {onZurueck && <span className="ep-bar-sep" aria-hidden="true" />}
           <span className="ep-bar-label">
             <span aria-hidden="true">🗓</span> Wochenplanung
           </span>
-          <span className="ep-bar-sep" aria-hidden="true" />
           {!hatPlan ? (
             <>
               <span className="ep-bar-text">

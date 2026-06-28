@@ -152,7 +152,7 @@
   align-items: center;
   gap: 14px;
   width: min(var(--leiste-breite), calc(100% - 28px));
-  padding: 8px 8px 8px 18px;
+  padding: 8px 8px 8px 10px;
   /* Heller Glas-Look, konsistent mit der Weg-Leiste und der Figma-Komponente. */
   background: linear-gradient(
     180deg,
@@ -164,6 +164,26 @@
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), var(--shadow-lg);
   -webkit-backdrop-filter: blur(30px) saturate(1.9) brightness(1.03);
   backdrop-filter: blur(30px) saturate(1.9) brightness(1.03);
+}
+/* Zurück-Pfeil ganz links in der Planungs-Leiste: nur das Chevron, danach ein
+   Trennstrich (.ep-bar-sep). Von Etappen- und Wochenplan geteilt. */
+.ep-bar-zurueck {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  border-radius: 999px;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+.ep-bar-zurueck:hover {
+  background: color-mix(in srgb, var(--text) 8%, transparent);
+  color: var(--accent);
 }
 .ep-bar-label {
   display: inline-flex;
