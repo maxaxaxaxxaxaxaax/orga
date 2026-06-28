@@ -7,6 +7,7 @@ import NavLeiste from "./NavLeiste";
 import Topbar from "./Topbar";
 import WegLeiste from "./WegLeiste";
 import IntroOverlay from "./IntroOverlay";
+import Login from "./Login";
 import Fokus from "./Fokus";
 import { koennensbeweise } from "../data/koennensbeweise";
 import {
@@ -20,6 +21,7 @@ import {
 import { heuteOffeneZiele, nachzuegler } from "./weg";
 
 const INTRO_KEY = "neu.intro.gesehen";
+const LOGIN_KEY = "neu.login";
 
 // Funktioniert der lokale Speicher ueberhaupt? Im privaten Modus oder bei
 // gesperrtem Speicher (Schulnetz) schlagen Schreibvorgaenge still fehl, und die
@@ -46,6 +48,30 @@ export default function App() {
   const [fokusKbId, setFokusKbId] = useState(null); // Ziel im Fokus-Modus (Vollbild)
   const [toast, setToast] = useState(null); // kurze Rückmeldung unten mittig
   const [speicherOk] = useState(speicherGeht); // einmal beim Start pruefen
+  // Anmeldung (Demo): die App startet hinter einem Login mit Schulaccount.
+  const [eingeloggt, setEingeloggt] = useState(() => {
+    try {
+      return !!localStorage.getItem(LOGIN_KEY);
+    } catch {
+      return false;
+    }
+  });
+  function anmelden() {
+    try {
+      localStorage.setItem(LOGIN_KEY, "1");
+    } catch {
+      /* localStorage blockiert: dann nur diese Sitzung */
+    }
+    setEingeloggt(true);
+  }
+  function abmelden() {
+    try {
+      localStorage.removeItem(LOGIN_KEY);
+    } catch {
+      /* localStorage blockiert: dann nur diese Sitzung */
+    }
+    setEingeloggt(false);
+  }
   // Erststart-Intro: einmal zeigen, bis es weggeklickt ist.
   const [introOffen, setIntroOffen] = useState(() => {
     try {
@@ -134,6 +160,13 @@ export default function App() {
   // Leiste unten führt zusätzlich durch den Schritt ("Weiter" / "‹ Etappe").
   const zeigeNav = true;
 
+  // Vor der App steht die Anmeldung: ohne Login zeigt der ganze Bildschirm den
+  // Schulaccount-Einstieg (alle Hooks laufen davor, daher ist der frühe Ausstieg
+  // hier sicher).
+  if (!eingeloggt) {
+    return <Login onLogin={anmelden} />;
+  }
+
   let inhalt;
   if (screen === "wochenplan") {
     inhalt = (
@@ -183,7 +216,12 @@ export default function App() {
       {zeigeWeg && <WegLeiste onGo={wegGo} />}
       {inhalt}
       {zeigeNav && <NavLeiste aktiv={bereich} onWechsel={wechsle} />}
-      {zeigeNav && <Topbar onResetDemo={() => window.location.reload()} />}
+      {zeigeNav && (
+        <Topbar
+          onResetDemo={() => window.location.reload()}
+          onAbmelden={abmelden}
+        />
+      )}
       {introOffen && <IntroOverlay onLos={introFertig} />}
       {fokusKb && (
         <Fokus

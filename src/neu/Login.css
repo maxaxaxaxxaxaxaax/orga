@@ -1,0 +1,209 @@
+/* Anmeldung: ruhiger Vollbild-Einstieg, über allem (auch Fokus z-200). */
+.login {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: radial-gradient(
+    120% 80% at 50% -10%,
+    color-mix(in srgb, var(--accent) 12%, var(--bg)),
+    var(--bg)
+  );
+}
+.login-karte {
+  position: relative;
+  box-sizing: border-box;
+  width: min(420px, 100%);
+  padding: 40px 34px 28px;
+  text-align: center;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  box-shadow: var(--shadow-lg);
+  animation: login-rein 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+@keyframes login-rein {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.login-marke {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 22px;
+}
+.login-logo {
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+}
+.login-logo-svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.login-schule {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text-2);
+}
+.login-titel {
+  margin: 0 0 8px;
+  font-family: var(--font-display);
+  font-size: 2.4rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+.login-text {
+  margin: 0 auto 26px;
+  max-width: 300px;
+  font-size: 0.98rem;
+  line-height: 1.5;
+  color: var(--text-2);
+}
+.login-haupt {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 14px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.98rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.16s ease, transform 0.12s ease;
+}
+.login-haupt:hover {
+  background: var(--accent-strong);
+}
+.login-haupt:active {
+  transform: scale(0.99);
+}
+.login-gast {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+  padding: 12px;
+  border: none;
+  border-radius: 14px;
+  background: transparent;
+  color: var(--text-2);
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.login-gast:hover {
+  color: var(--text);
+}
+.login-fuss {
+  margin: 22px 0 0;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+/* Schritt 2: Schulaccount verknüpfen. */
+.login-zurueck {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--card);
+  color: var(--text-2);
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.login-zurueck:hover {
+  color: var(--text);
+}
+.login-eyebrow {
+  margin: 6px 0 18px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+.login-konto {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  text-align: left;
+  margin-bottom: 16px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--bg);
+}
+.login-konto-avatar {
+  flex: none;
+  width: 46px;
+  height: 46px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+  font-weight: 700;
+  font-size: 1.15rem;
+}
+.login-konto-text {
+  display: flex;
+  flex-direction: column;
+}
+.login-konto-name {
+  font-size: 1.02rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.login-konto-meta {
+  font-size: 0.85rem;
+  color: var(--text-2);
+}
+.login-rechte {
+  list-style: none;
+  margin: 0 0 22px;
+  padding: 0;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.login-rechte li {
+  position: relative;
+  padding-left: 24px;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  color: var(--text-2);
+}
+.login-rechte li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: var(--accent-strong);
+  font-weight: 700;
+}

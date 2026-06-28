@@ -38,7 +38,7 @@ const BlattIcon = () => (
   </svg>
 );
 
-export default function Topbar({ onResetDemo }) {
+export default function Topbar({ onResetDemo, onAbmelden }) {
   const [offen, setOffen] = useState(null); // null | "mitteilungen" | "einstellungen"
   const [liste, setListe] = useState(ladeMitteilungen);
 
@@ -154,6 +154,15 @@ export default function Topbar({ onResetDemo }) {
             >
               Demo neu starten
             </button>
+            {onAbmelden && (
+              <button
+                type="button"
+                className="topbar-abmelden"
+                onClick={onAbmelden}
+              >
+                Abmelden
+              </button>
+            )}
           </div>
         )}
       </div>

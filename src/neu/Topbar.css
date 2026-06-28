@@ -281,6 +281,23 @@
   border-color: var(--accent);
   color: var(--accent-strong);
 }
+.topbar-abmelden {
+  display: block;
+  width: calc(100% - 16px);
+  margin: 0 8px 8px;
+  padding: 10px;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--text-2);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.topbar-abmelden:hover {
+  color: var(--text);
+  background: var(--bg);
+}
 
 @media (max-width: 560px) {
   .topbar-rechts {
