@@ -610,6 +610,9 @@
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  /* Immer zwei Zeilen hoch reservieren, damit Fach + Chips bei kurzen und
+     langen Titeln auf gleicher Höhe sitzen (nicht versetzt). */
+  min-height: 2.44em;
 }
 .hu-auf.done .hu-auf-titel {
   color: var(--muted);
