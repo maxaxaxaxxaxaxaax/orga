@@ -8,9 +8,14 @@ const RING_BREITE = 14;
 const LUECKE = 5;
 const AUSSEN = MITTE - RING_BREITE / 2 - 2;
 
-export default function Etappenring({ ringe, gesamtDone, gesamtTotal }) {
+export default function Etappenring({
+  ringe,
+  gesamtDone,
+  gesamtTotal,
+  animiert,
+}) {
   return (
-    <div className="hu-ring-wrap">
+    <div className={"hu-ring-wrap" + (animiert ? " hu-ring-animiert" : "")}>
       <svg
         className="hu-ring"
         viewBox={`0 0 ${GROESSE} ${GROESSE}`}

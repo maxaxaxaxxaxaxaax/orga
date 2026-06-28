@@ -580,107 +580,107 @@ export default function Fokus({
 
       {alleFertig ? (
         <div className="fokus-abschluss">
-          {abgeschlossen ? (
-            <main className="fokus-abschluss-karte">
-              {ringFaecher && (
-                <div className="fokus-abschluss-ring">
-                  <Etappenring
-                    ringe={ringFaecher}
-                    gesamtDone={etappeDone}
-                    gesamtTotal={etappeTotal}
-                  />
+          <main className="fokus-abschluss-karte">
+            {/* Ring + Titel bleiben stabil, damit der Bogen beim Abnehmen sanft
+                von N auf N+1 wächst (nur der Inhalt darunter wechselt). */}
+            {ringFaecher && (
+              <div className="fokus-abschluss-ring">
+                <Etappenring
+                  ringe={ringFaecher}
+                  gesamtDone={etappeDone}
+                  gesamtTotal={etappeTotal}
+                  animiert
+                />
+              </div>
+            )}
+            <p className="fokus-eyebrow">Geschafft ✓</p>
+            <h1 className="fokus-titel">{kb.titel}</h1>
+            {abgeschlossen ? (
+              <>
+                <p className="fokus-info">
+                  {naechste
+                    ? "Gut gemacht. Möchtest du gleich weitermachen oder zurück zur Übersicht?"
+                    : "Stark, du hast alle Ziele für heute geschafft."}
+                </p>
+                <div className="fokus-fuss">
+                  {naechste && (
+                    <button
+                      type="button"
+                      className="fokus-weiter"
+                      onClick={() => onWeiter(naechste.id)}
+                    >
+                      Weiter mit {naechste.fach}: {naechste.titel} →
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    className={naechste ? "fokus-sekundaer" : "fokus-weiter"}
+                    onClick={onClose}
+                  >
+                    Zurück zur Übersicht
+                  </button>
                 </div>
-              )}
-              <p className="fokus-eyebrow">Geschafft ✓</p>
-              <h1 className="fokus-titel">{kb.titel}</h1>
-              <p className="fokus-info">
-                {naechste
-                  ? "Gut gemacht. Möchtest du gleich weitermachen oder zurück zur Übersicht?"
-                  : "Stark, du hast alle Ziele für heute geschafft."}
-              </p>
-              <div className="fokus-fuss">
-                {naechste && (
+              </>
+            ) : (
+              <>
+                <p className="fokus-info">
+                  {schritte.length > 0 ? "Alle Schritte erledigt. " : ""}
+                  Wenn du dich sicher fühlst, melde den Könnensbeweis bei {COACH}{" "}
+                  zur Abnahme an. Sonst hakst du ihn nur für heute ab.
+                </p>
+                <div className="fokus-zeit">
+                  <span className="fokus-zeit-label">
+                    So lange hast du gebraucht
+                  </span>
+                  <span className="fokus-zeit-gross">
+                    {gemessenSek != null ? mmss(gemessenSek) : "0:00"}
+                  </span>
+                  <p className="fokus-zeit-hint">
+                    Genau gemessen in dieser Sitzung (Minuten:Sekunden). Die Zeit
+                    bleibt auf diesem Gerät und hilft nur dir bei der Einschätzung.
+                  </p>
+                </div>
+                {hilfe && (
+                  <p className="fokus-hilfe-laeuft" role="status">
+                    Dein Hilferuf an {COACH} läuft noch. {COACH} kümmert sich
+                    später darum, du kannst ruhig weitermachen.
+                  </p>
+                )}
+                <div className="fokus-fuss">
                   <button
                     type="button"
                     className="fokus-weiter"
-                    onClick={() => onWeiter(naechste.id)}
+                    onClick={() => {
+                      bucheZeit(gemessenSek ?? 0);
+                      setzeAbnahme(kb.id, true);
+                      onFertig(kb.id);
+                      setAbgeschlossen(true);
+                    }}
                   >
-                    Weiter mit {naechste.fach}: {naechste.titel} →
+                    Zur Abnahme anmelden
                   </button>
-                )}
+                  <button
+                    type="button"
+                    className="fokus-sekundaer"
+                    onClick={() => {
+                      bucheZeit(gemessenSek ?? 0);
+                      onFertig(kb.id);
+                      setAbgeschlossen(true);
+                    }}
+                  >
+                    Nur für heute abhaken
+                  </button>
+                </div>
                 <button
                   type="button"
-                  className={naechste ? "fokus-sekundaer" : "fokus-weiter"}
+                  className="fokus-textlink"
                   onClick={onClose}
                 >
-                  Zurück zur Übersicht
+                  Erst mal schließen
                 </button>
-              </div>
-            </main>
-          ) : (
-            <main className="fokus-abschluss-karte">
-              {ringFaecher && (
-                <div className="fokus-abschluss-ring">
-                  <Etappenring
-                    ringe={ringFaecher}
-                    gesamtDone={etappeDone}
-                    gesamtTotal={etappeTotal}
-                  />
-                </div>
-              )}
-              <p className="fokus-eyebrow">Geschafft ✓</p>
-              <h1 className="fokus-titel">{kb.titel}</h1>
-              <p className="fokus-info">
-                {schritte.length > 0 ? "Alle Schritte erledigt. " : ""}
-                Wenn du dich sicher fühlst, melde den Könnensbeweis bei {COACH}{" "}
-                zur Abnahme an. Sonst hakst du ihn nur für heute ab.
-              </p>
-              <div className="fokus-zeit">
-                <span className="fokus-zeit-label">So lange hast du gebraucht</span>
-                <span className="fokus-zeit-gross">
-                  {gemessenSek != null ? mmss(gemessenSek) : "0:00"}
-                </span>
-                <p className="fokus-zeit-hint">
-                  Genau gemessen in dieser Sitzung (Minuten:Sekunden). Die Zeit
-                  bleibt auf diesem Gerät und hilft nur dir bei der Einschätzung.
-                </p>
-              </div>
-              {hilfe && (
-                <p className="fokus-hilfe-laeuft" role="status">
-                  Dein Hilferuf an {COACH} läuft noch. {COACH} kümmert sich
-                  später darum, du kannst ruhig weitermachen.
-                </p>
-              )}
-              <div className="fokus-fuss">
-                <button
-                  type="button"
-                  className="fokus-weiter"
-                  onClick={() => {
-                    bucheZeit(gemessenSek ?? 0);
-                    setzeAbnahme(kb.id, true);
-                    onFertig(kb.id);
-                    setAbgeschlossen(true);
-                  }}
-                >
-                  Zur Abnahme anmelden
-                </button>
-                <button
-                  type="button"
-                  className="fokus-sekundaer"
-                  onClick={() => {
-                    bucheZeit(gemessenSek ?? 0);
-                    onFertig(kb.id);
-                    setAbgeschlossen(true);
-                  }}
-                >
-                  Nur für heute abhaken
-                </button>
-              </div>
-              <button type="button" className="fokus-textlink" onClick={onClose}>
-                Erst mal schließen
-              </button>
-            </main>
-          )}
+              </>
+            )}
+          </main>
         </div>
       ) : (
         <div

@@ -8,40 +8,14 @@ export const TAGE_KEY = "neu.wochenplan.tage"; // kbId -> Wochentag (0=Mo..4=Fr)
 export const STUNDEN_KEY = "neu.wochenplan.stunden"; // kbId -> Stunden-ID (Tag-Startzeit), optional
 export const ERLEDIGT_KEY = "neu.erledigt"; // kbId -> true
 
-// Demo-Stand: Max steckt schon ein Stück in der Etappe, ein paar Grundlagen-
-// Könnensbeweise sind erbracht. Dieser gelebte Fortschritt erscheint aber erst,
-// sobald geplant wurde: solange nach dem Login noch nichts geplant ist, startet
-// die Übersicht ehrlich bei null (siehe ladeErledigt). Die heutigen Ziele (7MA1,
-// 7EA1) bleiben bewusst offen, damit der Tag noch etwas zu tun hat.
-const ERLEDIGT_SEED = {
-  "7MA2": true, // Addieren & Subtrahieren negativer Zahlen
-  "7MA3": true, // Multiplikation & Division negativer Zahlen
-  "7DA1": true, // Mini-Vortrag
-  "7DA2": true, // Lernplakat
-  "7EA2": true, // Vocabulary unit 5, pp. 84-93
-  "7EA3": true, // will-future, question tags, if-clause I
-  "7EA4": true, // Vocabulary unit 5, pp. 94-99
-  "7FA1": true, // Vocabulaire Unité 3
-  "7FA2": true, // Présent: verbes en -ir
-  "7FA4": true, // Vocabulaire: les loisirs
-};
-
-// Erledigt-Stand laden. Ist schon etwas gespeichert, zählt das. Sonst hängt es
-// am Planungs-Stand: solange noch nichts geplant ist (frischer Start nach dem
-// Login), bleibt der Fortschritt leer (die App kann ehrlich nichts zeigen). Erst
-// wenn geplant wurde, erscheint Max' gelebter Demo-Stand.
+// Erledigt-Stand laden: ausschließlich, was wirklich abgenommen wurde. Die
+// Übersicht startet ehrlich bei null und wächst mit jedem geschafften
+// Könnensbeweis (kein vorab gesetzter Demo-Stand).
 export function ladeErledigt() {
   try {
     const r = localStorage.getItem(ERLEDIGT_KEY);
     const v = r == null ? {} : JSON.parse(r);
-    const stand = v && typeof v === "object" && !Array.isArray(v) ? v : {};
-    // Ist noch nichts erledigt gespeichert (auch ein leer persistiertes {} zählt
-    // als nichts), hängt der Stand am Planen: ungeplant bleibt er leer, sobald
-    // geplant wurde erscheint Max' gelebter Demo-Stand.
-    if (Object.keys(stand).length === 0) {
-      return Object.keys(lade(WOCHEN_KEY)).length > 0 ? { ...ERLEDIGT_SEED } : {};
-    }
-    return stand;
+    return v && typeof v === "object" && !Array.isArray(v) ? v : {};
   } catch {
     return {};
   }
