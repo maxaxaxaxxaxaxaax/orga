@@ -601,7 +601,15 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
           )}
         </div>
       ) : (
-        <div className="fokus-koerper">
+        <div
+          className={
+            "fokus-koerper" +
+            (werkzeug === "materialien" || werkzeug === "notizen"
+              ? ""
+              : " ohne-rail") +
+            (chatsOffen ? "" : " chats-zu")
+          }
+        >
           {/* Linke Werkzeug-Toolbar */}
           <nav className="fokus-werkzeuge" aria-label="Werkzeuge">
             <button

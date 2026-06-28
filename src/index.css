@@ -43,6 +43,18 @@
   --r-lg: 20px;
   --r-xl: 28px;
 
+  /* === Seiten-Raster: gemeinsames Spaltensystem (alle Screens) ===
+     Einheitlicher Seitenrand, Spaltenabstand und 12-Spalten-Basis, damit ein
+     gegebener Bruchteil (z. B. 4/12) auf jeder Seite gleich breit ist und nichts
+     clippt. Reine Geometrie, daher nicht im dunklen Theme nötig. */
+  --seite-x: 28px; /* horizontaler Seitenrand */
+  --seite-x-eng: 16px; /* Seitenrand < 560px */
+  --seite-top: 74px; /* Platz für die obere Weg-Leiste (Screens mit Navbar) */
+  --seite-top-wizard: 24px; /* oben für Planungs-Wizards ohne Navbar */
+  --seite-bottom: 96px; /* Platz für die untere Nav/Schritt-Pille */
+  --grid-gap: 18px; /* Spalten-/Zeilenabstand im Raster */
+  --grid-spalten: 12; /* Basis-Spaltenzahl */
+
   /* === Elevation: warm getönt, weich, mehrschichtig === */
   --shadow-sm: 0 1px 2px rgba(54, 44, 26, 0.05),
     0 2px 6px -2px rgba(54, 44, 26, 0.08);

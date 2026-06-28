@@ -9,7 +9,7 @@
   flex-direction: column;
   overflow: hidden;
   /* oben Platz fuer die Nav-Pille (Plan-Tab), unten fuer die schwebende Leiste */
-  padding: 70px 28px 88px;
+  padding: var(--seite-top) var(--seite-x) var(--seite-bottom);
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-satoshi);
@@ -17,29 +17,41 @@
 /* Wizard-Schritt: keine obere Nav, dafuer die "Wochenplanung"-Pille unten.
    Oben darf der Kalender naeher an den Rand, wie im Etappenplan. */
 .wp-screen.wp-wizard {
-  padding-top: 28px;
+  padding-top: var(--seite-top-wizard);
 }
 .wp-layout {
   flex: 1;
   min-height: 0;
   display: grid;
-  grid-template-columns: minmax(280px, 340px) minmax(0, 1fr);
+  grid-template-columns: repeat(12, minmax(0, 1fr));
   grid-template-rows: minmax(0, 1fr);
-  gap: 18px;
+  gap: var(--grid-gap);
   align-items: stretch;
+}
+/* Seitenleiste 4/12, Kalender 8/12 (gleicher Bruchteil wie die anderen Seiten). */
+.wp-layout > .wp-seite {
+  grid-column: span 4;
+}
+.wp-layout > .wp-kal {
+  grid-column: span 8;
+  min-width: 0;
 }
 @media (max-width: 860px) {
   .wp-screen {
     height: auto;
     overflow: visible;
-    padding: 70px 14px 88px;
+    padding: var(--seite-top) var(--seite-x) var(--seite-bottom);
   }
   .wp-screen.wp-wizard {
-    padding-top: 18px;
+    padding-top: var(--seite-top-wizard);
   }
   .wp-layout {
     grid-template-columns: 1fr;
     grid-template-rows: auto;
+  }
+  .wp-layout > .wp-seite,
+  .wp-layout > .wp-kal {
+    grid-column: auto;
   }
   .wp-seite-liste {
     overflow-y: visible;
@@ -51,8 +63,8 @@
 }
 @media (max-width: 560px) {
   .wp-screen {
-    padding-left: 14px;
-    padding-right: 14px;
+    padding-left: var(--seite-x-eng);
+    padding-right: var(--seite-x-eng);
   }
 }
 
@@ -209,7 +221,9 @@
 }
 
 .wp-kal-grid {
-  min-width: 580px;
+  /* Auf breiten Screens 100% (kein Scroll); erst unter ~580px scrollt der
+     Kalender INNERHALB seiner Karte (.wp-kal hat overflow:auto), nie die Seite. */
+  min-width: min(580px, 100%);
 }
 .wp-kal-head,
 .wp-kal-body {

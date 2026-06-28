@@ -123,20 +123,36 @@
   transition: width 0.35s cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 
-/* ---- Körper: dreispaltiges Raster -------------------------------------- */
+/* ---- Körper: gemeinsames 12-Spalten-Raster ----------------------------- */
 .fokus-koerper {
   flex: 1;
   min-height: 0;
-  display: flex;
+  position: relative;
+  display: grid;
+  /* Schmale Werkzeug-Spalte (auto) plus 12 fraktionale Spalten: rail 3, mitte 6,
+     chats 3. Spans statt fester clamp-Breiten, damit nichts über den Rand clippt. */
+  grid-template-columns: auto repeat(12, minmax(0, 1fr));
+  grid-template-areas: "tools rail rail rail mitte mitte mitte mitte mitte mitte chats chats chats";
   align-items: stretch;
-  gap: 16px;
-  padding: 8px 20px 18px;
+  gap: var(--grid-gap);
+  padding: 8px var(--seite-x) 18px;
   box-sizing: border-box;
+}
+/* rail ausgeblendet (Live-Coach/Stift): mitte rückt nach links */
+.fokus-koerper.ohne-rail {
+  grid-template-areas: "tools mitte mitte mitte mitte mitte mitte mitte mitte mitte chats chats chats";
+}
+/* Chats eingeklappt: mitte bis ans Ende, die Chat-Pille schwebt oben rechts */
+.fokus-koerper.chats-zu {
+  grid-template-areas: "tools rail rail rail mitte mitte mitte mitte mitte mitte mitte mitte mitte";
+}
+.fokus-koerper.ohne-rail.chats-zu {
+  grid-template-areas: "tools mitte mitte mitte mitte mitte mitte mitte mitte mitte mitte mitte mitte";
 }
 
 /* ---- Werkzeug-Toolbar (links) ----------------------------------------- */
 .fokus-werkzeuge {
-  order: 1;
+  grid-area: tools;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -200,8 +216,7 @@
 
 /* ---- Mitte: aktives Material + Schritt-Steuerung ----------------------- */
 .fokus-mitte {
-  order: 3;
-  flex: 1;
+  grid-area: mitte;
   position: relative;
   min-width: 0;
   min-height: 0;
@@ -802,9 +817,8 @@
 
 /* ---- Rechte Leiste: passende Materialien ------------------------------ */
 .fokus-rail {
-  order: 2;
-  width: clamp(250px, 21vw, 320px);
-  flex-shrink: 0;
+  grid-area: rail;
+  min-width: 0;
   min-height: 0;
   display: flex;
   flex-direction: column;
@@ -822,12 +836,8 @@
 
 /* ---- Rechtes Panel: Chats (Lerncoach = KI, Tutor = Mensch) ------------ */
 .fokus-chats {
-  order: 4;
-  /* Breiter als die Material-Leiste: der Chat (Nachrichten, Vorschlags-Chips,
-     Eingabe) braucht mehr Platz, damit der Inhalt gut hineinpasst. Auf schmalen
-     Screens schrumpft er mit, damit die Mitte nicht zerquetscht wird. */
-  width: clamp(270px, 25vw, 380px);
-  flex-shrink: 0;
+  grid-area: chats;
+  min-width: 0;
   min-height: 0;
   display: flex;
   flex-direction: column;
@@ -863,10 +873,15 @@
   border-color: var(--accent);
   color: var(--accent);
 }
-/* Eingeklappt: nur der Kopf als Pille, oben rechts; die Mitte wird breiter. */
+/* Eingeklappt: nur der Kopf als Pille, schwebt oben rechts; die Mitte (deren
+   Raster-Bereich dann bis ans Ende reicht, siehe .fokus-koerper.chats-zu) wird
+   dadurch breiter. Aus dem Fluss genommen, damit keine Spalte leer bleibt. */
 .fokus-chats.zu {
+  position: absolute;
+  top: 8px;
+  right: var(--seite-x);
+  z-index: 5;
   width: auto;
-  align-self: flex-start;
   border-radius: 999px;
   padding: 10px 14px;
 }
@@ -1335,36 +1350,41 @@
 }
 
 /* ---- Schmaler: Materialien-Leiste unter die Mitte --------------------- */
+/* ---- Schmaler (<=1024): alles untereinander stapeln ------------------- */
 @media (max-width: 1024px) {
   .fokus-koerper {
-    grid-template-columns: auto 1fr;
-    grid-template-rows: minmax(0, 1fr) auto;
-    grid-template-areas:
-      "tools mitte"
-      "rail rail";
+    display: flex;
+    flex-direction: column;
+    gap: var(--grid-gap);
+    overflow-y: auto;
   }
-  .fokus-rail {
-    max-height: 40vh;
-  }
-}
-@media (max-width: 720px) {
+  /* Werkzeug-Leiste als horizontale Zeile oben. */
   .fokus-werkzeuge {
     flex-direction: row;
     border-radius: 999px;
     align-self: stretch;
   }
-  .fokus-koerper {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto minmax(0, 1fr) auto;
-    grid-template-areas:
-      "tools"
-      "mitte"
-      "rail";
-  }
   .fokus-wz-spacer {
     flex: 1;
     min-height: 0;
   }
+  /* Mitte bleibt der Hauptteil; Seitenpanels darunter mit gedeckelter Höhe. */
+  .fokus-mitte {
+    flex: 1;
+    min-height: 40vh;
+  }
+  .fokus-rail,
+  .fokus-chats {
+    margin-bottom: 0;
+    max-height: 42vh;
+  }
+  /* Chat-Pille im Stapel wieder im Fluss (nicht schwebend). */
+  .fokus-chats.zu {
+    position: static;
+    align-self: flex-start;
+  }
+}
+@media (max-width: 720px) {
   .fokus-schrittleiste {
     gap: 10px;
     /* eng: lieber umbrechen als die Pille überlaufen lassen. */

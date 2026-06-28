@@ -2,7 +2,7 @@
   min-height: 100vh;
   box-sizing: border-box;
   /* Oben Platz für die "Mein Weg"-Leiste, unten für die Nav. */
-  padding: 74px 44px 110px;
+  padding: var(--seite-top) var(--seite-x) var(--seite-bottom);
   background: var(--bg);
   color: var(--text);
   /* Übersicht-Redesign: Satoshi nur hier; der Rest der App bleibt Fraunces/Hanken. */
@@ -19,8 +19,8 @@
 }
 @media (max-width: 560px) {
   .hu-screen {
-    padding-left: 16px;
-    padding-right: 16px;
+    padding-left: var(--seite-x-eng);
+    padding-right: var(--seite-x-eng);
   }
 }
 
@@ -167,11 +167,13 @@
 .hu-grid {
   margin-top: 8px;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(300px, 0.95fr);
+  /* Gemeinsames 12-Spalten-Raster: fortschritt 4, notizen 4, plan 4 (über beide
+     Zeilen), aufgaben 8. Gleiche Spaltenbreite wie auf den anderen Seiten. */
+  grid-template-columns: repeat(12, minmax(0, 1fr));
   grid-template-areas:
-    "fortschritt notizen plan"
-    "aufgaben    aufgaben plan";
-  gap: 20px;
+    "fortschritt fortschritt fortschritt fortschritt notizen notizen notizen notizen plan plan plan plan"
+    "aufgaben aufgaben aufgaben aufgaben aufgaben aufgaben aufgaben aufgaben plan plan plan plan";
+  gap: var(--grid-gap);
   align-items: start;
 }
 .hu-fortschritt {
