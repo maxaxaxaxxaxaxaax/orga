@@ -1,22 +1,17 @@
-// Etappenfortschritt: ein konzentrischer Ring je Fach (Fachfarbe). Jeder Ring ist
-// ein vollständig geschlossener Kreis, in sich in die Wochen DIESES Fachs geteilt
-// (Stückgröße nach Aufgabenzahl, mit Lücken). Alle Ringe starten oben am selben
-// Punkt, sind aber je Fach unterschiedlich segmentiert. Track = offen, Füllung =
-// erledigt; die aktuelle Woche ist dezent markiert. Mitte bleibt leer (Spiegeln
-// statt Werten, VISION). Kein Gamification.
-//
-// Zwei Modi: nurWoche = je Fach ein glatter Ring nur für die AKTUELLE Woche
-// (kleinste Box-Stufe, kein Segment, weil es nur die eine Woche ist); sonst die
-// ganze Etappe, je Fach in Wochen-Segmente geteilt. Breitere Box ergänzt darunter
-// Legende und Balken (in Heute).
+// Etappenfortschritt: ein konzentrischer Ring je Fach (Fachfarbe), durchgehend
+// gefüllt nach Anteil erledigter Etappenziele (anteilig, auch in Arbeit). Die
+// Form bleibt über alle Box-Breiten gleich; nur die Füllung wächst sanft mit dem
+// Fortschritt (per stroke-dasharray-Transition, siehe .hu-ring-animiert), kein
+// Springen, keine Segmente. Track = heller Fachton, ein farbiger Punkt markiert
+// jeden Ring auch ohne Fortschritt. Mitte bleibt leer (Spiegeln statt Werten,
+// VISION). Kein Gamification.
 const GROESSE = 240;
 const MITTE = GROESSE / 2;
 const RING_BREITE = 12;
 const RING_GAP = 5; // Abstand zwischen den konzentrischen Fach-Ringen
 const AUSSEN = MITTE - RING_BREITE / 2 - 2;
-const LUECKE_PX = 20; // konstante Lücke in px, damit innen wie außen gleich aussieht
 
-export default function Etappenring({ faecher, animiert, nurWoche }) {
+export default function Etappenring({ faecher, animiert }) {
   const liste = faecher && faecher.length ? faecher : null;
 
   return (
@@ -37,23 +32,20 @@ export default function Etappenring({ faecher, animiert, nurWoche }) {
               strokeWidth={RING_BREITE}
             />
           )}
-          {/* Kleinste Stufe (nurWoche): je Fach ein glatter Ring, der nur den
-              Stand DIESER Woche zeigt (Bogen = erledigter Anteil der aktuellen
-              Woche). Kein Segmentieren, weil es nur die eine Woche ist. */}
           {liste &&
-            nurWoche &&
             liste.map((f, i) => {
               const radius = AUSSEN - i * (RING_BREITE + RING_GAP);
               if (radius < RING_BREITE) return null;
               const umfang = 2 * Math.PI * radius;
-              const akt = f.wochen.find((w) => w.istAktuell);
-              const frac =
-                akt && akt.total
-                  ? Math.max(0, Math.min(1, akt.done / akt.total))
-                  : 0;
+              // Anteil der ganzen Etappe für dieses Fach (anteilig, auch in
+              // Arbeit). Der Bogen wächst von vorne, ein durchgehender Ring.
+              const fachTotal = f.wochen.reduce((s, w) => s + w.total, 0) || 1;
+              const fachDone = f.wochen.reduce((s, w) => s + w.done, 0);
+              const frac = Math.max(0, Math.min(1, fachDone / fachTotal));
               const bogen = frac * umfang;
               return (
                 <g key={f.fach} className="hu-ring-fach">
+                  {/* Offener Ring in hellem Fachton. */}
                   <circle
                     cx={MITTE}
                     cy={MITTE}
@@ -64,6 +56,8 @@ export default function Etappenring({ faecher, animiert, nurWoche }) {
                     }}
                     strokeWidth={RING_BREITE}
                   />
+                  {/* Fach-Punkt am Ring-Start: ordnet jeden Ring seinem Fach zu,
+                     auch ohne Fortschritt. */}
                   <circle
                     cx={MITTE}
                     cy={MITTE}
@@ -74,73 +68,9 @@ export default function Etappenring({ faecher, animiert, nurWoche }) {
                     strokeLinecap="round"
                     strokeDasharray={`0.1 ${umfang}`}
                   />
-                  {bogen > 0 && (
-                    <circle
-                      cx={MITTE}
-                      cy={MITTE}
-                      r={radius}
-                      fill="none"
-                      stroke={f.color}
-                      strokeWidth={RING_BREITE}
-                      strokeLinecap="round"
-                      strokeDasharray={`${bogen} ${umfang}`}
-                    />
-                  )}
-                </g>
-              );
-            })}
-          {/* Größere Stufen: die ganze Etappe, je Fach in Wochen-Segmente. */}
-          {liste &&
-            !nurWoche &&
-            liste.map((f, i) => {
-              const radius = AUSSEN - i * (RING_BREITE + RING_GAP);
-              if (radius < RING_BREITE) return null;
-              const umfang = 2 * Math.PI * radius;
-              // Eigene Segmentierung: die Wochen dieses Fachs füllen den ganzen
-              // Kreis (Größe nach Aufgabenzahl), mit Lücken dazwischen. Die Lücke
-              // wird pro Ring aus festen px berechnet, damit sie innen wie außen
-              // gleich groß aussieht.
-              const luecke = LUECKE_PX / umfang;
-              const fachTotal = f.wochen.reduce((s, w) => s + w.total, 0) || 1;
-              const fachDone = f.wochen.reduce((s, w) => s + w.done, 0);
-              const verfuegbar = Math.max(0.1, 1 - f.wochen.length * luecke);
-              let cursor = 0;
-              // Füllung läuft durchgehend von vorne durch die Segmente (wie der
-              // frühere Ring den Gesamt-Fortschritt zeigte), nur jetzt sieht man
-              // an den Stücken, in welcher Woche man steht.
-              let restDone = fachDone;
-              const segmente = f.wochen.map((w) => {
-                const len = (w.total / fachTotal) * verfuegbar;
-                const start = cursor;
-                cursor += len + luecke;
-                const fuellKbs = Math.max(0, Math.min(w.total, restDone));
-                restDone -= fuellKbs;
-                const fuellLen = (fuellKbs / fachTotal) * verfuegbar;
-                return { ...w, start, len, fuellLen };
-              });
-              return (
-                <g key={f.fach} className="hu-ring-fach">
-                  {/* Tracks (offene Wochen-Stücke). */}
-                  {segmente.map((s) => (
-                    <circle
-                      key={"t" + s.woche}
-                      cx={MITTE}
-                      cy={MITTE}
-                      r={radius}
-                      fill="none"
-                      style={{
-                        stroke: `color-mix(in srgb, ${f.color} ${
-                          s.istAktuell ? 42 : 22
-                        }%, var(--card))`,
-                      }}
-                      strokeWidth={RING_BREITE}
-                      strokeLinecap="round"
-                      strokeDasharray={`${s.len * umfang} ${umfang}`}
-                      strokeDashoffset={`${-s.start * umfang}`}
-                    />
-                  ))}
-                  {/* Fach-Markierung: farbiger Punkt oben am Ring-Start, damit man
-                     jeden Ring seinem Fach zuordnen kann, auch ohne Fortschritt. */}
+                  {/* Füllung: durchgehender Bogen, IMMER gerendert (bei 0 deckungs-
+                     gleich mit dem Punkt), damit er beim Fortschritt sanft von vorne
+                     wächst statt zu springen. */}
                   <circle
                     cx={MITTE}
                     cy={MITTE}
@@ -149,25 +79,8 @@ export default function Etappenring({ faecher, animiert, nurWoche }) {
                     stroke={f.color}
                     strokeWidth={RING_BREITE}
                     strokeLinecap="round"
-                    strokeDasharray={`0.1 ${umfang}`}
+                    strokeDasharray={`${bogen} ${umfang}`}
                   />
-                  {/* Füllungen (erledigt, durchgehend von vorne). */}
-                  {segmente.map((s) =>
-                    s.fuellLen > 0 ? (
-                      <circle
-                        key={"f" + s.woche}
-                        cx={MITTE}
-                        cy={MITTE}
-                        r={radius}
-                        fill="none"
-                        stroke={f.color}
-                        strokeWidth={RING_BREITE}
-                        strokeLinecap="round"
-                        strokeDasharray={`${s.fuellLen * umfang} ${umfang}`}
-                        strokeDashoffset={`${-s.start * umfang}`}
-                      />
-                    ) : null
-                  )}
                 </g>
               );
             })}

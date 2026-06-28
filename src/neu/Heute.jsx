@@ -89,19 +89,18 @@ export default function Heute({ onFokus }) {
   const nSpan = b2 - b1; // Notizen
   const aSpan = b2; // Aufgaben
   const pSpan = 12 - b2; // Stundenplan
-  // Etappenfortschritt-Stufen: je breiter die Box, desto mehr. 1 = je Fach ein
-  // glatter Ring nur für DIESE Woche (kein Segment), 2 = je Fach die ganze Etappe
-  // in Wochen-Segmente, 3 = + Farb-Legende, 4 = + Balken je Fach mit Zahl.
+  // Etappenfortschritt-Stufen: der glatte Ring bleibt immer gleich, je breiter die
+  // Box kommt nur mehr Info dazu. 3 = + Farb-Legende, 4 = + Balken je Fach mit Zahl.
   const fortStufe = fSpan <= 2 ? 1 : fSpan === 3 ? 2 : fSpan === 4 ? 3 : 4;
   // Untertitel erklärt, was man auf der aktuellen Stufe gerade sieht.
   const fortSub =
     fortStufe === 1
-      ? "Nur diese Woche"
+      ? "Dein Fortschritt"
       : fortStufe === 2
-        ? "Die ganze Etappe in Wochen"
+        ? "Dein Fortschritt je Fach"
         : fortStufe === 3
-          ? "Ganze Etappe, mit Fach-Legende"
-          : "Ganze Etappe, mit Legende und Balken";
+          ? "Je Fach, mit Farb-Legende"
+          : "Je Fach, mit Legende und Balken";
 
   useEffect(() => {
     localStorage.setItem(ERLEDIGT_KEY, JSON.stringify(erledigt));
@@ -470,11 +469,7 @@ export default function Heute({ onFokus }) {
           {/* Ring und (ab Stufe 3) die Fächer-Legende nebeneinander, damit die
               Legende seitlich aufgeht statt unter dem Ring zu stapeln. */}
           <div className="hu-fort-mitte">
-            <Etappenring
-              faecher={fachWochen}
-              nurWoche={fortStufe === 1}
-              animiert
-            />
+            <Etappenring faecher={fachWochen} animiert />
             {/* Stufe 3: Farb-Legende (welche Farbe ist welches Fach). Stufe 4:
                 zusätzlich ein Balken je Fach mit der Zahl. */}
             {fortStufe >= 3 && fachListe.length > 0 && (
