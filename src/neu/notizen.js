@@ -2,12 +2,24 @@
 // während der Fokus-Session kurz parken, ohne den Fokus zu verlieren). Ein
 // kleiner persönlicher Zettel, den der Schüler selbst wieder leert: kein
 // To-do-Verwalter, nur ein Kopf-frei-Machen. Reload-fest in localStorage.
-const KEY = "neu.notizen"; // [{ text, kontext? }]
+const KEY = "neu.notizen"; // [{ text, kontext?, erledigt? }]
+
+// Ein paar Demo-Notizen für die Übersicht, damit der Zettel nicht leer ist
+// (Max, 7a). Werden beim ersten Laden gesetzt; danach gehört der Zettel dem
+// Schüler (selbst hinzufügen/abhaken).
+const SEED = [
+  { text: "Eltern-Erlaubnis abgeben", kontext: "Fr. Berg", erledigt: true },
+  { text: "Buch für Deutsch mitbringen", erledigt: false },
+];
 
 export function ladeNotizen() {
   try {
     const r = localStorage.getItem(KEY);
-    const a = r ? JSON.parse(r) : [];
+    if (r == null) {
+      speichere(SEED);
+      return SEED;
+    }
+    const a = JSON.parse(r);
     if (!Array.isArray(a)) return [];
     // Alt-Format (reine Strings) auf das Objekt-Format heben.
     return a
@@ -16,6 +28,15 @@ export function ladeNotizen() {
   } catch {
     return [];
   }
+}
+
+// Notiz ab-/anhaken (erledigt umschalten). Bleibt in der Liste, nur durchgestrichen.
+export function toggleNotiz(index) {
+  const arr = ladeNotizen().map((n, i) =>
+    i === index ? { ...n, erledigt: !n.erledigt } : n
+  );
+  speichere(arr);
+  return arr;
 }
 
 function speichere(arr) {

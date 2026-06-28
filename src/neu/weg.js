@@ -4,7 +4,7 @@ import { ladeSchritte } from "./lernschritte";
 import {
   lade,
   WOCHEN_KEY,
-  ERLEDIGT_KEY,
+  ladeErledigt,
   AKTUELLE_WOCHE,
   heuteTag,
   slotTag,
@@ -56,7 +56,7 @@ export function wegStatus() {
   // Schritten als Fortschritt.
   const zuordnung = lade(WOCHEN_KEY);
   const stunden = ladeStunden();
-  const erledigt = lade(ERLEDIGT_KEY);
+  const erledigt = ladeErledigt();
   const ht = heuteTag();
   const heuteKbs = koennensbeweise.filter(
     (k) =>
@@ -112,7 +112,7 @@ export function wegStatus() {
 export function heuteOffeneZiele() {
   const zuordnung = lade(WOCHEN_KEY);
   const stunden = ladeStunden();
-  const erledigt = lade(ERLEDIGT_KEY);
+  const erledigt = ladeErledigt();
   const ht = heuteTag();
   return koennensbeweise.filter(
     (k) =>
@@ -128,7 +128,7 @@ export function heuteOffeneZiele() {
 export function nachzuegler() {
   const zuordnung = lade(WOCHEN_KEY);
   const stunden = ladeStunden();
-  const erledigt = lade(ERLEDIGT_KEY);
+  const erledigt = ladeErledigt();
   const ht = heuteTag();
   return koennensbeweise.filter((k) => {
     if (zuordnung[k.id] !== AKTUELLE_WOCHE || erledigt[k.id]) return false;

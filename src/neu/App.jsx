@@ -12,7 +12,7 @@ import {
   startScreen,
   planungsScreen,
   planungFertig,
-  lade,
+  ladeErledigt,
   ERLEDIGT_KEY,
   meldeAenderung,
 } from "./planung";
@@ -96,7 +96,7 @@ export default function App() {
   // damit der Schüler die Orientierung behält.
   function fokusFertig(kbId) {
     try {
-      const e = lade(ERLEDIGT_KEY);
+      const e = ladeErledigt();
       e[kbId] = true;
       localStorage.setItem(ERLEDIGT_KEY, JSON.stringify(e));
     } catch {

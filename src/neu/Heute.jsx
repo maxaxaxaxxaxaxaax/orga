@@ -1,6 +1,11 @@
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { koennensbeweise, kbFarbe, kbFaecher } from "../data/koennensbeweise";
-import { stundenWoche, fachFarbe, stundenId } from "../data/stundenplanWoche";
+import {
+  stundenWoche,
+  fachFarbe,
+  stundenId,
+  lehrkraefte,
+} from "../data/stundenplanWoche";
 import { etappen } from "../data/etappen";
 import { lernwegFuerKb } from "../data/wissen";
 import { generatorFuerKb } from "./uebungen";
@@ -9,6 +14,7 @@ import {
   lade,
   WOCHEN_KEY,
   ERLEDIGT_KEY,
+  ladeErledigt,
   AKTUELLE_WOCHE,
   heuteTag,
   slotTag,
@@ -16,8 +22,7 @@ import {
   setzeHeuteTag,
   meldeAenderung,
 } from "./planung";
-import KlassenPuls from "./KlassenPuls";
-import { ladeNotizen, entferneNotiz } from "./notizen";
+import { ladeNotizen, entferneNotiz, toggleNotiz } from "./notizen";
 import { ladeSchritte } from "./lernschritte";
 import "./Heute.css";
 
@@ -53,7 +58,7 @@ const ETAPPE = etappen.find((e) => e.id === 4) || etappen[0];
 export default function Heute({ onFokus }) {
   const wochenZuordnung = lade(WOCHEN_KEY);
   const stundenZuord = ladeStunden(); // kbId -> Liste der geplanten Stunden-IDs
-  const [erledigt, setErledigt] = useState(() => lade(ERLEDIGT_KEY));
+  const [erledigt, setErledigt] = useState(ladeErledigt);
   // Ist alles geschafft, kommt zuerst der grüne Abschluss-Screen. Dieser Schalter
   // blendet ihn weg, falls man den fertigen Tag doch noch ansehen will.
   const [tagAnsehen, setTagAnsehen] = useState(false);
@@ -77,7 +82,7 @@ export default function Heute({ onFokus }) {
   // Änderung, damit der Schreib-Effekt oben keine Schleife auslöst.
   useEffect(() => {
     const sync = () => {
-      const fresh = lade(ERLEDIGT_KEY);
+      const fresh = ladeErledigt();
       setErledigt((cur) =>
         JSON.stringify(cur) === JSON.stringify(fresh) ? cur : fresh
       );
@@ -124,6 +129,9 @@ export default function Heute({ onFokus }) {
   function notizWeg(i) {
     setNotizen(entferneNotiz(i));
   }
+  function notizUmschalten(i) {
+    setNotizen(toggleNotiz(i));
+  }
 
   // Die frueheste fuer dieses Ziel heute eingeplante Stunde (fuer Zeit + Raum auf
   // der Aufgaben-Karte). Nachzuegler aus frueheren Tagen liefern hier null.
@@ -143,6 +151,9 @@ export default function Heute({ onFokus }) {
     const done = !!erledigt[k.id];
     const info = kbInfo(k.id);
     const st = tagesStunde(k);
+    const anzahlStunden = (stundenZuord[k.id] || []).filter(
+      (sid) => slotTag(sid) === tag
+    ).length;
     const prog =
       info.schritte > 0
         ? Math.round((info.fertigeSchritte / info.schritte) * 100)
@@ -173,14 +184,45 @@ export default function Heute({ onFokus }) {
             <path d="M6 8.3v3.4a4 4 0 0 0 4 4h5.4" />
           </svg>
         </span>
-        <span className="hu-auf-eyebrow">Lernweg</span>
+        <span className="hu-auf-titel">{k.titel}</span>
         <span className="hu-auf-fach">{k.fach}</span>
-        {info.lernweg && <span className="hu-auf-thema">{info.lernweg}</span>}
         <span className="hu-auf-chips">
           <span className="hu-auf-chip">
-            {st ? `${st.von} – ${st.bis}` : "frei einteilbar"}
+            <svg
+              className="hu-auf-chip-icon"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <circle cx="12" cy="12" r="9" />
+              <path d="M12 7.5v5l3 2" />
+            </svg>
+            {st ? `${st.von} - ${st.bis}` : "frei einteilbar"}
           </span>
-          {st && <span className="hu-auf-chip">{st.raum}</span>}
+          {anzahlStunden > 0 && (
+            <span className="hu-auf-chip">
+              <svg
+                className="hu-auf-chip-icon"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path d="M7 4h10M7 20h10M8 4c0 4 8 4 8 8s-8 4-8 8" />
+              </svg>
+              {anzahlStunden} {anzahlStunden === 1 ? "Stunde" : "Stunden"}
+            </span>
+          )}
+          {st && (
+            <span className="hu-auf-chip">
+              <svg
+                className="hu-auf-chip-icon"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path d="M12 21s7-5.2 7-11a7 7 0 1 0-14 0c0 5.8 7 11 7 11Z" />
+                <circle cx="12" cy="10" r="2.4" />
+              </svg>
+              {st.raum}
+            </span>
+          )}
         </span>
         {done ? (
           <span className="hu-auf-status done">✓ Erledigt</span>
@@ -213,6 +255,8 @@ export default function Heute({ onFokus }) {
     const [h, m] = (hhmm || "0:0").split(":").map(Number);
     return h * 60 + (m || 0);
   };
+  // Uhrzeit ohne führende Null (Figma-Stil: "8:00" statt "08:00"), spart Platz.
+  const kurzeZeit = (t) => (t || "").replace(/^0/, "");
   const fruehesteStundeHeute = (k) => {
     const zeiten = (stundenZuord[k.id] || [])
       .filter((sid) => slotTag(sid) === tag)
@@ -287,6 +331,21 @@ export default function Heute({ onFokus }) {
   const zieleGesamt = koennensbeweise.length;
   const zieleDone = koennensbeweise.filter((k) => erledigt[k.id]).length;
 
+  // Tages-Fortschritt für den Balken unter den Aufgaben: Anteil erledigter
+  // Lernweg-Schritte über alle heutigen Ziele (granular, nicht nur ganz/gar nicht).
+  const tagSchritte = tagKbs.reduce(
+    (acc, k) => {
+      const info = kbInfo(k.id);
+      acc.total += info.schritte;
+      acc.fertig += erledigt[k.id] ? info.schritte : info.fertigeSchritte;
+      return acc;
+    },
+    { total: 0, fertig: 0 }
+  );
+  const tagProzent = tagSchritte.total
+    ? Math.round((tagSchritte.fertig / tagSchritte.total) * 100)
+    : 0;
+
   // Tag geschafft: ruhiger grüner Abschluss als kleine Belohnung, bevor der Tag
   // wieder zur Liste wird.
   if (allesGeschafft && !tagAnsehen) {
@@ -336,138 +395,192 @@ export default function Heute({ onFokus }) {
   return (
     <div className="hu-screen">
       <div className="hu-grid">
-        <div className="hu-main">
-          <div className="hu-oben">
-            <section className="hu-karte hu-fortschritt">
-              <h2 className="hu-karte-titel">Etappenfortschritt</h2>
-              <Etappenring
-                ringe={proFach}
-                gesamtDone={zieleDone}
-                gesamtTotal={zieleGesamt}
-              />
-            </section>
+        {/* Links oben: Etappenfortschritt */}
+        <section className="hu-karte hu-fortschritt">
+          <h2 className="hu-karte-titel">
+            <svg className="hu-karte-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 19V5M4 19h16M7.5 15l3.5-4 3 2 4.5-6" />
+            </svg>
+            Etappenfortschritt
+          </h2>
+          <p className="hu-karte-sub">Alle deine Könnensbeweise auf einen Blick</p>
+          <Etappenring
+            ringe={proFach}
+            gesamtDone={zieleDone}
+            gesamtTotal={zieleGesamt}
+          />
+        </section>
 
-            <KlassenPuls />
-          </div>
-
-          <section className="hu-karte hu-aufgaben">
-            <h2 className="hu-karte-titel hu-aufgaben-titel">
-              Meine Aufgaben
-              <span className="hu-aufgaben-datum">
-                {tagDatum.toLocaleDateString("de-DE", {
-                  day: "2-digit",
-                  month: "2-digit",
-                  year: "2-digit",
-                })}
-              </span>
-            </h2>
-            {allesGeschafft && (
-              <p className="hu-geschafft">
-                Alles geschafft! Du hast alle Ziele für heute erledigt.
-              </p>
-            )}
-            {tagKbs.length === 0 ? (
-              <p className="hu-leer">
-                {nachzueglerList.length > 0
-                  ? "Für heute ist nichts Neues geplant."
-                  : "Für heute hast du nichts eingeplant."}
-              </p>
-            ) : (
-              <div className="hu-auf-grid">{tagKbs.map((k) => karte(k))}</div>
-            )}
-            {morgenAnzahl > 0 && (
-              <p className={"hu-morgen" + (morgenVoll ? " voll" : "")}>
-                Morgen geplant: {morgenAnzahl}{" "}
-                {morgenAnzahl === 1 ? "Ziel" : "Ziele"}
-                {morgenUhren > 0 &&
-                  `, ${morgenUhren} ${morgenUhren === 1 ? "Uhr" : "Uhren"}`}
-                {morgenVoll && " · ziemlich voll"}
-              </p>
-            )}
-
-            {nachzueglerList.length > 0 && (
-              <div className="hu-nachzuegler">
-                <h3 className="hu-nachzuegler-titel">Noch offen von früher</h3>
-                <div className="hu-auf-grid">
-                  {(nachzueglerAlle
-                    ? nachzueglerList
-                    : nachzueglerList.slice(0, 3)
-                  ).map((k) => karte(k))}
-                </div>
-                {nachzueglerList.length > 3 && (
+        {/* Mitte oben: Notizen (Häkchen-Liste) */}
+        <section className="hu-karte hu-notizen">
+          <h2 className="hu-karte-titel">
+            <svg className="hu-karte-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="5" y="3.5" width="14" height="17" rx="2.5" />
+              <path d="M9 8.5h6M9 12h6M9 15.5h4" />
+            </svg>
+            Notizen
+          </h2>
+          {notizen.length === 0 ? (
+            <p className="hu-notizen-leer">
+              Noch nichts notiert. Im Fokus kannst du Gedanken kurz parken.
+            </p>
+          ) : (
+            <ul className="hu-notiz-liste">
+              {notizen.map((n, i) => (
+                <li
+                  className={"hu-notiz" + (n.erledigt ? " erledigt" : "")}
+                  key={i}
+                >
                   <button
                     type="button"
-                    className="hu-nachzuegler-mehr"
-                    onClick={() => setNachzueglerAlle((v) => !v)}
+                    className="hu-notiz-box"
+                    onClick={() => notizUmschalten(i)}
+                    role="checkbox"
+                    aria-checked={!!n.erledigt}
+                    aria-label={n.text}
                   >
-                    {nachzueglerAlle
-                      ? "Weniger anzeigen"
-                      : `+ ${nachzueglerList.length - 3} weitere anzeigen`}
+                    {n.erledigt && <span aria-hidden="true">✓</span>}
                   </button>
-                )}
-              </div>
-            )}
-          </section>
-
-          {notizen.length > 0 && (
-            <section className="hu-karte hu-notizen">
-              <h2 className="hu-karte-titel">Notizzettel</h2>
-              <p className="hu-notizen-hinweis">
-                Geparkte Gedanken aus dem Fokus. Hak einen ab, wenn er erledigt
-                ist.
-              </p>
-              <ul className="hu-notiz-liste">
-                {notizen.map((n, i) => (
-                  <li className="hu-notiz" key={i}>
-                    <button
-                      type="button"
-                      className="hu-notiz-weg"
-                      onClick={() => notizWeg(i)}
-                      aria-label="Notiz wegräumen"
-                    >
-                      ✓
-                    </button>
-                    <span className="hu-notiz-text">
-                      {n.text}
-                      {n.kontext && (
-                        <span className="hu-notiz-kontext">{n.kontext}</span>
-                      )}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )}
-        </div>
-
-        <aside className="hu-aside">
-          <section className="hu-karte hu-plan-karte">
-            <h2 className="hu-karte-titel">Stundenplan</h2>
-            <ul className="hu-plan">
-              {tagStunden.map((s, i) => {
-                const lernzeit = s.art === "studierzeit" || s.art === "selbst";
-                return (
-                  <li
-                    className={"hu-stunde" + (lernzeit ? " lernzeit" : "")}
-                    key={i}
+                  <span className="hu-notiz-text">
+                    {n.text}
+                    {n.kontext && (
+                      <span className="hu-notiz-kontext">{n.kontext}</span>
+                    )}
+                  </span>
+                  <button
+                    type="button"
+                    className="hu-notiz-weg"
+                    onClick={() => notizWeg(i)}
+                    aria-label="Notiz entfernen"
                   >
-                    <span className="hu-stunde-zeit">{s.von}</span>
+                    ✕
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+
+        {/* Links/Mitte unten: Aufgaben (über zwei Spalten) */}
+        <section className="hu-karte hu-aufgaben">
+          <h2 className="hu-karte-titel hu-aufgaben-titel">
+            Aufgaben
+            <span className="hu-aufgaben-datum">
+              {tagDatum.toLocaleDateString("de-DE", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "2-digit",
+              })}
+            </span>
+          </h2>
+          {allesGeschafft && (
+            <p className="hu-geschafft">
+              Alles geschafft! Du hast alle Ziele für heute erledigt.
+            </p>
+          )}
+          {tagKbs.length === 0 ? (
+            <p className="hu-leer">
+              {nachzueglerList.length > 0
+                ? "Für heute ist nichts Neues geplant."
+                : "Für heute hast du nichts eingeplant."}
+            </p>
+          ) : (
+            <div className="hu-auf-grid">{tagKbs.map((k) => karte(k))}</div>
+          )}
+          {morgenAnzahl > 0 && (
+            <p className={"hu-morgen" + (morgenVoll ? " voll" : "")}>
+              Morgen geplant: {morgenAnzahl}{" "}
+              {morgenAnzahl === 1 ? "Ziel" : "Ziele"}
+              {morgenUhren > 0 &&
+                `, ${morgenUhren} ${morgenUhren === 1 ? "Uhr" : "Uhren"}`}
+              {morgenVoll && " · ziemlich voll"}
+            </p>
+          )}
+
+          {nachzueglerList.length > 0 && (
+            <div className="hu-nachzuegler">
+              <h3 className="hu-nachzuegler-titel">Noch offen von früher</h3>
+              <div className="hu-auf-grid">
+                {(nachzueglerAlle
+                  ? nachzueglerList
+                  : nachzueglerList.slice(0, 3)
+                ).map((k) => karte(k))}
+              </div>
+              {nachzueglerList.length > 3 && (
+                <button
+                  type="button"
+                  className="hu-nachzuegler-mehr"
+                  onClick={() => setNachzueglerAlle((v) => !v)}
+                >
+                  {nachzueglerAlle
+                    ? "Weniger anzeigen"
+                    : `+ ${nachzueglerList.length - 3} weitere anzeigen`}
+                </button>
+              )}
+            </div>
+          )}
+          {tagKbs.length > 0 && (
+            <div className="hu-auf-fortschritt">
+              <span className="hu-auf-fortschritt-pct">{tagProzent}%</span>
+              <span className="hu-auf-fortschritt-bar">
+                <span style={{ width: tagProzent + "%" }} />
+              </span>
+            </div>
+          )}
+        </section>
+
+        {/* Rechte Spalte (volle Höhe): Stundenplan als Tages-Timeline */}
+        <aside className="hu-karte hu-plan-karte">
+          <h2 className="hu-karte-titel">
+            <svg className="hu-karte-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="4" y="5" width="16" height="15" rx="2.5" />
+              <path d="M4 9.5h16M8 3.5v3M16 3.5v3" />
+            </svg>
+            Stundenplan
+          </h2>
+          <ul className="hu-plan">
+            {tagStunden.map((s, i) => {
+              const prev = tagStunden[i - 1];
+              const pause = prev
+                ? minutenAusZeit(s.von) - minutenAusZeit(prev.bis)
+                : 0;
+              const lernzeit = s.art === "studierzeit" || s.art === "selbst";
+              const istPause = s.art === "pause";
+              return (
+                <Fragment key={i}>
+                  {pause > 0 && (
+                    <li className="hu-plan-pause">
+                      <span>{pause} min</span>
+                    </li>
+                  )}
+                  <li
+                    className={
+                      "hu-stunde" +
+                      (lernzeit ? " lernzeit" : "") +
+                      (istPause ? " neutral" : "")
+                    }
+                  >
                     <span
                       className="hu-stunde-strich"
-                      style={{ background: fachFarbe[s.fach] || "#868e96" }}
+                      style={{ background: fachFarbe[s.fach] || "#cbd5d1" }}
                     />
-                    <span className="hu-stunde-fach">{s.fach}</span>
-                    {lernzeit && (
-                      <span className="hu-stunde-hinweis">
-                        Zeit für deine Ziele
-                      </span>
-                    )}
-                    <span className="hu-stunde-raum">{s.raum}</span>
+                    <span className="hu-stunde-info">
+                      <span className="hu-stunde-fach">{s.fach}</span>
+                      {lehrkraefte[s.fach] && (
+                        <span className="hu-stunde-lehrer">
+                          {lehrkraefte[s.fach]}
+                        </span>
+                      )}
+                      <span className="hu-stunde-raum">{s.raum}</span>
+                    </span>
+                    <span className="hu-stunde-zeit">
+                      {kurzeZeit(s.von)} - {kurzeZeit(s.bis)}
+                    </span>
                   </li>
-                );
-              })}
-            </ul>
-          </section>
+                </Fragment>
+              );
+            })}
+          </ul>
         </aside>
       </div>
     </div>

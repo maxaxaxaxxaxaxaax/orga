@@ -8,6 +8,36 @@ export const TAGE_KEY = "neu.wochenplan.tage"; // kbId -> Wochentag (0=Mo..4=Fr)
 export const STUNDEN_KEY = "neu.wochenplan.stunden"; // kbId -> Stunden-ID (Tag-Startzeit), optional
 export const ERLEDIGT_KEY = "neu.erledigt"; // kbId -> true
 
+// Demo-Stand: Max steckt schon ein Stück in der Etappe, ein paar Grundlagen-
+// Könnensbeweise sind erbracht. So zeigt die Übersicht einen gelebten Fortschritt
+// (gefüllte Ringe) statt bei null zu starten. Die heutigen Ziele (7MA1, 7EA1)
+// bleiben bewusst offen, damit der Tag noch etwas zu tun hat.
+const ERLEDIGT_SEED = {
+  "7MA2": true, // Addieren & Subtrahieren negativer Zahlen
+  "7MA3": true, // Multiplikation & Division negativer Zahlen
+  "7DA1": true, // Mini-Vortrag
+  "7DA2": true, // Lernplakat
+  "7EA2": true, // Vocabulary unit 5, pp. 84-93
+  "7EA3": true, // will-future, question tags, if-clause I
+  "7EA4": true, // Vocabulary unit 5, pp. 94-99
+  "7FA1": true, // Vocabulaire Unité 3
+  "7FA2": true, // Présent: verbes en -ir
+  "7FA4": true, // Vocabulaire: les loisirs
+};
+
+// Erledigt-Stand laden. Ist noch nichts gespeichert (frischer Start), kommt der
+// Demo-Seed oben, damit die Übersicht direkt nach etwas aussieht.
+export function ladeErledigt() {
+  try {
+    const r = localStorage.getItem(ERLEDIGT_KEY);
+    if (r == null) return { ...ERLEDIGT_SEED };
+    const v = JSON.parse(r);
+    return v && typeof v === "object" && !Array.isArray(v) ? v : {};
+  } catch {
+    return { ...ERLEDIGT_SEED };
+  }
+}
+
 // Vorerst fest: Woche 1. Sobald die Datums-Ebene steht, folgt sie dem echten Datum.
 export const AKTUELLE_WOCHE = 0;
 

@@ -25,6 +25,22 @@ export const fachFarbe = {
   ZEuS: "#15aabf",
 };
 
+// Fachlehrkräfte (Kürzel) für die Stundenplan-Anzeige. Pro Fach eine feste
+// Lehrkraft. Die betreute Studierzeit übernimmt der Lerncoach (Fr. Berg).
+// Pausen, Projekte (ZEuS/FREI DAY) und Neigungsgruppen haben keine feste Lehrkraft.
+export const lehrkraefte = {
+  Deutsch: "Hofer",
+  Mathematik: "Brandt",
+  Französisch: "Mercier",
+  Englisch: "Walsh",
+  Biologie: "Krüger",
+  Geschichte: "Seidel",
+  Erdkunde: "Vogt",
+  Religion: "Adler",
+  Sport: "Kern",
+  Studierzeit: "Fr. Berg",
+};
+
 // Beschriftung der Lernform (Tag im Kalender / in der Agenda).
 export const artLabel = {
   angeleitet: "Unterricht",
