@@ -856,10 +856,6 @@ export default function Fokus({
                     )}
                   </div>
                   <span className="fokus-sl-trenner" aria-hidden="true" />
-                  <span className="fokus-sl-zahl">
-                    {aktuell}/{schritte.length}
-                  </span>
-                  <span className="fokus-sl-trenner" aria-hidden="true" />
                   <div className="fokus-sl-nav">
                     {aktuell > 0 && (
                       <button

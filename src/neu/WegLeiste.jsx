@@ -67,25 +67,6 @@ export default function WegLeiste({ onGo }) {
               <span className="weg-aufgabe-fach">{aufgabe.fach}</span>
               <span className="weg-aufgabe-titel">{aufgabe.titel}</span>
             </span>
-            {aufgabe.gesamt > 0 && (
-              <>
-                <span className="weg-segmente" aria-hidden="true">
-                  {aufgabe.schritte.map((st, i) => (
-                    <span
-                      key={i}
-                      className={
-                        "weg-seg" +
-                        (st.fertig ? " fertig" : "") +
-                        (i === aufgabe.aktuellerSchritt ? " aktuell" : "")
-                      }
-                    />
-                  ))}
-                </span>
-                <span className="weg-aufgabe-zahl">
-                  {aufgabe.fertigeAnzahl}/{aufgabe.gesamt}
-                </span>
-              </>
-            )}
             <span className="weg-aufgabe-cta">
               {jetzt.text || "Öffnen"}
               <span className="weg-aufgabe-pfeil" aria-hidden="true">
