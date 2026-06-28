@@ -25,7 +25,7 @@ import {
   setzeHeuteTag,
   meldeAenderung,
 } from "./planung";
-import { ladeNotizen, entferneNotiz, toggleNotiz } from "./notizen";
+import { ladeNotizen, addNotiz, entferneNotiz, toggleNotiz } from "./notizen";
 import { ladeSchritte } from "./lernschritte";
 import "./Heute.css";
 
@@ -70,8 +70,10 @@ export default function Heute({ onFokus }) {
   // sieht, wie sich die App an dem Tag verhält. Global gespeichert, damit die
   // Weg-Leiste und der Rest mitziehen.
   const [tag, setTag] = useState(heuteTag);
-  // Geparkte Gedanken (Brain-Dump aus dem Fokus), hier zum Wegräumen.
+  // Erinnerungen (Brain-Dump aus dem Fokus), hier zum Abhaken/Löschen.
   const [notizen, setNotizen] = useState(ladeNotizen);
+  const [wisch, setWisch] = useState(null); // { i, x0, dx } für Swipe-zum-Löschen
+  const [neueErinnerung, setNeueErinnerung] = useState("");
   // Lange Nachzügler-Liste ruhig eingeklappt halten (nicht überladen).
   const [nachzueglerAlle, setNachzueglerAlle] = useState(false);
   // Prototyp: die zwei senkrechten Raster-Grenzen der Übersicht per Ziehen
@@ -146,6 +148,38 @@ export default function Heute({ onFokus }) {
   }
   function notizUmschalten(i) {
     setNotizen(toggleNotiz(i));
+  }
+  function erinnerungHinzufuegen(e) {
+    e.preventDefault();
+    const t = neueErinnerung.trim();
+    if (!t) return;
+    setNotizen(addNotiz(t));
+    setNeueErinnerung("");
+  }
+  // Nach links wischen löscht die Erinnerung (Tippen auf die Checkbox bleibt
+  // Abhaken: dort startet kein Wisch).
+  function wischDown(e, i) {
+    if (e.target.closest(".hu-notiz-box")) return;
+    setWisch({ i, x0: e.clientX, dx: 0 });
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId);
+    } catch {
+      /* kein echter Zeiger */
+    }
+  }
+  function wischMove(e, i) {
+    setWisch((w) =>
+      w && w.i === i ? { ...w, dx: Math.min(0, e.clientX - w.x0) } : w
+    );
+  }
+  function wischUp(e, i) {
+    if (wisch && wisch.i === i && wisch.dx < -80) notizWeg(i);
+    setWisch(null);
+    try {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    } catch {
+      /* schon freigegeben */
+    }
   }
 
   // Die frueheste fuer dieses Ziel heute eingeplante Stunde (fuer Zeit + Raum auf
@@ -464,28 +498,45 @@ export default function Heute({ onFokus }) {
           />
         </section>
 
-        {/* Mitte oben: Notizen (Häkchen-Liste) */}
+        {/* Mitte oben: Erinnerungen (Abhaken, Hinzufügen, Wischen zum Löschen) */}
         <section className="hu-karte hu-notizen">
           <h2 className="hu-karte-titel">
             <svg className="hu-karte-icon" viewBox="0 0 24 24" aria-hidden="true">
               <rect x="5" y="3.5" width="14" height="17" rx="2.5" />
               <path d="M9 8.5h6M9 12h6M9 15.5h4" />
             </svg>
-            Notizen
+            Erinnerungen
           </h2>
           {nSpan >= 4 && (
             <p className="hu-karte-sub">Geparkte Gedanken aus dem Fokus</p>
           )}
           {notizen.length === 0 ? (
             <p className="hu-notizen-leer">
-              Noch nichts notiert. Im Fokus kannst du Gedanken kurz parken.
+              Noch keine Erinnerung. Schreib unten eine rein oder park sie im
+              Fokus.
             </p>
           ) : (
             <ul className="hu-notiz-liste">
               {notizen.map((n, i) => (
                 <li
-                  className={"hu-notiz" + (n.erledigt ? " erledigt" : "")}
+                  className={
+                    "hu-notiz" +
+                    (n.erledigt ? " erledigt" : "") +
+                    (wisch && wisch.i === i ? " wischt" : "")
+                  }
                   key={i}
+                  style={
+                    wisch && wisch.i === i
+                      ? {
+                          transform: `translateX(${wisch.dx}px)`,
+                          opacity: Math.max(0, 1 + wisch.dx / 200),
+                        }
+                      : undefined
+                  }
+                  onPointerDown={(e) => wischDown(e, i)}
+                  onPointerMove={(e) => wischMove(e, i)}
+                  onPointerUp={(e) => wischUp(e, i)}
+                  onPointerCancel={() => setWisch(null)}
                 >
                   <button
                     type="button"
@@ -507,7 +558,7 @@ export default function Heute({ onFokus }) {
                     type="button"
                     className="hu-notiz-weg"
                     onClick={() => notizWeg(i)}
-                    aria-label="Notiz entfernen"
+                    aria-label="Erinnerung entfernen"
                   >
                     ✕
                   </button>
@@ -515,6 +566,23 @@ export default function Heute({ onFokus }) {
               ))}
             </ul>
           )}
+          <form className="hu-notiz-add" onSubmit={erinnerungHinzufuegen}>
+            <input
+              className="hu-notiz-add-feld"
+              type="text"
+              value={neueErinnerung}
+              onChange={(e) => setNeueErinnerung(e.target.value)}
+              placeholder="Erinnerung hinzufügen"
+              aria-label="Neue Erinnerung"
+            />
+            <button
+              type="submit"
+              className="hu-notiz-add-knopf"
+              aria-label="Erinnerung hinzufügen"
+            >
+              +
+            </button>
+          </form>
           <RasterGriff
             {...griff("b2", (s) => setB2(Math.max(b1 + 2, Math.min(10, s))))}
           />

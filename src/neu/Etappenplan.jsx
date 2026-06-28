@@ -250,15 +250,31 @@ export default function Etappenplan({ onWeiter }) {
           }}
         >
           <div className="ep-kopf-karte">
-            <h1 className="ep-kopf-titel">
-              <span className="ep-kopf-icon" aria-hidden="true">
-                🗓
-              </span>
-              Plane deine Etappe
-            </h1>
-            <p className="ep-kopf-meta">
-              {zeitraum(ETAPPE)} · {koennensbeweise.length} Könnensbeweise
-            </p>
+            <div className="ep-kopf-text">
+              <h1 className="ep-kopf-titel">
+                <span className="ep-kopf-icon" aria-hidden="true">
+                  🗓
+                </span>
+                Plane deine Etappe
+              </h1>
+              <p className="ep-kopf-meta">
+                {zeitraum(ETAPPE)} · {koennensbeweise.length} Könnensbeweise
+              </p>
+            </div>
+            {hatPlan && (
+              <button
+                type="button"
+                className="ep-kopf-neu"
+                onClick={umplanen}
+                title="Neu planen: alles neu und ausgewogen verteilen"
+                aria-label="Neu planen"
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M12 20h9" />
+                  <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
+                </svg>
+              </button>
+            )}
           </div>
 
           <div className="ep-vorrat-liste">
@@ -359,14 +375,6 @@ export default function Etappenplan({ onWeiter }) {
           </>
         ) : (
           <>
-            <button
-              type="button"
-              className="ep-bar-umplanen"
-              onClick={umplanen}
-              title="Die Etappe neu und ausgewogen verteilen"
-            >
-              <span aria-hidden="true">↻</span> Neu planen
-            </button>
             {alleZugeordnet ? (
               <button type="button" className="ep-bar-weiter" onClick={onWeiter}>
                 Weiter

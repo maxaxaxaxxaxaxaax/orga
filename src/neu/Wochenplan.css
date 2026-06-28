@@ -17,7 +17,7 @@
 /* Wizard-Schritt: keine obere Nav, dafuer die "Wochenplanung"-Pille unten.
    Oben darf der Kalender naeher an den Rand, wie im Etappenplan. */
 .wp-screen.wp-wizard {
-  padding-top: var(--seite-top-wizard);
+  padding-top: var(--seite-top);
 }
 .wp-layout {
   flex: 1;
@@ -43,7 +43,7 @@
     padding: var(--seite-top) var(--seite-x) var(--seite-bottom);
   }
   .wp-screen.wp-wizard {
-    padding-top: var(--seite-top-wizard);
+    padding-top: var(--seite-top);
   }
   .wp-layout {
     grid-template-columns: 1fr;

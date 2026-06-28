@@ -228,49 +228,26 @@ export default function MaterialChat({
         }}
       >
         {visionModell && (
-          <>
-            <button
-              type="button"
-              className="mc-bild-knopf"
-              onClick={() => setWebcamOffen(true)}
-              title="Foto mit der Kamera aufnehmen"
-              aria-label="Foto aufnehmen"
+          <label
+            className="mc-bild-knopf"
+            title="Bild anhängen (Kamera oder Galerie)"
+          >
+            <input type="file" accept="image/*" onChange={waehleBild} hidden />
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
             >
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
-                <circle cx="12" cy="13" r="4" />
-              </svg>
-            </button>
-            <label className="mc-bild-knopf" title="Bild anhängen">
-              <input
-                type="file"
-                accept="image/*"
-                onChange={waehleBild}
-                hidden
-              />
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <rect x="3" y="3" width="18" height="18" rx="2" />
-                <circle cx="8.5" cy="8.5" r="1.5" />
-                <path d="M21 15l-5-5L5 21" />
-              </svg>
-            </label>
-          </>
+              {/* Zauberstab */}
+              <path d="m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72Z" />
+              <path d="m14 7 3 3" />
+              <path d="M5 6v4M3 8h4M19 14v4M17 16h4" />
+            </svg>
+          </label>
         )}
         <input
           type="text"

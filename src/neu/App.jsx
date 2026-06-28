@@ -43,6 +43,7 @@ function speicherGeht() {
 export default function App() {
   const [screen, setScreen] = useState(startScreen);
   const [fokusKbId, setFokusKbId] = useState(null); // Ziel im Fokus-Modus (Vollbild)
+  const [toast, setToast] = useState(null); // kurze Rückmeldung unten mittig
   const [speicherOk] = useState(speicherGeht); // einmal beim Start pruefen
   // Erststart-Intro: einmal zeigen, bis es weggeklickt ist.
   const [introOffen, setIntroOffen] = useState(() => {
@@ -67,6 +68,21 @@ export default function App() {
   useEffect(() => {
     document.documentElement.classList.remove("dark");
   }, []);
+
+  // Toast blendet sich nach kurzer Zeit selbst aus.
+  useEffect(() => {
+    if (!toast) return undefined;
+    const t = setTimeout(() => setToast(null), 2800);
+    return () => clearTimeout(t);
+  }, [toast]);
+
+  // "Aufgabe wechseln" im Fokus: zurück in die Planung (dort umsortieren) plus
+  // kurzer Toast zur Orientierung.
+  function fokusZurPlanung() {
+    setFokusKbId(null);
+    setScreen(planungFertig() ? "plan" : planungsScreen());
+    setToast("In der Planung kannst du deine Aufgaben neu ordnen.");
+  }
 
   const bereich =
     screen === "heute" ? "heute" : screen === "ablage" ? "ablage" : "plan";
@@ -112,13 +128,10 @@ export default function App() {
     screen !== "etappenplan" &&
     screen !== "wochenplan" &&
     screen !== "plan";
-  // Während des Planens (Etappe, Woche, Neu-Planen) bleibt die obere Navbar weg:
-  // voller Fokus auf den Planungsschritt. Neu planen sieht so aus wie das erste
-  // Planen, die Planungs-Leiste unten führt heraus ("Weiter" / "‹ Etappe").
-  const zeigeNav =
-    screen !== "etappenplan" &&
-    screen !== "wochenplan" &&
-    screen !== "plan";
+  // Die obere Nav-Leiste ist überall sichtbar, auch in der Planung (Wunsch:
+  // jederzeit zwischen Übersicht/Planung/Ablage wechseln können). Die Planungs-
+  // Leiste unten führt zusätzlich durch den Schritt ("Weiter" / "‹ Etappe").
+  const zeigeNav = true;
 
   let inhalt;
   if (screen === "wochenplan") {
@@ -177,8 +190,14 @@ export default function App() {
           naechste={fokusNaechste}
           onFertig={fokusFertig}
           onWeiter={(id) => setFokusKbId(id)}
+          onPlanung={fokusZurPlanung}
           onClose={() => setFokusKbId(null)}
         />
+      )}
+      {toast && (
+        <div className="app-toast" role="status" aria-live="polite">
+          {toast}
+        </div>
       )}
     </>
   );

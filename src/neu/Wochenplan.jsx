@@ -444,25 +444,25 @@ export default function Wochenplan({ onZurueck, onWeiter, woche = 0 }) {
         >
           {/* Gleiche Kopf-Karte wie im Etappenplan (ep-kopf-karte). */}
           <div className="ep-kopf-karte">
-            <h1 className="ep-kopf-titel">
-              <span className="ep-kopf-icon" aria-hidden="true">
-                🗓
-              </span>
-              Plane deine Woche
-              <span className="wp-kopf-pfeil" aria-hidden="true">
-                ⌄
-              </span>
-            </h1>
-            <p className="ep-kopf-meta">
-              {langDatum(ETAPPE.von)} - {langDatum(ETAPPE.bis)}
-            </p>
+            <div className="ep-kopf-text">
+              <h1 className="ep-kopf-titel">
+                <span className="ep-kopf-icon" aria-hidden="true">
+                  🗓
+                </span>
+                Plane deine Woche
+                <span className="wp-kopf-pfeil" aria-hidden="true">
+                  ⌄
+                </span>
+              </h1>
+              <p className="ep-kopf-meta">
+                {langDatum(ETAPPE.von)} - {langDatum(ETAPPE.bis)} ·{" "}
+                {wocheKbs.length}{" "}
+                {wocheKbs.length === 1 ? "Lernweg" : "Lernwege"}
+              </p>
 
-            {/* Plan-Übersicht: "Umplanen" verteilt die Woche neu. Danach wird der
-               Knopf zu "Zurücksetzen" (Umplanen wäre dann überflüssig). Im Wizard
-               führt stattdessen die Pille unten durch. */}
-            {!istWizard && (
-              <div className="wp-aktionen">
-                {umgeplant ? (
+              {/* Nach dem Neu planen (Stift oben) erscheint hier "Zurücksetzen". */}
+              {!istWizard && umgeplant && (
+                <div className="wp-aktionen">
                   <button
                     type="button"
                     className="wp-zuruecksetzen"
@@ -471,17 +471,22 @@ export default function Wochenplan({ onZurueck, onWeiter, woche = 0 }) {
                   >
                     Zurücksetzen
                   </button>
-                ) : (
-                  <button
-                    type="button"
-                    className="wp-umplanen"
-                    onClick={umplanen}
-                    title="Die Woche automatisch neu verteilen"
-                  >
-                    Umplanen
-                  </button>
-                )}
-              </div>
+                </div>
+              )}
+            </div>
+            {hatPlan && (
+              <button
+                type="button"
+                className="ep-kopf-neu"
+                onClick={umplanen}
+                title="Neu planen: die Woche automatisch neu verteilen"
+                aria-label="Neu planen"
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M12 20h9" />
+                  <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
+                </svg>
+              </button>
             )}
           </div>
 
@@ -645,14 +650,6 @@ export default function Wochenplan({ onZurueck, onWeiter, woche = 0 }) {
             </>
           ) : (
             <>
-              <button
-                type="button"
-                className="ep-bar-umplanen"
-                onClick={umplanen}
-                title="Die Woche neu und ausgewogen verteilen"
-              >
-                <span aria-hidden="true">↻</span> Neu planen
-              </button>
               {zielVerplant ? (
                 <button
                   type="button"

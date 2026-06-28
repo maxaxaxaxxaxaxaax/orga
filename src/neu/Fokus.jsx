@@ -141,7 +141,14 @@ function IcLive(p) {
   );
 }
 
-export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
+export default function Fokus({
+  kb,
+  naechste,
+  onFertig,
+  onWeiter,
+  onPlanung,
+  onClose,
+}) {
   const lw = lernwegFuerKb(kb.id);
   const thema = lw?.thema || null;
   const schritte = thema?.schritte || [];
@@ -526,12 +533,12 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
               {hilfe ? `${COACH} ist informiert ✓` : `Frag ${COACH}`}
             </button>
           )}
-          {naechste && !alleFertig && (
+          {!alleFertig && (
             <button
               type="button"
               className="fokus-wechsel"
-              onClick={() => onWeiter(naechste.id)}
-              title={`Weiter mit ${naechste.fach}: ${naechste.titel}`}
+              onClick={onPlanung}
+              title="Zur Planung, um die Aufgaben neu zu ordnen"
             >
               Aufgabe wechseln
             </button>
@@ -666,16 +673,6 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
               {notizen.length > 0 && (
                 <span className="fokus-wz-zahl">{notizen.length}</span>
               )}
-            </button>
-            <button
-              type="button"
-              className={"fokus-wz" + (werkzeug === "live" ? " aktiv" : "")}
-              onClick={() => toggleWerkzeug("live")}
-              aria-pressed={werkzeug === "live"}
-              aria-label="Live-Coach"
-              title="Live-Coach: schaut beim Arbeiten mit"
-            >
-              <IcLive aria-hidden="true" />
             </button>
             <button
               type="button"
@@ -1112,15 +1109,31 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
           >
             <header className="fokus-chats-kopf">
               <span className="fokus-chats-titel">Chats</span>
-              <button
-                type="button"
-                className="fokus-chats-toggle"
-                onClick={() => setChatsOffen((o) => !o)}
-                aria-expanded={chatsOffen}
-                aria-label={chatsOffen ? "Chats einklappen" : "Chats ausklappen"}
-              >
-                {chatsOffen ? "⌄" : "⌃"}
-              </button>
+              <div className="fokus-chats-aktionen">
+                <button
+                  type="button"
+                  className={
+                    "fokus-chats-auge" + (werkzeug === "live" ? " an" : "")
+                  }
+                  onClick={() => toggleWerkzeug("live")}
+                  aria-pressed={werkzeug === "live"}
+                  aria-label="Live-Coach: schaut beim Arbeiten mit"
+                  title="Live-Coach: schaut beim Arbeiten mit"
+                >
+                  <IcLive aria-hidden="true" />
+                </button>
+                <button
+                  type="button"
+                  className="fokus-chats-toggle"
+                  onClick={() => setChatsOffen((o) => !o)}
+                  aria-expanded={chatsOffen}
+                  aria-label={
+                    chatsOffen ? "Chats einklappen" : "Chats ausklappen"
+                  }
+                >
+                  {chatsOffen ? "⌄" : "⌃"}
+                </button>
+              </div>
             </header>
             {chatsOffen && (
               <>
@@ -1174,47 +1187,61 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
                 </p>
               </>
             ) : (
-              <div className="fokus-panel-lerncoach">
-                <p className="fokus-lc-info">
-                  Hier erreichst du {COACH} (ein Mensch, kein Automat). Schreib
-                  kurz, woran es hängt: deine Frage wartet bis zum Tutorentermin,
-                  du musst dich nicht melden.
-                </p>
-                {hilfe ? (
-                  <div className="fokus-lc-status">
-                    <p className="fokus-hilfe-info">
-                      <span className="fokus-hilfe-haken" aria-hidden="true">
-                        ✓
-                      </span>
-                      {COACH} ist informiert.
-                    </p>
-                    {frage && <p className="fokus-hilfe-frage">„{frage}"</p>}
-                    <button
-                      type="button"
-                      className="fokus-textlink"
-                      onClick={hilfeZuruecknehmen}
-                    >
-                      Hilferuf zurücknehmen
-                    </button>
+              <div className="fokus-tutor">
+                <div className="fokus-tutor-verlauf">
+                  <div className="fokus-tutor-blase tutor">
+                    Hier erreichst du {lehrkraefte[kb.fach] || COACH} (ein Mensch,
+                    kein Automat). Schreib kurz, woran es hängt. Deine Frage
+                    wartet bis zum nächsten Termin.
                   </div>
-                ) : (
-                  <>
-                    <textarea
-                      className="fokus-lc-feld"
-                      rows={4}
+                  {hilfe && (
+                    <>
+                      {frage && (
+                        <div className="fokus-tutor-blase du">„{frage}"</div>
+                      )}
+                      <div className="fokus-tutor-blase tutor">
+                        <span className="fokus-hilfe-haken" aria-hidden="true">
+                          ✓
+                        </span>{" "}
+                        Ist angekommen, Antwort kommt zum Termin.{" "}
+                        <button
+                          type="button"
+                          className="fokus-textlink"
+                          onClick={hilfeZuruecknehmen}
+                        >
+                          zurücknehmen
+                        </button>
+                      </div>
+                    </>
+                  )}
+                </div>
+                {!hilfe && (
+                  <form
+                    className="fokus-tutor-eingabe"
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      if (entwurf.trim()) hilfeSenden();
+                    }}
+                  >
+                    <input
+                      type="text"
+                      className="fokus-tutor-feld"
                       value={entwurf}
                       onChange={(e) => setEntwurf(e.target.value)}
-                      placeholder="Zum Beispiel: Ich verstehe diesen Schritt nicht."
+                      placeholder={`Frag ${
+                        lehrkraefte[kb.fach] || "den Tutor"
+                      } etwas …`}
+                      aria-label="Frage an die Lehrkraft"
                     />
                     <button
-                      type="button"
-                      className="fokus-lc-senden"
-                      onClick={hilfeSenden}
+                      type="submit"
+                      className="fokus-tutor-senden"
                       disabled={!entwurf.trim()}
+                      aria-label="Senden"
                     >
-                      An {COACH} senden
+                      →
                     </button>
-                  </>
+                  </form>
                 )}
               </div>
             )}

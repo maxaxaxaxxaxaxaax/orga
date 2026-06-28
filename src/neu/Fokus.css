@@ -902,6 +902,115 @@
   border-color: var(--accent);
   color: var(--accent);
 }
+.fokus-chats-aktionen {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+/* Auge = Live-Coach (schaut beim Arbeiten mit), jetzt auf der Chat-Karte. */
+.fokus-chats-auge {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: var(--card);
+  color: var(--text-2);
+  cursor: pointer;
+  transition: border-color 0.12s ease, color 0.12s ease, background 0.12s ease;
+}
+.fokus-chats-auge svg {
+  width: 18px;
+  height: 18px;
+}
+.fokus-chats-auge:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.fokus-chats-auge.an {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+}
+/* Tutor-Tab als Chat (wie der KI-Chat): Blasen-Verlauf + Eingabe unten. */
+.fokus-tutor {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.fokus-tutor-verlauf {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.fokus-tutor-blase {
+  max-width: 85%;
+  padding: 9px 12px;
+  font-size: 0.86rem;
+  line-height: 1.4;
+  border-radius: 14px;
+}
+.fokus-tutor-blase.tutor {
+  align-self: flex-start;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  color: var(--text-2);
+  border-bottom-left-radius: 4px;
+}
+.fokus-tutor-blase.du {
+  align-self: flex-end;
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+  border-bottom-right-radius: 4px;
+}
+.fokus-tutor-eingabe {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.fokus-tutor-feld {
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+  font-size: 0.88rem;
+  padding: 9px 12px;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  outline: none;
+}
+.fokus-tutor-feld:focus-visible {
+  border-color: var(--accent);
+}
+.fokus-tutor-senden {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  color: var(--on-accent);
+  background: var(--accent);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+}
+.fokus-tutor-senden:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
 /* Eingeklappt: nur der Kopf als Pille, schwebt oben rechts; die Mitte (deren
    Raster-Bereich dann bis ans Ende reicht, siehe .fokus-koerper.chats-zu) wird
    dadurch breiter. Aus dem Fluss genommen, damit keine Spalte leer bleibt. */
