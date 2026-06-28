@@ -84,6 +84,75 @@
 .lz-feld textarea:focus {
   border-color: var(--accent);
 }
+/* E8: Kopfzeile des Inhaltsfelds mit Umschalter Vorschau/Bearbeiten. */
+.lz-feld-kopf {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.lz-umschalten {
+  border: none;
+  background: transparent;
+  color: var(--accent);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 2px 4px;
+}
+.lz-umschalten:hover {
+  text-decoration: underline;
+}
+/* E8: formatierte Lernzettel-Vorschau (gleiche Struktur wie die Ablage-Ansicht). */
+.lz-vorschau {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-height: 184px;
+  max-height: 340px;
+  overflow-y: auto;
+  box-sizing: border-box;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm, 8px);
+  background: var(--bg);
+}
+.lz-v-leer {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+.lz-v-h {
+  margin: 10px 0 2px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+.lz-v-h:first-child {
+  margin-top: 0;
+}
+.lz-v-punkt {
+  margin: 0;
+  padding-left: 18px;
+  position: relative;
+  font-size: 0.95rem;
+  line-height: 1.45;
+  color: var(--text);
+}
+.lz-v-punkt::before {
+  content: "•";
+  position: absolute;
+  left: 4px;
+  color: var(--accent);
+}
+.lz-v-zeile {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--text);
+}
 .lz-aktionen {
   display: flex;
   justify-content: flex-end;

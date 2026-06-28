@@ -84,12 +84,25 @@ export default function Netz({ fach, struktur, erledigt, onSelect }) {
   }
 
   const aktiv = hover;
+  // I1: Die aktuelle Ebene wird als getönte Pille in der Fachfarbe hervorgehoben
+  // (gleiche Fach-Farbsprache wie die Knoten, I2). Ein führender Farbpunkt zeigt
+  // ruhig, in welchem Fach man steckt.
+  const aktuellStil = {
+    background: `color-mix(in srgb, ${fach.farbe} 14%, var(--card))`,
+    color: fach.farbe,
+  };
   return (
     <div>
       <nav className="netz-brotkrumen" aria-label="Ebene">
+        <span
+          className="netz-krume-punkt"
+          style={{ background: fach.farbe }}
+          aria-hidden="true"
+        />
         <button
           type="button"
-          className="netz-krume"
+          className={"netz-krume" + (!pfad.kategorie ? " aktuell" : "")}
+          style={!pfad.kategorie ? aktuellStil : undefined}
           onClick={() => gehe({ kategorie: null, sub: null })}
           disabled={!pfad.kategorie}
         >
@@ -100,7 +113,8 @@ export default function Netz({ fach, struktur, erledigt, onSelect }) {
             <span className="netz-krume-sep" aria-hidden="true">›</span>
             <button
               type="button"
-              className="netz-krume"
+              className={"netz-krume" + (!pfad.sub ? " aktuell" : "")}
+              style={!pfad.sub ? aktuellStil : undefined}
               onClick={() => gehe({ kategorie: pfad.kategorie, sub: null })}
               disabled={!pfad.sub}
             >
@@ -111,7 +125,9 @@ export default function Netz({ fach, struktur, erledigt, onSelect }) {
         {pfad.sub && (
           <>
             <span className="netz-krume-sep" aria-hidden="true">›</span>
-            <span className="netz-krume aktuell">{pfad.sub}</span>
+            <span className="netz-krume aktuell" style={aktuellStil}>
+              {pfad.sub}
+            </span>
           </>
         )}
       </nav>

@@ -25,10 +25,18 @@
   cursor: default;
 }
 .netz-krume.aktuell {
-  font-weight: 500;
+  padding: 3px 10px;
+  font-weight: 600;
 }
 .netz-krume-sep {
   color: var(--text-2, #6b6b6b);
+}
+.netz-krume-punkt {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex: none;
+  margin-right: 1px;
 }
 .netz-flaeche {
   width: 100%;

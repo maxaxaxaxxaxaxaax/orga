@@ -1371,6 +1371,16 @@
 .fokus-abschluss-karte .fokus-fuss {
   justify-content: center;
 }
+/* J1: Etappenring als ruhiger Mittelpunkt des Abschlusses (gleiche Bildsprache
+   wie die Übersicht). Zentriert, etwas kompakter als auf dem Dashboard. */
+.fokus-abschluss-ring {
+  display: flex;
+  justify-content: center;
+  margin-top: 4px;
+}
+.fokus-abschluss-ring .hu-ring-wrap {
+  max-width: 184px;
+}
 /* Zeit-Bestätigung im Abschluss: App misst, der Schüler bestätigt oder korrigiert. */
 .fokus-zeit {
   display: flex;
