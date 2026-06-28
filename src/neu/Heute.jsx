@@ -202,17 +202,19 @@ export default function Heute({ onFokus }) {
         <span className="hu-auf-titel">{k.titel}</span>
         <span className="hu-auf-fach">{k.fach}</span>
         <span className="hu-auf-chips">
-          <span className="hu-auf-chip">
-            <svg
-              className="hu-auf-chip-icon"
-              viewBox="0 0 24 24"
-              aria-hidden="true"
-            >
-              <circle cx="12" cy="12" r="9" />
-              <path d="M12 7.5v5l3 2" />
-            </svg>
-            {st ? `${st.von} - ${st.bis}` : "frei einteilbar"}
-          </span>
+          {aSpan >= 5 && (
+            <span className="hu-auf-chip">
+              <svg
+                className="hu-auf-chip-icon"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <circle cx="12" cy="12" r="9" />
+                <path d="M12 7.5v5l3 2" />
+              </svg>
+              {st ? `${st.von} - ${st.bis}` : "frei einteilbar"}
+            </span>
+          )}
           {anzahlStunden > 0 && aSpan >= 8 && (
             <span className="hu-auf-chip">
               <svg
@@ -240,19 +242,20 @@ export default function Heute({ onFokus }) {
           )}
         </span>
         {aSpan >= 9 &&
-          (info.schritte > 0 || info.materialien > 0 || info.hatUebung) && (
+          (info.schritte > 0 ||
+            (aSpan >= 10 && (info.materialien > 0 || info.hatUebung))) && (
             <span className="hu-auf-meta">
               {info.schritte > 0 && (
                 <span className="hu-auf-meta-teil">
                   {info.fertigeSchritte}/{info.schritte} Schritte
                 </span>
               )}
-              {info.materialien > 0 && (
+              {aSpan >= 10 && info.materialien > 0 && (
                 <span className="hu-auf-meta-teil">
                   {info.materialien} Materialien
                 </span>
               )}
-              {info.hatUebung && (
+              {aSpan >= 10 && info.hatUebung && (
                 <span className="hu-auf-meta-teil">Übung dabei</span>
               )}
             </span>
@@ -442,7 +445,7 @@ export default function Heute({ onFokus }) {
             </svg>
             Etappenfortschritt
           </h2>
-          {fSpan >= 4 && (
+          {fSpan >= 3 && (
             <p className="hu-karte-sub">
               Alle deine Könnensbeweise auf einen Blick
             </p>
@@ -452,6 +455,13 @@ export default function Heute({ onFokus }) {
             gesamtDone={zieleDone}
             gesamtTotal={zieleGesamt}
           />
+          {fSpan >= 4 && zieleGesamt - zieleDone > 0 && (
+            <p className="hu-fort-rest">
+              Noch {zieleGesamt - zieleDone}{" "}
+              {zieleGesamt - zieleDone === 1 ? "Ziel" : "Ziele"} bis zur vollen
+              Etappe
+            </p>
+          )}
           {/* Breit gezogen: zusätzlich die Fächer einzeln auflisten. */}
           {fSpan >= 5 && (
             <ul className="hu-fort-legende">
@@ -479,7 +489,7 @@ export default function Heute({ onFokus }) {
             </ul>
           )}
           <RasterGriff
-            {...griff("b1", (s) => setB1(Math.max(1, Math.min(b2 - 1, s))))}
+            {...griff("b1", (s) => setB1(Math.max(2, Math.min(b2 - 2, s))))}
           />
         </section>
 
@@ -492,6 +502,9 @@ export default function Heute({ onFokus }) {
             </svg>
             Notizen
           </h2>
+          {nSpan >= 4 && (
+            <p className="hu-karte-sub">Geparkte Gedanken aus dem Fokus</p>
+          )}
           {notizen.length === 0 ? (
             <p className="hu-notizen-leer">
               Noch nichts notiert. Im Fokus kannst du Gedanken kurz parken.
@@ -532,7 +545,7 @@ export default function Heute({ onFokus }) {
             </ul>
           )}
           <RasterGriff
-            {...griff("b2", (s) => setB2(Math.max(b1 + 1, Math.min(11, s))))}
+            {...griff("b2", (s) => setB2(Math.max(b1 + 2, Math.min(10, s))))}
           />
         </section>
 
@@ -603,7 +616,7 @@ export default function Heute({ onFokus }) {
             </div>
           )}
           <RasterGriff
-            {...griff("b2", (s) => setB2(Math.max(b1 + 1, Math.min(11, s))))}
+            {...griff("b2", (s) => setB2(Math.max(b1 + 2, Math.min(10, s))))}
           />
         </section>
 
@@ -624,6 +637,10 @@ export default function Heute({ onFokus }) {
                 : 0;
               const lernzeit = s.art === "studierzeit" || s.art === "selbst";
               const istPause = s.art === "pause";
+              // Welche heutigen Ziele sind in dieser Stunde eingeplant?
+              const geplant = tagKbs.filter((k) =>
+                (stundenZuord[k.id] || []).includes(stundenId(s))
+              );
               return (
                 <Fragment key={i}>
                   {pause > 0 && (
@@ -654,6 +671,11 @@ export default function Heute({ onFokus }) {
                       )}
                       {pSpan >= 5 && artLabel[s.art] && (
                         <span className="hu-stunde-art">{artLabel[s.art]}</span>
+                      )}
+                      {pSpan >= 6 && geplant.length > 0 && (
+                        <span className="hu-stunde-geplant">
+                          {geplant.map((k) => k.titel).join(", ")}
+                        </span>
                       )}
                     </span>
                     <span className="hu-stunde-zeit">

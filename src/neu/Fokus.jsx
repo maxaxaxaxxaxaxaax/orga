@@ -877,7 +877,7 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
             {chatsOffen && (
               <RasterGriff
                 {...rasterGriff("mc", (s) =>
-                  setRasterC(Math.max(rasterR + 1, Math.min(11, s)))
+                  setRasterC(Math.max(rasterR + 2, Math.min(10, s)))
                 )}
               />
             )}
@@ -1117,7 +1117,7 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
             {/* Grenze Materialien|Mitte ziehen. */}
             <RasterGriff
               {...rasterGriff("rm", (s) =>
-                setRasterR(Math.max(1, Math.min(rasterC - 1, s)))
+                setRasterR(Math.max(2, Math.min(rasterC - 2, s)))
               )}
             />
             </aside>

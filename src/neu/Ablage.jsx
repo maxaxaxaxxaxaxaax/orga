@@ -247,7 +247,7 @@ export default function Ablage() {
           </section>
           )}
           <RasterGriff
-            {...griff("ab", (s) => setAbGrenze(Math.max(1, Math.min(11, s))))}
+            {...griff("ab", (s) => setAbGrenze(Math.max(2, Math.min(10, s))))}
           />
         </div>
 
