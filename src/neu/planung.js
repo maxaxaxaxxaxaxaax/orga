@@ -4,6 +4,8 @@ import {
   kbFaecher,
   kbFarbe,
 } from "../data/koennensbeweise";
+import { lernwegFuerKb } from "../data/wissen";
+import { ladeSchritte } from "./lernschritte";
 
 // Geteilter Planungs-Stand: localStorage-Keys, Platzhalter für "jetzt" und die
 // Frage, mit welchem Screen die App sinnvoll startet.
@@ -65,9 +67,24 @@ export function lade(key) {
   }
 }
 
+// Anteiliger Fortschritt eines KB (0..1): voll abgenommen = 1, sonst der Anteil
+// der erledigten Lernweg-Schritte. So zeigt der Ring auch den Zwischenstand,
+// während man an einer Aufgabe arbeitet (nicht erst beim Abschluss).
+function kbFortschritt(kbId, erledigt) {
+  if (erledigt[kbId]) return 1;
+  const schritte = lernwegFuerKb(kbId)?.thema?.schritte || [];
+  if (schritte.length === 0) return 0;
+  const stand = ladeSchritte(kbId);
+  const fertige = schritte.filter((st, i) =>
+    stand[i] != null ? stand[i] : !!st.fertig
+  ).length;
+  return fertige / schritte.length;
+}
+
 // Fortschritt je Fach und geplanter Woche. Speist den konzentrischen Wochen-Ring:
 // ein Ring pro Fach (Fachfarbe), geteilt in gemeinsame Wochen-Stücke (Größe nach
-// Aufgabenzahl). Fächer/Wochen ohne geplante KBs fallen raus.
+// Aufgabenzahl). "done" ist der anteilige Stand (auch in Arbeit), "fertig" zählt
+// die voll abgenommenen KBs (für den "noch offen"-Text). Leere Wochen fallen raus.
 export function fachWochenFortschritt(erledigt) {
   const zuordnung = lade(WOCHEN_KEY);
   return kbFaecher
@@ -81,7 +98,8 @@ export function fachWochenFortschritt(erledigt) {
         wochen.push({
           woche: w,
           total: kbs.length,
-          done: kbs.filter((k) => erledigt[k.id]).length,
+          done: kbs.reduce((s, k) => s + kbFortschritt(k.id, erledigt), 0),
+          fertig: kbs.filter((k) => erledigt[k.id]).length,
           istAktuell: w === AKTUELLE_WOCHE,
         });
       }

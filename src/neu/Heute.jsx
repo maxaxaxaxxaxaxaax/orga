@@ -376,22 +376,22 @@ export default function Heute({ onFokus }) {
   // Etappenfortschritt: ein Ring je Fach, in gemeinsame Wochen-Stücke geteilt. So
   // liest man pro Fach und gesamt ab, was diese Woche und insgesamt noch fehlt.
   const fachWochen = fachWochenFortschritt(erledigt);
-  let ringDone = 0;
+  let ringFertig = 0;
   let ringTotal = 0;
-  let wocheDone = 0;
+  let wocheFertig = 0;
   let wocheTotal = 0;
   fachWochen.forEach((f) =>
     f.wochen.forEach((w) => {
-      ringDone += w.done;
+      ringFertig += w.fertig;
       ringTotal += w.total;
       if (w.istAktuell) {
-        wocheDone += w.done;
+        wocheFertig += w.fertig;
         wocheTotal += w.total;
       }
     })
   );
-  const wocheOffen = wocheTotal - wocheDone;
-  const gesamtOffen = ringTotal - ringDone;
+  const wocheOffen = wocheTotal - wocheFertig;
+  const gesamtOffen = ringTotal - ringFertig;
 
   // Tag geschafft: ruhiger grüner Abschluss als kleine Belohnung, bevor der Tag
   // wieder zur Liste wird.
