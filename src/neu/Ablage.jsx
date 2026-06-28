@@ -151,7 +151,7 @@ export default function Ablage() {
         ref={gridRef}
         style={{ "--ab-start": abGrenze + 1 }}
       >
-        {zieht && <RasterOverlay />}
+        <RasterOverlay />
         {/* Linke Spalte: Fächer + Kompetenzen */}
         <div className="ab-links">
           <section className="ab-card ab-faecher">

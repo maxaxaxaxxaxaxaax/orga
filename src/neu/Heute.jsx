@@ -472,8 +472,9 @@ export default function Heute({ onFokus }) {
         ref={gridRef}
         style={{ "--n-start": b1 + 1, "--p-start": b2 + 1 }}
       >
-        {/* Beim Ziehen: das 12-Spalten-Raster als Hilfslinien einblenden. */}
-        {zieht && <RasterOverlay />}
+        {/* Das 12-Spalten-Raster liegt immer bereit und blendet beim Ziehen
+            weich ein/aus (Sichtbarkeit über .raster-zieht, siehe index.css). */}
+        <RasterOverlay />
         {/* Links oben: Etappenfortschritt */}
         <section className="hu-karte hu-fortschritt">
           <h2 className="hu-karte-titel">

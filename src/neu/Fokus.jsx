@@ -669,7 +669,7 @@ export default function Fokus({
           }
           style={{ "--fok-rm": rasterR + 2, "--fok-mc": rasterC + 2 }}
         >
-          {rasterZieht && <RasterOverlay von={2} />}
+          <RasterOverlay von={2} />
           {/* Linke Werkzeug-Toolbar */}
           <nav className="fokus-werkzeuge" aria-label="Werkzeuge">
             <button

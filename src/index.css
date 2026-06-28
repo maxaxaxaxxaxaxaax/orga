@@ -409,12 +409,23 @@ select:focus-visible {
   grid-template-columns: repeat(12, minmax(0, 1fr));
   gap: var(--grid-gap, 18px);
   pointer-events: none;
+  /* Liegt immer bereit und blendet beim Ziehen weich ein/aus, statt hart
+     aufzupoppen und nach dem Loslassen wegzuspringen. */
+  opacity: 0;
+  transition: opacity 0.22s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.raster-zieht .raster-overlay {
+  opacity: 1;
 }
 .raster-overlay-spalte {
-  border-radius: 6px;
-  background: color-mix(in srgb, var(--accent) 9%, transparent);
-  outline: 1px solid color-mix(in srgb, var(--accent) 24%, transparent);
-  outline-offset: -1px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--accent) 6%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 15%, transparent);
+}
+@media (prefers-reduced-motion: reduce) {
+  .raster-overlay {
+    transition: none;
+  }
 }
 
 /* Globaler Toast: kurze Rückmeldung unten mittig, blendet sich selbst aus. */
