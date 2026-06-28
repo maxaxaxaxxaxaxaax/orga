@@ -9,9 +9,10 @@ export const STUNDEN_KEY = "neu.wochenplan.stunden"; // kbId -> Stunden-ID (Tag-
 export const ERLEDIGT_KEY = "neu.erledigt"; // kbId -> true
 
 // Demo-Stand: Max steckt schon ein Stück in der Etappe, ein paar Grundlagen-
-// Könnensbeweise sind erbracht. So zeigt die Übersicht einen gelebten Fortschritt
-// (gefüllte Ringe) statt bei null zu starten. Die heutigen Ziele (7MA1, 7EA1)
-// bleiben bewusst offen, damit der Tag noch etwas zu tun hat.
+// Könnensbeweise sind erbracht. Dieser gelebte Fortschritt erscheint aber erst,
+// sobald geplant wurde: solange nach dem Login noch nichts geplant ist, startet
+// die Übersicht ehrlich bei null (siehe ladeErledigt). Die heutigen Ziele (7MA1,
+// 7EA1) bleiben bewusst offen, damit der Tag noch etwas zu tun hat.
 const ERLEDIGT_SEED = {
   "7MA2": true, // Addieren & Subtrahieren negativer Zahlen
   "7MA3": true, // Multiplikation & Division negativer Zahlen
@@ -25,16 +26,24 @@ const ERLEDIGT_SEED = {
   "7FA4": true, // Vocabulaire: les loisirs
 };
 
-// Erledigt-Stand laden. Ist noch nichts gespeichert (frischer Start), kommt der
-// Demo-Seed oben, damit die Übersicht direkt nach etwas aussieht.
+// Erledigt-Stand laden. Ist schon etwas gespeichert, zählt das. Sonst hängt es
+// am Planungs-Stand: solange noch nichts geplant ist (frischer Start nach dem
+// Login), bleibt der Fortschritt leer (die App kann ehrlich nichts zeigen). Erst
+// wenn geplant wurde, erscheint Max' gelebter Demo-Stand.
 export function ladeErledigt() {
   try {
     const r = localStorage.getItem(ERLEDIGT_KEY);
-    if (r == null) return { ...ERLEDIGT_SEED };
-    const v = JSON.parse(r);
-    return v && typeof v === "object" && !Array.isArray(v) ? v : {};
+    const v = r == null ? {} : JSON.parse(r);
+    const stand = v && typeof v === "object" && !Array.isArray(v) ? v : {};
+    // Ist noch nichts erledigt gespeichert (auch ein leer persistiertes {} zählt
+    // als nichts), hängt der Stand am Planen: ungeplant bleibt er leer, sobald
+    // geplant wurde erscheint Max' gelebter Demo-Stand.
+    if (Object.keys(stand).length === 0) {
+      return Object.keys(lade(WOCHEN_KEY)).length > 0 ? { ...ERLEDIGT_SEED } : {};
+    }
+    return stand;
   } catch {
-    return { ...ERLEDIGT_SEED };
+    return {};
   }
 }
 
