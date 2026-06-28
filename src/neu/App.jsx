@@ -4,6 +4,7 @@ import Wochenplan from "./Wochenplan";
 import Heute from "./Heute";
 import Ablage from "./Ablage";
 import NavLeiste from "./NavLeiste";
+import Topbar from "./Topbar";
 import WegLeiste from "./WegLeiste";
 import IntroOverlay from "./IntroOverlay";
 import Fokus from "./Fokus";
@@ -182,6 +183,7 @@ export default function App() {
       {zeigeWeg && <WegLeiste onGo={wegGo} />}
       {inhalt}
       {zeigeNav && <NavLeiste aktiv={bereich} onWechsel={wechsle} />}
+      {zeigeNav && <Topbar onResetDemo={() => window.location.reload()} />}
       {introOffen && <IntroOverlay onLos={introFertig} />}
       {fokusKb && (
         <Fokus

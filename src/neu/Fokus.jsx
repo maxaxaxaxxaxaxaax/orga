@@ -6,6 +6,7 @@ import { ladeErledigt } from "./planung";
 import Etappenring from "./Etappenring";
 import { ART_LABEL } from "./material";
 import { eigeneFuerThema, speichereEigenes } from "./eigeneMaterialien";
+import { addMitteilung } from "./benachrichtigungen";
 import { ladeSchritte, speichereSchritte } from "./lernschritte";
 import {
   GEFUEHLE,
@@ -1345,6 +1346,12 @@ export default function Fokus({
             speichereEigenes(m);
             setEigeneStand((n) => n + 1);
             setUploadOffen(false);
+            // A2: hochgeladener Content meldet sich ruhig im Postfach.
+            addMitteilung({
+              art: "material",
+              titel: "Hochgeladen",
+              text: `„${m.titel || "Neues Material"}“ liegt jetzt bei ${kb.fach} in der Ablage.`,
+            });
           }}
           onClose={() => setUploadOffen(false)}
         />
