@@ -823,7 +823,10 @@
 /* ---- Rechtes Panel: Chats (Lerncoach = KI, Tutor = Mensch) ------------ */
 .fokus-chats {
   order: 4;
-  width: clamp(250px, 21vw, 330px);
+  /* Breiter als die Material-Leiste: der Chat (Nachrichten, Vorschlags-Chips,
+     Eingabe) braucht mehr Platz, damit der Inhalt gut hineinpasst. Auf schmalen
+     Screens schrumpft er mit, damit die Mitte nicht zerquetscht wird. */
+  width: clamp(270px, 25vw, 380px);
   flex-shrink: 0;
   min-height: 0;
   display: flex;
