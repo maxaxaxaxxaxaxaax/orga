@@ -308,6 +308,37 @@
   align-self: flex-end;
   font-size: 1.6rem;
 }
+/* Breit gezogene Fortschritt-Karte: kompakte Fächer-Legende unter dem Ring. */
+.hu-fort-legende {
+  list-style: none;
+  margin: 16px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.hu-fort-legende-zeile {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.86rem;
+}
+.hu-fort-legende-punkt {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+.hu-fort-legende-fach {
+  flex: 1;
+  min-width: 0;
+  color: var(--text-2);
+}
+.hu-fort-legende-wert {
+  font-weight: 700;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
 .hu-leer {
   margin: 0;
   font-size: 0.9rem;

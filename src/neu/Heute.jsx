@@ -79,6 +79,12 @@ export default function Heute({ onFokus }) {
   const [b1, setB1] = useState(4);
   const [b2, setB2] = useState(8);
   const { ref: gridRef, zieht, griff } = useRasterZiehen();
+  // Inhaltsdichte hängt an der Breite der jeweiligen Box: mehr Spalten -> mehr
+  // Details, weniger Spalten -> nur das Wichtigste.
+  const fSpan = b1; // Etappenfortschritt
+  const nSpan = b2 - b1; // Notizen
+  const aSpan = b2; // Aufgaben
+  const pSpan = 12 - b2; // Stundenplan
 
   useEffect(() => {
     localStorage.setItem(ERLEDIGT_KEY, JSON.stringify(erledigt));
@@ -206,7 +212,7 @@ export default function Heute({ onFokus }) {
             </svg>
             {st ? `${st.von} - ${st.bis}` : "frei einteilbar"}
           </span>
-          {anzahlStunden > 0 && (
+          {anzahlStunden > 0 && aSpan >= 8 && (
             <span className="hu-auf-chip">
               <svg
                 className="hu-auf-chip-icon"
@@ -218,7 +224,7 @@ export default function Heute({ onFokus }) {
               {anzahlStunden} {anzahlStunden === 1 ? "Stunde" : "Stunden"}
             </span>
           )}
-          {st && (
+          {st && aSpan >= 6 && (
             <span className="hu-auf-chip">
               <svg
                 className="hu-auf-chip-icon"
@@ -417,12 +423,34 @@ export default function Heute({ onFokus }) {
             </svg>
             Etappenfortschritt
           </h2>
-          <p className="hu-karte-sub">Alle deine Könnensbeweise auf einen Blick</p>
+          {fSpan >= 4 && (
+            <p className="hu-karte-sub">
+              Alle deine Könnensbeweise auf einen Blick
+            </p>
+          )}
           <Etappenring
             ringe={proFach}
             gesamtDone={zieleDone}
             gesamtTotal={zieleGesamt}
           />
+          {/* Breit gezogen: zusätzlich die Fächer einzeln auflisten. */}
+          {fSpan >= 5 && (
+            <ul className="hu-fort-legende">
+              {proFach.map((r) => (
+                <li className="hu-fort-legende-zeile" key={r.fach}>
+                  <span
+                    className="hu-fort-legende-punkt"
+                    style={{ background: r.color }}
+                    aria-hidden="true"
+                  />
+                  <span className="hu-fort-legende-fach">{r.fach}</span>
+                  <span className="hu-fort-legende-wert">
+                    {r.done}/{r.total}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
           <RasterGriff
             {...griff("b1", (s) => setB1(Math.max(1, Math.min(b2 - 1, s))))}
           />
@@ -460,7 +488,7 @@ export default function Heute({ onFokus }) {
                   </button>
                   <span className="hu-notiz-text">
                     {n.text}
-                    {n.kontext && (
+                    {n.kontext && nSpan >= 3 && (
                       <span className="hu-notiz-kontext">{n.kontext}</span>
                     )}
                   </span>
@@ -507,7 +535,7 @@ export default function Heute({ onFokus }) {
           ) : (
             <div className="hu-auf-grid">{tagKbs.map((k) => karte(k))}</div>
           )}
-          {morgenAnzahl > 0 && (
+          {morgenAnzahl > 0 && aSpan >= 7 && (
             <p className={"hu-morgen" + (morgenVoll ? " voll" : "")}>
               Morgen geplant: {morgenAnzahl}{" "}
               {morgenAnzahl === 1 ? "Ziel" : "Ziele"}
@@ -589,12 +617,14 @@ export default function Heute({ onFokus }) {
                     />
                     <span className="hu-stunde-info">
                       <span className="hu-stunde-fach">{s.fach}</span>
-                      {lehrkraefte[s.fach] && (
+                      {lehrkraefte[s.fach] && pSpan >= 4 && (
                         <span className="hu-stunde-lehrer">
                           {lehrkraefte[s.fach]}
                         </span>
                       )}
-                      <span className="hu-stunde-raum">{s.raum}</span>
+                      {pSpan >= 3 && (
+                        <span className="hu-stunde-raum">{s.raum}</span>
+                      )}
                     </span>
                     <span className="hu-stunde-zeit">
                       {kurzeZeit(s.von)} - {kurzeZeit(s.bis)}
