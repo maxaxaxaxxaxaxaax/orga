@@ -151,7 +151,7 @@
   display: flex;
   align-items: center;
   gap: 14px;
-  width: min(720px, calc(100% - 28px));
+  width: min(var(--leiste-breite), calc(100% - 28px));
   padding: 8px 8px 8px 18px;
   /* Heller Glas-Look, konsistent mit der Weg-Leiste und der Figma-Komponente. */
   background: linear-gradient(

@@ -149,7 +149,8 @@
   grid-template-columns: auto repeat(12, minmax(0, 1fr));
   align-items: stretch;
   gap: var(--grid-gap);
-  padding: 8px var(--seite-x) 18px;
+  /* Unten Platz für die schwebende Schritt-Pille (position: fixed). */
+  padding: 8px var(--seite-x) 90px;
   box-sizing: border-box;
 }
 /* rail ausgeblendet (Live-Coach/Stift): mitte rückt links an die Werkzeug-Spalte. */
@@ -330,7 +331,16 @@
 /* Schmale Schritt-Steuerung am unteren Rand der Mitte. Heller Glas-Look,
    konsistent mit der Weg-Leiste und den unteren Leisten der anderen Seiten. */
 .fokus-schrittleiste {
-  flex-shrink: 0;
+  /* Gleiche zentrierte Pille wie Weg-/Planungs-Leiste: viewport-zentriert und
+     gleiche Breite, unabhängig von der mittleren Spalte (sonst springt der Knopf
+     je nach offenem Panel). Der Körper reserviert unten Platz dafür. */
+  position: fixed;
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%);
+  z-index: 6;
+  box-sizing: border-box;
+  width: min(var(--leiste-breite), calc(100% - 28px));
   display: flex;
   align-items: center;
   gap: 14px;

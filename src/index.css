@@ -52,6 +52,7 @@
   --seite-top: 74px; /* Platz für die obere Weg-Leiste (Screens mit Navbar) */
   --seite-top-wizard: 24px; /* oben für Planungs-Wizards ohne Navbar */
   --seite-bottom: 96px; /* Platz für die untere Nav/Schritt-Pille */
+  --leiste-breite: 800px; /* gemeinsame Breite aller unteren Pillen (Weg/Plan/Fokus) */
   --grid-gap: 18px; /* Spalten-/Zeilenabstand im Raster */
   --grid-spalten: 12; /* Basis-Spaltenzahl */
 
