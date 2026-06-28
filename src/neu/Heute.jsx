@@ -509,12 +509,11 @@ export default function Heute({ onFokus }) {
             Erinnerungen
           </h2>
           {nSpan >= 4 && (
-            <p className="hu-karte-sub">Geparkte Gedanken aus dem Fokus</p>
+            <p className="hu-karte-sub">Was du nicht vergessen willst</p>
           )}
           {notizen.length === 0 ? (
             <p className="hu-notizen-leer">
-              Noch keine Erinnerung. Schreib unten eine rein oder park sie im
-              Fokus.
+              Noch keine Erinnerung. Schreib unten deine erste rein.
             </p>
           ) : (
             <ul className="hu-notiz-liste">

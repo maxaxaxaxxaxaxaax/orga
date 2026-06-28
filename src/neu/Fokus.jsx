@@ -442,7 +442,9 @@ export default function Fokus({
     if (!t) return;
     const kontext =
       kb.titel + (aktuell >= 0 ? " · Schritt " + (aktuell + 1) : "");
-    addNotiz(t, kontext);
+    // An diese Aufgabe binden: im Fokus nur hier sichtbar, in der Übersicht
+    // (die alles zeigt) taucht sie trotzdem auf.
+    addNotiz(t, kontext, kb.id);
     setNotizEntwurf("");
     setNotizen(ladeNotizen());
   }
@@ -450,6 +452,11 @@ export default function Fokus({
     entferneNotiz(i);
     setNotizen(ladeNotizen());
   }
+  // Nur die Notizen dieser Aufgabe (Scope = kb.id). Der Originalindex (_i) bleibt
+  // erhalten, damit Entfernen die richtige Notiz im Gesamtspeicher trifft.
+  const meineNotizen = notizen
+    .map((n, i) => ({ ...n, _i: i }))
+    .filter((n) => n.kbId === kb.id);
 
   // Werkzeug umschalten (Toggle).
   function toggleWerkzeug(w) {
@@ -717,8 +724,8 @@ export default function Fokus({
               title="Notizen"
             >
               <IcNotizen aria-hidden="true" />
-              {notizen.length > 0 && (
-                <span className="fokus-wz-zahl">{notizen.length}</span>
+              {meineNotizen.length > 0 && (
+                <span className="fokus-wz-zahl">{meineNotizen.length}</span>
               )}
             </button>
             <button
@@ -958,12 +965,12 @@ export default function Fokus({
                       Parken
                     </button>
                   </div>
-                  {notizen.length === 0 ? (
+                  {meineNotizen.length === 0 ? (
                     <p className="fokus-notiz-leer">Noch nichts geparkt.</p>
                   ) : (
                     <ul className="fokus-notiz-liste">
-                      {notizen.map((n, i) => (
-                        <li key={i} className="fokus-notiz">
+                      {meineNotizen.map((n) => (
+                        <li key={n._i} className="fokus-notiz">
                           <div className="fokus-notiz-text">
                             {n.text}
                             {n.kontext && (
@@ -975,7 +982,7 @@ export default function Fokus({
                           <button
                             type="button"
                             className="fokus-notiz-weg"
-                            onClick={() => notizEntfernen(i)}
+                            onClick={() => notizEntfernen(n._i)}
                             aria-label="Notiz entfernen"
                           >
                             ✕

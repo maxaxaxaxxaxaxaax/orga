@@ -1,24 +1,13 @@
-// Gedanken-Parkplatz / Brain-Dump (SCHULE.md Cluster 5: abdriftende Gedanken
-// während der Fokus-Session kurz parken, ohne den Fokus zu verlieren). Ein
-// kleiner persönlicher Zettel, den der Schüler selbst wieder leert: kein
-// To-do-Verwalter, nur ein Kopf-frei-Machen. Reload-fest in localStorage.
+// Erinnerungen: ein kleines eigenes To-do-Widget auf der Übersicht. Der Schüler
+// legt seine Erinnerungen direkt dort an, hakt sie ab und wischt sie weg. Startet
+// bewusst leer (kein Demo-Seed): erst was eingetragen ist, steht hier. Reload-fest
+// in localStorage.
 const KEY = "neu.notizen"; // [{ text, kontext?, erledigt? }]
-
-// Ein paar Demo-Notizen für die Übersicht, damit der Zettel nicht leer ist
-// (Max, 7a). Werden beim ersten Laden gesetzt; danach gehört der Zettel dem
-// Schüler (selbst hinzufügen/abhaken).
-const SEED = [
-  { text: "Eltern-Erlaubnis abgeben", kontext: "Fr. Berg", erledigt: true },
-  { text: "Buch für Deutsch mitbringen", erledigt: false },
-];
 
 export function ladeNotizen() {
   try {
     const r = localStorage.getItem(KEY);
-    if (r == null) {
-      speichere(SEED);
-      return SEED;
-    }
+    if (r == null) return [];
     const a = JSON.parse(r);
     if (!Array.isArray(a)) return [];
     // Alt-Format (reine Strings) auf das Objekt-Format heben.
@@ -53,10 +42,15 @@ function speichere(arr) {
   }
 }
 
-export function addNotiz(text, kontext) {
+// kbId bindet eine Notiz an genau eine Aufgabe: im Fokus wird sie nur dort
+// gezeigt, die Übersicht zeigt trotzdem alle. Ohne kbId (z.B. direkt in der
+// Übersicht angelegt) gehört sie nirgends in einen Fokus.
+export function addNotiz(text, kontext, kbId) {
   const t = (text || "").trim();
   if (!t) return ladeNotizen();
-  const eintrag = kontext ? { text: t, kontext } : { text: t };
+  const eintrag = { text: t };
+  if (kontext) eintrag.kontext = kontext;
+  if (kbId) eintrag.kbId = kbId;
   const arr = [...ladeNotizen(), eintrag];
   speichere(arr);
   return arr;
