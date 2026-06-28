@@ -61,36 +61,52 @@ export default function Etappenring({ faecher, animiert }) {
               });
               return (
                 <g key={f.fach}>
+                  {/* Tracks (offene Wochen-Stücke). */}
                   {segmente.map((s) => (
-                    <g key={s.woche}>
+                    <circle
+                      key={"t" + s.woche}
+                      className={
+                        "hu-ring-track" + (s.istAktuell ? " aktuell" : "")
+                      }
+                      cx={MITTE}
+                      cy={MITTE}
+                      r={radius}
+                      fill="none"
+                      strokeWidth={RING_BREITE}
+                      strokeLinecap="round"
+                      strokeDasharray={`${s.len * umfang} ${umfang}`}
+                      strokeDashoffset={`${-s.start * umfang}`}
+                    />
+                  ))}
+                  {/* Fach-Markierung: farbiger Punkt oben am Ring-Start, damit man
+                     jeden Ring seinem Fach zuordnen kann, auch ohne Fortschritt. */}
+                  <circle
+                    cx={MITTE}
+                    cy={MITTE}
+                    r={radius}
+                    fill="none"
+                    stroke={f.color}
+                    strokeWidth={RING_BREITE}
+                    strokeLinecap="round"
+                    strokeDasharray={`0.1 ${umfang}`}
+                  />
+                  {/* Füllungen (erledigt, durchgehend von vorne). */}
+                  {segmente.map((s) =>
+                    s.fuellLen > 0 ? (
                       <circle
-                        className={
-                          "hu-ring-track" + (s.istAktuell ? " aktuell" : "")
-                        }
+                        key={"f" + s.woche}
                         cx={MITTE}
                         cy={MITTE}
                         r={radius}
                         fill="none"
+                        stroke={f.color}
                         strokeWidth={RING_BREITE}
                         strokeLinecap="round"
-                        strokeDasharray={`${s.len * umfang} ${umfang}`}
+                        strokeDasharray={`${s.fuellLen * umfang} ${umfang}`}
                         strokeDashoffset={`${-s.start * umfang}`}
                       />
-                      {s.fuellLen > 0 && (
-                        <circle
-                          cx={MITTE}
-                          cy={MITTE}
-                          r={radius}
-                          fill="none"
-                          stroke={f.color}
-                          strokeWidth={RING_BREITE}
-                          strokeLinecap="round"
-                          strokeDasharray={`${s.fuellLen * umfang} ${umfang}`}
-                          strokeDashoffset={`${-s.start * umfang}`}
-                        />
-                      )}
-                    </g>
-                  ))}
+                    ) : null
+                  )}
                 </g>
               );
             })}
