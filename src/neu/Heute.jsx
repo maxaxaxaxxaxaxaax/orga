@@ -386,25 +386,8 @@ export default function Heute({ onFokus }) {
         ).length
       : 0;
 
-  // Etappenfortschritt: ein Ring je Fach, in gemeinsame Wochen-Stücke geteilt. So
-  // liest man pro Fach und gesamt ab, was diese Woche und insgesamt noch fehlt.
+  // Etappenfortschritt: ein Ring je Fach, in gemeinsame Wochen-Stücke geteilt.
   const fachWochen = fachWochenFortschritt(erledigt);
-  let ringFertig = 0;
-  let ringTotal = 0;
-  let wocheFertig = 0;
-  let wocheTotal = 0;
-  fachWochen.forEach((f) =>
-    f.wochen.forEach((w) => {
-      ringFertig += w.fertig;
-      ringTotal += w.total;
-      if (w.istAktuell) {
-        wocheFertig += w.fertig;
-        wocheTotal += w.total;
-      }
-    })
-  );
-  const wocheOffen = wocheTotal - wocheFertig;
-  const gesamtOffen = ringTotal - ringFertig;
   // Stufe 3-4: je Fach Gesamtzahl, abgenommene KBs und anteiliger Stand (Balken).
   const fachListe = fachWochen.map((f) => {
     const total = f.wochen.reduce((s, w) => s + w.total, 0);
@@ -527,17 +510,6 @@ export default function Heute({ onFokus }) {
               </ul>
             )}
           </div>
-          {/* Stufe 1-2: kurzer Rest-Hinweis unter dem Ring. */}
-          {fortStufe <= 2 && wocheTotal > 0 && (
-            <p className="hu-fort-rest">
-              {wocheOffen > 0
-                ? `Diese Woche noch ${wocheOffen}`
-                : "Diese Woche geschafft"}
-              {fortStufe >= 2 && gesamtOffen > 0
-                ? ` · insgesamt noch ${gesamtOffen}`
-                : ""}
-            </p>
-          )}
           <RasterGriff
             {...griff("b1", (s) => setB1(Math.max(2, Math.min(b2 - 2, s))))}
           />
