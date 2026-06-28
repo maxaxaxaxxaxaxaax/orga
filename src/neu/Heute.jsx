@@ -476,7 +476,11 @@ export default function Heute({ onFokus }) {
           {/* Ring und (ab Stufe 3) die Fächer-Legende nebeneinander, damit die
               Legende seitlich aufgeht statt unter dem Ring zu stapeln. */}
           <div className="hu-fort-mitte">
-            <Etappenring faecher={fachWochen} animiert />
+            <Etappenring
+              faecher={fachWochen}
+              animiert
+              gapFaktor={Math.max(0, Math.min(1, fSpan - 2))}
+            />
             {/* Stufe 3: Farb-Legende (welche Farbe ist welches Fach). Stufe 4:
                 zusätzlich ein Balken je Fach mit der Zahl. */}
             {fortStufe >= 3 && fachListe.length > 0 && (

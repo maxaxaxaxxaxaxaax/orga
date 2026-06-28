@@ -320,6 +320,11 @@
   transition: stroke-dasharray 0.85s cubic-bezier(0.2, 0.7, 0.2, 1),
     stroke-dashoffset 0.85s cubic-bezier(0.2, 0.7, 0.2, 1);
 }
+/* Beim Ziehen den Glatt<->Segment-Morph ohne Verzögerung der Maus folgen lassen
+   (die Fortschritt-Animation oben würde sonst nachziehen). */
+.hu-grid.raster-zieht .hu-ring circle {
+  transition: none;
+}
 /* Beim Verbreitern/Verschmälern der Box wechselt der Ring zwischen Wochen- und
    Etappen-Ansicht (bzw. Legende/Balken kommen dazu). Der neue Inhalt blendet
    dann weich ein, OHNE zu skalieren oder die Position zu verschieben, damit der
