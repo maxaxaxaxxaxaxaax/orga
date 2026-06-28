@@ -243,8 +243,8 @@ export default function Heute({ onFokus }) {
                 viewBox="0 0 24 24"
                 aria-hidden="true"
               >
-                <circle cx="12" cy="12" r="9" />
-                <path d="M12 7.5v5l3 2" />
+                <rect x="4" y="5" width="16" height="15" rx="2.5" />
+                <path d="M4 9.5h16M8 3.5v3M16 3.5v3" />
               </svg>
               {st ? `${st.von} - ${st.bis}` : "frei einteilbar"}
             </span>
@@ -256,7 +256,8 @@ export default function Heute({ onFokus }) {
                 viewBox="0 0 24 24"
                 aria-hidden="true"
               >
-                <path d="M7 4h10M7 20h10M8 4c0 4 8 4 8 8s-8 4-8 8" />
+                <circle cx="12" cy="12" r="9" />
+                <path d="M12 7.5v5l3 2" />
               </svg>
               {anzahlStunden} {anzahlStunden === 1 ? "Stunde" : "Stunden"}
             </span>
@@ -591,6 +592,9 @@ export default function Heute({ onFokus }) {
         {/* Links/Mitte unten: Aufgaben (über zwei Spalten) */}
         <section className="hu-karte hu-aufgaben">
           <h2 className="hu-karte-titel hu-aufgaben-titel">
+            <svg className="hu-karte-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M3.5 7l1.5 1.5L7.5 5M3.5 15.5l1.5 1.5 3-3.5M11 7h9.5M11 16h9.5" />
+            </svg>
             Aufgaben
             <span className="hu-aufgaben-datum">
               {tagDatum.toLocaleDateString("de-DE", {
