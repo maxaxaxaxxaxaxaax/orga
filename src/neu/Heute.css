@@ -168,22 +168,36 @@
   position: relative;
   margin-top: 8px;
   display: grid;
-  /* Gemeinsames 12-Spalten-Raster. Die zwei senkrechten Grenzen sind über
-     --n-start (Fortschritt|Notizen) und --p-start (Notizen/Aufgaben|Stundenplan)
-     steuerbar (Prototyp: per Ziehen, siehe .raster-griff). Standard: fortschritt 4,
-     notizen 4, plan 4, aufgaben 8. */
-  grid-template-columns: repeat(12, minmax(0, 1fr));
+  /* Drei fr-Spalten: Fortschritt | Notizen | Stundenplan (Aufgaben spannt die
+     ersten beiden). Die zwei Grenzen liegen in --col-a/b/c (aus b1/b2, in
+     12tel). Beim Ziehen sind sie kontinuierlich, daher folgt die Box flüssig der
+     Maus; im Ruhezustand sind es ganze Spalten. Standard 4/4/4. */
+  grid-template-columns:
+    minmax(0, var(--col-a, 4fr))
+    minmax(0, var(--col-b, 4fr))
+    minmax(0, var(--col-c, 4fr));
   gap: var(--grid-gap);
   align-items: start;
+  /* Beim Loslassen sanft auf die ganze Spalte gleiten. Während des Ziehens (siehe
+     unten) ist die Transition aus, damit die Box ohne Verzögerung der Maus folgt. */
+  transition: grid-template-columns 0.2s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.hu-grid.raster-zieht {
+  transition: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hu-grid {
+    transition: none;
+  }
 }
 .hu-fortschritt {
   position: relative;
-  grid-column: 1 / var(--n-start, 5);
+  grid-column: 1;
   grid-row: 1;
 }
 .hu-notizen {
   position: relative;
-  grid-column: var(--n-start, 5) / var(--p-start, 9);
+  grid-column: 2;
   grid-row: 1;
   /* Auf die Zeilenhöhe strecken, damit die Karte so hoch ist wie der
      Etappenfortschritt daneben (statt nur so hoch wie ihr Inhalt). */
@@ -191,13 +205,13 @@
 }
 .hu-aufgaben {
   position: relative;
-  grid-column: 1 / var(--p-start, 9);
+  grid-column: 1 / 3;
   grid-row: 2;
   display: flex;
   flex-direction: column;
 }
 .hu-plan-karte {
-  grid-column: var(--p-start, 9) / -1;
+  grid-column: 3;
   grid-row: 1 / 3;
   align-self: stretch;
 }
@@ -278,7 +292,9 @@
 .hu-fort-mitte {
   display: flex;
   align-items: center;
-  justify-content: center;
+  /* Ring links verankert: bleibt beim Ziehen an derselben Stelle (linke Kante =
+     Box-Anfang), die Legende geht rechts daneben auf. */
+  justify-content: flex-start;
   gap: 14px;
   margin-top: 6px;
 }

@@ -59,3 +59,62 @@ export function useRasterZiehen(messbereich) {
 
   return { ref, zieht, griff };
 }
+
+// Variante mit kontinuierlichem Morph + magnetischem Einrasten (Übersicht): die
+// aktive Grenze folgt beim Ziehen flüssig der Maus, rastet nur nahe ganzer
+// Spalten ein ("einhacken") und schnappt beim Loslassen auf die ganze Spalte.
+// drag = { id, wert } während des Ziehens (wert kann gebrochen sein), sonst null.
+export function useRasterMorph() {
+  const ref = useRef(null);
+  const [drag, setDrag] = useState(null);
+
+  function spalteAusX(clientX) {
+    const el = ref.current;
+    if (!el) return null;
+    const r = el.getBoundingClientRect();
+    if (!(r.width > 0)) return null;
+    return ((clientX - r.left) / r.width) * 12;
+  }
+
+  // grenzeZieh(id, start, { min, max, commit }): start = aktueller Wert der
+  // Grenze, min/max = Klemmung (aus der anderen Grenze), commit(spalte) schreibt
+  // die gerastete Spalte beim Loslassen.
+  function grenzeZieh(id, start, opts) {
+    return {
+      onPointerDown: (e) => {
+        e.preventDefault();
+        setDrag({ id, wert: start });
+        try {
+          e.currentTarget.setPointerCapture(e.pointerId);
+        } catch {
+          /* kein echter Zeiger */
+        }
+      },
+      onPointerMove: (e) => {
+        const roh = spalteAusX(e.clientX);
+        if (roh == null) return;
+        setDrag((d) => {
+          if (!d || d.id !== id) return d;
+          const c = Math.max(opts.min, Math.min(opts.max, roh));
+          const nah = Math.round(c);
+          const wert = Math.abs(c - nah) <= 0.18 ? nah : c;
+          return d.wert === wert ? d : { id, wert };
+        });
+      },
+      onPointerUp: (e) => {
+        setDrag((d) => {
+          if (d && d.id === id) opts.commit(Math.round(d.wert));
+          return null;
+        });
+        try {
+          e.currentTarget.releasePointerCapture(e.pointerId);
+        } catch {
+          /* schon freigegeben */
+        }
+      },
+      onPointerCancel: () => setDrag(null),
+    };
+  }
+
+  return { ref, drag, grenzeZieh };
+}

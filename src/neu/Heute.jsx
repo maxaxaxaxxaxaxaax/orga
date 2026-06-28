@@ -11,8 +11,8 @@ import { etappen } from "../data/etappen";
 import { lernwegFuerKb } from "../data/wissen";
 import { generatorFuerKb } from "./uebungen";
 import Etappenring from "./Etappenring";
-import { useRasterZiehen } from "./rasterZiehen";
-import { RasterGriff, RasterOverlay } from "./raster";
+import { RasterGriff } from "./raster";
+import { useRasterMorph } from "./rasterZiehen";
 import {
   lade,
   WOCHEN_KEY,
@@ -82,16 +82,20 @@ export default function Heute({ onFokus }) {
   // Notizen, B2 = Notizen/Aufgaben|Stundenplan.
   const [b1, setB1] = useState(4);
   const [b2, setB2] = useState(8);
-  const { ref: gridRef, zieht, griff } = useRasterZiehen();
-  // Inhaltsdichte hängt an der Breite der jeweiligen Box: mehr Spalten -> mehr
-  // Details, weniger Spalten -> nur das Wichtigste.
-  const fSpan = b1; // Etappenfortschritt
-  const nSpan = b2 - b1; // Notizen
-  const aSpan = b2; // Aufgaben
-  const pSpan = 12 - b2; // Stundenplan
+  // Beim Ziehen folgt die aktive Grenze kontinuierlich der Maus (g1/g2) und rastet
+  // nur nahe ganzer Spalten magnetisch ein; im Ruhezustand sind es die gerasteten
+  // b1/b2. So folgt die Box flüssig statt sprunghaft.
+  const { ref: gridRef, drag, grenzeZieh } = useRasterMorph();
+  const g1 = drag?.id === "b1" ? drag.wert : b1;
+  const g2 = drag?.id === "b2" ? drag.wert : b2;
+  // Inhaltsdichte hängt an der (beim Ziehen kontinuierlichen) Breite der Box.
+  const fSpan = g1; // Etappenfortschritt
+  const nSpan = g2 - g1; // Notizen
+  const aSpan = g2; // Aufgaben
+  const pSpan = 12 - g2; // Stundenplan
   // Etappenfortschritt-Stufen: der glatte Ring bleibt immer gleich, je breiter die
   // Box kommt nur mehr Info dazu. 3 = + Farb-Legende, 4 = + Balken je Fach mit Zahl.
-  const fortStufe = fSpan <= 2 ? 1 : fSpan === 3 ? 2 : fSpan === 4 ? 3 : 4;
+  const fortStufe = fSpan < 2.5 ? 1 : fSpan < 3.5 ? 2 : fSpan < 4.5 ? 3 : 4;
   // Untertitel erklärt, was man auf der aktuellen Stufe gerade sieht.
   const fortSub =
     fortStufe === 1
@@ -450,13 +454,16 @@ export default function Heute({ onFokus }) {
   return (
     <div className="hu-screen">
       <div
-        className={"hu-grid" + (zieht ? " raster-zieht" : "")}
+        className={"hu-grid" + (drag ? " raster-zieht" : "")}
         ref={gridRef}
-        style={{ "--n-start": b1 + 1, "--p-start": b2 + 1 }}
+        style={{
+          "--col-a": g1 + "fr",
+          "--col-b": g2 - g1 + "fr",
+          "--col-c": 12 - g2 + "fr",
+        }}
       >
-        {/* Das 12-Spalten-Raster liegt immer bereit und blendet beim Ziehen
-            weich ein/aus (Sichtbarkeit über .raster-zieht, siehe index.css). */}
-        <RasterOverlay />
+        {/* Kein Hilfsraster-Overlay: die Box folgt beim Ziehen flüssig der Maus
+            und rastet magnetisch an den Spalten ein, das ist Feedback genug. */}
         {/* Links oben: Etappenfortschritt */}
         <section className="hu-karte hu-fortschritt">
           <h2 className="hu-karte-titel">
@@ -506,7 +513,7 @@ export default function Heute({ onFokus }) {
             )}
           </div>
           <RasterGriff
-            {...griff("b1", (s) => setB1(Math.max(2, Math.min(b2 - 2, s))))}
+            {...grenzeZieh("b1", b1, { min: 2, max: b2 - 2, commit: setB1 })}
           />
         </section>
 
@@ -595,7 +602,7 @@ export default function Heute({ onFokus }) {
             </button>
           </form>
           <RasterGriff
-            {...griff("b2", (s) => setB2(Math.max(b1 + 2, Math.min(10, s))))}
+            {...grenzeZieh("b2", b2, { min: b1 + 2, max: 10, commit: setB2 })}
           />
         </section>
 
@@ -652,7 +659,7 @@ export default function Heute({ onFokus }) {
             </div>
           )}
           <RasterGriff
-            {...griff("b2", (s) => setB2(Math.max(b1 + 2, Math.min(10, s))))}
+            {...grenzeZieh("b2", b2, { min: b1 + 2, max: 10, commit: setB2 })}
           />
         </section>
 
