@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import { wegStatus } from "./weg";
 import "./WegLeiste.css";
 
-// Schwebende "Mein Weg"-Leiste unten mittig. In der Mach-Phase das aktuelle Ziel
-// mit Schritt-Fortschritt als Knopf, der direkt in die Aufgabe (Fokus) springt.
-// In der Planungsphase bleibt sie bewusst leer (die Schritt-Anzeige Etappe/Woche/
-// Übersicht entfällt). Aktualisiert sich live über das "neu:planung"-Event,
-// sobald sich der Planungs- oder Erledigt-Stand ändert.
+// Schwebende "Mein Weg"-Leiste unten mittig. In der Planungsphase (noch nichts
+// geplant) meldet sie "Materialien abgerufen" und bietet den Einstieg ins Planen;
+// in der Mach-Phase das aktuelle Ziel mit Schritt-Fortschritt als Knopf, der
+// direkt in die Aufgabe (Fokus) springt. Aktualisiert sich live über das
+// "neu:planung"-Event, sobald sich der Planungs- oder Erledigt-Stand ändert.
 export default function WegLeiste({ onGo }) {
   const [stand, setStand] = useState(wegStatus);
 
@@ -18,10 +18,38 @@ export default function WegLeiste({ onGo }) {
 
   const { phase, jetzt, aufgabe } = stand;
 
-  // Die Planungs-Schritte (Etappe planen / Woche planen / Übersicht) werden
-  // bewusst nicht mehr angezeigt: in der Planungsphase bleibt die Leiste leer,
-  // die Wizards führen über ihre eigene Leiste unten durch den Schritt.
-  if (phase === "planung") return null;
+  // Planungsphase (noch nichts geplant): keine Schritt-Anzeige mehr. Stattdessen
+  // meldet die Leiste, dass die Materialien abgerufen wurden, und bietet mit einem
+  // "Planen"-Knopf den Einstieg in die Planung (Etappenplan, dann wie gewohnt).
+  if (phase === "planung") {
+    return (
+      <nav className="weg" aria-label="Mein Weg">
+        <div className="weg-inner">
+          <span className="weg-abruf">
+            <span className="weg-abruf-haken" aria-hidden="true">
+              ✓
+            </span>
+            <span className="weg-abruf-text">
+              <span className="weg-abruf-titel">
+                Materialien erfolgreich abgerufen
+              </span>
+              <span className="weg-abruf-sub">Plane jetzt deine Etappe</span>
+            </span>
+          </span>
+          <button
+            type="button"
+            className="weg-planen-knopf"
+            onClick={() => onGo("etappe")}
+          >
+            Planen
+            <span className="weg-aufgabe-pfeil" aria-hidden="true">
+              →
+            </span>
+          </button>
+        </div>
+      </nav>
+    );
+  }
 
   return (
     <nav className="weg" aria-label="Mein Weg">

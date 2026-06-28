@@ -11,7 +11,6 @@ import Login from "./Login";
 import Fokus from "./Fokus";
 import { koennensbeweise } from "../data/koennensbeweise";
 import {
-  startScreen,
   planungsScreen,
   planungFertig,
   ladeErledigt,
@@ -44,7 +43,9 @@ function speicherGeht() {
 // danach zeigt er die Etappe mit Fortschritt. Smart-Start: wer fertig geplant
 // hat, landet direkt auf Heute.
 export default function App() {
-  const [screen, setScreen] = useState(startScreen);
+  // Nach dem Login immer die Übersicht (auch wenn noch nichts geplant ist): dort
+  // bietet die untere Leiste den Einstieg ins Planen an.
+  const [screen, setScreen] = useState("heute");
   const [fokusKbId, setFokusKbId] = useState(null); // Ziel im Fokus-Modus (Vollbild)
   const [toast, setToast] = useState(null); // kurze Rückmeldung unten mittig
   const [speicherOk] = useState(speicherGeht); // einmal beim Start pruefen
