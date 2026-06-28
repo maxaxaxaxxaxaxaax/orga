@@ -3,11 +3,8 @@
 // (Stückgröße nach Aufgabenzahl, mit Lücken). Alle Ringe starten oben am selben
 // Punkt, sind aber je Fach unterschiedlich segmentiert. Track = offen, Füllung =
 // erledigt; die aktuelle Woche ist dezent markiert. Mitte bleibt leer (Spiegeln
-// statt Werten, VISION). Kein Gamification.
-//
-// Auf der kleinsten Box-Stufe (stufe === 1) wird stattdessen ein einzelner,
-// glatt gefuellter Ring gezeigt, der nur den Stand der aktuellen Woche spiegelt
-// (kein Aufteilen in Faecher/Segmente, ruhig wie der urspruengliche Ring).
+// statt Werten, VISION). Kein Gamification. Die Ringe bleiben über alle
+// Box-Breiten gleich; nur die Zusatzinfo darunter (Legende, Balken) wächst mit.
 const GROESSE = 240;
 const MITTE = GROESSE / 2;
 const RING_BREITE = 12;
@@ -15,50 +12,8 @@ const RING_GAP = 5; // Abstand zwischen den konzentrischen Fach-Ringen
 const AUSSEN = MITTE - RING_BREITE / 2 - 2;
 const LUECKE_PX = 20; // konstante Lücke in px, damit innen wie außen gleich aussieht
 
-export default function Etappenring({ faecher, animiert, stufe, woche }) {
+export default function Etappenring({ faecher, animiert }) {
   const liste = faecher && faecher.length ? faecher : null;
-
-  // Kleinste Stufe: ein einzelner Ring, der nur den Stand DIESER Woche spiegelt
-  // (glatt gefüllt, ein Akzentton, keine Fächer/Segmente).
-  if (stufe === 1) {
-    const total = woche?.total || 0;
-    const done = woche?.done || 0;
-    const frac = total > 0 ? Math.max(0, Math.min(1, done / total)) : 0;
-    const umfang = 2 * Math.PI * AUSSEN;
-    const bogen = frac * umfang;
-    return (
-      <div className={"hu-ring-wrap" + (animiert ? " hu-ring-animiert" : "")}>
-        <svg
-          className="hu-ring"
-          viewBox={`0 0 ${GROESSE} ${GROESSE}`}
-          aria-hidden="true"
-        >
-          <g transform={`rotate(-90 ${MITTE} ${MITTE})`}>
-            <circle
-              cx={MITTE}
-              cy={MITTE}
-              r={AUSSEN}
-              fill="none"
-              stroke="var(--accent-soft)"
-              strokeWidth={RING_BREITE}
-            />
-            {bogen > 0 && (
-              <circle
-                cx={MITTE}
-                cy={MITTE}
-                r={AUSSEN}
-                fill="none"
-                stroke="var(--accent)"
-                strokeWidth={RING_BREITE}
-                strokeLinecap="round"
-                strokeDasharray={`${bogen} ${umfang}`}
-              />
-            )}
-          </g>
-        </svg>
-      </div>
-    );
-  }
 
   return (
     <div className={"hu-ring-wrap" + (animiert ? " hu-ring-animiert" : "")}>
