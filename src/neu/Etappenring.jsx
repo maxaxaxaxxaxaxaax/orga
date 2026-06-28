@@ -43,13 +43,21 @@ export default function Etappenring({ faecher, animiert }) {
               // gleich groß aussieht.
               const luecke = LUECKE_PX / umfang;
               const fachTotal = f.wochen.reduce((s, w) => s + w.total, 0) || 1;
+              const fachDone = f.wochen.reduce((s, w) => s + w.done, 0);
               const verfuegbar = Math.max(0.1, 1 - f.wochen.length * luecke);
               let cursor = 0;
+              // Füllung läuft durchgehend von vorne durch die Segmente (wie der
+              // frühere Ring den Gesamt-Fortschritt zeigte), nur jetzt sieht man
+              // an den Stücken, in welcher Woche man steht.
+              let restDone = fachDone;
               const segmente = f.wochen.map((w) => {
                 const len = (w.total / fachTotal) * verfuegbar;
                 const start = cursor;
                 cursor += len + luecke;
-                return { ...w, start, len, doneFrac: w.total ? w.done / w.total : 0 };
+                const fuellKbs = Math.max(0, Math.min(w.total, restDone));
+                restDone -= fuellKbs;
+                const fuellLen = (fuellKbs / fachTotal) * verfuegbar;
+                return { ...w, start, len, fuellLen };
               });
               return (
                 <g key={f.fach}>
@@ -68,7 +76,7 @@ export default function Etappenring({ faecher, animiert }) {
                         strokeDasharray={`${s.len * umfang} ${umfang}`}
                         strokeDashoffset={`${-s.start * umfang}`}
                       />
-                      {s.doneFrac > 0 && (
+                      {s.fuellLen > 0 && (
                         <circle
                           cx={MITTE}
                           cy={MITTE}
@@ -77,7 +85,7 @@ export default function Etappenring({ faecher, animiert }) {
                           stroke={f.color}
                           strokeWidth={RING_BREITE}
                           strokeLinecap="round"
-                          strokeDasharray={`${s.doneFrac * s.len * umfang} ${umfang}`}
+                          strokeDasharray={`${s.fuellLen * umfang} ${umfang}`}
                           strokeDashoffset={`${-s.start * umfang}`}
                         />
                       )}
