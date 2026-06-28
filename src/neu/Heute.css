@@ -181,6 +181,9 @@
 }
 .hu-notizen {
   grid-area: notizen;
+  /* Auf die Zeilenhöhe strecken, damit die Karte so hoch ist wie der
+     Etappenfortschritt daneben (statt nur so hoch wie ihr Inhalt). */
+  align-self: stretch;
 }
 .hu-aufgaben {
   grid-area: aufgaben;
