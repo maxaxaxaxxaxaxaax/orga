@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import { wegStatus } from "./weg";
 import "./WegLeiste.css";
 
-// Schwebende "Mein Weg"-Leiste unten mittig. In der Planung die drei Schritte
-// mit Status (der aktuelle hervorgehoben, Klick springt dorthin); in der
-// Mach-Phase das aktuelle Ziel mit Schritt-Fortschritt als Knopf, der direkt in
-// die Aufgabe (Fokus) springt. Aktualisiert sich live über das "neu:planung"-
-// Event, sobald sich der Planungs- oder Erledigt-Stand ändert.
+// Schwebende "Mein Weg"-Leiste unten mittig. In der Mach-Phase das aktuelle Ziel
+// mit Schritt-Fortschritt als Knopf, der direkt in die Aufgabe (Fokus) springt.
+// In der Planungsphase bleibt sie bewusst leer (die Schritt-Anzeige Etappe/Woche/
+// Übersicht entfällt). Aktualisiert sich live über das "neu:planung"-Event,
+// sobald sich der Planungs- oder Erledigt-Stand ändert.
 export default function WegLeiste({ onGo }) {
   const [stand, setStand] = useState(wegStatus);
 
@@ -16,38 +16,17 @@ export default function WegLeiste({ onGo }) {
     return () => window.removeEventListener("neu:planung", aktualisiere);
   }, []);
 
-  const { phase, schritte, jetzt, aufgabe } = stand;
+  const { phase, jetzt, aufgabe } = stand;
+
+  // Die Planungs-Schritte (Etappe planen / Woche planen / Übersicht) werden
+  // bewusst nicht mehr angezeigt: in der Planungsphase bleibt die Leiste leer,
+  // die Wizards führen über ihre eigene Leiste unten durch den Schritt.
+  if (phase === "planung") return null;
 
   return (
-    <nav
-      className={"weg" + (phase === "planung" ? " weg-oben" : "")}
-      aria-label="Mein Weg"
-    >
+    <nav className="weg" aria-label="Mein Weg">
       <div className="weg-inner">
-        {phase === "planung" ? (
-          // Planungsphase: nur die Schritt-Anzeige (wo stehe ich gerade).
-          <ol className="weg-schritte">
-              {schritte.map((s) => (
-                <li key={s.id}>
-                  <button
-                    type="button"
-                    className={"weg-schritt " + s.status}
-                    onClick={() => onGo(s.id)}
-                    aria-current={s.status === "aktuell" ? "step" : undefined}
-                    title={`Schritt ${s.nr}: ${s.label}`}
-                  >
-                    <span className="weg-marke" aria-hidden="true">
-                      {s.status === "fertig" ? "✓" : s.nr}
-                    </span>
-                    <span className="weg-text">
-                      <span className="weg-label">{s.label}</span>
-                      {s.info && <span className="weg-info">{s.info}</span>}
-                    </span>
-                  </button>
-                </li>
-              ))}
-            </ol>
-        ) : aufgabe ? (
+        {aufgabe ? (
           // Mach-Phase: das aktuelle Ziel mit Schritt-Fortschritt. Ein Klick
           // springt direkt in die Aufgabe (Fokus).
           <button
