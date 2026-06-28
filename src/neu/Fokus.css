@@ -598,11 +598,15 @@
 .fokus-panel-mc {
   flex: 1;
   min-height: 0;
+  /* Im schmalen Chats-Panel mitschrumpfen, sonst läuft der Chat (inkl.
+     Senden-Knopf) über den Rand und wird abgeschnitten. */
+  min-width: 0;
   display: flex;
 }
 .fokus-panel-mc > .mc {
   flex: 1;
   min-height: 0;
+  min-width: 0;
   margin-top: 0;
   max-width: none;
   border: none;
