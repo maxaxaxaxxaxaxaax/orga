@@ -1,9 +1,9 @@
-// Etappenfortschritt: ein konzentrischer Ring je Fach (Fachfarbe), der ganze
-// Kreis in gemeinsame Wochen-Stücke geteilt (Größe nach Aufgabenzahl, mit Lücken).
-// In jedem Wochen-Stück zeigt jeder Fach-Ring, wie weit dieses Fach in der Woche
-// ist (Track = offen, gefüllt = erledigt). Die aktuelle Woche ist dezent markiert,
-// damit man pro Fach und gesamt sieht, was diese Woche noch fehlt. Mitte bleibt
-// leer (Spiegeln statt Werten, VISION). Kein Gamification.
+// Etappenfortschritt: ein konzentrischer Ring je Fach (Fachfarbe). Jeder Ring ist
+// ein vollständig geschlossener Kreis, in sich in die Wochen DIESES Fachs geteilt
+// (Stückgröße nach Aufgabenzahl, mit Lücken). Alle Ringe starten oben am selben
+// Punkt, sind aber je Fach unterschiedlich segmentiert. Track = offen, Füllung =
+// erledigt; die aktuelle Woche ist dezent markiert. Mitte bleibt leer (Spiegeln
+// statt Werten, VISION). Kein Gamification.
 const GROESSE = 240;
 const MITTE = GROESSE / 2;
 const RING_BREITE = 12;
@@ -13,28 +13,6 @@ const LUECKE = 0.035; // Anteil des Kreises je Lücke zwischen zwei Wochen
 
 export default function Etappenring({ faecher, animiert }) {
   const liste = faecher && faecher.length ? faecher : null;
-
-  // Gemeinsame Wochen-Stücke: pro Woche die Gesamt-Aufgabenzahl über alle Fächer.
-  const wochenTotal = new Map();
-  let aktW = null;
-  if (liste) {
-    liste.forEach((f) =>
-      f.wochen.forEach((w) => {
-        wochenTotal.set(w.woche, (wochenTotal.get(w.woche) || 0) + w.total);
-        if (w.istAktuell) aktW = w.woche;
-      })
-    );
-  }
-  const wochen = [...wochenTotal.keys()].sort((a, b) => a - b);
-  const gesamtKbs = wochen.reduce((s, w) => s + wochenTotal.get(w), 0) || 1;
-  const verfuegbar = Math.max(0.1, 1 - wochen.length * LUECKE);
-  const slice = new Map(); // woche -> { start, len } (Bruchteile des Kreises)
-  let cursor = 0;
-  wochen.forEach((w) => {
-    const len = (wochenTotal.get(w) / gesamtKbs) * verfuegbar;
-    slice.set(w, { start: cursor, len });
-    cursor += len + LUECKE;
-  });
 
   return (
     <div className={"hu-ring-wrap" + (animiert ? " hu-ring-animiert" : "")}>
@@ -59,44 +37,49 @@ export default function Etappenring({ faecher, animiert }) {
               const radius = AUSSEN - i * (RING_BREITE + RING_GAP);
               if (radius < RING_BREITE) return null;
               const umfang = 2 * Math.PI * radius;
+              // Eigene Segmentierung: die Wochen dieses Fachs füllen den ganzen
+              // Kreis (Größe nach Aufgabenzahl), mit Lücken dazwischen.
+              const fachTotal = f.wochen.reduce((s, w) => s + w.total, 0) || 1;
+              const verfuegbar = Math.max(0.1, 1 - f.wochen.length * LUECKE);
+              let cursor = 0;
+              const segmente = f.wochen.map((w) => {
+                const len = (w.total / fachTotal) * verfuegbar;
+                const start = cursor;
+                cursor += len + LUECKE;
+                return { ...w, start, len, doneFrac: w.total ? w.done / w.total : 0 };
+              });
               return (
                 <g key={f.fach}>
-                  {f.wochen.map((w) => {
-                    const s = slice.get(w.woche);
-                    if (!s) return null;
-                    const doneFrac = w.total ? w.done / w.total : 0;
-                    return (
-                      <g key={w.woche}>
+                  {segmente.map((s) => (
+                    <g key={s.woche}>
+                      <circle
+                        className={
+                          "hu-ring-track" + (s.istAktuell ? " aktuell" : "")
+                        }
+                        cx={MITTE}
+                        cy={MITTE}
+                        r={radius}
+                        fill="none"
+                        strokeWidth={RING_BREITE}
+                        strokeLinecap="round"
+                        strokeDasharray={`${s.len * umfang} ${umfang}`}
+                        strokeDashoffset={`${-s.start * umfang}`}
+                      />
+                      {s.doneFrac > 0 && (
                         <circle
-                          className={
-                            "hu-ring-track" +
-                            (w.woche === aktW ? " aktuell" : "")
-                          }
                           cx={MITTE}
                           cy={MITTE}
                           r={radius}
                           fill="none"
+                          stroke={f.color}
                           strokeWidth={RING_BREITE}
                           strokeLinecap="round"
-                          strokeDasharray={`${s.len * umfang} ${umfang}`}
+                          strokeDasharray={`${s.doneFrac * s.len * umfang} ${umfang}`}
                           strokeDashoffset={`${-s.start * umfang}`}
                         />
-                        {doneFrac > 0 && (
-                          <circle
-                            cx={MITTE}
-                            cy={MITTE}
-                            r={radius}
-                            fill="none"
-                            stroke={f.color}
-                            strokeWidth={RING_BREITE}
-                            strokeLinecap="round"
-                            strokeDasharray={`${doneFrac * s.len * umfang} ${umfang}`}
-                            strokeDashoffset={`${-s.start * umfang}`}
-                          />
-                        )}
-                      </g>
-                    );
-                  })}
+                      )}
+                    </g>
+                  ))}
                 </g>
               );
             })}
