@@ -9,7 +9,7 @@ const MITTE = GROESSE / 2;
 const RING_BREITE = 12;
 const RING_GAP = 5; // Abstand zwischen den konzentrischen Fach-Ringen
 const AUSSEN = MITTE - RING_BREITE / 2 - 2;
-const LUECKE = 0.035; // Anteil des Kreises je Lücke zwischen zwei Wochen
+const LUECKE_PX = 20; // konstante Lücke in px, damit innen wie außen gleich aussieht
 
 export default function Etappenring({ faecher, animiert }) {
   const liste = faecher && faecher.length ? faecher : null;
@@ -38,14 +38,17 @@ export default function Etappenring({ faecher, animiert }) {
               if (radius < RING_BREITE) return null;
               const umfang = 2 * Math.PI * radius;
               // Eigene Segmentierung: die Wochen dieses Fachs füllen den ganzen
-              // Kreis (Größe nach Aufgabenzahl), mit Lücken dazwischen.
+              // Kreis (Größe nach Aufgabenzahl), mit Lücken dazwischen. Die Lücke
+              // wird pro Ring aus festen px berechnet, damit sie innen wie außen
+              // gleich groß aussieht.
+              const luecke = LUECKE_PX / umfang;
               const fachTotal = f.wochen.reduce((s, w) => s + w.total, 0) || 1;
-              const verfuegbar = Math.max(0.1, 1 - f.wochen.length * LUECKE);
+              const verfuegbar = Math.max(0.1, 1 - f.wochen.length * luecke);
               let cursor = 0;
               const segmente = f.wochen.map((w) => {
                 const len = (w.total / fachTotal) * verfuegbar;
                 const start = cursor;
-                cursor += len + LUECKE;
+                cursor += len + luecke;
                 return { ...w, start, len, doneFrac: w.total ? w.done / w.total : 0 };
               });
               return (
