@@ -89,6 +89,10 @@ export default function Heute({ onFokus }) {
   const nSpan = b2 - b1; // Notizen
   const aSpan = b2; // Aufgaben
   const pSpan = 12 - b2; // Stundenplan
+  // Etappenfortschritt-Stufen: je breiter die Box, desto mehr Information.
+  // 1 = ein Ring für die Woche, 2 = Wochen-Segmente je Fach, 3 = + Farb-Legende
+  // (welche Farbe ist welches Fach), 4 = + Balken je Fach mit Zahl.
+  const fortStufe = fSpan <= 2 ? 1 : fSpan === 3 ? 2 : fSpan === 4 ? 3 : 4;
 
   useEffect(() => {
     localStorage.setItem(ERLEDIGT_KEY, JSON.stringify(erledigt));
@@ -380,6 +384,7 @@ export default function Heute({ onFokus }) {
   let ringTotal = 0;
   let wocheFertig = 0;
   let wocheTotal = 0;
+  let wocheDone = 0; // anteilig (auch in Arbeit), für den Wochen-Ring auf Stufe 1
   fachWochen.forEach((f) =>
     f.wochen.forEach((w) => {
       ringFertig += w.fertig;
@@ -387,11 +392,25 @@ export default function Heute({ onFokus }) {
       if (w.istAktuell) {
         wocheFertig += w.fertig;
         wocheTotal += w.total;
+        wocheDone += w.done;
       }
     })
   );
   const wocheOffen = wocheTotal - wocheFertig;
   const gesamtOffen = ringTotal - ringFertig;
+  // Stufe 3-4: je Fach Gesamtzahl, abgenommene KBs und anteiliger Stand (Balken).
+  const fachListe = fachWochen.map((f) => {
+    const total = f.wochen.reduce((s, w) => s + w.total, 0);
+    const fertig = f.wochen.reduce((s, w) => s + w.fertig, 0);
+    const done = f.wochen.reduce((s, w) => s + w.done, 0);
+    return {
+      fach: f.fach,
+      color: f.color,
+      total,
+      fertig,
+      frac: total > 0 ? done / total : 0,
+    };
+  });
 
   // Tag geschafft: ruhiger grüner Abschluss als kleine Belohnung, bevor der Tag
   // wieder zur Liste wird.
@@ -456,19 +475,56 @@ export default function Heute({ onFokus }) {
             </svg>
             Etappenfortschritt
           </h2>
-          {fSpan >= 3 && (
+          {fortStufe >= 2 && (
             <p className="hu-karte-sub">
               Alle deine Könnensbeweise auf einen Blick
             </p>
           )}
-          <Etappenring faecher={fachWochen} />
-          {fSpan >= 4 && wocheTotal > 0 && (
+          <Etappenring
+            faecher={fachWochen}
+            stufe={fortStufe}
+            woche={{ done: wocheDone, total: wocheTotal }}
+          />
+          {/* Stufe 1-2: kurzer Rest-Hinweis unter dem Ring. */}
+          {fortStufe <= 2 && wocheTotal > 0 && (
             <p className="hu-fort-rest">
               {wocheOffen > 0
                 ? `Diese Woche noch ${wocheOffen}`
                 : "Diese Woche geschafft"}
-              {gesamtOffen > 0 ? ` · insgesamt noch ${gesamtOffen}` : ""}
+              {fortStufe >= 2 && gesamtOffen > 0
+                ? ` · insgesamt noch ${gesamtOffen}`
+                : ""}
             </p>
+          )}
+          {/* Stufe 3: Farb-Legende (welche Farbe ist welches Fach). Stufe 4:
+              zusätzlich ein Balken je Fach mit der Zahl. */}
+          {fortStufe >= 3 && fachListe.length > 0 && (
+            <ul className="hu-fort-legende">
+              {fachListe.map((f) => (
+                <li className="hu-fort-legende-zeile" key={f.fach}>
+                  <span
+                    className="hu-fort-legende-punkt"
+                    style={{ background: f.color }}
+                  />
+                  <span className="hu-fort-legende-fach">{f.fach}</span>
+                  {fortStufe >= 4 && (
+                    <span className="hu-fort-legende-bar">
+                      <span
+                        style={{
+                          width: Math.round(f.frac * 100) + "%",
+                          background: f.color,
+                        }}
+                      />
+                    </span>
+                  )}
+                  {fortStufe >= 4 && (
+                    <span className="hu-fort-legende-wert">
+                      {f.fertig}/{f.total}
+                    </span>
+                  )}
+                </li>
+              ))}
+            </ul>
           )}
           <RasterGriff
             {...griff("b1", (s) => setB1(Math.max(2, Math.min(b2 - 2, s))))}

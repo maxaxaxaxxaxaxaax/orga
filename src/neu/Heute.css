@@ -347,8 +347,11 @@
   flex-shrink: 0;
 }
 .hu-fort-legende-fach {
-  width: 5.6em;
+  width: 6.8em;
   flex-shrink: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   color: var(--text-2);
 }
 .hu-fort-legende-bar {
