@@ -373,20 +373,9 @@ select:focus-visible {
   touch-action: none;
   z-index: 6;
 }
-/* Zieh-Kante zwischen den Boxen, fein ausgearbeitet: eine zarte Hairline über die
-   ganze Höhe (::before) plus ein zentrierter Griff als klarer, aber dezenter
-   Anfasspunkt (::after). Teal wie die aktive Nav-Pille. Beim Hover/Ziehen wächst
-   der Griff sanft und beide werden kräftiger. */
-.raster-griff::before {
-  content: "";
-  position: absolute;
-  inset: 5px auto 5px 50%;
-  transform: translateX(-50%);
-  width: 1.5px;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--accent) 20%, transparent);
-  transition: background 0.18s cubic-bezier(0.2, 0.7, 0.2, 1);
-}
+/* Zieh-Kante zwischen den Boxen: ein zentrierter Griff (Kapsel) als dezenter
+   Anfasspunkt, Teal wie die aktive Nav-Pille. Beim Hover/Ziehen wächst er sanft
+   und wird kräftiger. */
 .raster-griff::after {
   content: "";
   position: absolute;
@@ -406,12 +395,7 @@ select:focus-visible {
   opacity: 1;
   height: 40px;
 }
-.raster-griff:hover::before,
-.raster-zieht .raster-griff::before {
-  background: color-mix(in srgb, var(--accent) 42%, transparent);
-}
 @media (prefers-reduced-motion: reduce) {
-  .raster-griff::before,
   .raster-griff::after {
     transition: none;
   }
