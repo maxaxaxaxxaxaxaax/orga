@@ -483,7 +483,49 @@ export default function Heute({ onFokus }) {
             Etappenfortschritt
           </h2>
           <p className="hu-karte-sub">{fortSub}</p>
-          <Etappenring faecher={fachWochen} nurWoche={fortStufe === 1} animiert />
+          {/* Ring und (ab Stufe 3) die Fächer-Legende nebeneinander, damit die
+              Legende seitlich aufgeht statt unter dem Ring zu stapeln. */}
+          <div className="hu-fort-mitte">
+            <Etappenring
+              faecher={fachWochen}
+              nurWoche={fortStufe === 1}
+              animiert
+            />
+            {/* Stufe 3: Farb-Legende (welche Farbe ist welches Fach). Stufe 4:
+                zusätzlich ein Balken je Fach mit der Zahl. */}
+            {fortStufe >= 3 && fachListe.length > 0 && (
+              <ul
+                className={
+                  "hu-fort-legende" + (fortStufe >= 4 ? " mit-balken" : "")
+                }
+              >
+                {fachListe.map((f) => (
+                  <li className="hu-fort-legende-zeile" key={f.fach}>
+                    <span
+                      className="hu-fort-legende-punkt"
+                      style={{ background: f.color }}
+                    />
+                    <span className="hu-fort-legende-fach">{f.fach}</span>
+                    {fortStufe >= 4 && (
+                      <span className="hu-fort-legende-bar">
+                        <span
+                          style={{
+                            width: Math.round(f.frac * 100) + "%",
+                            background: f.color,
+                          }}
+                        />
+                      </span>
+                    )}
+                    {fortStufe >= 4 && (
+                      <span className="hu-fort-legende-wert">
+                        {f.fertig}/{f.total}
+                      </span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
           {/* Stufe 1-2: kurzer Rest-Hinweis unter dem Ring. */}
           {fortStufe <= 2 && wocheTotal > 0 && (
             <p className="hu-fort-rest">
@@ -494,36 +536,6 @@ export default function Heute({ onFokus }) {
                 ? ` · insgesamt noch ${gesamtOffen}`
                 : ""}
             </p>
-          )}
-          {/* Stufe 3: Farb-Legende (welche Farbe ist welches Fach). Stufe 4:
-              zusätzlich ein Balken je Fach mit der Zahl. */}
-          {fortStufe >= 3 && fachListe.length > 0 && (
-            <ul className="hu-fort-legende">
-              {fachListe.map((f) => (
-                <li className="hu-fort-legende-zeile" key={f.fach}>
-                  <span
-                    className="hu-fort-legende-punkt"
-                    style={{ background: f.color }}
-                  />
-                  <span className="hu-fort-legende-fach">{f.fach}</span>
-                  {fortStufe >= 4 && (
-                    <span className="hu-fort-legende-bar">
-                      <span
-                        style={{
-                          width: Math.round(f.frac * 100) + "%",
-                          background: f.color,
-                        }}
-                      />
-                    </span>
-                  )}
-                  {fortStufe >= 4 && (
-                    <span className="hu-fort-legende-wert">
-                      {f.fertig}/{f.total}
-                    </span>
-                  )}
-                </li>
-              ))}
-            </ul>
           )}
           <RasterGriff
             {...griff("b1", (s) => setB1(Math.max(2, Math.min(b2 - 2, s))))}

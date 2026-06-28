@@ -270,12 +270,27 @@
   aspect-ratio: 1;
   margin: 4px auto 0;
 }
-/* In der Übersicht den Ring links verankern (nicht zentrieren): so bleibt er
-   beim Verbreitern der Box an derselben Stelle, statt nach rechts zu wandern,
-   und fluchtet mit Untertitel, Rest-Hinweis und Legende darunter. */
-.hu-fortschritt .hu-ring-wrap {
-  align-self: flex-start;
-  margin: 4px 0 0;
+/* Ring und Fächer-Legende nebeneinander (ab Stufe 3, sobald die Box breit genug
+   ist): der Ring links in fester Größe verankert, die Legende rechts daneben in
+   der frei werdenden Fläche. Auf den schmalen Stufen 1-2 enthält die Reihe nur
+   den Ring. So bleibt der Ring beim Verbreitern an derselben Stelle, die Legende
+   geht seitlich auf statt darunter zu stapeln. */
+.hu-fort-mitte {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 6px;
+}
+.hu-fort-mitte .hu-ring-wrap {
+  flex: 0 0 auto;
+  width: 200px;
+  max-width: 100%;
+  margin: 0;
+}
+.hu-fort-mitte .hu-fort-legende {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
 }
 .hu-ring {
   width: 100%;
@@ -381,12 +396,17 @@
   flex-shrink: 0;
 }
 .hu-fort-legende-fach {
-  width: 6.8em;
   flex-shrink: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   color: var(--text-2);
+}
+/* Nur mit Balken (Stufe 4) braucht die Fach-Spalte eine feste Breite, damit die
+   Balken bündig starten. Ohne Balken (Stufe 3) nimmt der Name seine Eigenbreite,
+   was neben dem Ring Platz spart. */
+.hu-fort-legende.mit-balken .hu-fort-legende-fach {
+  width: 6.8em;
 }
 .hu-fort-legende-bar {
   flex: 1;
