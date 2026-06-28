@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useState } from "react";
-import { koennensbeweise, kbFarbe, kbFaecher } from "../data/koennensbeweise";
+import { koennensbeweise, kbFarbe } from "../data/koennensbeweise";
 import {
   stundenWoche,
   fachFarbe,
@@ -24,6 +24,7 @@ import {
   ladeStunden,
   setzeHeuteTag,
   meldeAenderung,
+  fachWochenFortschritt,
 } from "./planung";
 import { ladeNotizen, addNotiz, entferneNotiz, toggleNotiz } from "./notizen";
 import { ladeSchritte } from "./lernschritte";
@@ -372,21 +373,25 @@ export default function Heute({ onFokus }) {
         ).length
       : 0;
 
-  // Etappenfortschritt: pro Fach Anteil erledigter Ziele (Ring) plus drei
-  // sachliche Kennzahlen. Spiegelt den Stand, wertet nicht (VISION).
-  const proFach = kbFaecher.map((f) => {
-    const ziele = koennensbeweise.filter((k) => k.fach === f);
-    const done = ziele.filter((k) => erledigt[k.id]).length;
-    return {
-      fach: f,
-      color: kbFarbe[f] || "#868e96",
-      total: ziele.length,
-      done,
-      fraction: ziele.length ? done / ziele.length : 0,
-    };
-  });
-  const zieleGesamt = koennensbeweise.length;
-  const zieleDone = koennensbeweise.filter((k) => erledigt[k.id]).length;
+  // Etappenfortschritt: ein Ring je Fach, in gemeinsame Wochen-Stücke geteilt. So
+  // liest man pro Fach und gesamt ab, was diese Woche und insgesamt noch fehlt.
+  const fachWochen = fachWochenFortschritt(erledigt);
+  let ringDone = 0;
+  let ringTotal = 0;
+  let wocheDone = 0;
+  let wocheTotal = 0;
+  fachWochen.forEach((f) =>
+    f.wochen.forEach((w) => {
+      ringDone += w.done;
+      ringTotal += w.total;
+      if (w.istAktuell) {
+        wocheDone += w.done;
+        wocheTotal += w.total;
+      }
+    })
+  );
+  const wocheOffen = wocheTotal - wocheDone;
+  const gesamtOffen = ringTotal - ringDone;
 
   // Tag geschafft: ruhiger grüner Abschluss als kleine Belohnung, bevor der Tag
   // wieder zur Liste wird.
@@ -456,43 +461,14 @@ export default function Heute({ onFokus }) {
               Alle deine Könnensbeweise auf einen Blick
             </p>
           )}
-          <Etappenring
-            ringe={proFach}
-            gesamtDone={zieleDone}
-            gesamtTotal={zieleGesamt}
-          />
-          {fSpan >= 4 && zieleGesamt - zieleDone > 0 && (
+          <Etappenring faecher={fachWochen} />
+          {fSpan >= 4 && wocheTotal > 0 && (
             <p className="hu-fort-rest">
-              Noch {zieleGesamt - zieleDone}{" "}
-              {zieleGesamt - zieleDone === 1 ? "Ziel" : "Ziele"} bis zur vollen
-              Etappe
+              {wocheOffen > 0
+                ? `Diese Woche noch ${wocheOffen}`
+                : "Diese Woche geschafft"}
+              {gesamtOffen > 0 ? ` · insgesamt noch ${gesamtOffen}` : ""}
             </p>
-          )}
-          {/* Breit gezogen: zusätzlich die Fächer einzeln auflisten. */}
-          {fSpan >= 5 && (
-            <ul className="hu-fort-legende">
-              {proFach.map((r) => (
-                <li className="hu-fort-legende-zeile" key={r.fach}>
-                  <span
-                    className="hu-fort-legende-punkt"
-                    style={{ background: r.color }}
-                    aria-hidden="true"
-                  />
-                  <span className="hu-fort-legende-fach">{r.fach}</span>
-                  <span className="hu-fort-legende-bar" aria-hidden="true">
-                    <span
-                      style={{
-                        width: Math.round(r.fraction * 100) + "%",
-                        background: r.color,
-                      }}
-                    />
-                  </span>
-                  <span className="hu-fort-legende-wert">
-                    {r.done}/{r.total}
-                  </span>
-                </li>
-              ))}
-            </ul>
           )}
           <RasterGriff
             {...griff("b1", (s) => setB1(Math.max(2, Math.min(b2 - 2, s))))}

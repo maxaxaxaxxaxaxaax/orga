@@ -1,8 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { lernwegFuerKb } from "../data/wissen";
-import { koennensbeweise, kbFarbe, kbFaecher } from "../data/koennensbeweise";
 import { lehrkraefte } from "../data/stundenplanWoche";
-import { ladeErledigt } from "./planung";
+import { ladeErledigt, fachWochenFortschritt } from "./planung";
 import Etappenring from "./Etappenring";
 import { ART_LABEL } from "./material";
 import { eigeneFuerThema, speichereEigenes } from "./eigeneMaterialien";
@@ -296,29 +295,17 @@ export default function Fokus({
     ? Math.round((fertigeAnzahl / schritte.length) * 100)
     : 100;
 
-  // J1: Auf dem Abschluss spiegelt derselbe sachliche Etappenring wie auf der
-  // Übersicht den Stand (gleiche Bildsprache). Dieser Könnensbeweis zählt erst
-  // mit, sobald er bestätigt ist (angemeldet oder für heute abgehakt): dann tickt
-  // der Ring ruhig um eins hoch. Spiegeln statt Belohnen (VISION).
+  // J1: Auf dem Abschluss spiegelt derselbe Wochen-Ring wie auf der Übersicht den
+  // Stand (gleiche Bildsprache). Dieser Könnensbeweis zählt erst mit, sobald er
+  // bestätigt ist (angemeldet oder für heute abgehakt): dann wächst das Segment
+  // seiner Woche ruhig mit. Spiegeln statt Belohnen (VISION).
   let ringFaecher = null;
-  let etappeDone = 0;
-  const etappeTotal = koennensbeweise.length;
   if (alleFertig) {
     const erledigtBasis = ladeErledigt();
-    ringFaecher = kbFaecher.map((f) => {
-      const ziele = koennensbeweise.filter((k) => k.fach === f);
-      const done = ziele.filter((k) =>
-        k.id === kb.id ? abgeschlossen : !!erledigtBasis[k.id]
-      ).length;
-      return {
-        fach: f,
-        color: kbFarbe[f] || "#868e96",
-        total: ziele.length,
-        done,
-        fraction: ziele.length ? done / ziele.length : 0,
-      };
+    ringFaecher = fachWochenFortschritt({
+      ...erledigtBasis,
+      [kb.id]: abgeschlossen,
     });
-    etappeDone = ringFaecher.reduce((s, r) => s + r.done, 0);
   }
 
   // Material des aktuellen Schritts. Jeder Schritt hat sein eigenes (verstehen →
@@ -590,14 +577,9 @@ export default function Fokus({
           <main className="fokus-abschluss-karte">
             {/* Ring + Titel bleiben stabil, damit der Bogen beim Abnehmen sanft
                 von N auf N+1 wächst (nur der Inhalt darunter wechselt). */}
-            {ringFaecher && (
+            {ringFaecher && ringFaecher.length > 0 && (
               <div className="fokus-abschluss-ring">
-                <Etappenring
-                  ringe={ringFaecher}
-                  gesamtDone={etappeDone}
-                  gesamtTotal={etappeTotal}
-                  animiert
-                />
+                <Etappenring faecher={ringFaecher} animiert />
               </div>
             )}
             <p className="fokus-eyebrow">Geschafft ✓</p>

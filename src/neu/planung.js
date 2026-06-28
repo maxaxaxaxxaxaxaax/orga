@@ -1,4 +1,9 @@
-import { koennensbeweise } from "../data/koennensbeweise";
+import {
+  koennensbeweise,
+  etappeWochen,
+  kbFaecher,
+  kbFarbe,
+} from "../data/koennensbeweise";
 
 // Geteilter Planungs-Stand: localStorage-Keys, Platzhalter für "jetzt" und die
 // Frage, mit welchem Screen die App sinnvoll startet.
@@ -58,6 +63,31 @@ export function lade(key) {
   } catch {
     return {};
   }
+}
+
+// Fortschritt je Fach und geplanter Woche. Speist den konzentrischen Wochen-Ring:
+// ein Ring pro Fach (Fachfarbe), geteilt in gemeinsame Wochen-Stücke (Größe nach
+// Aufgabenzahl). Fächer/Wochen ohne geplante KBs fallen raus.
+export function fachWochenFortschritt(erledigt) {
+  const zuordnung = lade(WOCHEN_KEY);
+  return kbFaecher
+    .map((fach) => {
+      const wochen = [];
+      for (let w = 0; w < etappeWochen; w++) {
+        const kbs = koennensbeweise.filter(
+          (k) => k.fach === fach && zuordnung[k.id] === w
+        );
+        if (kbs.length === 0) continue;
+        wochen.push({
+          woche: w,
+          total: kbs.length,
+          done: kbs.filter((k) => erledigt[k.id]).length,
+          istAktuell: w === AKTUELLE_WOCHE,
+        });
+      }
+      return { fach, color: kbFarbe[fach] || "#868e96", wochen };
+    })
+    .filter((f) => f.wochen.length > 0);
 }
 
 // Aus einer Stunden-ID ("Tag-Startzeit", z. B. "0-09:50") den Wochentag lesen.
