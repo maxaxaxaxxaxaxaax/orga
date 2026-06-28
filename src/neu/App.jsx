@@ -223,7 +223,9 @@ export default function App() {
           onAbmelden={abmelden}
         />
       )}
-      {introOffen && <IntroOverlay onLos={introFertig} />}
+      {introOffen && screen === "etappenplan" && (
+        <IntroOverlay onLos={introFertig} />
+      )}
       {fokusKb && (
         <Fokus
           key={fokusKb.id}
