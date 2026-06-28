@@ -93,6 +93,15 @@ export default function Heute({ onFokus }) {
   // glatter Ring nur für DIESE Woche (kein Segment), 2 = je Fach die ganze Etappe
   // in Wochen-Segmente, 3 = + Farb-Legende, 4 = + Balken je Fach mit Zahl.
   const fortStufe = fSpan <= 2 ? 1 : fSpan === 3 ? 2 : fSpan === 4 ? 3 : 4;
+  // Untertitel erklärt, was man auf der aktuellen Stufe gerade sieht.
+  const fortSub =
+    fortStufe === 1
+      ? "Nur diese Woche"
+      : fortStufe === 2
+        ? "Die ganze Etappe in Wochen"
+        : fortStufe === 3
+          ? "Ganze Etappe, mit Fach-Legende"
+          : "Ganze Etappe, mit Legende und Balken";
 
   useEffect(() => {
     localStorage.setItem(ERLEDIGT_KEY, JSON.stringify(erledigt));
@@ -473,11 +482,7 @@ export default function Heute({ onFokus }) {
             </svg>
             Etappenfortschritt
           </h2>
-          {fortStufe >= 2 && (
-            <p className="hu-karte-sub">
-              Alle deine Könnensbeweise auf einen Blick
-            </p>
-          )}
+          <p className="hu-karte-sub">{fortSub}</p>
           <Etappenring faecher={fachWochen} nurWoche={fortStufe === 1} animiert />
           {/* Stufe 1-2: kurzer Rest-Hinweis unter dem Ring. */}
           {fortStufe <= 2 && wocheTotal > 0 && (

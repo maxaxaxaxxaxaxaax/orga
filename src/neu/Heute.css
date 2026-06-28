@@ -270,6 +270,13 @@
   aspect-ratio: 1;
   margin: 4px auto 0;
 }
+/* In der Übersicht den Ring links verankern (nicht zentrieren): so bleibt er
+   beim Verbreitern der Box an derselben Stelle, statt nach rechts zu wandern,
+   und fluchtet mit Untertitel, Rest-Hinweis und Legende darunter. */
+.hu-fortschritt .hu-ring-wrap {
+  align-self: flex-start;
+  margin: 4px 0 0;
+}
 .hu-ring {
   width: 100%;
   height: 100%;
@@ -282,28 +289,17 @@
     stroke-dashoffset 0.85s cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 /* Beim Verbreitern/Verschmälern der Box wechselt der Ring zwischen Wochen- und
-   Etappen-Ansicht (bzw. Legende/Balken kommen dazu). Der neue Inhalt wächst
-   dann weich herein statt zu springen. */
+   Etappen-Ansicht (bzw. Legende/Balken kommen dazu). Der neue Inhalt blendet
+   dann weich ein, OHNE zu skalieren oder die Position zu verschieben, damit der
+   Ring ruhig an derselben Stelle bleibt. */
 .hu-ring-fach {
-  transform-box: view-box;
-  transform-origin: 120px 120px;
-  animation: hu-fort-rein 0.4s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  animation: hu-fort-fade 0.4s cubic-bezier(0.2, 0.7, 0.2, 1) both;
 }
 .hu-fort-legende {
   animation: hu-fort-fade 0.4s cubic-bezier(0.2, 0.7, 0.2, 1) both;
 }
 .hu-fort-legende-bar > span {
   transition: width 0.55s cubic-bezier(0.2, 0.7, 0.2, 1);
-}
-@keyframes hu-fort-rein {
-  from {
-    opacity: 0;
-    transform: scale(0.9);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
 }
 @keyframes hu-fort-fade {
   from {
@@ -361,7 +357,7 @@
   margin: 14px 0 0;
   font-size: 0.84rem;
   color: var(--text-2);
-  text-align: center;
+  text-align: left;
 }
 /* Breit gezogene Fortschritt-Karte: kompakte Fächer-Legende unter dem Ring. */
 .hu-fort-legende {
