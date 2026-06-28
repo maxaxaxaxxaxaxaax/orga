@@ -48,10 +48,19 @@ export default function Etappenring({ ringe, gesamtDone, gesamtTotal }) {
         </g>
       </svg>
       <div className="hu-ring-mitte">
-        <span className="hu-ring-label">Gesamt</span>
-        <span className="hu-ring-zahl">
-          {gesamtDone}
-          <span className="hu-ring-von">/{gesamtTotal}</span>
+        <span
+          className="hu-ring-bruch"
+          aria-label={`${gesamtDone} von ${gesamtTotal} Könnensbeweisen`}
+        >
+          <span className="hu-ring-zaehler" aria-hidden="true">
+            {gesamtDone}
+          </span>
+          <span className="hu-ring-strich" aria-hidden="true">
+            /
+          </span>
+          <span className="hu-ring-nenner" aria-hidden="true">
+            {gesamtTotal}
+          </span>
         </span>
       </div>
     </div>
