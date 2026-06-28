@@ -53,7 +53,7 @@ export default function Etappenring({ faecher, animiert, nurWoche }) {
                   : 0;
               const bogen = frac * umfang;
               return (
-                <g key={f.fach}>
+                <g key={f.fach} className="hu-ring-fach">
                   <circle
                     cx={MITTE}
                     cy={MITTE}
@@ -119,7 +119,7 @@ export default function Etappenring({ faecher, animiert, nurWoche }) {
                 return { ...w, start, len, fuellLen };
               });
               return (
-                <g key={f.fach}>
+                <g key={f.fach} className="hu-ring-fach">
                   {/* Tracks (offene Wochen-Stücke). */}
                   {segmente.map((s) => (
                     <circle

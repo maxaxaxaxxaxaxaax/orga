@@ -275,14 +275,52 @@
   height: 100%;
   display: block;
 }
-/* Animierter Ring (Fokus-Abschluss): der gefüllte Fach-Bogen wächst sanft mit,
-   wenn ein Könnensbeweis abgenommen wird. */
+/* Animierter Ring: der gefüllte Fach-Bogen wächst sanft mit, wenn ein
+   Könnensbeweis abgenommen wird (Fokus-Abschluss und Übersicht). */
 .hu-ring-animiert .hu-ring circle {
-  transition: stroke-dasharray 0.85s cubic-bezier(0.2, 0.7, 0.2, 1);
+  transition: stroke-dasharray 0.85s cubic-bezier(0.2, 0.7, 0.2, 1),
+    stroke-dashoffset 0.85s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+/* Beim Verbreitern/Verschmälern der Box wechselt der Ring zwischen Wochen- und
+   Etappen-Ansicht (bzw. Legende/Balken kommen dazu). Der neue Inhalt wächst
+   dann weich herein statt zu springen. */
+.hu-ring-fach {
+  transform-box: view-box;
+  transform-origin: 120px 120px;
+  animation: hu-fort-rein 0.4s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.hu-fort-legende {
+  animation: hu-fort-fade 0.4s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.hu-fort-legende-bar > span {
+  transition: width 0.55s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+@keyframes hu-fort-rein {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes hu-fort-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 @media (prefers-reduced-motion: reduce) {
-  .hu-ring-animiert .hu-ring circle {
+  .hu-ring-animiert .hu-ring circle,
+  .hu-fort-legende-bar > span {
     transition: none;
+  }
+  .hu-ring-fach,
+  .hu-fort-legende {
+    animation: none;
   }
 }
 .hu-ring-mitte {

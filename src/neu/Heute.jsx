@@ -478,7 +478,7 @@ export default function Heute({ onFokus }) {
               Alle deine Könnensbeweise auf einen Blick
             </p>
           )}
-          <Etappenring faecher={fachWochen} nurWoche={fortStufe === 1} />
+          <Etappenring faecher={fachWochen} nurWoche={fortStufe === 1} animiert />
           {/* Stufe 1-2: kurzer Rest-Hinweis unter dem Ring. */}
           {fortStufe <= 2 && wocheTotal > 0 && (
             <p className="hu-fort-rest">
