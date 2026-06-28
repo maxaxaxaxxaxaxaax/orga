@@ -330,11 +330,25 @@
   flex-shrink: 0;
 }
 .hu-fort-legende-fach {
-  flex: 1;
-  min-width: 0;
+  width: 5.6em;
+  flex-shrink: 0;
   color: var(--text-2);
 }
+.hu-fort-legende-bar {
+  flex: 1;
+  min-width: 24px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--line);
+  overflow: hidden;
+}
+.hu-fort-legende-bar > span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+}
 .hu-fort-legende-wert {
+  flex-shrink: 0;
   font-weight: 700;
   color: var(--text);
   font-variant-numeric: tabular-nums;
@@ -570,6 +584,24 @@
   stroke-linejoin: round;
   color: var(--muted);
 }
+/* Breit gezogene Aufgaben-Karte: nützliche Zusatzinfos (Schritte, Materialien,
+   Übung) als ruhige Meta-Zeile. */
+.hu-auf-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px 14px;
+  margin-top: 8px;
+  font-size: 0.74rem;
+  color: var(--muted);
+}
+.hu-auf-meta-teil {
+  position: relative;
+}
+.hu-auf-meta-teil:not(:first-child)::before {
+  content: "·";
+  position: absolute;
+  left: -8px;
+}
 .hu-auf-prog {
   margin-top: auto;
   padding-top: 12px;
@@ -689,6 +721,16 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+/* Bei breitem Stundenplan: die Lernform (Unterricht/Ankerstunde/betreut). */
+.hu-stunde-art {
+  flex-shrink: 0;
+  font-size: 0.64rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--accent);
+  white-space: nowrap;
 }
 .hu-stunde-zeit {
   flex-shrink: 0;

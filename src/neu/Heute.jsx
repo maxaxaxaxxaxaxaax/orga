@@ -5,6 +5,7 @@ import {
   fachFarbe,
   stundenId,
   lehrkraefte,
+  artLabel,
 } from "../data/stundenplanWoche";
 import { etappen } from "../data/etappen";
 import { lernwegFuerKb } from "../data/wissen";
@@ -238,6 +239,24 @@ export default function Heute({ onFokus }) {
             </span>
           )}
         </span>
+        {aSpan >= 9 &&
+          (info.schritte > 0 || info.materialien > 0 || info.hatUebung) && (
+            <span className="hu-auf-meta">
+              {info.schritte > 0 && (
+                <span className="hu-auf-meta-teil">
+                  {info.fertigeSchritte}/{info.schritte} Schritte
+                </span>
+              )}
+              {info.materialien > 0 && (
+                <span className="hu-auf-meta-teil">
+                  {info.materialien} Materialien
+                </span>
+              )}
+              {info.hatUebung && (
+                <span className="hu-auf-meta-teil">Übung dabei</span>
+              )}
+            </span>
+          )}
         {done ? (
           <span className="hu-auf-status done">✓ Erledigt</span>
         ) : prog > 0 ? (
@@ -444,6 +463,14 @@ export default function Heute({ onFokus }) {
                     aria-hidden="true"
                   />
                   <span className="hu-fort-legende-fach">{r.fach}</span>
+                  <span className="hu-fort-legende-bar" aria-hidden="true">
+                    <span
+                      style={{
+                        width: Math.round(r.fraction * 100) + "%",
+                        background: r.color,
+                      }}
+                    />
+                  </span>
                   <span className="hu-fort-legende-wert">
                     {r.done}/{r.total}
                   </span>
@@ -624,6 +651,9 @@ export default function Heute({ onFokus }) {
                       )}
                       {pSpan >= 3 && (
                         <span className="hu-stunde-raum">{s.raum}</span>
+                      )}
+                      {pSpan >= 5 && artLabel[s.art] && (
+                        <span className="hu-stunde-art">{artLabel[s.art]}</span>
                       )}
                     </span>
                     <span className="hu-stunde-zeit">
