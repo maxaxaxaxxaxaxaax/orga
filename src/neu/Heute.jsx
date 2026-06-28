@@ -89,10 +89,9 @@ export default function Heute({ onFokus }) {
   const nSpan = b2 - b1; // Notizen
   const aSpan = b2; // Aufgaben
   const pSpan = 12 - b2; // Stundenplan
-  // Etappenfortschritt-Stufen: die Wochen-Ringe je Fach bleiben immer gleich
-  // sichtbar; je breiter die Box, desto mehr Zusatzinfo darunter. 1-2 = nur Ringe
-  // (+ kurzer Rest-Hinweis), 3 = + Farb-Legende (welche Farbe ist welches Fach),
-  // 4 = + Balken je Fach mit Zahl.
+  // Etappenfortschritt-Stufen: je breiter die Box, desto mehr. 1 = je Fach ein
+  // glatter Ring nur für DIESE Woche (kein Segment), 2 = je Fach die ganze Etappe
+  // in Wochen-Segmente, 3 = + Farb-Legende, 4 = + Balken je Fach mit Zahl.
   const fortStufe = fSpan <= 2 ? 1 : fSpan === 3 ? 2 : fSpan === 4 ? 3 : 4;
 
   useEffect(() => {
@@ -479,7 +478,7 @@ export default function Heute({ onFokus }) {
               Alle deine Könnensbeweise auf einen Blick
             </p>
           )}
-          <Etappenring faecher={fachWochen} />
+          <Etappenring faecher={fachWochen} nurWoche={fortStufe === 1} />
           {/* Stufe 1-2: kurzer Rest-Hinweis unter dem Ring. */}
           {fortStufe <= 2 && wocheTotal > 0 && (
             <p className="hu-fort-rest">

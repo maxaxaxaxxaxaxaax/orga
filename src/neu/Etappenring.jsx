@@ -3,8 +3,12 @@
 // (Stückgröße nach Aufgabenzahl, mit Lücken). Alle Ringe starten oben am selben
 // Punkt, sind aber je Fach unterschiedlich segmentiert. Track = offen, Füllung =
 // erledigt; die aktuelle Woche ist dezent markiert. Mitte bleibt leer (Spiegeln
-// statt Werten, VISION). Kein Gamification. Die Ringe bleiben über alle
-// Box-Breiten gleich; nur die Zusatzinfo darunter (Legende, Balken) wächst mit.
+// statt Werten, VISION). Kein Gamification.
+//
+// Zwei Modi: nurWoche = je Fach ein glatter Ring nur für die AKTUELLE Woche
+// (kleinste Box-Stufe, kein Segment, weil es nur die eine Woche ist); sonst die
+// ganze Etappe, je Fach in Wochen-Segmente geteilt. Breitere Box ergänzt darunter
+// Legende und Balken (in Heute).
 const GROESSE = 240;
 const MITTE = GROESSE / 2;
 const RING_BREITE = 12;
@@ -12,7 +16,7 @@ const RING_GAP = 5; // Abstand zwischen den konzentrischen Fach-Ringen
 const AUSSEN = MITTE - RING_BREITE / 2 - 2;
 const LUECKE_PX = 20; // konstante Lücke in px, damit innen wie außen gleich aussieht
 
-export default function Etappenring({ faecher, animiert }) {
+export default function Etappenring({ faecher, animiert, nurWoche }) {
   const liste = faecher && faecher.length ? faecher : null;
 
   return (
@@ -33,7 +37,61 @@ export default function Etappenring({ faecher, animiert }) {
               strokeWidth={RING_BREITE}
             />
           )}
+          {/* Kleinste Stufe (nurWoche): je Fach ein glatter Ring, der nur den
+              Stand DIESER Woche zeigt (Bogen = erledigter Anteil der aktuellen
+              Woche). Kein Segmentieren, weil es nur die eine Woche ist. */}
           {liste &&
+            nurWoche &&
+            liste.map((f, i) => {
+              const radius = AUSSEN - i * (RING_BREITE + RING_GAP);
+              if (radius < RING_BREITE) return null;
+              const umfang = 2 * Math.PI * radius;
+              const akt = f.wochen.find((w) => w.istAktuell);
+              const frac =
+                akt && akt.total
+                  ? Math.max(0, Math.min(1, akt.done / akt.total))
+                  : 0;
+              const bogen = frac * umfang;
+              return (
+                <g key={f.fach}>
+                  <circle
+                    cx={MITTE}
+                    cy={MITTE}
+                    r={radius}
+                    fill="none"
+                    style={{
+                      stroke: `color-mix(in srgb, ${f.color} 22%, var(--card))`,
+                    }}
+                    strokeWidth={RING_BREITE}
+                  />
+                  <circle
+                    cx={MITTE}
+                    cy={MITTE}
+                    r={radius}
+                    fill="none"
+                    stroke={f.color}
+                    strokeWidth={RING_BREITE}
+                    strokeLinecap="round"
+                    strokeDasharray={`0.1 ${umfang}`}
+                  />
+                  {bogen > 0 && (
+                    <circle
+                      cx={MITTE}
+                      cy={MITTE}
+                      r={radius}
+                      fill="none"
+                      stroke={f.color}
+                      strokeWidth={RING_BREITE}
+                      strokeLinecap="round"
+                      strokeDasharray={`${bogen} ${umfang}`}
+                    />
+                  )}
+                </g>
+              );
+            })}
+          {/* Größere Stufen: die ganze Etappe, je Fach in Wochen-Segmente. */}
+          {liste &&
+            !nurWoche &&
             liste.map((f, i) => {
               const radius = AUSSEN - i * (RING_BREITE + RING_GAP);
               if (radius < RING_BREITE) return null;
