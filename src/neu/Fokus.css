@@ -98,7 +98,6 @@
 .fokus-lernzeit svg {
   opacity: 0.85;
 }
-.fokus-kopf-hilfe,
 .fokus-wechsel {
   flex-shrink: 0;
   border: 1px solid var(--line-strong);
@@ -111,15 +110,9 @@
   cursor: pointer;
   transition: border-color 0.12s ease, color 0.12s ease;
 }
-.fokus-kopf-hilfe:hover,
 .fokus-wechsel:hover {
   border-color: var(--accent);
   color: var(--accent);
-}
-.fokus-kopf-hilfe.aktiv {
-  border-color: var(--ok-text);
-  color: var(--ok-text);
-  background: var(--ok-bg);
 }
 .fokus-balken {
   flex-shrink: 0;

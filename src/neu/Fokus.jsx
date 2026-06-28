@@ -408,11 +408,6 @@ export default function Fokus({
     speichereSchritte(kb.id, next);
   }
 
-  function hilfeOeffnen() {
-    // Chat ist jetzt dauerhaft rechts: nur auf den Tutor-Tab (Mensch) wechseln.
-    setChatTab("lerncoach");
-    setEntwurf(frage);
-  }
   function hilfeSenden() {
     setzeHilferuf(kb.id, true);
     setzeFrage(kb.id, entwurf);
@@ -546,16 +541,6 @@ export default function Fokus({
           <span className="fokus-zaehler">
             {alleFertig ? schritte.length : aktuell + 1} / {schritte.length}
           </span>
-          {!alleFertig && (
-            <button
-              type="button"
-              className={"fokus-kopf-hilfe" + (hilfe ? " aktiv" : "")}
-              onClick={hilfeOeffnen}
-              title={`Frage an ${COACH}`}
-            >
-              {hilfe ? `${COACH} ist informiert ✓` : `Frag ${COACH}`}
-            </button>
-          )}
           {!alleFertig && (
             <button
               type="button"
