@@ -178,17 +178,8 @@
     minmax(0, var(--col-c, 4fr));
   gap: var(--grid-gap);
   align-items: start;
-  /* Beim Loslassen sanft auf die ganze Spalte gleiten. Während des Ziehens (siehe
-     unten) ist die Transition aus, damit die Box ohne Verzögerung der Maus folgt. */
-  transition: grid-template-columns 0.2s cubic-bezier(0.2, 0.7, 0.2, 1);
-}
-.hu-grid.raster-zieht {
-  transition: none;
-}
-@media (prefers-reduced-motion: reduce) {
-  .hu-grid {
-    transition: none;
-  }
+  /* Die Spaltenbreite wird beim Ziehen per Feder (JS, rAF) animiert; eine
+     CSS-Transition auf grid-template-columns greift hier nicht. */
 }
 .hu-fortschritt {
   position: relative;

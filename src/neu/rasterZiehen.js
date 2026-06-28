@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 // Geteilter Prototyp: eine senkrechte Raster-Grenze per Ziehen verschieben. Die
 // Grenze rastet auf die 12 Spalten ein, lebt nur im Speicher (Reload setzt
@@ -60,13 +60,33 @@ export function useRasterZiehen(messbereich) {
   return { ref, zieht, griff };
 }
 
-// Variante mit kontinuierlichem Morph + magnetischem Einrasten (Übersicht): die
-// aktive Grenze folgt beim Ziehen flüssig der Maus, rastet nur nahe ganzer
-// Spalten ein ("einhacken") und schnappt beim Loslassen auf die ganze Spalte.
-// drag = { id, wert } während des Ziehens (wert kann gebrochen sein), sonst null.
+// Variante mit kontinuierlichem Morph + federndem Einrasten (Übersicht): die
+// aktive Grenze folgt beim Ziehen der Maus und rastet nahe ganzer Spalten
+// magnetisch ein. Statt hart zu stoppen läuft sie über eine Feder (rAF, mit
+// leichtem Überschwingen) aus -> fluides "Wackeln" beim Stillstand und beim
+// Loslassen. drag = { id, wert } während Ziehen/Auslaufen, sonst null.
 export function useRasterMorph() {
   const ref = useRef(null);
   const [drag, setDrag] = useState(null);
+  // Feder-Zustand außerhalb des Renders.
+  const sim = useRef({
+    id: null,
+    ziel: 0, // Zielspalte (gerastet)
+    wert: 0, // aktueller Federwert
+    v: 0, // Geschwindigkeit
+    raf: 0,
+    aktiv: false, // Finger unten -> folgt der Maus
+    min: 0,
+    max: 12,
+    commit: null,
+  });
+
+  useEffect(() => {
+    const s = sim.current; // stabiles Objekt; .raf wird live aktualisiert
+    return () => {
+      if (s.raf) cancelAnimationFrame(s.raf);
+    };
+  }, []);
 
   function spalteAusX(clientX) {
     const el = ref.current;
@@ -76,14 +96,53 @@ export function useRasterMorph() {
     return ((clientX - r.left) / r.width) * 12;
   }
 
-  // grenzeZieh(id, start, { min, max, commit }): start = aktueller Wert der
-  // Grenze, min/max = Klemmung (aus der anderen Grenze), commit(spalte) schreibt
-  // die gerastete Spalte beim Loslassen.
+  // Ein Federschritt: zieht wert mit Überschwingen zum ziel. Läuft, solange der
+  // Finger unten ist (folgen) oder bis die Feder nach dem Loslassen steht.
+  function tick() {
+    const s = sim.current;
+    s.v += (s.ziel - s.wert) * 0.34;
+    s.v *= 0.5;
+    s.wert += s.v;
+    const steht = Math.abs(s.ziel - s.wert) < 0.0015 && Math.abs(s.v) < 0.0015;
+    if (steht && !s.aktiv) {
+      // Nach dem Loslassen ausgelaufen: auf ganze Spalte fixieren + committen.
+      s.wert = s.ziel;
+      s.v = 0;
+      s.raf = 0;
+      if (s.commit) s.commit(Math.round(s.wert));
+      setDrag(null);
+      s.id = null;
+      return;
+    }
+    if (steht) {
+      s.wert = s.ziel;
+      s.v = 0;
+    }
+    setDrag({ id: s.id, wert: s.wert });
+    s.raf = requestAnimationFrame(tick);
+  }
+
+  function starte() {
+    if (!sim.current.raf) sim.current.raf = requestAnimationFrame(tick);
+  }
+
+  // grenzeZieh(id, start, { min, max, commit }): start = aktueller Wert, min/max =
+  // Klemmung (aus der anderen Grenze), commit(spalte) schreibt die gerastete Spalte.
   function grenzeZieh(id, start, opts) {
     return {
       onPointerDown: (e) => {
         e.preventDefault();
+        const s = sim.current;
+        s.id = id;
+        s.ziel = start;
+        s.wert = start;
+        s.v = 0;
+        s.aktiv = true;
+        s.min = opts.min;
+        s.max = opts.max;
+        s.commit = opts.commit;
         setDrag({ id, wert: start });
+        starte();
         try {
           e.currentTarget.setPointerCapture(e.pointerId);
         } catch {
@@ -91,28 +150,36 @@ export function useRasterMorph() {
         }
       },
       onPointerMove: (e) => {
+        const s = sim.current;
+        if (!s.aktiv || s.id !== id) return;
         const roh = spalteAusX(e.clientX);
         if (roh == null) return;
-        setDrag((d) => {
-          if (!d || d.id !== id) return d;
-          const c = Math.max(opts.min, Math.min(opts.max, roh));
-          const nah = Math.round(c);
-          const wert = Math.abs(c - nah) <= 0.18 ? nah : c;
-          return d.wert === wert ? d : { id, wert };
-        });
+        const c = Math.max(s.min, Math.min(s.max, roh));
+        const nah = Math.round(c);
+        s.ziel = Math.abs(c - nah) <= 0.18 ? nah : c; // magnetisch einrasten
+        starte();
       },
       onPointerUp: (e) => {
-        setDrag((d) => {
-          if (d && d.id === id) opts.commit(Math.round(d.wert));
-          return null;
-        });
+        const s = sim.current;
+        if (s.id === id) {
+          s.aktiv = false;
+          s.ziel = Math.round(s.ziel); // auf ganze Spalte, Feder läuft dorthin aus
+          starte();
+        }
         try {
           e.currentTarget.releasePointerCapture(e.pointerId);
         } catch {
           /* schon freigegeben */
         }
       },
-      onPointerCancel: () => setDrag(null),
+      onPointerCancel: () => {
+        const s = sim.current;
+        if (s.id === id) {
+          s.aktiv = false;
+          s.ziel = Math.round(s.wert);
+          starte();
+        }
+      },
     };
   }
 

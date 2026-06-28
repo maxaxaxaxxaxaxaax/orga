@@ -11,7 +11,7 @@ import { etappen } from "../data/etappen";
 import { lernwegFuerKb } from "../data/wissen";
 import { generatorFuerKb } from "./uebungen";
 import Etappenring from "./Etappenring";
-import { RasterGriff } from "./raster";
+import { RasterGriff, RasterOverlay } from "./raster";
 import { useRasterMorph } from "./rasterZiehen";
 import {
   lade,
@@ -462,8 +462,10 @@ export default function Heute({ onFokus }) {
           "--col-c": 12 - g2 + "fr",
         }}
       >
-        {/* Kein Hilfsraster-Overlay: die Box folgt beim Ziehen flüssig der Maus
-            und rastet magnetisch an den Spalten ein, das ist Feedback genug. */}
+        {/* Hilfsraster (12 Spalten) liegt immer bereit und blendet beim Ziehen
+            weich ein/aus (Sichtbarkeit über .raster-zieht, siehe index.css). Zeigt,
+            wie die Box unterteilt ist und wohin sie einrastet. */}
+        <RasterOverlay />
         {/* Links oben: Etappenfortschritt */}
         <section className="hu-karte hu-fortschritt">
           <h2 className="hu-karte-titel">
