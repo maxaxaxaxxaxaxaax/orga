@@ -640,7 +640,7 @@ export default function Wochenplan({ onZurueck, onWeiter, woche = 0 }) {
                 onClick={vorschlagVerteilen}
                 title="Die offenen Uhren aller Wochen ausgewogen auf die Stunden verteilen"
               >
-                <span aria-hidden="true">✦</span> Für mich einsortieren
+                <span aria-hidden="true">✦</span> Automatisch einsortieren
               </button>
             </>
           ) : (
@@ -668,7 +668,7 @@ export default function Wochenplan({ onZurueck, onWeiter, woche = 0 }) {
                   onClick={vorschlagVerteilen}
                   title="Die offenen Uhren ausgewogen auf die Stunden verteilen"
                 >
-                  <span aria-hidden="true">✦</span> Für mich einsortieren
+                  <span aria-hidden="true">✦</span> Automatisch einsortieren
                 </button>
               )}
             </>

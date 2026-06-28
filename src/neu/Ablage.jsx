@@ -155,7 +155,12 @@ export default function Ablage() {
         {/* Linke Spalte: Fächer + Kompetenzen */}
         <div className="ab-links">
           <section className="ab-card ab-faecher">
-            <h2 className="ab-card-titel">Fächer</h2>
+            <h2 className="ab-card-titel">
+              <svg className="ab-card-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 7.5a2 2 0 0 1 2-2h3.2l1.6 2H18a2 2 0 0 1 2 2v6.5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7.5Z" />
+              </svg>
+              Fächer
+            </h2>
             <div className="ab-ordner-grid">
               {faecher.map((f) => (
                 <button
@@ -255,7 +260,13 @@ export default function Ablage() {
         <section className="ab-card ab-materialien">
           <div className="ab-mat-kopf">
             <div>
-              <h2 className="ab-card-titel">Materialien</h2>
+              <h2 className="ab-card-titel">
+                <svg className="ab-card-icon" viewBox="0 0 24 24" aria-hidden="true">
+                  <rect x="5.5" y="3.5" width="13" height="17" rx="2" />
+                  <path d="M9.5 3.5v17M12.5 8.5h4M12.5 12h4" />
+                </svg>
+                Materialien
+              </h2>
               <p className="ab-mat-fach">{fach ? `${fach.fach} Gesamt` : ""}</p>
             </div>
             {struktur && (

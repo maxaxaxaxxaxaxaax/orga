@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { lernwegFuerKb } from "../data/wissen";
+import { lehrkraefte } from "../data/stundenplanWoche";
 import { ART_LABEL } from "./material";
 import { eigeneFuerThema, speichereEigenes } from "./eigeneMaterialien";
 import { ladeSchritte, speichereSchritte } from "./lernschritte";
@@ -39,7 +40,6 @@ import Rechenweg from "./Rechenweg";
 import Aufschrieb from "./Aufschrieb";
 import MarkierenFrage from "./MarkierenFrage";
 import LiveCoach from "./LiveCoach";
-import { hatRechenweg } from "./rechenwegSpeicher";
 import { useRasterZiehen } from "./rasterZiehen";
 import { RasterGriff, RasterOverlay } from "./raster";
 import "./Fokus.css";
@@ -511,30 +511,32 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
           <span className="fokus-kb-eyebrow">Lernweg</span>
           {kb.fach}: {kb.titel}
         </span>
-        <Lernzeit />
-        <span className="fokus-zaehler">
-          {alleFertig ? schritte.length : aktuell + 1} / {schritte.length}
-        </span>
-        {!alleFertig && (
-          <button
-            type="button"
-            className={"fokus-kopf-hilfe" + (hilfe ? " aktiv" : "")}
-            onClick={hilfeOeffnen}
-            title={`Frage an ${COACH}`}
-          >
-            {hilfe ? `${COACH} ist informiert ✓` : `Frag ${COACH}`}
-          </button>
-        )}
-        {naechste && !alleFertig && (
-          <button
-            type="button"
-            className="fokus-wechsel"
-            onClick={() => onWeiter(naechste.id)}
-            title={`Weiter mit ${naechste.fach}: ${naechste.titel}`}
-          >
-            Aufgabe wechseln
-          </button>
-        )}
+        <div className="fokus-kopf-rechts">
+          <Lernzeit />
+          <span className="fokus-zaehler">
+            {alleFertig ? schritte.length : aktuell + 1} / {schritte.length}
+          </span>
+          {!alleFertig && (
+            <button
+              type="button"
+              className={"fokus-kopf-hilfe" + (hilfe ? " aktiv" : "")}
+              onClick={hilfeOeffnen}
+              title={`Frage an ${COACH}`}
+            >
+              {hilfe ? `${COACH} ist informiert ✓` : `Frag ${COACH}`}
+            </button>
+          )}
+          {naechste && !alleFertig && (
+            <button
+              type="button"
+              className="fokus-wechsel"
+              onClick={() => onWeiter(naechste.id)}
+              title={`Weiter mit ${naechste.fach}: ${naechste.titel}`}
+            >
+              Aufgabe wechseln
+            </button>
+          )}
+        </div>
       </header>
       <div className="fokus-balken" aria-hidden="true">
         <div className="fokus-balken-fuell" style={{ width: proz + "%" }} />
@@ -802,42 +804,21 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
                       </span>
                     )}
                   </div>
-                  <span className="fokus-sl-segmente" aria-hidden="true">
-                    {schritte.map((st, i) => (
-                      <span
-                        key={i}
-                        className={
-                          "fokus-sl-seg" +
-                          (i < aktuell ? " fertig" : "") +
-                          (i === aktuell ? " aktuell" : "")
-                        }
-                      />
-                    ))}
-                  </span>
+                  <span className="fokus-sl-trenner" aria-hidden="true" />
                   <span className="fokus-sl-zahl">
                     {aktuell}/{schritte.length}
                   </span>
+                  <span className="fokus-sl-trenner" aria-hidden="true" />
                   <div className="fokus-sl-nav">
-                    {istMathe && (
-                      <button
-                        type="button"
-                        className="fokus-sl-rechenweg"
-                        onClick={() => setRechenwegOffen(true)}
-                        title="Rechenweg mit Coach"
-                      >
-                        ✎ Rechenweg
-                        {hatRechenweg(kb.id, "rechenweg") && (
-                          <span className="fokus-sl-badge">✓</span>
-                        )}
-                      </button>
-                    )}
                     {aktuell > 0 && (
                       <button
                         type="button"
                         className="fokus-sl-zurueck"
                         onClick={zurueck}
+                        aria-label="Ein Schritt zurück"
+                        title="Ein Schritt zurück"
                       >
-                        ← zurück
+                        ‹
                       </button>
                     )}
                     <button
@@ -1162,7 +1143,7 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
                 }
                 onClick={() => setChatTab("lerncoach")}
               >
-                Tutor
+                {lehrkraefte[kb.fach] || "Tutor"}
               </button>
             </div>
             {chatTab === "coach" ? (

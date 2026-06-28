@@ -354,7 +354,7 @@ export default function Etappenplan({ onWeiter }) {
               onClick={vorschlagVerteilung}
               title="Die noch offenen Ziele ausgewogen auf die Wochen verteilen"
             >
-              <span aria-hidden="true">✦</span> Für mich einsortieren
+              <span aria-hidden="true">✦</span> Automatisch einsortieren
             </button>
           </>
         ) : (
@@ -378,7 +378,7 @@ export default function Etappenplan({ onWeiter }) {
                 onClick={vorschlagVerteilung}
                 title="Die noch offenen Ziele ausgewogen auf die Wochen verteilen"
               >
-                <span aria-hidden="true">✦</span> Für mich einsortieren
+                <span aria-hidden="true">✦</span> Automatisch einsortieren
               </button>
             )}
           </>

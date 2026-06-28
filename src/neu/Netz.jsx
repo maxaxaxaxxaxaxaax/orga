@@ -116,19 +116,25 @@ export default function Netz({ fach, struktur, erledigt, onSelect }) {
         )}
       </nav>
       <div className="netz-legende" aria-hidden="true">
-        <span>Farbe = Bereich</span>
+        <span>Farbe = Lernstand</span>
         <span>
-          <span className="netz-punkt" style={{ background: "#888780", opacity: 0.4 }} />
+          <span
+            className="netz-punkt"
+            style={{ background: `color-mix(in srgb, ${fach.farbe} 24%, var(--card))` }}
+          />
           offen
         </span>
         <span>
-          <span className="netz-punkt" style={{ background: "#888780" }} />
+          <span className="netz-punkt" style={{ background: fach.farbe }} />
           erledigt
         </span>
         <span>
           <span
             className="netz-punkt"
-            style={{ background: "#888780", border: "2px solid var(--text,#1d1d1f)" }}
+            style={{
+              background: `color-mix(in srgb, ${fach.farbe} 58%, var(--card))`,
+              border: "2px solid var(--text,#1d1d1f)",
+            }}
           />
           aktuell
         </span>
@@ -214,7 +220,14 @@ export default function Netz({ fach, struktur, erledigt, onSelect }) {
               const istAktiv = aktiv === n.id;
               const nachbar = aktiv && nachbarn[aktiv]?.has(n.id);
               const gedimmt = aktiv && !istAktiv && !nachbar;
-              const voll = n.status === "erledigt" || n.status === "aktuell";
+              // Lernstand als Farbabstufung der EINEN Fachfarbe (statt bunter
+              // Kategorie-Farben + Deckkraft): offen hell, aktuell mittel, erledigt voll.
+              const fuell =
+                n.status === "erledigt"
+                  ? fach.farbe
+                  : n.status === "aktuell"
+                    ? `color-mix(in srgb, ${fach.farbe} 58%, var(--card))`
+                    : `color-mix(in srgb, ${fach.farbe} 24%, var(--card))`;
               return (
                 <g
                   key={n.id}
@@ -254,9 +267,8 @@ export default function Netz({ fach, struktur, erledigt, onSelect }) {
                   )}
                   <circle
                     r={n.r}
-                    fill={n.color}
-                    fillOpacity={voll ? 1 : 0.4}
-                    stroke={n.color}
+                    fill={fuell}
+                    stroke={fach.farbe}
                     strokeWidth="2"
                   />
                   {n.status === "erledigt" && (

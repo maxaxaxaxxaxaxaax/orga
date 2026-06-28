@@ -336,20 +336,6 @@ export default function Heute({ onFokus }) {
             (stundenZuord[k.id] || []).some((sid) => slotTag(sid) === tag + 1)
         ).length
       : 0;
-  // Wie viele Uhren sind für morgen schon verplant? Nur Fakt, kein Vorwurf:
-  // ein voller Tag früh sehen, damit man heute noch umplanen kann (ohne Druck).
-  const morgenUhren =
-    tag < 4
-      ? koennensbeweise.reduce((sum, k) => {
-          if (wochenZuordnung[k.id] !== AKTUELLE_WOCHE) return sum;
-          return (
-            sum +
-            (stundenZuord[k.id] || []).filter((sid) => slotTag(sid) === tag + 1)
-              .length
-          );
-        }, 0)
-      : 0;
-  const morgenVoll = morgenUhren >= 5;
 
   // Etappenfortschritt: pro Fach Anteil erledigter Ziele (Ring) plus drei
   // sachliche Kennzahlen. Spiegelt den Stand, wertet nicht (VISION).
@@ -366,21 +352,6 @@ export default function Heute({ onFokus }) {
   });
   const zieleGesamt = koennensbeweise.length;
   const zieleDone = koennensbeweise.filter((k) => erledigt[k.id]).length;
-
-  // Tages-Fortschritt für den Balken unter den Aufgaben: Anteil erledigter
-  // Lernweg-Schritte über alle heutigen Ziele (granular, nicht nur ganz/gar nicht).
-  const tagSchritte = tagKbs.reduce(
-    (acc, k) => {
-      const info = kbInfo(k.id);
-      acc.total += info.schritte;
-      acc.fertig += erledigt[k.id] ? info.schritte : info.fertigeSchritte;
-      return acc;
-    },
-    { total: 0, fertig: 0 }
-  );
-  const tagProzent = tagSchritte.total
-    ? Math.round((tagSchritte.fertig / tagSchritte.total) * 100)
-    : 0;
 
   // Tag geschafft: ruhiger grüner Abschluss als kleine Belohnung, bevor der Tag
   // wieder zur Liste wird.
@@ -575,15 +546,6 @@ export default function Heute({ onFokus }) {
           ) : (
             <div className="hu-auf-grid">{tagKbs.map((k) => karte(k))}</div>
           )}
-          {morgenAnzahl > 0 && aSpan >= 7 && (
-            <p className={"hu-morgen" + (morgenVoll ? " voll" : "")}>
-              Morgen geplant: {morgenAnzahl}{" "}
-              {morgenAnzahl === 1 ? "Ziel" : "Ziele"}
-              {morgenUhren > 0 &&
-                `, ${morgenUhren} ${morgenUhren === 1 ? "Uhr" : "Uhren"}`}
-              {morgenVoll && " · ziemlich voll"}
-            </p>
-          )}
 
           {nachzueglerList.length > 0 && (
             <div className="hu-nachzuegler">
@@ -605,14 +567,6 @@ export default function Heute({ onFokus }) {
                     : `+ ${nachzueglerList.length - 3} weitere anzeigen`}
                 </button>
               )}
-            </div>
-          )}
-          {tagKbs.length > 0 && (
-            <div className="hu-auf-fortschritt">
-              <span className="hu-auf-fortschritt-pct">{tagProzent}%</span>
-              <span className="hu-auf-fortschritt-bar">
-                <span style={{ width: tagProzent + "%" }} />
-              </span>
             </div>
           )}
           <RasterGriff
