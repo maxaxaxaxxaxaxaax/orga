@@ -365,7 +365,9 @@ select:focus-visible {
   position: absolute;
   top: 0;
   bottom: 0;
-  right: calc(var(--grid-gap, 18px) / -2 - 1px);
+  /* Griff so legen, dass seine MITTE (dort sitzt der Balken) genau in der Lücke
+     zwischen den beiden Boxen liegt: halbe Lücke + 1px Rand + halbe Griffbreite. */
+  right: calc(var(--grid-gap, 18px) / -2 - 7px);
   width: 12px;
   cursor: col-resize;
   touch-action: none;
@@ -379,12 +381,14 @@ select:focus-visible {
   width: 3px;
   border-radius: 999px;
   background: var(--accent);
-  opacity: 0;
+  /* Dezent dauerhaft sichtbar (Teal wie die aktive Nav-Pille), damit man die
+     ziehbare Kante zwischen den Boxen erkennt. Beim Hover/Ziehen kräftiger. */
+  opacity: 0.4;
   transition: opacity 0.12s ease;
 }
 .raster-griff:hover::after,
 .raster-zieht .raster-griff::after {
-  opacity: 0.55;
+  opacity: 0.8;
 }
 .raster-overlay {
   position: absolute;
