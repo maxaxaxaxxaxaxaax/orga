@@ -418,7 +418,9 @@ select:focus-visible {
   opacity: 1;
 }
 .raster-overlay-spalte {
-  border-radius: 8px;
+  /* Gleicher Radius wie die Boxen selbst (--r-lg), damit die Ziel-Felder exakt
+     die Form der Karten haben. */
+  border-radius: var(--r-lg, 20px);
   background: color-mix(in srgb, var(--accent) 6%, transparent);
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 15%, transparent);
 }
