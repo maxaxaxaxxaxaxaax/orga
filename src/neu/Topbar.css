@@ -1,23 +1,12 @@
-/* Schwebende Glas-Pille oben rechts: Postfach (Chat-Icon) und Einstellungen.
-   Gleicher Liquid-Glass-Look wie die Navigation oben mittig. */
+/* Oben rechts: Postfach (Chat-Icon) und Einstellungen. Bewusst OHNE Glas-Pille,
+   nur die Navigation oben mittig trägt die Pille. Die Icons schweben frei. */
 .topbar-rechts {
   position: fixed;
   top: 14px;
   right: var(--seite-x, 28px);
   z-index: 50;
   display: flex;
-  gap: 2px;
-  padding: 5px;
-  background: linear-gradient(
-    180deg,
-    color-mix(in srgb, var(--card) 52%, transparent),
-    color-mix(in srgb, var(--card) 34%, transparent)
-  );
-  -webkit-backdrop-filter: blur(30px) saturate(1.9) brightness(1.03);
-  backdrop-filter: blur(30px) saturate(1.9) brightness(1.03);
-  border: 1px solid rgba(255, 255, 255, 0.6);
-  border-radius: 999px;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), var(--shadow-lg);
+  gap: 4px;
   animation: topbar-rein 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) 0.12s both;
 }
 @keyframes topbar-rein {
