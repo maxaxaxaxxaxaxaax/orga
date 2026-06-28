@@ -40,7 +40,23 @@ import Aufschrieb from "./Aufschrieb";
 import MarkierenFrage from "./MarkierenFrage";
 import LiveCoach from "./LiveCoach";
 import { hatRechenweg } from "./rechenwegSpeicher";
+import { useRasterZiehen } from "./rasterZiehen";
+import { RasterGriff, RasterOverlay } from "./raster";
 import "./Fokus.css";
+
+// Messbereich für das Fokus-Raster: die 12 fraktionalen Spalten beginnen rechts
+// der schmalen Werkzeug-Leiste, daher deren Breite plus ein Gutter abziehen.
+function fokusMessbereich(koerper) {
+  const tools = koerper.querySelector(".fokus-werkzeuge");
+  if (!tools) return null;
+  const kr = koerper.getBoundingClientRect();
+  const tr = tools.getBoundingClientRect();
+  const cs = getComputedStyle(koerper);
+  const gap = parseFloat(cs.columnGap) || 18;
+  const padR = parseFloat(cs.paddingRight) || 28;
+  const left = tr.right + gap;
+  return { left, width: kr.right - padR - left };
+}
 
 // Fokus: Vollbild-Arbeitsumgebung für eine Aufgabe. Links eine schlanke
 // Werkzeug-Toolbar (Chat mit KI-Coach und Lerncoach, Notizen, Markieren mit
@@ -145,6 +161,16 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
   const [werkzeug, setWerkzeug] = useState("materialien");
   const [chatTab, setChatTab] = useState("coach"); // "coach" | "lerncoach"
   const [chatsOffen, setChatsOffen] = useState(true); // rechtes Chats-Panel auf/zu
+  // Prototyp: die zwei Grenzen im Fokus-Raster per Ziehen verschieben. R = rail|
+  // mitte, C = mitte|chats, als Bruchteil der 12 Spalten (geteilt mit Übersicht/
+  // Ablage, siehe ./rasterZiehen).
+  const [rasterR, setRasterR] = useState(3);
+  const [rasterC, setRasterC] = useState(9);
+  const {
+    ref: koerperRef,
+    zieht: rasterZieht,
+    griff: rasterGriff,
+  } = useRasterZiehen(fokusMessbereich);
 
   // Vollbild-Werkzeuge mit eigenem Overlay.
   const [markierenOffen, setMarkierenOffen] = useState(false);
@@ -602,14 +628,18 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
         </div>
       ) : (
         <div
+          ref={koerperRef}
           className={
             "fokus-koerper" +
             (werkzeug === "materialien" || werkzeug === "notizen"
               ? ""
               : " ohne-rail") +
-            (chatsOffen ? "" : " chats-zu")
+            (chatsOffen ? "" : " chats-zu") +
+            (rasterZieht ? " raster-zieht" : "")
           }
+          style={{ "--fok-rm": rasterR + 2, "--fok-mc": rasterC + 2 }}
         >
+          {rasterZieht && <RasterOverlay von={2} />}
           {/* Linke Werkzeug-Toolbar */}
           <nav className="fokus-werkzeuge" aria-label="Werkzeuge">
             <button
@@ -841,6 +871,14 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
                 visionModell={visionModell}
                 mitteRef={mitteRef}
                 onClose={() => setWerkzeug(null)}
+              />
+            )}
+            {/* Grenze Mitte|Chats ziehen (nur wenn die Chats offen sind). */}
+            {chatsOffen && (
+              <RasterGriff
+                {...rasterGriff("mc", (s) =>
+                  setRasterC(Math.max(rasterR + 1, Math.min(11, s)))
+                )}
               />
             )}
           </main>
@@ -1076,6 +1114,12 @@ export default function Fokus({ kb, naechste, onFertig, onWeiter, onClose }) {
                 </button>
               </>
             )}
+            {/* Grenze Materialien|Mitte ziehen. */}
+            <RasterGriff
+              {...rasterGriff("rm", (s) =>
+                setRasterR(Math.max(1, Math.min(rasterC - 1, s)))
+              )}
+            />
             </aside>
           )}
 

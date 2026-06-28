@@ -129,30 +129,29 @@
   min-height: 0;
   position: relative;
   display: grid;
-  /* Schmale Werkzeug-Spalte (auto) plus 12 fraktionale Spalten: rail 3, mitte 6,
-     chats 3. Spans statt fester clamp-Breiten, damit nichts über den Rand clippt. */
+  /* Schmale Werkzeug-Spalte (auto) plus 12 fraktionale Spalten. Die Grenzen
+     --fok-rm (rail|mitte) und --fok-mc (mitte|chats) sind per Ziehen verschiebbar
+     (Prototyp, siehe raster). Standard: rail 3, mitte 6, chats 3. Spans statt
+     fester clamp-Breiten, damit nichts über den Rand clippt. */
   grid-template-columns: auto repeat(12, minmax(0, 1fr));
-  grid-template-areas: "tools rail rail rail mitte mitte mitte mitte mitte mitte chats chats chats";
   align-items: stretch;
   gap: var(--grid-gap);
   padding: 8px var(--seite-x) 18px;
   box-sizing: border-box;
 }
-/* rail ausgeblendet (Live-Coach/Stift): mitte rückt nach links */
-.fokus-koerper.ohne-rail {
-  grid-template-areas: "tools mitte mitte mitte mitte mitte mitte mitte mitte mitte chats chats chats";
+/* rail ausgeblendet (Live-Coach/Stift): mitte rückt links an die Werkzeug-Spalte. */
+.fokus-koerper.ohne-rail .fokus-mitte {
+  grid-column-start: 2;
 }
-/* Chats eingeklappt: mitte bis ans Ende, die Chat-Pille schwebt oben rechts */
-.fokus-koerper.chats-zu {
-  grid-template-areas: "tools rail rail rail mitte mitte mitte mitte mitte mitte mitte mitte mitte";
-}
-.fokus-koerper.ohne-rail.chats-zu {
-  grid-template-areas: "tools mitte mitte mitte mitte mitte mitte mitte mitte mitte mitte mitte mitte";
+/* Chats eingeklappt: mitte reicht bis ans Ende, die Chat-Pille schwebt oben rechts. */
+.fokus-koerper.chats-zu .fokus-mitte {
+  grid-column-end: -1;
 }
 
 /* ---- Werkzeug-Toolbar (links) ----------------------------------------- */
 .fokus-werkzeuge {
-  grid-area: tools;
+  grid-column: 1;
+  grid-row: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -216,7 +215,8 @@
 
 /* ---- Mitte: aktives Material + Schritt-Steuerung ----------------------- */
 .fokus-mitte {
-  grid-area: mitte;
+  grid-column: var(--fok-rm, 5) / var(--fok-mc, 11);
+  grid-row: 1;
   position: relative;
   min-width: 0;
   min-height: 0;
@@ -817,7 +817,9 @@
 
 /* ---- Rechte Leiste: passende Materialien ------------------------------ */
 .fokus-rail {
-  grid-area: rail;
+  grid-column: 2 / var(--fok-rm, 5);
+  grid-row: 1;
+  position: relative;
   min-width: 0;
   min-height: 0;
   display: flex;
@@ -836,7 +838,8 @@
 
 /* ---- Rechtes Panel: Chats (Lerncoach = KI, Tutor = Mensch) ------------ */
 .fokus-chats {
-  grid-area: chats;
+  grid-column: var(--fok-mc, 11) / -1;
+  grid-row: 1;
   min-width: 0;
   min-height: 0;
   display: flex;
@@ -1357,6 +1360,11 @@
     flex-direction: column;
     gap: var(--grid-gap);
     overflow-y: auto;
+  }
+  /* Greifpunkte und Raster nur im breiten Layout. */
+  .fokus-koerper .raster-griff,
+  .fokus-koerper .raster-overlay {
+    display: none;
   }
   /* Werkzeug-Leiste als horizontale Zeile oben. */
   .fokus-werkzeuge {

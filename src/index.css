@@ -350,3 +350,48 @@ select:focus-visible {
     font-size: 1.05rem;
   }
 }
+
+/* === Raster-Ziehen-Prototyp: Greifpunkt + Raster-Overlay (Übersicht, Ablage,
+   Fokus). Eine Box-Kante greifen und in 12-Spalten-Schritten ziehen; beim Ziehen
+   wird das Raster als Bänder eingeblendet. Nur im Speicher, kein Persistieren. */
+.raster-griff {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: calc(var(--grid-gap, 18px) / -2 - 1px);
+  width: 12px;
+  cursor: col-resize;
+  touch-action: none;
+  z-index: 6;
+}
+.raster-griff::after {
+  content: "";
+  position: absolute;
+  inset: 10px auto 10px 50%;
+  transform: translateX(-50%);
+  width: 3px;
+  border-radius: 999px;
+  background: var(--accent);
+  opacity: 0;
+  transition: opacity 0.12s ease;
+}
+.raster-griff:hover::after,
+.raster-zieht .raster-griff::after {
+  opacity: 0.55;
+}
+.raster-overlay {
+  position: absolute;
+  inset: 0;
+  grid-row: 1 / -1;
+  z-index: 4;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: var(--grid-gap, 18px);
+  pointer-events: none;
+}
+.raster-overlay-spalte {
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--accent) 9%, transparent);
+  outline: 1px solid color-mix(in srgb, var(--accent) 24%, transparent);
+  outline-offset: -1px;
+}

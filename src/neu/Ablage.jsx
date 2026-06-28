@@ -11,6 +11,8 @@ import MaterialUpload from "./MaterialUpload";
 import MaterialAnsicht from "./MaterialAnsicht";
 import KbInhalt from "./KbInhalt";
 import Netz from "./Netz";
+import { useRasterZiehen } from "./rasterZiehen";
+import { RasterGriff, RasterOverlay } from "./raster";
 import "./Ablage.css";
 
 // Ablage: links die Fächer als bunte Ordner (plus später Kompetenzen), rechts die
@@ -75,6 +77,10 @@ export default function Ablage() {
   const [offenesMaterial, setOffenesMaterial] = useState(null);
   const [offenerLernweg, setOffenerLernweg] = useState(null);
   const [ansicht, setAnsicht] = useState("liste"); // liste | netz
+  // Prototyp: die Grenze zwischen Seitenleiste und Materialien per Ziehen
+  // verschieben (geteilt mit Übersicht/Fokus, siehe ./rasterZiehen).
+  const [abGrenze, setAbGrenze] = useState(4);
+  const { ref: gridRef, zieht, griff } = useRasterZiehen();
 
   const fach = faecher.find((f) => f.id === fachId) || null;
   const struktur = fach ? FACH_STRUKTUR[fach.id] : null;
@@ -140,7 +146,12 @@ export default function Ablage() {
   return (
     <>
     <div className="ab-screen">
-      <div className="ab-grid">
+      <div
+        className={"ab-grid" + (zieht ? " raster-zieht" : "")}
+        ref={gridRef}
+        style={{ "--ab-start": abGrenze + 1 }}
+      >
+        {zieht && <RasterOverlay />}
         {/* Linke Spalte: Fächer + Kompetenzen */}
         <div className="ab-links">
           <section className="ab-card ab-faecher">
@@ -235,6 +246,9 @@ export default function Ablage() {
             )}
           </section>
           )}
+          <RasterGriff
+            {...griff("ab", (s) => setAbGrenze(Math.max(1, Math.min(11, s))))}
+          />
         </div>
 
         {/* Rechte Spalte: Materialien */}

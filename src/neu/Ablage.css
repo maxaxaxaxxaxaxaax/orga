@@ -101,16 +101,19 @@
 /* Zwei Spalten auf dem gemeinsamen 12-Spalten-Raster: Seitenleiste 4/12,
    Materialien 8/12 (gleicher Bruchteil wie auf den anderen Seiten). */
 .ab-grid {
+  position: relative;
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
   gap: var(--grid-gap);
   align-items: start;
 }
+/* Die Grenze --ab-start ist per Ziehen verschiebbar (Prototyp, siehe raster). */
 .ab-grid > .ab-links {
-  grid-column: span 4;
+  position: relative;
+  grid-column: 1 / var(--ab-start, 5);
 }
 .ab-grid > .ab-materialien {
-  grid-column: span 8;
+  grid-column: var(--ab-start, 5) / -1;
   min-width: 0;
 }
 @media (max-width: 860px) {
@@ -120,6 +123,10 @@
   .ab-grid > .ab-links,
   .ab-grid > .ab-materialien {
     grid-column: auto;
+  }
+  .raster-griff,
+  .raster-overlay {
+    display: none;
   }
 }
 

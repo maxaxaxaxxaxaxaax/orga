@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { koennensbeweise, kbFarbe, kbFaecher } from "../data/koennensbeweise";
 import {
   stundenWoche,
@@ -10,6 +10,8 @@ import { etappen } from "../data/etappen";
 import { lernwegFuerKb } from "../data/wissen";
 import { generatorFuerKb } from "./uebungen";
 import Etappenring from "./Etappenring";
+import { useRasterZiehen } from "./rasterZiehen";
+import { RasterGriff, RasterOverlay } from "./raster";
 import {
   lade,
   WOCHEN_KEY,
@@ -72,12 +74,11 @@ export default function Heute({ onFokus }) {
   // Lange Nachzügler-Liste ruhig eingeklappt halten (nicht überladen).
   const [nachzueglerAlle, setNachzueglerAlle] = useState(false);
   // Prototyp: die zwei senkrechten Raster-Grenzen der Übersicht per Ziehen
-  // verschieben. Rastet auf die 12 Spalten ein, lebt nur im Speicher (Reload
-  // setzt zurück). B1 = Fortschritt|Notizen, B2 = Notizen/Aufgaben|Stundenplan.
-  const gridRef = useRef(null);
+  // verschieben (geteilt mit Ablage/Fokus, siehe ./raster). B1 = Fortschritt|
+  // Notizen, B2 = Notizen/Aufgaben|Stundenplan.
   const [b1, setB1] = useState(4);
   const [b2, setB2] = useState(8);
-  const [ziehtGrenze, setZiehtGrenze] = useState(null); // "b1" | "b2" | null
+  const { ref: gridRef, zieht, griff } = useRasterZiehen();
 
   useEffect(() => {
     localStorage.setItem(ERLEDIGT_KEY, JSON.stringify(erledigt));
@@ -131,39 +132,6 @@ export default function Heute({ onFokus }) {
     const c = Math.max(0, Math.min(4, n));
     setzeHeuteTag(c);
     setTag(c);
-  }
-
-  // Aus der Zeiger-X-Position die nächste Spaltengrenze (0..12) bestimmen.
-  function grenzeAusX(clientX) {
-    const el = gridRef.current;
-    if (!el) return null;
-    const rect = el.getBoundingClientRect();
-    return Math.round(((clientX - rect.left) / rect.width) * 12);
-  }
-  function grenzeDown(e, welche) {
-    e.preventDefault();
-    setZiehtGrenze(welche);
-    try {
-      e.currentTarget.setPointerCapture(e.pointerId);
-    } catch {
-      /* kein echter Zeiger (z. B. Test): dann ohne Capture */
-    }
-  }
-  function grenzeMove(e, welche) {
-    if (ziehtGrenze !== welche) return;
-    const spalte = grenzeAusX(e.clientX);
-    if (spalte == null) return;
-    // Einrasten, je Box mindestens eine Spalte, B1 < B2.
-    if (welche === "b1") setB1(Math.max(1, Math.min(b2 - 1, spalte)));
-    else setB2(Math.max(b1 + 1, Math.min(11, spalte)));
-  }
-  function grenzeUp(e) {
-    setZiehtGrenze(null);
-    try {
-      e.currentTarget.releasePointerCapture(e.pointerId);
-    } catch {
-      /* Zeiger schon freigegeben */
-    }
   }
 
   function notizWeg(i) {
@@ -435,18 +403,12 @@ export default function Heute({ onFokus }) {
   return (
     <div className="hu-screen">
       <div
-        className={"hu-grid" + (ziehtGrenze ? " hu-grid-zieht" : "")}
+        className={"hu-grid" + (zieht ? " raster-zieht" : "")}
         ref={gridRef}
         style={{ "--n-start": b1 + 1, "--p-start": b2 + 1 }}
       >
         {/* Beim Ziehen: das 12-Spalten-Raster als Hilfslinien einblenden. */}
-        {ziehtGrenze && (
-          <div className="hu-raster" aria-hidden="true">
-            {Array.from({ length: 12 }).map((_, i) => (
-              <span className="hu-raster-spalte" key={i} />
-            ))}
-          </div>
-        )}
+        {zieht && <RasterOverlay />}
         {/* Links oben: Etappenfortschritt */}
         <section className="hu-karte hu-fortschritt">
           <h2 className="hu-karte-titel">
@@ -461,14 +423,8 @@ export default function Heute({ onFokus }) {
             gesamtDone={zieleDone}
             gesamtTotal={zieleGesamt}
           />
-          <span
-            className="hu-resize"
-            role="separator"
-            aria-orientation="vertical"
-            aria-label="Breite ziehen"
-            onPointerDown={(e) => grenzeDown(e, "b1")}
-            onPointerMove={(e) => grenzeMove(e, "b1")}
-            onPointerUp={grenzeUp}
+          <RasterGriff
+            {...griff("b1", (s) => setB1(Math.max(1, Math.min(b2 - 1, s))))}
           />
         </section>
 
@@ -520,14 +476,8 @@ export default function Heute({ onFokus }) {
               ))}
             </ul>
           )}
-          <span
-            className="hu-resize"
-            role="separator"
-            aria-orientation="vertical"
-            aria-label="Breite ziehen"
-            onPointerDown={(e) => grenzeDown(e, "b2")}
-            onPointerMove={(e) => grenzeMove(e, "b2")}
-            onPointerUp={grenzeUp}
+          <RasterGriff
+            {...griff("b2", (s) => setB2(Math.max(b1 + 1, Math.min(11, s))))}
           />
         </section>
 
@@ -597,14 +547,8 @@ export default function Heute({ onFokus }) {
               </span>
             </div>
           )}
-          <span
-            className="hu-resize"
-            role="separator"
-            aria-orientation="vertical"
-            aria-label="Breite ziehen"
-            onPointerDown={(e) => grenzeDown(e, "b2")}
-            onPointerMove={(e) => grenzeMove(e, "b2")}
-            onPointerUp={grenzeUp}
+          <RasterGriff
+            {...griff("b2", (s) => setB2(Math.max(b1 + 1, Math.min(11, s))))}
           />
         </section>
 
