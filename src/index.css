@@ -145,6 +145,12 @@ body {
   min-height: 100vh;
   background: var(--bg);
 }
+/* Scrollbalken-Platz immer reservieren: sonst verschiebt sich beim Auftauchen
+   des Scrollbalkens (je nach Seiteninhalt) die zentrierte untere Leiste und ihr
+   Knopf springt seitlich. So bleibt die Viewport-Breite konstant. */
+html {
+  scrollbar-gutter: stable;
+}
 
 /* Feines Papierkorn über allem: gibt der Fläche Textur statt Plastik. */
 body::after {
