@@ -275,15 +275,6 @@
   height: 100%;
   display: block;
 }
-/* Wochen-Stücke: grauer Track (offen), Füllung in Fachfarbe (erledigt, inline
-   gesetzt). Das Stück der aktuellen Woche bekommt einen kräftigeren Track, damit
-   es sich über alle Fach-Ringe hinweg dezent abhebt. */
-.hu-ring-track {
-  stroke: var(--line);
-}
-.hu-ring-track.aktuell {
-  stroke: var(--line-strong);
-}
 /* Animierter Ring (Fokus-Abschluss): der gefüllte Fach-Bogen wächst sanft mit,
    wenn ein Könnensbeweis abgenommen wird. */
 .hu-ring-animiert .hu-ring circle {

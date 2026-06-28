@@ -65,13 +65,15 @@ export default function Etappenring({ faecher, animiert }) {
                   {segmente.map((s) => (
                     <circle
                       key={"t" + s.woche}
-                      className={
-                        "hu-ring-track" + (s.istAktuell ? " aktuell" : "")
-                      }
                       cx={MITTE}
                       cy={MITTE}
                       r={radius}
                       fill="none"
+                      style={{
+                        stroke: `color-mix(in srgb, ${f.color} ${
+                          s.istAktuell ? 42 : 22
+                        }%, var(--card))`,
+                      }}
                       strokeWidth={RING_BREITE}
                       strokeLinecap="round"
                       strokeDasharray={`${s.len * umfang} ${umfang}`}
