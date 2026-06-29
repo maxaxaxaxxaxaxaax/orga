@@ -22,6 +22,10 @@
 .wp-layout {
   flex: 1;
   min-height: 0;
+  /* Mittig, höchstens so breit wie der Abstand Top↔Bottom-Bar. */
+  width: 100%;
+  max-width: var(--inhalt-max);
+  margin-inline: auto;
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
   grid-template-rows: minmax(0, 1fr);

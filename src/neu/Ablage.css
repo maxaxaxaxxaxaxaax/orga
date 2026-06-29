@@ -100,9 +100,12 @@
 
 /* Zwei Spalten auf dem gemeinsamen 12-Spalten-Raster: Seitenleiste 4/12,
    Materialien 8/12 (gleicher Bruchteil wie auf den anderen Seiten). */
-/* Eine Spalte: nur noch die Materialien-Karte (die Fächer sind oben drin). */
+/* Eine Spalte: nur noch die Materialien-Karte (die Fächer sind oben drin).
+   Mittig, höchstens so breit wie der Abstand Top↔Bottom-Bar. */
 .ab-grid {
   position: relative;
+  max-width: var(--inhalt-max);
+  margin-inline: auto;
 }
 
 .ab-card {
