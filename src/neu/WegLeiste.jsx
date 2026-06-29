@@ -29,6 +29,7 @@ export default function WegLeiste({ onGo }) {
             <span className="weg-abruf-haken" aria-hidden="true">
               ✓
             </span>
+            <span className="weg-abruf-sep" aria-hidden="true" />
             <span className="weg-abruf-text">
               <span className="weg-abruf-titel">
                 Materialien erfolgreich abgerufen

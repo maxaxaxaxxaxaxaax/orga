@@ -176,7 +176,8 @@
   height: 32px;
   border: none;
   background: transparent;
-  color: var(--text);
+  /* Grau wie die inaktive Nav-Schrift (Übersicht/Planung/Ablage), nicht schwarz. */
+  color: var(--text-2);
   cursor: pointer;
   border-radius: 999px;
   transition: background 0.12s ease, color 0.12s ease;

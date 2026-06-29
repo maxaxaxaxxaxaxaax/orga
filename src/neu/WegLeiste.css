@@ -296,6 +296,14 @@
   font-size: 0.76rem;
   font-weight: 700;
 }
+/* Trennstrich zwischen Haken und Text, wie der Strich beim Zurück-Knopf in der
+   Planungs-Leiste. */
+.weg-abruf-sep {
+  flex-shrink: 0;
+  width: 1px;
+  height: 24px;
+  background: var(--line-strong);
+}
 .weg-abruf-text {
   display: flex;
   flex-direction: column;
