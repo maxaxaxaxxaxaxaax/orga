@@ -351,28 +351,42 @@
   gap: 3px;
   background: transparent;
 }
-/* Platziertes Etappenziel im Slot: bunte Vollton-Kachel wie im Etappenplan. */
+/* Platziertes Etappenziel im Slot: clean wie die festen Stunden (.wp-blk-fix) –
+   heller, dezent fach-getönter Kasten mit farbigem Strich links und dunklem Text,
+   statt bunter Vollton-Kachel. So passt es zum Stundenplan, bleibt aber durch die
+   Tönung als eigene Aufgabe erkennbar. */
 .wp-kb {
   flex: 1;
   min-height: 0;
+  position: relative;
   display: flex;
   flex-direction: column;
   justify-content: center;
   gap: 2px;
-  background: var(--c);
-  color: var(--kbt);
-  border-radius: var(--r-md, 14px);
-  padding: 6px 10px;
+  background: color-mix(in srgb, var(--c) 12%, var(--card));
+  color: var(--text-2);
+  border: 1px solid color-mix(in srgb, var(--c) 28%, var(--line));
+  border-radius: var(--r-sm, 8px);
+  padding: 6px 8px 6px 11px;
   cursor: grab;
-  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+.wp-kb::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--c);
 }
 .wp-kb:active {
   cursor: grabbing;
 }
 .wp-kb-titel {
   font-size: 0.8rem;
-  font-weight: 700;
-  color: var(--kbt);
+  font-weight: 600;
+  color: var(--text);
   line-height: 1.2;
   overflow: hidden;
   display: -webkit-box;
@@ -385,8 +399,7 @@
   gap: 6px;
   font-size: 0.7rem;
   font-weight: 600;
-  color: var(--kbt);
-  opacity: 0.85;
+  color: var(--muted);
 }
 .wp-kb-uhr {
   font-size: 0.75rem;
