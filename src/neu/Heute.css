@@ -208,6 +208,21 @@
   grid-row: 1 / 3;
   align-self: stretch;
 }
+/* Box per Tipp auf maximale Größe öffnen: die getippte Box füllt das ganze
+   Raster, die anderen treten zurück; nochmal tippen schließt wieder. */
+.hu-grid.hat-expandiert > section:not(.expandiert),
+.hu-grid.hat-expandiert > aside:not(.expandiert) {
+  display: none;
+}
+.hu-grid > .hu-karte.expandiert {
+  grid-column: 1 / -1;
+  grid-row: 1 / -1;
+  min-height: var(--inhalt-max);
+  z-index: 4;
+}
+.hu-grid.hat-expandiert .raster-griff {
+  display: none;
+}
 /* Greifpunkt (.raster-griff) und Raster-Overlay (.raster-overlay) sind global in
    index.css definiert (geteilt mit Ablage und Fokus). */
 @media (max-width: 960px) {

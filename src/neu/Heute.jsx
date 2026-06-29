@@ -106,6 +106,20 @@ export default function Heute({ onFokus }) {
           ? "Je Fach, mit Farb-Legende"
           : "Je Fach, mit Legende und Balken";
 
+  // Tippt man auf eine Box (nicht auf interaktive Inhalte wie Karten, Felder,
+  // Greifpunkte), öffnet sie sich auf die maximale Größe; nochmal tippen schließt
+  // sie wieder (Toggle, klein <-> groß).
+  const [expandiert, setExpandiert] = useState(null);
+  function boxTipp(e, id) {
+    if (
+      e.target.closest(
+        "button, input, textarea, select, a, .raster-griff, .hu-notiz-liste, .hu-notiz-add"
+      )
+    )
+      return;
+    setExpandiert((cur) => (cur === id ? null : id));
+  }
+
   useEffect(() => {
     localStorage.setItem(ERLEDIGT_KEY, JSON.stringify(erledigt));
     meldeAenderung();
@@ -454,7 +468,11 @@ export default function Heute({ onFokus }) {
   return (
     <div className="hu-screen">
       <div
-        className={"hu-grid" + (drag ? " raster-zieht" : "")}
+        className={
+          "hu-grid" +
+          (drag ? " raster-zieht" : "") +
+          (expandiert ? " hat-expandiert" : "")
+        }
         ref={gridRef}
         style={{
           "--col-a": g1 + "fr",
@@ -465,7 +483,13 @@ export default function Heute({ onFokus }) {
         {/* Kein Bänder-Overlay mehr: beim Ziehen zeigt die aktive Kante selbst
             eine dünne Linie über die volle Box-Höhe (siehe .raster-griff.aktiv). */}
         {/* Links oben: Etappenfortschritt */}
-        <section className="hu-karte hu-fortschritt">
+        <section
+          className={
+            "hu-karte hu-fortschritt" +
+            (expandiert === "fortschritt" ? " expandiert" : "")
+          }
+          onClick={(e) => boxTipp(e, "fortschritt")}
+        >
           <h2 className="hu-karte-titel">
             <svg className="hu-karte-icon" viewBox="0 0 24 24" aria-hidden="true">
               <path d="M4 19V5M4 19h16M7.5 15l3.5-4 3 2 4.5-6" />
@@ -523,7 +547,13 @@ export default function Heute({ onFokus }) {
         </section>
 
         {/* Mitte oben: Erinnerungen (Abhaken, Hinzufügen, Wischen zum Löschen) */}
-        <section className="hu-karte hu-notizen">
+        <section
+          className={
+            "hu-karte hu-notizen" +
+            (expandiert === "notizen" ? " expandiert" : "")
+          }
+          onClick={(e) => boxTipp(e, "notizen")}
+        >
           <h2 className="hu-karte-titel">
             <svg className="hu-karte-icon" viewBox="0 0 24 24" aria-hidden="true">
               <rect x="5" y="3.5" width="14" height="17" rx="2.5" />
@@ -613,7 +643,13 @@ export default function Heute({ onFokus }) {
         </section>
 
         {/* Links/Mitte unten: Aufgaben (über zwei Spalten) */}
-        <section className="hu-karte hu-aufgaben">
+        <section
+          className={
+            "hu-karte hu-aufgaben" +
+            (expandiert === "aufgaben" ? " expandiert" : "")
+          }
+          onClick={(e) => boxTipp(e, "aufgaben")}
+        >
           <h2 className="hu-karte-titel hu-aufgaben-titel">
             <svg className="hu-karte-icon" viewBox="0 0 24 24" aria-hidden="true">
               <path d="M3.5 7l1.5 1.5L7.5 5M3.5 15.5l1.5 1.5 3-3.5M11 7h9.5M11 16h9.5" />
@@ -671,7 +707,13 @@ export default function Heute({ onFokus }) {
         </section>
 
         {/* Rechte Spalte (volle Höhe): Stundenplan als Tages-Timeline */}
-        <aside className="hu-karte hu-plan-karte">
+        <aside
+          className={
+            "hu-karte hu-plan-karte" +
+            (expandiert === "plan" ? " expandiert" : "")
+          }
+          onClick={(e) => boxTipp(e, "plan")}
+        >
           <h2 className="hu-karte-titel">
             <svg className="hu-karte-icon" viewBox="0 0 24 24" aria-hidden="true">
               <rect x="4" y="5" width="16" height="15" rx="2.5" />
