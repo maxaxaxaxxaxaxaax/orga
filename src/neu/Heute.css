@@ -602,15 +602,16 @@
   justify-content: center;
   font-size: 1.2rem;
   line-height: 1;
-  color: var(--on-accent);
-  background: var(--accent);
+  /* Gleicher Look wie die aktive Nav-Pille oben: helles Teal, dunkler Teal-Text. */
+  color: var(--accent-strong);
+  background: var(--accent-soft);
   border: none;
-  border-radius: 50%;
+  border-radius: 999px;
   cursor: pointer;
   transition: background 0.12s ease;
 }
 .hu-notiz-add-knopf:hover {
-  background: var(--accent-strong);
+  background: color-mix(in srgb, var(--accent-soft) 70%, var(--accent));
 }
 /* Meine Aufgaben: Lernweg-Karten. Fach in (kontrastsicher abgedunkelter)
    Fachfarbe, der konkrete Lernweg darunter, Zeit/Raum als Chips, unten ein

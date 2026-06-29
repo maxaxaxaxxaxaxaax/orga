@@ -590,6 +590,13 @@ export default function Heute({ onFokus }) {
             </ul>
           )}
           <form className="hu-notiz-add" onSubmit={erinnerungHinzufuegen}>
+            <button
+              type="submit"
+              className="hu-notiz-add-knopf"
+              aria-label="Erinnerung hinzufügen"
+            >
+              +
+            </button>
             <input
               className="hu-notiz-add-feld"
               type="text"
@@ -598,13 +605,6 @@ export default function Heute({ onFokus }) {
               placeholder="Erinnerung hinzufügen"
               aria-label="Neue Erinnerung"
             />
-            <button
-              type="submit"
-              className="hu-notiz-add-knopf"
-              aria-label="Erinnerung hinzufügen"
-            >
-              +
-            </button>
           </form>
           <RasterGriff
             aktiv={drag?.id === "b2"}

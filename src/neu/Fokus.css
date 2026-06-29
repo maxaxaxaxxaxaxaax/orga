@@ -168,7 +168,7 @@
   border: 1px solid var(--line);
   border-radius: 999px;
   box-shadow: var(--shadow-sm);
-  align-self: start;
+  /* Volle Höhe wie die Mitte (Werkzeuge bleiben oben). */
 }
 .fokus-wz {
   position: relative;
@@ -880,8 +880,8 @@
   padding: 14px;
   box-sizing: border-box;
   overflow: hidden;
-  /* wie .fokus-rail: endet auf Höhe der Schrittleiste. */
-  margin-bottom: 64px;
+  /* Volle Höhe wie die Mitte (der .fokus-koerper-Boden lässt unten schon Platz
+     für die schwebende Schrittleiste). */
 }
 .fokus-chats-kopf {
   flex-shrink: 0;
