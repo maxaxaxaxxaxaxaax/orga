@@ -1,10 +1,12 @@
 // Bausteine für den Raster-Ziehen-Prototyp (Hook in ./rasterZiehen).
 
 // Greifpunkt am rechten Rand einer Box (die Box braucht position: relative).
-export function RasterGriff(props) {
+// aktiv=true (während diese Kante gezogen wird) zeigt statt des Punkts eine dünne
+// Linie über die ganze Box-Höhe an der Kante.
+export function RasterGriff({ aktiv, ...props }) {
   return (
     <span
-      className="raster-griff"
+      className={"raster-griff" + (aktiv ? " aktiv" : "")}
       role="separator"
       aria-orientation="vertical"
       aria-label="Breite ziehen"

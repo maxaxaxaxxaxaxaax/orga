@@ -390,10 +390,21 @@ select:focus-visible {
   transition: opacity 0.18s cubic-bezier(0.2, 0.7, 0.2, 1),
     height 0.18s cubic-bezier(0.2, 0.7, 0.2, 1);
 }
-.raster-griff:hover::after,
-.raster-zieht .raster-griff::after {
+.raster-griff:hover::after {
   opacity: 1;
   height: 40px;
+}
+/* Während diese Kante gezogen wird, wird aus dem Punkt eine dünne Linie über die
+   ganze Box-Höhe (Ober- bis Unterkante), genau auf der Kante. */
+.raster-griff.aktiv::after {
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 2px;
+  height: auto;
+  opacity: 1;
+  transform: translateX(-50%);
+  transition: none;
 }
 @media (prefers-reduced-motion: reduce) {
   .raster-griff::after {

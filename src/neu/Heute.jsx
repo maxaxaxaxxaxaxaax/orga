@@ -11,7 +11,7 @@ import { etappen } from "../data/etappen";
 import { lernwegFuerKb } from "../data/wissen";
 import { generatorFuerKb } from "./uebungen";
 import Etappenring from "./Etappenring";
-import { RasterGriff, RasterOverlay } from "./raster";
+import { RasterGriff } from "./raster";
 import { useRasterMorph } from "./rasterZiehen";
 import {
   lade,
@@ -462,10 +462,8 @@ export default function Heute({ onFokus }) {
           "--col-c": 12 - g2 + "fr",
         }}
       >
-        {/* Hilfsraster (12 Spalten) liegt immer bereit und blendet beim Ziehen
-            weich ein/aus (Sichtbarkeit über .raster-zieht, siehe index.css). Zeigt,
-            wie die Box unterteilt ist und wohin sie einrastet. */}
-        <RasterOverlay />
+        {/* Kein Bänder-Overlay mehr: beim Ziehen zeigt die aktive Kante selbst
+            eine dünne Linie über die volle Box-Höhe (siehe .raster-griff.aktiv). */}
         {/* Links oben: Etappenfortschritt */}
         <section className="hu-karte hu-fortschritt">
           <h2 className="hu-karte-titel">
@@ -519,6 +517,7 @@ export default function Heute({ onFokus }) {
             )}
           </div>
           <RasterGriff
+            aktiv={drag?.id === "b1"}
             {...grenzeZieh("b1", b1, { min: 2, max: b2 - 2, commit: setB1 })}
           />
         </section>
@@ -608,6 +607,7 @@ export default function Heute({ onFokus }) {
             </button>
           </form>
           <RasterGriff
+            aktiv={drag?.id === "b2"}
             {...grenzeZieh("b2", b2, { min: b1 + 2, max: 10, commit: setB2 })}
           />
         </section>
@@ -665,6 +665,7 @@ export default function Heute({ onFokus }) {
             </div>
           )}
           <RasterGriff
+            aktiv={drag?.id === "b2"}
             {...grenzeZieh("b2", b2, { min: b1 + 2, max: 10, commit: setB2 })}
           />
         </section>
