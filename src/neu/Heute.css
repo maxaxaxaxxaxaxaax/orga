@@ -166,9 +166,7 @@
    der Stundenplan. */
 .hu-grid {
   position: relative;
-  /* Mittig, höchstens so breit wie der Abstand Top↔Bottom-Bar. */
-  margin: 8px auto 0;
-  max-width: var(--inhalt-max);
+  margin-top: 8px;
   display: grid;
   /* Drei fr-Spalten: Fortschritt | Notizen | Stundenplan (Aufgaben spannt die
      ersten beiden). Die zwei Grenzen liegen in --col-a/b/c (aus b1/b2, in
