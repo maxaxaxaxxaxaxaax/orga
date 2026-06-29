@@ -100,34 +100,9 @@
 
 /* Zwei Spalten auf dem gemeinsamen 12-Spalten-Raster: Seitenleiste 4/12,
    Materialien 8/12 (gleicher Bruchteil wie auf den anderen Seiten). */
+/* Eine Spalte: nur noch die Materialien-Karte (die Fächer sind oben drin). */
 .ab-grid {
   position: relative;
-  display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  gap: var(--grid-gap);
-  align-items: start;
-}
-/* Die Grenze --ab-start ist per Ziehen verschiebbar (Prototyp, siehe raster). */
-.ab-grid > .ab-links {
-  position: relative;
-  grid-column: 1 / var(--ab-start, 5);
-}
-.ab-grid > .ab-materialien {
-  grid-column: var(--ab-start, 5) / -1;
-  min-width: 0;
-}
-@media (max-width: 860px) {
-  .ab-grid {
-    grid-template-columns: 1fr;
-  }
-  .ab-grid > .ab-links,
-  .ab-grid > .ab-materialien {
-    grid-column: auto;
-  }
-  .raster-griff,
-  .raster-overlay {
-    display: none;
-  }
 }
 
 .ab-card {
@@ -159,17 +134,15 @@
   stroke-linejoin: round;
 }
 
-.ab-links {
+/* Fächer-Ordner als Leiste oben in der Materialien-Karte, mit Trennlinie zur
+   Material-Liste darunter. */
+.ab-faecher-leiste {
   display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
-
-/* Fächer als Ordner */
-.ab-ordner-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px 6px;
+  flex-wrap: wrap;
+  gap: 6px 4px;
+  margin: 0 0 14px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--line);
 }
 .ab-ordner {
   display: flex;
