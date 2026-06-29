@@ -59,6 +59,17 @@ function kbInfo(kbId) {
 
 const ETAPPE = etappen.find((e) => e.id === 4) || etappen[0];
 
+// Raster-Standard und je Box die "größtmögliche" Aufteilung (b1=Fortschritt|
+// Notizen-Grenze, b2=…|Stundenplan-Grenze, in 12teln). Beim Antippen einer Box
+// wächst sie auf ihr Maximum, die anderen bleiben sichtbar (kein Vollbild).
+const GRENZEN_STD = { b1: 4, b2: 8 };
+const GRENZEN_MAX = {
+  fortschritt: { b1: 8, b2: 10 },
+  notizen: { b1: 2, b2: 10 },
+  aufgaben: { b1: 6, b2: 10 },
+  plan: { b1: 2, b2: 4 },
+};
+
 export default function Heute({ onFokus }) {
   const wochenZuordnung = lade(WOCHEN_KEY);
   const stundenZuord = ladeStunden(); // kbId -> Liste der geplanten Stunden-IDs
@@ -107,8 +118,9 @@ export default function Heute({ onFokus }) {
           : "Je Fach, mit Legende und Balken";
 
   // Tippt man auf eine Box (nicht auf interaktive Inhalte wie Karten, Felder,
-  // Greifpunkte), öffnet sie sich auf die maximale Größe; nochmal tippen schließt
-  // sie wieder (Toggle, klein <-> groß).
+  // Greifpunkte), wächst sie auf die größtmögliche Aufteilung im Raster; die
+  // anderen schrumpfen, bleiben aber sichtbar. Nochmal tippen stellt das Standard-
+  // Raster wieder her (Toggle).
   const [expandiert, setExpandiert] = useState(null);
   function boxTipp(e, id) {
     if (
@@ -117,7 +129,11 @@ export default function Heute({ onFokus }) {
       )
     )
       return;
-    setExpandiert((cur) => (cur === id ? null : id));
+    const ziel = expandiert === id ? GRENZEN_STD : GRENZEN_MAX[id];
+    if (!ziel) return;
+    setB1(ziel.b1);
+    setB2(ziel.b2);
+    setExpandiert(expandiert === id ? null : id);
   }
 
   useEffect(() => {
@@ -468,11 +484,7 @@ export default function Heute({ onFokus }) {
   return (
     <div className="hu-screen">
       <div
-        className={
-          "hu-grid" +
-          (drag ? " raster-zieht" : "") +
-          (expandiert ? " hat-expandiert" : "")
-        }
+        className={"hu-grid" + (drag ? " raster-zieht" : "")}
         ref={gridRef}
         style={{
           "--col-a": g1 + "fr",
@@ -484,10 +496,7 @@ export default function Heute({ onFokus }) {
             eine dünne Linie über die volle Box-Höhe (siehe .raster-griff.aktiv). */}
         {/* Links oben: Etappenfortschritt */}
         <section
-          className={
-            "hu-karte hu-fortschritt" +
-            (expandiert === "fortschritt" ? " expandiert" : "")
-          }
+          className="hu-karte hu-fortschritt"
           onClick={(e) => boxTipp(e, "fortschritt")}
         >
           <h2 className="hu-karte-titel">
@@ -548,10 +557,7 @@ export default function Heute({ onFokus }) {
 
         {/* Mitte oben: Erinnerungen (Abhaken, Hinzufügen, Wischen zum Löschen) */}
         <section
-          className={
-            "hu-karte hu-notizen" +
-            (expandiert === "notizen" ? " expandiert" : "")
-          }
+          className="hu-karte hu-notizen"
           onClick={(e) => boxTipp(e, "notizen")}
         >
           <h2 className="hu-karte-titel">
@@ -644,10 +650,7 @@ export default function Heute({ onFokus }) {
 
         {/* Links/Mitte unten: Aufgaben (über zwei Spalten) */}
         <section
-          className={
-            "hu-karte hu-aufgaben" +
-            (expandiert === "aufgaben" ? " expandiert" : "")
-          }
+          className="hu-karte hu-aufgaben"
           onClick={(e) => boxTipp(e, "aufgaben")}
         >
           <h2 className="hu-karte-titel hu-aufgaben-titel">
@@ -708,10 +711,7 @@ export default function Heute({ onFokus }) {
 
         {/* Rechte Spalte (volle Höhe): Stundenplan als Tages-Timeline */}
         <aside
-          className={
-            "hu-karte hu-plan-karte" +
-            (expandiert === "plan" ? " expandiert" : "")
-          }
+          className="hu-karte hu-plan-karte"
           onClick={(e) => boxTipp(e, "plan")}
         >
           <h2 className="hu-karte-titel">
