@@ -837,10 +837,24 @@
 }
 .hu-stunde-fach {
   flex-shrink: 0;
+  /* Feste Spaltenbreite, damit Lehrer/Raum in allen Zeilen an derselben Stelle
+     anfangen (statt direkt nach dem unterschiedlich langen Fach). */
+  width: 6.8em;
   font-size: 0.92rem;
   font-weight: 600;
   color: var(--text);
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* Trennstrich zwischen Fach und Lehrer/Raum, wie der Strich beim Zurück-Knopf
+   in der Planung. */
+.hu-stunde-sep {
+  flex-shrink: 0;
+  width: 1px;
+  align-self: stretch;
+  min-height: 22px;
+  background: var(--line-strong);
 }
 .hu-stunde-lehrer {
   flex-shrink: 0;
@@ -879,6 +893,10 @@
 }
 .hu-stunde-zeit {
   flex-shrink: 0;
+  /* Einheitlich breite Zeit-Pille (alle gleich groß, statt je nach Zeitstring). */
+  box-sizing: border-box;
+  width: 6.6em;
+  text-align: center;
   font-size: 0.73rem;
   color: var(--text-2);
   background: var(--bg);

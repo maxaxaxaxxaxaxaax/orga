@@ -711,6 +711,9 @@ export default function Heute({ onFokus }) {
                     />
                     <span className="hu-stunde-info">
                       <span className="hu-stunde-fach">{s.fach}</span>
+                      {pSpan >= 3 && (
+                        <span className="hu-stunde-sep" aria-hidden="true" />
+                      )}
                       {lehrkraefte[s.fach] && pSpan >= 4 && (
                         <span className="hu-stunde-lehrer">
                           {lehrkraefte[s.fach]}
