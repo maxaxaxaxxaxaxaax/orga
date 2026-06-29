@@ -32,9 +32,24 @@
     transform: translate(-50%, 0);
   }
 }
+/* Gleitende aktive Pille: liegt hinter den Labels und wandert beim Wechsel sanft
+   zum aktiven Button (Position/Breite gemessen, siehe NavLeiste.jsx). */
+.nav-pille {
+  position: absolute;
+  top: 6px;
+  bottom: 6px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  z-index: 0;
+  transition: left 0.34s cubic-bezier(0.4, 0, 0.2, 1),
+    width 0.34s cubic-bezier(0.4, 0, 0.2, 1);
+}
 .nav-punkt {
+  position: relative;
+  z-index: 1;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   padding: 10px 18px;
   border: none;
@@ -45,19 +60,16 @@
   font-weight: 600;
   letter-spacing: -0.005em;
   cursor: pointer;
-  transition: color 0.18s ease, background 0.18s ease, transform 0.12s ease;
+  transition: color 0.18s ease, transform 0.12s ease;
 }
 .nav-punkt:hover {
   color: var(--text);
-  background: color-mix(in srgb, var(--text) 6%, transparent);
 }
 .nav-punkt:active {
   transform: scale(0.95);
 }
-/* Aktiv: helle Teal-Pille (Figma), dunkle Schrift. */
-.nav-punkt.aktiv,
-.nav-punkt.aktiv:hover {
-  background: var(--accent-soft);
+/* Aktiv: dunkle Schrift (der Hintergrund ist die gleitende Pille darunter). */
+.nav-punkt.aktiv {
   color: var(--accent-strong);
 }
 /* Schmale Screens (Handy): etwas kompaktere Tap-Flächen. */
