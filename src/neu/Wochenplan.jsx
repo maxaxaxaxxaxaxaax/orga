@@ -137,6 +137,7 @@ export default function Wochenplan({
   const [stunden, setStunden] = useState(ladeStunden); // kbId -> [Slot-IDs]
   const [ueber, setUeber] = useState(null); // aktuelles Drop-Ziel (Hover)
   const [gewaehltId, setGewaehltId] = useState(null); // angetippter Chip (Touch)
+  const [ziehend, setZiehend] = useState(false); // läuft gerade ein Drag? (alle Drop-Ziele markieren wie beim Tippen)
   const [hinweis, setHinweis] = useState(null); // kurze Rueckmeldung (Toast)
   // Plan-Übersicht: erst nach einem "Umplanen" erscheint daneben "Zurücksetzen".
   const [umgeplant, setUmgeplant] = useState(false);
@@ -170,10 +171,14 @@ export default function Wochenplan({
   // zurücksetzen (Escape räumt zusätzlich eine getippte Auswahl ab). Zusammen mit
   // dem verzögerten Ablegen unten verhindert das ein hängendes Vorschaubild.
   useEffect(() => {
-    const aufDragEnde = () => setUeber(null);
+    const aufDragEnde = () => {
+      setUeber(null);
+      setZiehend(false);
+    };
     const aufEsc = (e) => {
       if (e.key !== "Escape") return;
       setUeber(null);
+      setZiehend(false);
       setGewaehltId(null);
     };
     window.addEventListener("dragend", aufDragEnde);
@@ -239,9 +244,12 @@ export default function Wochenplan({
     } catch {
       /* manche Browser ohne Drag-Image */
     }
+    // Beim Ziehen alle freien Slots markieren (gleicher Indikator wie beim Tippen).
+    setZiehend(true);
   }
   function dragEnde() {
     setUeber(null);
+    setZiehend(false);
   }
 
   function platziereUhr(id, zielSlot, quelleSlot) {
@@ -366,6 +374,7 @@ export default function Wochenplan({
     e.preventDefault();
     const [id, quelle] = (e.dataTransfer.getData("text/plain") || "").split("|");
     setUeber(null);
+    setZiehend(false);
     // Erst nach Abschluss des nativen Drags entfernen, sonst kann ein Geisterbild
     // des gezogenen Chips hängen bleiben (dragend wird nicht mehr zugestellt).
     if (id && quelle) setTimeout(() => entferneUhr(id, quelle), 0);
@@ -421,7 +430,7 @@ export default function Wochenplan({
           (leer ? " leer" : " belegt") +
           (aktiv ? " ueber" : "") +
           (istJetzt ? " jetzt" : "") +
-          (leer && gewaehltId != null ? " tippbar" : "")
+          (leer && (gewaehltId != null || ziehend) ? " tippbar" : "")
         }
         style={stil}
         onDragOver={(e) => {
@@ -435,6 +444,7 @@ export default function Wochenplan({
             e.dataTransfer.getData("text/plain") || ""
           ).split("|");
           setUeber(null);
+          setZiehend(false);
           // Siehe dropInVorrat: Platzieren erst nach dem nativen Drag.
           if (id) setTimeout(() => platziereUhr(id, sid, quelle || null), 0);
         }}
@@ -447,15 +457,12 @@ export default function Wochenplan({
         {leer ? (
           <>
             <span className="wp-frei-label">
-              {aktiv || gewaehltId != null
+              {aktiv
                 ? "hier ablegen"
                 : s.fach === "Studierzeit"
                   ? "Studierzeit"
-                  : "Freiarbeit"}
+                  : s.fach}
             </span>
-            {s.fach !== "Studierzeit" && (
-              <span className="wp-frei-fach">{s.fach}</span>
-            )}
             <span className="wp-frei-zeit">
               {s.von.replace(/^0/, "")} – {s.bis.replace(/^0/, "")}
             </span>

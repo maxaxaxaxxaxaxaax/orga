@@ -386,6 +386,10 @@
 .hu-plan-karte {
   grid-column: 2;
   align-self: stretch;
+  /* Karte als Spalte, damit die Stundenliste die volle Resthöhe unter dem Titel
+     einnimmt (kein toter Weißraum unten, der Tagesplan füllt das Feld). */
+  display: flex;
+  flex-direction: column;
 }
 /* Greifpunkt (.raster-griff) und Raster-Overlay (.raster-overlay) sind global in
    index.css definiert (geteilt mit Ablage und Fokus). */
@@ -847,14 +851,17 @@
 }
 .hu-auf-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  /* So viele ~165px-Spalten wie passen: nie eine einzige Karte über die volle Breite.
+     Beim Vergrößern der Box kommen Spalten dazu, die Karten bleiben in ruhiger Größe. */
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   gap: 14px;
-  /* Füllt die Höhe der Aufgaben-Karte: die Karten wachsen bis zum unteren Rand
-     (gleicher Abstand wie seitlich), statt oben zu kleben und unten Leerraum zu
-     lassen. align-content streckt die Kartenreihe(n) auf die volle Höhe. */
+  /* Karten oben bündig (start, NICHT gestreckt), damit sie bei wenigen Aufgaben nicht
+     aufgeblasen werden. Passen sie nicht in die Box, scrollt der Bereich INNERHALB der
+     Karte, statt die Box zu sprengen. */
   flex: 1;
   min-height: 0;
-  align-content: stretch;
+  align-content: start;
+  overflow-y: auto;
 }
 .hu-auf {
   display: flex;
@@ -863,8 +870,8 @@
      der gestreckten Karte bleibt als ruhiger Weißraum unten. */
   justify-content: flex-start;
   gap: 7px;
-  min-height: 196px;
-  padding: 18px;
+  min-height: 150px;
+  padding: 16px;
   text-align: left;
   font: inherit;
   color: inherit;
@@ -1038,16 +1045,29 @@
   list-style: none;
   margin: 0;
   padding: 0;
+  /* Volle Resthöhe der Karte einnehmen und die Zeilen gleichmäßig über die ganze
+     Höhe verteilen (oben/unten bündig), statt sie oben zu sammeln. gap ist die
+     Mindest-Lücke; space-between füllt den Rest. */
+  flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   gap: 4px;
 }
 .hu-stunde {
+  /* Kompakte Zeile. Die Liste (.hu-plan) verteilt die Zeilen per space-between über
+     die ganze Kartenhöhe: erste Zeile oben, letzte unten, bündig mit dem Inhalt der
+     Nachbar-Karten (kein Versatz, kein toter Raum). */
+  min-height: 38px;
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 9px 10px;
   border-radius: var(--r-md, 12px);
+}
+.hu-plan-pause {
+  flex-shrink: 0;
 }
 .hu-stunde-strich {
   width: 3px;
@@ -1062,11 +1082,11 @@
   min-width: 0;
   display: flex;
   align-items: baseline;
-  gap: 6px;
+  gap: 10px;
 }
 .hu-stunde-fach {
   flex-shrink: 0;
-  /* Feste Spaltenbreite, damit Lehrer/Raum in allen Zeilen an derselben Stelle
+  /* Feste Spaltenbreite, damit Raum/Lehrer in allen Zeilen an derselben Stelle
      anfangen (statt direkt nach dem unterschiedlich langen Fach). */
   width: 6.8em;
   font-size: 0.92rem;
@@ -1076,24 +1096,22 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
-/* Trennstrich zwischen Fach und Lehrer/Raum, wie der Strich beim Zurück-Knopf
-   in der Planung. */
-.hu-stunde-sep {
-  flex-shrink: 0;
-  width: 1px;
-  align-self: stretch;
-  min-height: 22px;
-  background: var(--line-strong);
-}
-.hu-stunde-lehrer {
-  flex-shrink: 0;
+/* Raum, Lehrer und Lernform teilen sich den Platz nach dem Fach gleichmäßig auf
+   (je eine gleich breite Spalte), damit die Infos über die Zeile verteilt sind
+   und nicht links zusammenkleben. Feste Spalten = saubere Flucht über alle Zeilen,
+   auch wenn ein Fach keine Lehrkraft hat (leere Spalte bleibt erhalten). */
+.hu-stunde-raum {
+  flex: 1 1 0;
+  min-width: 0;
   font-size: 0.74rem;
   color: var(--muted);
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-.hu-stunde-raum {
+.hu-stunde-lehrer {
+  flex: 1 1 0;
   min-width: 0;
-  flex-shrink: 1;
   font-size: 0.74rem;
   color: var(--muted);
   white-space: nowrap;
@@ -1102,17 +1120,20 @@
 }
 /* Bei breitem Stundenplan: die Lernform (Unterricht/Ankerstunde/betreut). */
 .hu-stunde-art {
-  flex-shrink: 0;
+  flex: 1 1 0;
+  min-width: 0;
   font-size: 0.7rem;
   font-weight: 600;
   letter-spacing: 0.01em;
   color: var(--text-2);
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 /* Noch breiter: das in dieser Stunde eingeplante Ziel. */
 .hu-stunde-geplant {
+  flex: 1.6 1 0;
   min-width: 0;
-  flex-shrink: 1;
   font-size: 0.74rem;
   color: var(--accent-strong);
   white-space: nowrap;
@@ -1147,6 +1168,8 @@
 /* Aktuelle Stunde: nur die farbige Box (wie die aktive Pille in der Nav-Leiste),
    ohne Outline und ohne „Jetzt"-Label. Voller Radius (999px) wie die Nav-Pille.
    Seitenpolster bleibt wie bei den anderen Zeilen, damit die Spalten fluchten. */
+/* Aktuelle Stunde: dezente Pille in derselben Höhe/Farbe wie die aktive Nav-Pille
+   oben. Die Zeile ist kompakt (~38px), also füllt die Pille genau die Zeile. */
 .hu-stunde.jetzt {
   background: var(--accent-soft);
   border-radius: 999px;

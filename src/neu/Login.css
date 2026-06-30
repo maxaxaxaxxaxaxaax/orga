@@ -19,6 +19,12 @@
 .login-weg {
   z-index: 2;
 }
+/* Der Text sitzt genauso weit innen wie in der App-Pille (dort gibt .weg-aufgabe dem
+   Inhalt 12px Polster). Ohne das stünde "Dein Schulaccount" weiter links als auf der
+   Home-Pille. */
+.login-weg .weg-abruf {
+  padding-left: 12px;
+}
 
 /* Inhaltsspalte auf der gemeinsamen Pillenbreite (800px), damit Hero und CTA auf
    demselben Raster sitzen. Füllt die Höhe; unten Platz für die Pille. */
@@ -95,43 +101,35 @@
   color: var(--text-2);
 }
 
-/* Start-Hero: zweispaltig (Text links, Produktbild rechts). */
+/* Start-Hero: nur die drei getrackten Wörter oben und ein riesiges orca-Wortmark
+   in der Mitte. Sonst nichts (reines Type-Plakat). */
 .login-hero-start {
-  display: grid;
-  grid-template-columns: 1.04fr 0.96fr;
-  align-items: center;
-  gap: clamp(28px, 5vw, 64px);
+  justify-content: space-between;
+  gap: clamp(14px, 3vh, 30px);
 }
-.login-hero-text {
+.login-start-labels {
   display: flex;
-  flex-direction: column;
-  gap: clamp(14px, 2.4vh, 22px);
+  gap: clamp(12px, 1.6vw, 20px);
 }
-.login-hero-start .login-display {
-  font-size: clamp(2.3rem, 5.4vw, 4rem);
+.login-start-labels span {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--text-2);
 }
-
-/* Produktbild rechts, Logo oben links darüber. */
-.login-bild {
-  position: relative;
-  margin: 0;
+/* Mitte: das riesige orca-Wortmark als Zentrum. */
+.login-start-mitte {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
 }
-.login-bild img {
-  display: block;
-  width: 100%;
-  height: auto;
-  border-radius: var(--r-lg, 20px);
-  border: 1px solid var(--line);
-  box-shadow: var(--shadow-md);
-}
-.login-bild-logo {
-  position: absolute;
-  top: 18px;
-  left: 20px;
-  width: clamp(92px, 11vw, 128px);
+.login-start-orca {
+  width: min(96%, 1060px);
   height: auto;
   color: var(--text);
-  z-index: 2;
 }
 
 /* Schritt 2: Konto verknüpfen, in einer ruhigen Karte mittig im Hero-Bereich. */
@@ -234,14 +232,421 @@
   font-weight: 700;
 }
 
-/* Schmaler: Hero stapelt, Bild unter den Text (oben begrenzt). */
-@media (max-width: 760px) {
-  .login-hero-start {
-    grid-template-columns: 1fr;
-    gap: clamp(20px, 4vh, 32px);
+/* Schritt 2: Dienste anbinden. Kopf (Fraunces) + zwei Gruppen mit Logo-Kacheln.
+   Linksbündig oben, scrollt bei Bedarf zwischen Masthead und Pille. */
+.login-hero-dienste {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: clamp(18px, 3vh, 28px);
+  overflow-y: auto;
+  margin: 0 -4px;
+  padding: 4px 4px 0;
+}
+.login-dienste-kopf {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 48ch;
+}
+.login-dienste-titel {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(1.9rem, 4vw, 3rem);
+  line-height: 1.05;
+  letter-spacing: -0.015em;
+  color: var(--text);
+  text-wrap: balance;
+}
+.login-dienste-titel em {
+  font-style: italic;
+  font-weight: 500;
+}
+.login-dienste-deck {
+  margin: 0;
+  font-size: clamp(0.96rem, 1.4vw, 1.1rem);
+  line-height: 1.55;
+  color: var(--text-2);
+}
+.login-dienste-gruppe {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.login-dienste-label {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.login-dienste-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+}
+/* Eine Dienst-Kachel: farbiges Logo, Name + Status, rechts der Verbinden-Haken. */
+.login-dienst {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  text-align: left;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md, 14px);
+  cursor: pointer;
+  transition: border-color 0.14s ease, box-shadow 0.14s ease,
+    background 0.14s ease, transform 0.12s ease;
+}
+.login-dienst:hover {
+  border-color: var(--line-strong);
+  box-shadow: var(--shadow-sm);
+}
+.login-dienst:active {
+  transform: scale(0.99);
+}
+.login-dienst.an {
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--line));
+  background: color-mix(in srgb, var(--accent) 6%, var(--card));
+}
+.login-dienst-logo {
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 11px;
+  color: #fff;
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1;
+}
+.login-dienst-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+  line-height: 1.2;
+}
+.login-dienst-name {
+  font-size: 0.94rem;
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.login-dienst-status {
+  font-size: 0.76rem;
+  color: var(--muted);
+}
+.login-dienst.an .login-dienst-status {
+  color: var(--accent-strong);
+  font-weight: 600;
+}
+/* Rechter Indikator: + zum Verbinden, ✓ wenn verbunden. */
+.login-dienst-haken {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 0.82rem;
+  font-weight: 700;
+  border: 1.5px solid var(--line-strong);
+  color: var(--muted);
+}
+.login-dienst.an .login-dienst-haken {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+}
+
+/* Zurück-Pfeil in der unteren Pille (Schritt Dienste). */
+.login-weg-zurueck {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--text-2);
+  font-size: 1.2rem;
+  line-height: 1;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+.login-weg-zurueck:hover {
+  background: color-mix(in srgb, var(--text) 8%, transparent);
+  color: var(--accent);
+}
+.login-weg-sep {
+  flex-shrink: 0;
+  width: 1px;
+  height: 24px;
+  background: var(--line-strong);
+}
+
+/* Schritt 3: Funktion erklären. Editorial-Kopf (Fraunces) + eine ruhige 3-Stationen-
+   Demo der Kern-Magie: Inhalt schicken -> orca liest und taggt -> landet an der
+   richtigen Aufgabe. Gleiche Karten/Token wie der Rest des Logins. */
+.login-hero-funktion {
+  justify-content: center;
+  gap: clamp(28px, 5.5vh, 56px);
+}
+.login-funktion-kopf {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 54ch;
+}
+.login-funktion-titel {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(1.9rem, 3.6vw, 2.7rem);
+  line-height: 1.05;
+  letter-spacing: -0.015em;
+  color: var(--text);
+  text-wrap: balance;
+}
+.login-funktion-titel em {
+  font-style: italic;
+  font-weight: 500;
+}
+.login-funktion-deck {
+  margin: 0;
+  font-size: clamp(0.96rem, 1.4vw, 1.1rem);
+  line-height: 1.55;
+  color: var(--text-2);
+}
+
+/* Demo-Pipeline: drei Stationen mit Pfeilen dazwischen. */
+.login-funktion-demo {
+  display: flex;
+  align-items: stretch;
+  gap: clamp(8px, 1.4vw, 16px);
+}
+.lf-cap {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+/* Gleiches Box-Styling wie die Übersicht-Kachel (.hu-karte): Label oben, Inhalt
+   mittig im Rest der Kachel. */
+.lf-karte {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg, 20px);
+  padding: 20px 22px;
+  box-shadow: var(--shadow-sm);
+}
+.lf-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 12px;
+}
+/* Pillen-Tags ziehen nicht über die ganze Breite. */
+.lf-body > .lf-tag {
+  align-self: flex-start;
+}
+.lf-pfeil {
+  flex-shrink: 0;
+  align-self: center;
+  color: var(--line-strong);
+  font-size: 1.35rem;
+}
+
+/* Station 1: Link-Vorschau + weitere Inhaltsarten. */
+.lf-link {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+.lf-link-thumb {
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  color: #fff;
+  font-size: 0.86rem;
+}
+.lf-yt {
+  background: #ff0000;
+}
+.lf-link-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.25;
+}
+.lf-link-titel {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.lf-link-quelle {
+  font-size: 0.76rem;
+  color: var(--muted);
+}
+.lf-auch {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.lf-auch span {
+  font-size: 0.72rem;
+  color: var(--text-2);
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+}
+
+/* Kachel 2: orca liest (Scan-Punkte) und vergibt Tags, mittig. */
+.lf-denk .lf-body {
+  align-items: center;
+  text-align: center;
+}
+.lf-scan {
+  display: inline-flex;
+  gap: 5px;
+}
+.lf-scan i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: lf-scan 1.2s ease-in-out infinite;
+}
+.lf-scan i:nth-child(2) {
+  animation-delay: 0.18s;
+}
+.lf-scan i:nth-child(3) {
+  animation-delay: 0.36s;
+}
+@keyframes lf-scan {
+  0%,
+  100% {
+    opacity: 0.25;
+    transform: translateY(0);
   }
-  .login-bild {
-    max-width: 420px;
+  50% {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
+}
+.lf-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+}
+.lf-tag {
+  font-size: 0.76rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+/* Fach-Tag in Mathe-Blau (Fachfarbe), dunkler Text für Kontrast. */
+.lf-tag-fach {
+  background: color-mix(in srgb, #7dc0fe 24%, var(--card));
+  color: color-mix(in srgb, #7dc0fe 42%, #00181c);
+}
+.lf-tag-thema {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  color: var(--text-2);
+}
+
+/* Kachel 3: die Aufgabe mit Tag und angehängtem Inhalt. */
+.lf-ziel-titel {
+  font-size: 0.96rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.3;
+}
+.lf-anhang {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px 10px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+.lf-anhang-thumb {
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  font-size: 0.66rem;
+}
+.lf-anhang-text {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.82rem;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.lf-anhang-haken {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--ok-text);
+  color: var(--on-accent);
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+/* Schmal: Pipeline vertikal, Pfeile zeigen nach unten. */
+@media (max-width: 720px) {
+  .login-funktion-demo {
+    flex-direction: column;
+  }
+  .lf-pfeil {
+    transform: rotate(90deg);
+  }
+}
+
+/* Schmaler: Beschreib linksbündig, die zusätzlichen Labels weg (zu eng). */
+@media (max-width: 760px) {
+  .login-start-deck {
+    align-self: flex-start;
+    text-align: left;
+    max-width: 100%;
+  }
+  .login-start-labels {
+    display: none;
   }
 }
 /* Schmal: enger Seitenrand. */
@@ -259,5 +664,15 @@
   .login-inhalt {
     min-height: 100%;
     height: auto;
+  }
+}
+/* Reduced Motion: kein Einflug, sofort sichtbar. */
+@media (prefers-reduced-motion: reduce) {
+  .login-inhalt {
+    animation: none;
+  }
+  .lf-scan i {
+    animation: none;
+    opacity: 0.7;
   }
 }

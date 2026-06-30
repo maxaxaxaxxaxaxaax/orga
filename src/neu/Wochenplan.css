@@ -209,19 +209,20 @@
 .wp-umplanen:active {
   transform: scale(0.98);
 }
+/* Wochen-Pfeile (‹ ›): kein Kreis/keine Outline, nur das Chevron selbst in der
+   Akzentfarbe (wie die aktive Nav-Schrift oben). */
 .wp-kal-pfeil {
   width: 32px;
   height: 32px;
-  border: 1px solid var(--line);
-  background: var(--card);
-  color: var(--text-2);
-  border-radius: 50%;
+  border: none;
+  background: none;
+  color: var(--accent);
   font-size: 1.05rem;
   cursor: pointer;
+  transition: color 0.12s ease;
 }
 .wp-kal-pfeil:hover:not(:disabled) {
-  border-color: var(--accent);
-  color: var(--accent);
+  color: var(--accent-strong);
 }
 .wp-kal-pfeil:disabled {
   opacity: 0.4;
@@ -371,7 +372,9 @@
    damit die Stunden-Gitterlinie nicht durch den Slot läuft. */
 .wp-blk-frei.leer {
   background: var(--card);
-  border: 1.5px dashed var(--line-strong);
+  /* Kräftigere gestrichelte Ablagefläche, damit klar sichtbar ist, wohin man die
+     Uhren ziehen kann. */
+  border: 2px dashed var(--muted);
   color: var(--text);
   cursor: pointer;
 }
@@ -385,19 +388,9 @@
   font-size: 0.78rem;
   font-weight: 600;
 }
-/* Welcher Fachunterricht in dieser Freiarbeit läuft (Lehrkraft ist da). */
-.wp-frei-fach {
-  font-size: 0.7rem;
-  font-weight: 600;
-  color: var(--text-2);
-}
 .wp-frei-zeit {
   font-size: 0.66rem;
   color: var(--muted);
-}
-.wp-blk-frei.leer.ueber .wp-frei-fach,
-.wp-blk-frei.leer.tippbar .wp-frei-fach {
-  color: inherit;
 }
 .wp-blk-frei.leer.ueber .wp-frei-zeit,
 .wp-blk-frei.leer.tippbar .wp-frei-zeit {

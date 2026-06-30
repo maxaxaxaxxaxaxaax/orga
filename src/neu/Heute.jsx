@@ -143,8 +143,15 @@ export default function Heute({ onFokus }) {
   // Gesamtraster (Default 2/3, also Stundenplan rechts = 1/3). Lebt nur im Speicher.
   const [splits, setSplits] = useState({ o: 25, u: 50, p: 200 / 3 });
   const [zieh, setZieh] = useState(null); // { key, rect } beim seitlichen Ziehen
+  // Klick auf eine Box maximiert sie (größte Stufe); erneuter Klick stellt die
+  // vorherige Größe wieder her. splitsVorher merkt sich die manuelle Größe davor.
+  const [maximiert, setMaximiert] = useState(null);
+  const [splitsVorher, setSplitsVorher] = useState(null);
   function ziehStart(e, key) {
     e.preventDefault();
+    // Manuelles Ziehen hebt einen per Klick maximierten Zustand auf.
+    setMaximiert(null);
+    setSplitsVorher(null);
     // Container (.hu-row) über das Eltern-Element des Reglers.
     const cont = e.currentTarget.parentElement;
     if (!cont) return;
@@ -161,18 +168,19 @@ export default function Heute({ onFokus }) {
     const roh = ((e.clientX - rect.left) / rect.width) * 100;
     let pct;
     if (key === "p") {
-      // Stundenplan-Regler: linke Fläche auf 7, 8 oder 9 von 12 Spalten rasten,
-      // der Stundenplan rechts also auf 5, 4 oder 3 Spalten.
+      // Stundenplan-Regler: linke Fläche auf 7, 8 oder 9 von 12 Spalten rasten, der
+      // Stundenplan rechts also auf 5, 4 oder 3 Spalten. Jede Stufe blendet eine Info
+      // ein/aus: 3=Fach+Raum+Zeit, 4=+Lehrer, 5=+Typ. Noch schmaler (2 Spalten) macht
+      // die linke Fläche zu breit und erzeugt komische Abstände, daher bei 3 gedeckelt.
       const cols = Math.max(7, Math.min(9, Math.round((roh / 100) * 12)));
       pct = (cols / 12) * 100;
     } else {
-      // o/u: beide Reihen rasten identisch auf drei Stufen der linken Fläche (8 von 12
-      // Spalten): Stufe 1 = 2 Spalten (schmalster Block, glatter Kreis ohne Segmente),
-      // Stufe 2 = 4 Spalten (Ring mit Segmenten + Fächer-Legende), Stufe 3 = 5 Spalten
-      // (zusätzlich der Segment-Balken je Fach). Die 3 dazwischen rastet nicht; die
-      // rechte Box behält dadurch mindestens 3 Spalten.
-      const rawSpalten = (roh / 100) * 8;
-      const spalten = rawSpalten < 3 ? 2 : rawSpalten < 4.5 ? 4 : 5;
+      // o/u: drei Stufen der linken Spalte (2, 4 oder 5 von 8). Die linke Spalte bleibt
+      // absolut gleich breit, egal wo der Stundenplan-Regler steht, daher wird die
+      // Cursor-Position über den aktuellen p-Stand auf die Referenz zurückgerechnet:
+      // Spalten-Anteil = roh / 100 * (Reihenbreite / Referenz) = roh/100 * (p / (2/3)).
+      const ziel = (roh / 100) * 8 * (splits.p / 100 / (2 / 3));
+      const spalten = ziel < 3 ? 2 : ziel < 4.5 ? 4 : 5;
       pct = (spalten / 8) * 100;
     }
     setSplits((s) => (s[key] === pct ? s : { ...s, [key]: pct }));
@@ -192,6 +200,40 @@ export default function Heute({ onFokus }) {
       onPointerUp: ziehEnde,
       onPointerCancel: ziehEnde,
     };
+  }
+  // Zielwerte für "maximal" je Box. WICHTIG: jede Box rastet nur entlang IHRES eigenen
+  // Reglers (obere Reihe o, untere Reihe u, Stundenplan p) auf den größten Wert. Die
+  // Plan-Fläche (p) wird von den linken Boxen NICHT verstellt, sonst würde ein Klick auf
+  // z.B. Nachrichten die ganze linke Fläche verbreitern und die Nachbarbox (Etappe) in
+  // eine beim Ziehen unerreichbare Größe schieben.
+  const O_MAX = (5 / 8) * 100; // linke Spalte am breitesten (5 von 8)
+  const O_MIN = (2 / 8) * 100; // linke Spalte am schmalsten (2 von 8) -> rechte am breitesten
+  const PLAN_MAX = (7 / 12) * 100; // linke Fläche am schmalsten -> Stundenplan am breitesten
+  const BOX_MAX = {
+    fortschritt: { o: O_MAX },
+    nachrichten: { o: O_MIN },
+    aufgaben: { u: O_MAX },
+    notizen: { u: O_MIN },
+    plan: { p: PLAN_MAX },
+  };
+  // Klick auf eine Box: auf größte Größe schalten (Regler entsprechend setzen).
+  // Erneuter Klick auf dieselbe Box stellt die vorherige Größe wieder her. Klicks auf
+  // interaktive Elemente (Buttons, Eingaben) lösen das NICHT aus.
+  function maximiereBox(e, id) {
+    if (e.target.closest('button, a, input, textarea, select, [role="button"]'))
+      return;
+    if (maximiert === id) {
+      if (splitsVorher) setSplits(splitsVorher);
+      setSplitsVorher(null);
+      setMaximiert(null);
+      return;
+    }
+    // Ziel immer auf die ursprüngliche (manuelle) Größe anwenden, nicht auf einen
+    // schon maximierten Zwischenstand, damit kein Rest-Versatz übrig bleibt.
+    const basis = maximiert === null ? splits : splitsVorher || splits;
+    if (maximiert === null) setSplitsVorher(splits);
+    setSplits({ ...basis, ...BOX_MAX[id] });
+    setMaximiert(id);
   }
   // Inhaltsdichte je Box aus den Reglern (12tel-Äquivalent; links = 2/3 des Rasters,
   // Stundenplan fest 1/3). So bleibt die bestehende Stufen-Logik gültig.
@@ -225,17 +267,28 @@ export default function Heute({ onFokus }) {
     if (!grid || typeof ResizeObserver === "undefined") return undefined;
     const messen = () => {
       const gap = parseFloat(getComputedStyle(grid).columnGap) || 18;
-      const spalte2 = ((grid.clientWidth - gap) * 2) / 12;
-      const ringW = Math.max(0, spalte2 - 44);
+      // Referenz-Fläche = linke Fläche bei Standard-Stundenplan (2/3 der Breite). Die
+      // linke Spalte (Etappe/Aufgaben) wird IMMER auf diese feste Referenz bezogen, NICHT
+      // auf die aktuelle, vom p-Regler veränderte Flächenbreite. Dadurch bleibt der Ring
+      // unter jedem Regler-Stand gleich groß (kein Skalieren) und die Box gleich breit.
+      const refLeftW = (grid.clientWidth - gap) * (2 / 3);
+      // Breite einer "vollen" linken Reihe (Inhalt ohne Gap) als feste Referenz. Die
+      // linke Spalte (Etappe/Aufgaben) bekommt davon einen exakten px-Anteil (o bzw. u),
+      // p-unabhängig. So bleibt sie beim Ziehen des Stundenplans EXAKT gleich breit und
+      // wackelt nicht (kein Sub-Pixel-Drift durch Gap-Verteilung).
+      grid.style.setProperty("--ref-spalte", refLeftW - gap + "px");
+      // Ring = Innenbreite der kleinsten Fortschritt-Box (linke Spalte am schmalsten,
+      // 2 von 8). Nie breiter als die Box -> konstant.
+      const boxMin = (refLeftW - gap) * (2 / 8);
+      const ringW = Math.max(0, boxMin - 44);
       grid.style.setProperty("--ring-groesse", ringW + "px");
       // Feste, in der Namens-Stufe (4 Spalten) zentrierte Startposition der Legende.
       // Sie gilt auch in der Balken-Stufe (5 Spalten), damit die Namen beim Vergrößern
-      // NICHT verrutschen: nur der Balken füllt den Platz rechts davon. Unabhängig vom
-      // aktuellen Regler berechnet (über die feste Breite der linken Fläche).
-      const links = grid.querySelector(".hu-left");
+      // NICHT verrutschen: nur der Balken füllt den Platz rechts davon. Über die feste
+      // Referenz-Fläche berechnet (unabhängig vom aktuellen Regler).
       const karte = grid.querySelector(".hu-fortschritt");
-      if (links && karte) {
-        const box4 = (links.clientWidth - gap) / 2; // 4 von 8 Spalten = halbe Fläche
+      if (karte) {
+        const box4 = (refLeftW - gap) / 2; // 4 von 8 Spalten der Referenz = halbe Fläche
         const pad = parseFloat(getComputedStyle(karte).paddingLeft) || 0;
         const inhalt = box4 - 2 * pad;
         const namenBreite = 18 + 6.8 * 0.86 * 16; // Punkt + Lücke + Fach-Spalte (6.8em)
@@ -584,13 +637,16 @@ export default function Heute({ onFokus }) {
           <div
             className="hu-row hu-row-1"
             style={{
-              gridTemplateColumns: `minmax(0, ${splits.o}fr) minmax(0, ${
-                100 - splits.o
-              }fr)`,
+              gridTemplateColumns: `calc(var(--ref-spalte, 0px) * ${
+                splits.o / 100
+              }) minmax(0, 1fr)`,
             }}
           >
             {/* Links oben: Etappenfortschritt */}
-            <section className="hu-karte hu-fortschritt">
+            <section
+              className="hu-karte hu-fortschritt"
+              onClick={(e) => maximiereBox(e, "fortschritt")}
+            >
           <h2 className="hu-karte-titel">
             <Icon name="graph" className="hu-karte-icon" />
             Etappenfortschritt
@@ -650,7 +706,10 @@ export default function Heute({ onFokus }) {
             </section>
 
             {/* Rechts oben: Nachrichten (früher Topbar-Glocke, jetzt eigene Box) */}
-            <section className="hu-karte hu-nachrichten">
+            <section
+              className="hu-karte hu-nachrichten"
+              onClick={(e) => maximiereBox(e, "nachrichten")}
+            >
           <h2 className="hu-karte-titel">
             <Icon name="chat" className="hu-karte-icon" />
             Nachrichten
@@ -689,7 +748,11 @@ export default function Heute({ onFokus }) {
 
             <div
               className={"hu-teiler hu-teiler-v" + (zieh?.key === "o" ? " zieht" : "")}
-              style={{ left: teilerLinks(splits.o) }}
+              style={{
+                left: `calc(var(--ref-spalte, 0px) * ${
+                  splits.o / 100
+                } + var(--grid-gap, 18px) / 2)`,
+              }}
               aria-hidden="true"
               {...reglerProps("o")}
             />
@@ -698,13 +761,16 @@ export default function Heute({ onFokus }) {
           <div
             className="hu-row hu-row-2"
             style={{
-              gridTemplateColumns: `minmax(0, ${splits.u}fr) minmax(0, ${
-                100 - splits.u
-              }fr)`,
+              gridTemplateColumns: `calc(var(--ref-spalte, 0px) * ${
+                splits.u / 100
+              }) minmax(0, 1fr)`,
             }}
           >
             {/* Unten rechts: Erinnerungen (per CSS order rechts) */}
-            <section className="hu-karte hu-notizen">
+            <section
+              className="hu-karte hu-notizen"
+              onClick={(e) => maximiereBox(e, "notizen")}
+            >
           <h2 className="hu-karte-titel">
             <Icon name="erinnerung" className="hu-karte-icon" />
             Erinnerungen
@@ -787,7 +853,10 @@ export default function Heute({ onFokus }) {
             </section>
 
             {/* Unten links: Aufgaben (per CSS order links) */}
-            <section className="hu-karte hu-aufgaben">
+            <section
+              className="hu-karte hu-aufgaben"
+              onClick={(e) => maximiereBox(e, "aufgaben")}
+            >
           <h2 className="hu-karte-titel hu-aufgaben-titel">
             <Icon name="task" className="hu-karte-icon" />
             Aufgaben
@@ -840,7 +909,11 @@ export default function Heute({ onFokus }) {
 
             <div
               className={"hu-teiler hu-teiler-v" + (zieh?.key === "u" ? " zieht" : "")}
-              style={{ left: teilerLinks(splits.u) }}
+              style={{
+                left: `calc(var(--ref-spalte, 0px) * ${
+                  splits.u / 100
+                } + var(--grid-gap, 18px) / 2)`,
+              }}
               aria-hidden="true"
               {...reglerProps("u")}
             />
@@ -849,7 +922,10 @@ export default function Heute({ onFokus }) {
         </div>
 
         {/* Rechte Spalte (volle Höhe): Stundenplan als Tages-Timeline */}
-        <aside className="hu-karte hu-plan-karte">
+        <aside
+          className="hu-karte hu-plan-karte"
+          onClick={(e) => maximiereBox(e, "plan")}
+        >
           <h2 className="hu-karte-titel">
             <Icon name="week" className="hu-karte-icon" />
             Stundenplan
@@ -896,15 +972,12 @@ export default function Heute({ onFokus }) {
                     <span className="hu-stunde-info">
                       <span className="hu-stunde-fach">{s.fach}</span>
                       {pSpan >= 3 && (
-                        <span className="hu-stunde-sep" aria-hidden="true" />
-                      )}
-                      {lehrkraefte[s.fach] && pSpan >= 4 && (
-                        <span className="hu-stunde-lehrer">
-                          {lehrkraefte[s.fach]}
-                        </span>
-                      )}
-                      {pSpan >= 3 && (
                         <span className="hu-stunde-raum">{s.raum}</span>
+                      )}
+                      {pSpan >= 4 && (
+                        <span className="hu-stunde-lehrer">
+                          {lehrkraefte[s.fach] || ""}
+                        </span>
                       )}
                       {pSpan >= 5 && artLabel[s.art] && (
                         <span

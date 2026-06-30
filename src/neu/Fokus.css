@@ -341,7 +341,10 @@
   align-items: center;
   gap: 10px;
   flex-wrap: nowrap;
-  padding: 7px 8px 7px 10px;
+  /* Linkes Polster wie bei der Weg-Leiste (deren .weg-aufgabe 12px Extra-Polster
+     hat), damit das Fach beim Wechsel Übersicht -> Fokus an derselben Stelle bleibt
+     und nicht weiter nach außen rutscht. */
+  padding: 7px 8px 7px 22px;
   background: linear-gradient(
     180deg,
     color-mix(in srgb, var(--card) 52%, transparent),

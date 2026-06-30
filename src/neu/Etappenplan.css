@@ -51,6 +51,7 @@
   overflow: hidden;
 }
 .ep-vorrat {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -58,6 +59,18 @@
   min-height: 0;
   max-height: 100%;
   transition: opacity 0.45s ease;
+}
+/* Weicher Auslauf am unteren Rand der scrollenden Lernweg-Liste: macht sichtbar, dass
+   noch mehr Aufgaben darunter liegen (statt sie hart abzuschneiden). */
+.ep-vorrat::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 30px;
+  pointer-events: none;
+  background: linear-gradient(to bottom, transparent, var(--bg));
 }
 @media (max-width: 860px) {
   .ep-screen {
@@ -414,7 +427,7 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
   grid-auto-rows: min-content;
   align-content: start;
-  gap: 16px;
+  gap: 14px;
   padding-right: 4px;
 }
 @media (max-width: 860px) {
@@ -431,9 +444,9 @@
   background: var(--card);
   border: 1px solid var(--line);
   border-radius: var(--r-lg, 20px);
-  padding: 16px;
+  padding: 14px;
   box-shadow: var(--shadow-sm);
-  min-height: 220px;
+  min-height: 180px;
   transition: border-color 0.12s ease, box-shadow 0.12s ease;
 }
 .ep-woche.ueber {
@@ -444,7 +457,7 @@
   display: flex;
   align-items: baseline;
   gap: 8px;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 .ep-woche-nr {
   font-size: 1.15rem;
@@ -459,10 +472,10 @@
 .ep-woche-slots {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 7px;
 }
 .ep-slot-leer {
-  height: 52px;
+  height: 44px;
   border: 1.5px dashed var(--line-strong);
   border-radius: var(--r-md, 14px);
 }

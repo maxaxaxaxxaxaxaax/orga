@@ -19,7 +19,7 @@ import "./Etappenplan.css";
 
 const ETAPPE = etappen.find((e) => e.id === 4) || etappen[0];
 const SPEICHER = "neu.etappenplan.zuordnung";
-const ZIEL_SLOTS = 4; // gestrichelte Leer-Slots je Woche (nur Optik)
+const ZIEL_SLOTS = 3; // gestrichelte Leer-Slots je Woche (nur Optik)
 
 function zeitraum(e) {
   const opt = { day: "2-digit", month: "2-digit" };

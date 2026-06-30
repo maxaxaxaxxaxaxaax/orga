@@ -1,45 +1,295 @@
-// Orca-Wortmarke (aktuelles Logo). Einfarbig in currentColor, passt sich also dem
-// Theme an (auf dem Login var(--text)).
-export default function OrcaLogo({ className }) {
+import { useEffect, useRef, useState } from "react";
+
+// Fach-Farben je Buchstabe (wie in der App).
+const FARBE = { o: "#61DA85", r: "#7DC0FE", c: "#FF7DA9", a: "#FFE37D" };
+
+// Die gefüllten Buchstaben-Glyphen (aus dem orca-Wortmark).
+const PFAD = {
+  o: "M6.53803 35.9289C13.1312 22.3719 22.5513 14.7438 28.5456 10.6619C34.5399 6.57995 46.5153 0.788397 61.0714 0.122182C68.6644 -0.225345 74.9964 0.318432 83.2976 2.96167C89.9226 5.0712 91.0929 12.5703 89.1512 16.6831C87.2095 20.7958 82.0299 23.509 77.1783 21.9794C72.1131 20.3824 68.0872 19.5795 61.0714 20.0132C52.1121 20.567 45.0374 24.1478 41.4638 26.1278C31.7604 31.5037 26.2156 40.7499 24.3082 44.8331C19.9994 53.432 18.6109 64.9745 21.0599 74.2589C23.008 83.6656 28.586 91.9994 35.9629 98.2153C43.3398 104.431 53.1165 107.869 62.7865 108.252C72.4565 108.635 82.2195 105.419 90.0722 99.8068C97.9249 94.1941 103.726 85.7737 106.423 76.551C109.121 67.3284 108.847 57.228 105.242 48.3156C101.884 39.5085 96.1401 33.4899 93.1867 30.8562C90.2333 28.2225 89.2498 22.1059 92.5688 17.7396C93.9281 15.9514 97.525 13.2751 102.073 14.1399C104.77 14.6526 106.96 16.5274 108.924 18.4452C113.722 23.1325 119.274 30.1143 123.732 40.8792C129.034 53.9887 129.433 68.4719 125.465 82.0379C121.497 95.6039 113.287 107.573 101.736 115.829C90.1853 124.085 76.2507 128.591 62.0267 128.028C47.8027 127.464 33.8981 122.458 23.0471 113.315C12.1961 104.172 4.16809 91.1146 1.30257 77.2779C-1.56296 63.4412 0.350582 48.6517 6.53803 35.9289Z",
+  r: "M193.011 1.6708C199.507 0.192835 206.683 -0.61059 209.955 0.562406C215.11 2.26761 216.781 6.3955 216.781 10.1913C216.951 15.7698 211.923 19.8273 206.39 19.7235C190.505 19.4253 181.656 25.732 176.924 29.33C174.353 31.2848 173.104 32.6574 171.009 34.9765C167.488 38.8741 165.419 43.9076 165.439 49.1601L165.702 118.242C165.702 123.765 161.224 128.242 155.702 128.242C150.179 128.242 145.702 123.765 145.702 118.242V32.1884C145.613 31.47 145.611 30.7438 145.702 30.0253V10.1913C145.702 4.66853 150.179 0.191425 155.702 0.191312C161.224 0.191312 165.702 4.66847 165.702 10.1913V15.1786C166.244 14.7467 166.582 14.3856 167.304 13.8495C174.223 8.71042 178.392 6.71752 182.277 5.03799C184.74 3.97311 188.709 2.64968 193.011 1.6708Z",
+  c: "M312.648 9.42939C308.598 6.99155 310.35 7.99729 307.68 6.69848C294.957 0.51107 280.167 -1.4025 266.331 1.46303C252.494 4.32855 239.437 12.3566 230.294 23.2076C221.15 34.0585 216.144 47.9632 215.581 62.1872C215.017 76.4112 219.523 90.3457 227.779 101.897C236.035 113.447 248.005 121.658 261.571 125.625C275.137 129.593 289.62 129.195 302.729 123.893C307.519 121.956 309.134 121.17 313.04 118.842C317.582 115.308 319.025 108.795 314.616 103.924C311.193 100.141 305.295 100.147 302.126 102.278C300.511 103.117 297.865 104.565 295.347 105.492C287.317 108.724 276.28 109.281 267.057 106.584C257.835 103.886 249.414 98.0854 243.802 90.2327C238.189 82.38 234.974 72.617 235.357 62.947C235.74 53.277 239.177 43.5002 245.393 36.1233C251.609 28.7465 259.943 23.1684 269.35 21.2203C278.634 18.7714 290.176 20.1598 298.775 24.4686C299.734 25.1298 299.299 24.5863 302.179 26.2903C305.059 27.9942 311.244 28.7123 315.033 24.0409C319.647 18.3509 316.698 11.8672 312.648 9.42939Z",
+};
+const PFAD_A = [
+  "M434.84 91.5386C434.336 92.1878 433.813 92.8213 433.271 93.4374C431.838 95.0686 430.264 96.5878 428.578 97.9841C430.861 96.0292 432.967 93.8702 434.84 91.5386ZM444.238 110.601C443.249 111.549 442.232 112.464 441.188 113.344C442.231 112.472 443.248 111.559 444.238 110.601ZM441.133 113.39C437.575 116.355 433.715 118.837 429.628 120.991C433.724 118.905 437.59 116.368 441.133 113.39ZM355.82 110.326C354.704 109.242 353.622 108.116 352.576 106.95C346.495 100.076 341.753 91.4749 338.976 82.8383C341.698 92.0787 346.515 100.192 352.576 106.95C353.619 108.129 354.701 109.257 355.82 110.326ZM416.093 105.31C411.41 107.081 406.415 108.084 401.449 108.28C391.779 108.663 382.016 105.448 374.163 99.8354C373.433 99.3137 372.721 98.7678 372.028 98.1993C372.277 98.4087 372.528 98.6149 372.781 98.8179C381.482 105.786 392.741 109.225 403.774 108.245C407.941 107.875 412.115 106.87 416.093 105.31Z",
+  "M443.176 74.2875C441.862 80.633 438.896 86.4903 434.84 91.5386C441.203 83.3405 444.541 72.6179 444.285 62.1856C444.147 59.5017 443.787 56.8164 443.212 54.1744C444.735 60.8508 444.814 68.0747 443.176 74.2875ZM429.628 120.991C421.186 125.292 411.77 127.678 402.209 128.056C387.985 128.62 374.05 124.114 362.499 115.858C360.129 114.164 357.9 112.314 355.82 110.326C357.291 111.756 358.835 113.12 360.447 114.411C373.246 124.661 389.407 129.506 405.637 128.064C414.091 127.313 422.233 124.89 429.628 120.991ZM357.812 76.5796C357.231 74.5932 356.788 72.5661 356.486 70.5189C358.207 81.1189 363.885 91.3494 372.028 98.1993C365.259 92.6506 360.259 84.9452 357.812 76.5796ZM416.093 105.31C420.528 103.633 424.684 101.267 428.273 98.2439C424.631 101.204 420.479 103.591 416.093 105.31Z",
+  "M338.976 82.8383C341.698 92.0787 346.515 100.192 352.576 106.95C346.495 100.076 341.753 91.4749 338.976 82.8383ZM441.188 113.344C442.231 112.472 443.248 111.559 444.238 110.601C443.249 111.549 442.232 112.464 441.188 113.344Z",
+  "M434.84 91.5386C434.336 92.1878 433.813 92.8213 433.271 93.4374L434.974 91.3703C434.93 91.4265 434.885 91.4826 434.84 91.5386ZM463.929 57.9712L463.966 58.2625C463.97 58.2982 463.975 58.3335 463.979 58.3682C463.963 58.2422 463.947 58.1102 463.929 57.9712Z",
+  "M463.929 57.9712C463.943 58.0797 463.956 58.184 463.968 58.2844C463.968 58.2771 463.967 58.2698 463.966 58.2625L463.929 57.9712Z",
+  "M433.271 93.4374C433.813 92.8213 434.336 92.1878 434.84 91.5386C438.896 86.4903 441.862 80.633 443.176 74.2875C444.814 68.0747 444.735 60.8508 443.212 54.1744C442.459 50.8735 441.353 47.7065 439.927 44.8617C438.02 40.7785 432.475 31.5323 422.772 26.1564C419.198 24.1764 412.123 20.5956 403.164 20.0418C396.148 19.6081 392.122 20.411 387.057 22.008C382.206 23.5376 377.026 20.8244 375.084 16.7117C373.143 12.5989 374.313 5.09978 380.938 2.99026C389.239 0.347014 395.558 -0.0623482 403.164 0.150764C415.122 0.48582 425.327 4.62296 431.915 8.35221C433.352 9.1656 434.617 9.95959 435.69 10.6905C441.684 14.7724 451.104 22.4005 457.697 35.9575C460.827 42.3918 462.863 49.3547 463.74 56.4556C463.795 56.8947 463.843 57.2824 463.887 57.6294L463.909 57.8087L463.929 57.9712C463.942 58.0718 463.954 58.1688 463.966 58.2625C463.981 58.3843 463.995 58.5005 464.009 58.6119C464.257 60.6425 464.258 61.0601 464.258 64.3104V118.306C464.258 123.838 459.647 128.299 454.164 128.299C448.682 128.299 444.238 123.814 444.238 118.282V110.601C443.249 111.549 442.232 112.464 441.188 113.344L441.133 113.39C437.575 116.355 433.715 118.837 429.628 120.991C421.186 125.292 411.77 127.678 402.209 128.056C387.985 128.62 374.05 124.114 362.499 115.858C360.129 114.164 357.9 112.314 355.82 110.326C354.704 109.242 353.622 108.116 352.576 106.95C346.495 100.076 341.753 91.4749 338.976 82.8383C334.96 70.5189 335.201 54.0173 340.503 40.9077C341.721 37.9664 343.021 35.3076 344.365 32.9007C347.939 26.4989 351.824 21.8804 355.312 18.4738C357.275 16.556 359.466 14.6811 362.162 14.1685C366.71 13.3037 370.307 15.98 371.667 17.7682C374.986 22.1344 374.002 28.2511 371.049 30.8848C368.095 33.5185 362.351 39.5371 358.993 48.3442C356.165 55.337 355.387 63.0612 356.486 70.5189C356.788 72.5661 357.231 74.5932 357.812 76.5796C360.259 84.9452 365.259 92.6506 372.028 98.1993C372.277 98.4087 372.528 98.6149 372.781 98.8179C381.482 105.786 392.741 109.225 403.774 108.245C407.941 107.875 412.115 106.87 416.093 105.31C420.528 103.633 424.684 101.267 428.273 98.2439C428.318 98.2053 428.367 98.1638 428.414 98.1243L428.434 98.1072L428.48 98.0679L428.512 98.041L428.526 98.0286L428.551 98.0074L428.578 97.9841C430.264 96.5878 431.838 95.0686 433.271 93.4374Z",
+];
+
+// Die drei runden Buchstaben (o, c, a) werden durch einen wachsenden Kreissektor
+// freigelegt: so füllt sich exakt die Glyph-Form, nie die Aussparung, und am Ende
+// komplett. Zentren/Winkel aus den gemessenen Glyph-Boxen (Mittellinie R54).
+// von/bis = Anteil am Gesamt-Fortschritt (nach Bogenlänge gewichtet).
+const KREISE = [
+  { id: "o", cx: 64.1, cy: 64.1, a0: 180, sweep: 360, von: 0, bis: 0.325, farbe: FARBE.o, pfade: [PFAD.o], eo: false },
+  { id: "c", cx: 279.5, cy: 64.2, a0: -58.9, sweep: -242, von: 0.457, bis: 0.675, farbe: FARBE.c, pfade: [PFAD.c], eo: false },
+  { id: "a", cx: 400.2, cy: 64.2, a0: -90, sweep: 360, von: 0.675, bis: 1, farbe: FARBE.a, pfade: PFAD_A, eo: true },
+];
+const R_VON = 0.325;
+const R_BIS = 0.457; // r (Stamm) füllt vertikal von unten nach oben
+
+// Mittellinie (o → r → c → a) nur zum Messen: Punkt-Position und Zieh-Tangente.
+const MITTE =
+  "M10.1 64.1 A54 54 0 1 1 118.1 64.1 A54 54 0 1 1 10.1 64.1 " +
+  "M155.7 118 L155.7 33 C155.7 20 174 14 201 14 " +
+  "M307.4 17.9 A54 54 0 1 0 307.4 110.5 " +
+  "M400.2 10.2 A54 54 0 1 1 400.2 118.2 A54 54 0 1 1 400.2 10.2";
+
+const klemm = (v, a, b) => Math.max(a, Math.min(b, v));
+
+function sektorD(cx, cy, a0, sweep, local) {
+  const sw = sweep * klemm(local, 0, 1);
+  if (Math.abs(sw) < 0.05) return "NONE";
+  if (Math.abs(sw) >= 359.5) return "FULL";
+  const bigR = 92;
+  const r0 = (a0 * Math.PI) / 180;
+  const r1 = ((a0 + sw) * Math.PI) / 180;
+  const x0 = (cx + bigR * Math.cos(r0)).toFixed(2);
+  const y0 = (cy + bigR * Math.sin(r0)).toFixed(2);
+  const x1 = (cx + bigR * Math.cos(r1)).toFixed(2);
+  const y1 = (cy + bigR * Math.sin(r1)).toFixed(2);
+  const gross = Math.abs(sw) > 180 ? 1 : 0;
+  const richtung = sw > 0 ? 1 : 0;
+  return `M${cx} ${cy} L${x0} ${y0} A${bigR} ${bigR} 0 ${gross} ${richtung} ${x1} ${y1} Z`;
+}
+
+function leitFarbe(p) {
+  if (p < R_VON) return FARBE.o;
+  if (p < R_BIS) return FARBE.r;
+  if (p < 0.675) return FARBE.c;
+  return FARBE.a;
+}
+
+export default function OrcaLogo({ className, interaktiv = false, onVoll }) {
+  const svgRef = useRef(null);
+  const mitteRef = useRef(null);
+  const letztPunkt = useRef(null);
+  const vollRef = useRef(false);
+  const progRef = useRef(0); // aktueller Stand, unabhängig vom Render-Takt
+  const ziehtRef = useRef(false);
+  const [len, setLen] = useState(0);
+  const [progress, setProgress] = useState(0);
+  const [griff, setGriff] = useState({ x: 10.1, y: 64.1 });
+  const [zieht, setZieht] = useState(false);
+  const [reduce] = useState(
+    () =>
+      interaktiv &&
+      typeof window !== "undefined" &&
+      typeof window.matchMedia === "function" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  );
+
+  useEffect(() => {
+    if (interaktiv && mitteRef.current) {
+      setLen(mitteRef.current.getTotalLength());
+      const q = mitteRef.current.getPointAtLength(0);
+      setGriff({ x: q.x, y: q.y });
+    }
+  }, [interaktiv]);
+
+  function punktBei(t) {
+    const path = mitteRef.current;
+    const L = len || (path && path.getTotalLength()) || 1;
+    if (!path) return { x: 10.1, y: 64.1 };
+    const q = path.getPointAtLength(klemm(t, 0, 1) * L);
+    return { x: q.x, y: q.y };
+  }
+
+  function setze(t) {
+    const v = klemm(t, 0, 1);
+    progRef.current = v;
+    setProgress(v);
+    setGriff(punktBei(v));
+    if (v >= 0.992 && !vollRef.current) {
+      vollRef.current = true;
+      if (onVoll) onVoll();
+    } else if (v < 0.992) {
+      vollRef.current = false;
+    }
+  }
+
+  function zuSvg(e) {
+    const svg = svgRef.current;
+    const ctm = svg && svg.getScreenCTM();
+    if (!ctm) return null;
+    const pt = svg.createSVGPoint();
+    pt.x = e.clientX;
+    pt.y = e.clientY;
+    return pt.matrixTransform(ctm.inverse());
+  }
+
+  function beiDown(e) {
+    if (!interaktiv) return;
+    e.preventDefault();
+    try {
+      svgRef.current.setPointerCapture(e.pointerId);
+    } catch {
+      /* z. B. synthetische Events ohne aktiven Pointer */
+    }
+    letztPunkt.current = zuSvg(e);
+    ziehtRef.current = true;
+    setZieht(true);
+  }
+
+  // Fortschritt zählt nur die Bewegung ENTLANG des Pfades (Projektion auf die
+  // Tangente). Quer zum Pfad (durch die Aussparung) bewegt nichts: man muss die
+  // Kreisform wirklich nachziehen. 1 Einheit entlang ≈ 1/Länge Fortschritt, also
+  // füllt ein einmal nachgezogener Kreis genau diesen Buchstaben.
+  function beiMove(e) {
+    if (!ziehtRef.current) return;
+    const p = zuSvg(e);
+    const vor = letztPunkt.current;
+    letztPunkt.current = p;
+    if (!p || !vor) return;
+    const path = mitteRef.current;
+    const L = len;
+    if (!path || !L) return;
+    const stand = progRef.current;
+    const a = path.getPointAtLength(klemm(stand - 0.004, 0, 1) * L);
+    const b = path.getPointAtLength(klemm(stand + 0.004, 0, 1) * L);
+    let tx = b.x - a.x;
+    let ty = b.y - a.y;
+    const tl = Math.hypot(tx, ty) || 1;
+    tx /= tl;
+    ty /= tl;
+    const entlang = (p.x - vor.x) * tx + (p.y - vor.y) * ty;
+    const d = klemm(entlang / L, -0.06, 0.06);
+    setze(stand + d);
+  }
+
+  function beiUp(e) {
+    if (!zieht) return;
+    setZieht(false);
+    letztPunkt.current = null;
+    try {
+      svgRef.current.releasePointerCapture(e.pointerId);
+    } catch {
+      /* Pointer schon freigegeben */
+    }
+  }
+
+  // Statisch (z. B. Masthead): einfache gefüllte Glyphen in currentColor.
+  if (!interaktiv) {
+    return (
+      <svg
+        viewBox="0 0 465 129"
+        className={className}
+        role="img"
+        aria-label="Orca"
+        fill="currentColor"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path d={PFAD.o} />
+        <path d={PFAD.r} />
+        <path d={PFAD.c} />
+        {PFAD_A.map((d, i) => (
+          <path key={i} fillRule="evenodd" clipRule="evenodd" d={d} />
+        ))}
+      </svg>
+    );
+  }
+
+  // Freilege-Sektoren je rundem Buchstaben.
+  const sektoren = KREISE.map((k) => ({
+    k,
+    d: sektorD(k.cx, k.cy, k.a0, k.sweep, (progress - k.von) / (k.bis - k.von)),
+  }));
+  // r: vertikaler Freilege-Streifen (unten -> oben).
+  const rLocal = klemm((progress - R_VON) / (R_BIS - R_VON), 0, 1);
+  const rTop = 118 - 114 * rLocal;
+  const griffFarbe = leitFarbe(progress);
+
   return (
     <svg
-      viewBox="0 0 507 130"
+      ref={svgRef}
+      viewBox="0 0 465 129"
       className={className}
       role="img"
-      aria-label="Orca"
-      fill="none"
+      aria-label="Orca, zum Füllen am Punkt entlang der Kreise ziehen"
       xmlns="http://www.w3.org/2000/svg"
+      onPointerDown={beiDown}
+      onPointerMove={beiMove}
+      onPointerUp={beiUp}
+      onPointerCancel={beiUp}
+      style={{ touchAction: "none", cursor: zieht ? "grabbing" : "grab" }}
     >
-      <path
-        d="M353.284 27.0963C350.528 23.3688 343.348 14.1081 329.791 7.51495C317.068 1.32751 302.279 -0.586022 288.442 2.2795C274.605 5.14503 261.548 13.1731 252.405 24.024C243.262 34.875 238.256 48.7797 237.692 63.0037C237.129 77.2277 241.635 91.1622 249.891 102.713C258.147 114.264 270.116 122.474 283.682 126.442C297.248 130.41 311.731 130.011 324.841 124.709C337.977 119.269 345.48 112.2 350.054 106.858C354.326 101.251 351.819 95.0945 347.987 92.5258C343.749 89.6848 338.003 90.5278 334.864 94.1636C331.725 97.7995 326.211 102.861 317.404 106.219C308.492 109.824 298.392 110.097 289.169 107.4C279.946 104.703 271.526 98.9018 265.913 91.0491C260.301 83.1964 257.085 73.4335 257.468 63.7635C257.851 54.0935 261.289 44.3167 267.505 36.9398C273.721 29.5629 282.054 23.9849 291.461 22.0368C300.746 19.5878 312.288 20.9763 320.887 25.2851C328.682 28.9266 334.594 35.1156 337.428 39.1231C340.262 43.1305 347.659 44.4217 352.029 40.2887C356.366 36.1858 356.039 30.8237 353.284 27.0963Z"
-        fill="currentColor"
-      />
-      <path
-        d="M28.5456 11.5596C22.5513 15.6416 13.1312 23.2696 6.53803 36.8266C0.350582 49.5494 -1.56296 64.3389 1.30257 78.1756C4.16809 92.0123 12.1961 105.069 23.0471 114.213C33.8981 123.356 47.8027 128.362 62.0267 128.926C76.2507 129.489 90.1853 124.983 101.736 116.727C113.287 108.471 121.497 96.5016 125.465 82.9356C129.433 69.3696 129.034 54.8864 123.732 41.7769C118.292 28.6405 111.223 21.1376 105.881 16.5632C100.274 12.2915 93.6769 14.7907 91.1375 19.2142C88.5981 23.6377 89.5509 28.6149 93.1867 31.7539C96.8225 34.893 101.884 40.4062 105.242 49.2133C108.847 58.1257 109.121 68.2261 106.423 77.4487C103.726 86.6714 97.9249 95.0918 90.0722 100.704C82.2195 106.317 72.4566 109.532 62.7865 109.149C53.1165 108.766 43.3398 105.329 35.9629 99.113C28.586 92.8971 23.008 84.5633 21.0599 75.1566C18.6109 65.8722 19.9994 54.3297 24.3082 45.7308C26.2156 41.6476 31.7604 32.4014 41.4638 27.0255C45.0374 25.0456 52.1121 21.4647 61.0714 20.9109C68.0872 20.4772 74.4016 21.6018 79.4505 23.6377C83.0317 25.0818 88.5981 23.6377 91.1375 19.2142C93.6769 14.7907 92.4577 7.52218 86.241 4.9163C77.9846 1.45537 68.6644 0.672367 61.0714 1.01989C46.5153 1.6861 34.5399 7.47766 28.5456 11.5596Z"
-        fill="currentColor"
-      />
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M149.282 33.0862V30.9232C149.191 31.6416 149.193 32.3678 149.282 33.0862Z"
-        fill="currentColor"
-      />
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M169.282 120L169.043 45.3184C169.027 40.2336 170.83 35.2181 174.402 31.5989C176.03 29.9484 176.994 29.342 179.727 27.9063C185.089 25.0895 191.743 25.9173 196.31 28.1741C205.065 32.5001 211.596 25.2282 211.316 19.353C211.316 15.5572 208.506 11.4672 203.5 9.9634C197.848 7.33472 190.657 6.82275 187.279 6.90063C183.885 6.97891 178.296 7.21493 170.777 11.0888C170.275 11.3476 169.776 11.6126 169.282 11.8839V10C169.282 4.47715 164.805 0 159.282 0C153.759 0 149.282 4.47715 149.282 10V30.9232V33.0862V120C149.282 125.523 153.759 130 159.282 130C164.805 130 169.282 125.523 169.282 120Z"
-        fill="currentColor"
-      />
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M506.442 63.4033C506.442 63.4033 506.413 62.4927 506.399 62.1477C506.417 62.5657 506.442 63.4033 506.442 63.4033Z"
-        fill="currentColor"
-      />
-      <path
-        d="M379.119 74.5533C377.208 61.8278 379.045 50.2596 384.069 38.6093C386.258 33.5305 392.686 31.0822 398.11 34.1025C402.324 36.4487 403.975 40.8862 402.588 45.8173C399.229 52.7978 396.997 62.6137 398.765 71.5627C400.413 82.5408 406.595 93.0166 415.297 99.8855C423.998 106.755 435.321 109.908 446.354 108.942C457.388 107.975 467.965 102.693 475.346 94.4155C482.727 86.1382 486.805 74.9421 486.529 63.8438C486.254 52.7455 481.609 41.779 473.826 33.8799C466.044 25.9809 455.174 21.2882 444.106 20.8733C436.516 20.5888 428.727 22.2568 422.09 25.7128C417.88 28.361 412.357 28.0883 408.618 23.7878C404.606 19.1738 406.402 12.0721 411.19 9.0785C418.856 4.56419 431.983 0.469285 444.847 0.951516C461.128 1.56181 476.543 8.28408 487.991 19.9031C499.145 31.2239 505.695 46.2822 506.399 62.1477C506.417 62.5657 506.442 63.4033 506.442 63.4033L506.462 115.563C506.462 121.016 502.018 125.437 496.535 125.437C491.053 125.437 486.609 121.016 486.609 115.563V111.458C476.129 121.47 462.53 127.607 448.008 128.878C431.778 130.3 415.617 125.523 402.818 115.42C390.02 105.316 381.545 90.7015 379.119 74.5533Z"
-        fill="currentColor"
-      />
+      <defs>
+        {sektoren.map(({ k, d }) =>
+          d === "NONE" || d === "FULL" ? null : (
+            <clipPath key={k.id} id={`orca-rev-${k.id}`}>
+              <path d={d} />
+            </clipPath>
+          )
+        )}
+        {rLocal > 0 && rLocal < 0.999 && (
+          <clipPath id="orca-rev-r">
+            <rect x="140" y={rTop} width="84" height={130 - rTop} />
+          </clipPath>
+        )}
+      </defs>
+
+      {/* Blasse Spur: alle Buchstaben ungefüllt. */}
+      <g fill="#e1e4e3">
+        <path d={PFAD.o} />
+        <path d={PFAD.r} />
+        <path d={PFAD.c} />
+        {PFAD_A.map((d, i) => (
+          <path key={i} fillRule="evenodd" clipRule="evenodd" d={d} />
+        ))}
+      </g>
+
+      {/* Gefüllte Buchstaben, durch Sektor/Streifen freigelegt. */}
+      {sektoren.map(({ k, d }) => {
+        if (d === "NONE") return null;
+        const glyphen = k.pfade.map((pd, i) => (
+          <path
+            key={i}
+            d={pd}
+            fill={k.farbe}
+            fillRule={k.eo ? "evenodd" : "nonzero"}
+            clipRule="evenodd"
+          />
+        ));
+        return d === "FULL" ? (
+          <g key={k.id}>{glyphen}</g>
+        ) : (
+          <g key={k.id} clipPath={`url(#orca-rev-${k.id})`}>
+            {glyphen}
+          </g>
+        );
+      })}
+      {rLocal > 0 &&
+        (rLocal >= 0.999 ? (
+          <path d={PFAD.r} fill={FARBE.r} />
+        ) : (
+          <g clipPath="url(#orca-rev-r)">
+            <path d={PFAD.r} fill={FARBE.r} />
+          </g>
+        ))}
+
+      {/* Mittellinie, unsichtbar, nur zum Messen. */}
+      <path ref={mitteRef} d={MITTE} fill="none" stroke="none" />
+
+      {/* Griff-Punkt: führt die Spur, pulst am Start als Einladung. */}
+      <g>
+        {progress < 0.02 && !zieht && !reduce && (
+          <circle cx={griff.x} cy={griff.y} r="12" fill="none" stroke={griffFarbe} strokeWidth="2.5">
+            <animate attributeName="r" values="12;24" dur="1.7s" repeatCount="indefinite" />
+            <animate attributeName="opacity" values="0.55;0" dur="1.7s" repeatCount="indefinite" />
+          </circle>
+        )}
+        <circle
+          cx={griff.x}
+          cy={griff.y}
+          r="13"
+          fill={griffFarbe}
+          stroke="#fff"
+          strokeWidth="3.5"
+          style={{ filter: "drop-shadow(0 2px 6px rgba(0, 24, 24, 0.28))" }}
+        />
+      </g>
     </svg>
   );
 }

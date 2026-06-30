@@ -12,6 +12,9 @@
   display: flex;
   align-items: center;
   gap: 10px;
+  /* Immer die App-Schrift (Satoshi), damit die Pille auf dem Login (Hanken-Kontext)
+     genau wie im App-Shell aussieht und nicht die Schrift wechselt. */
+  font-family: var(--font-satoshi);
   padding: 7px 8px 7px 10px;
   /* Feste Höhe, damit die Box in allen Phasen (Abruf/Aufgabe/Endzustand) gleich
      groß bleibt und der blaue Knopf nicht springt. Gleiche Höhe wie Planung/Fokus. */
@@ -383,5 +386,13 @@
   }
   .weg-aufgabe-zahl {
     display: none;
+  }
+}
+
+/* Reduced Motion: keine Einflug-Animation der schwebenden Leiste. */
+@media (prefers-reduced-motion: reduce) {
+  .weg,
+  .weg-oben {
+    animation: none;
   }
 }

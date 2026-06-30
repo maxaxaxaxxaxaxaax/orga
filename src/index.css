@@ -18,7 +18,7 @@
   --card-2: #f2f2f2; /* Semantic/color/fach/disabled */
   --text: #001818; /* Font/color/contrast/high */
   --text-2: #4a5553;
-  --muted: #889390;
+  --muted: #626d6a; /* abgedunkelt fuer WCAG AA (>=4.5:1 auf bg/card); vorher #889390 ~2.8:1 */
   --line: #e3e3e3; /* Semantic/color/card/border */
   --line-strong: #dcdcdc; /* Semantic/color/card/element/border */
 
