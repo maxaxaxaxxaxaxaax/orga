@@ -1,47 +1,25 @@
 import { FACH_STRUKTUR } from "./fachStruktur";
 
-// Gerichtete "baut auf"-Kanten GROB zwischen den Kategorien eines Fachs.
-// Konvention: [voraussetzung, baut-darauf-auf] (Pfeil zeigt von der Grundlage
-// zum darauf Aufbauenden). Nur Kategorie-Namen aus FACH_STRUKTUR. Einmalig am
-// Lehrplan orientiert kuratiert, nicht aus Nutzerdaten erzeugt.
+// Gerichtete "baut auf"-Kanten zwischen Themenbereichen eines Fachs.
+// Konvention: [voraussetzung, baut-darauf-auf].
+//
+// BEWUSST LEER. Eine belegte Treue-Prüfung gegen die RLP-Lehrpläne (Sek I, 2022)
+// und KMK-Bildungsstandards (Mathe/Deutsch/Englisch, Volltext gelesen) hat gezeigt:
+// Die Lehrpläne entwickeln ihre Kompetenzbereiche/Leitideen SPIRALIG und VERZAHNT
+// und benennen KEINE gerichteten Voraussetzungsketten zwischen Themenbereichen
+// (KMK Mathe 2022 S.6; KMK Deutsch S.12 "in komplexer Weise verzahnt"; RLP Spiral-
+// prinzip). Von den früher kodierten Kanten war nur eine wörtlich belegt (Mathe
+// Funktionen→Analysis), die liegt im neuen Modell INNERHALB von "Funktionaler
+// Zusammenhang". Mehrere Kanten waren sogar verdreht (z.B. Funktionen→Geometrie:
+// Geometrie läuft ab Kl. 5/6, vor den Funktionen). Daher werden im Netz keine
+// "baut auf"-Pfeile mehr behauptet; die wahrheitsgetreue Beziehung ist die
+// ZUGEHÖRIGKEIT zum Kompetenzbereich (siehe kompetenzbereiche.js, Memory
+// schulhub-lehrplan-treue). Diese Datei bleibt für mögliche, künftig BELEGTE
+// Kanten erhalten; aktuell sind alle Fächer leer.
 export const VORAUSSETZUNGEN = {
-  mathe: [
-    ["Mathematische Grundlagen", "Algebra"],
-    ["Mathematische Grundlagen", "Funktionen"],
-    ["Mathematische Grundlagen", "Geometrie"],
-    ["Mathematische Grundlagen", "Stochastik"],
-    ["Mathematische Grundlagen", "Angewandte Mathematik"],
-    ["Algebra", "Funktionen"],
-    ["Funktionen", "Analysis"],
-    ["Funktionen", "Geometrie"],
-    ["Funktionen", "Stochastik"],
-    ["Analysis", "Stochastik"],
-    ["Algebra", "Angewandte Mathematik"],
-    ["Funktionen", "Angewandte Mathematik"],
-  ],
-  deutsch: [
-    ["Grammatik", "Textarten und Schreiben"],
-    ["Rechtschreibung", "Textarten und Schreiben"],
-    ["Grammatik", "Sprache und Kommunikation"],
-    ["Grammatik", "Stilmittel"],
-    ["Stilmittel", "Lyrik"],
-    ["Stilmittel", "Epik und Dramatik"],
-    ["Lyrik", "Literaturepochen"],
-    ["Epik und Dramatik", "Literaturepochen"],
-    ["Literaturepochen", "Literarische Werke"],
-    ["Epik und Dramatik", "Literarische Werke"],
-  ],
-  englisch: [
-    ["Wortarten", "Satzbau"],
-    ["Zeitformen", "Satzbau"],
-    ["Zeitformen", "Verben"],
-    ["Verben", "Satzbau"],
-    ["Wortschatz und Rechtschreibung", "Schreiben und Textarten"],
-    ["Satzbau", "Schreiben und Textarten"],
-    ["Schreiben und Textarten", "Analyse und Interpretation"],
-    ["Satzbau", "Sprachmittlung und Kommunikation"],
-    ["Wortschatz und Rechtschreibung", "Sprachmittlung und Kommunikation"],
-  ],
+  mathe: [],
+  deutsch: [],
+  englisch: [],
 };
 
 // Prueft die Kanten eines Fachs: existierende Kategorien, keine Selbstkante,

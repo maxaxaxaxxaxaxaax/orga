@@ -146,11 +146,12 @@ body {
   min-height: 100vh;
   background: var(--bg);
 }
-/* Scrollbalken-Platz immer reservieren: sonst verschiebt sich beim Auftauchen
-   des Scrollbalkens (je nach Seiteninhalt) die zentrierte untere Leiste und ihr
-   Knopf springt seitlich. So bleibt die Viewport-Breite konstant. */
+/* Scrollbalken-Platz immer reservieren (auf BEIDEN Seiten): sonst verschiebt sich
+   beim Auftauchen des Scrollbalkens die zentrierte untere Leiste (Knopf springt).
+   both-edges = links wie rechts gleich viel Reserve, damit der Inhalt symmetrisch
+   in der Mitte sitzt (gleiche Ränder). */
 html {
-  scrollbar-gutter: stable;
+  scrollbar-gutter: stable both-edges;
 }
 
 /* Feines Papierkorn über allem: gibt der Fläche Textur statt Plastik. */
@@ -467,5 +468,85 @@ select:focus-visible {
   to {
     opacity: 1;
     transform: translate(-50%, 0);
+  }
+}
+
+/* Anker für die untere Leiste: kein eigener Kasten (display: contents), die fixe
+   Leiste darin positioniert sich selbst. Liegt außerhalb der wischenden Schiene,
+   daher bleibt die Leiste beim Screen-Wechsel stehen und nur ihr Inhalt wechselt. */
+.unten-leiste-slot {
+  display: contents;
+}
+
+/* ---- Screen-Wechsel: horizontaler Wisch zwischen Nav-Bereichen ---------- */
+/* Ruhezustand: ein Screen in normaler Höhe. Beim Wechsel (.im-wechsel) liegen
+   alter und neuer Screen auf einer 200% breiten Schiene nebeneinander und wischen
+   in Pillen-Richtung; danach bleibt nur der neue (statisch). */
+.screen-buehne {
+  position: relative;
+}
+.screen-buehne.im-wechsel {
+  height: 100dvh;
+  overflow: hidden;
+}
+.screen-buehne.im-wechsel .screen-track {
+  display: flex;
+  width: 200%;
+  height: 100%;
+}
+.screen-buehne.im-wechsel .screen-blatt {
+  flex: 0 0 50%;
+  width: 50%;
+  height: 100%;
+}
+/* dir +1 (Pille nach rechts): Schiene [neu, alt], von -50% (alt sichtbar) auf 0
+   (neu sichtbar) -> alles wandert nach rechts. */
+.screen-track.track-rechts {
+  animation: screen-wisch-rechts 0.38s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+/* dir -1 (Pille nach links): Schiene [alt, neu], von 0 auf -50% -> nach links. */
+.screen-track.track-links {
+  animation: screen-wisch-links 0.38s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+@keyframes screen-wisch-rechts {
+  from {
+    transform: translateX(-50%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+@keyframes screen-wisch-links {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .screen-track.track-rechts,
+  .screen-track.track-links {
+    animation-duration: 0.01ms;
+  }
+}
+@media (max-width: 860px) {
+  /* Schmale Screens scrollen die Seite normal: kein Höhen-/Overflow-Zwang, der
+     alte Screen wird einfach ausgeblendet (sofortiger Wechsel ohne Schiene). */
+  .screen-buehne.im-wechsel {
+    height: auto;
+    overflow: visible;
+  }
+  .screen-buehne.im-wechsel .screen-track {
+    display: block;
+    width: 100%;
+    animation: none;
+    transform: none;
+  }
+  .screen-buehne.im-wechsel .screen-blatt {
+    width: 100%;
+  }
+  .screen-buehne.im-wechsel .screen-blatt-alt {
+    display: none;
   }
 }

@@ -79,6 +79,7 @@ export function useRasterMorph() {
     min: 0,
     max: 12,
     commit: null,
+    zumNaechsten: null, // optional: überschreibt Math.round beim Einrasten
   });
 
   useEffect(() => {
@@ -141,6 +142,7 @@ export function useRasterMorph() {
         s.min = opts.min;
         s.max = opts.max;
         s.commit = opts.commit;
+        s.zumNaechsten = opts.zumNaechsten || null;
         setDrag({ id, wert: start });
         starte();
         try {
@@ -155,7 +157,7 @@ export function useRasterMorph() {
         const roh = spalteAusX(e.clientX);
         if (roh == null) return;
         const c = Math.max(s.min, Math.min(s.max, roh));
-        const nah = Math.round(c);
+        const nah = s.zumNaechsten ? s.zumNaechsten(c) : Math.round(c);
         s.ziel = Math.abs(c - nah) <= 0.18 ? nah : c; // magnetisch einrasten
         starte();
       },
@@ -163,7 +165,8 @@ export function useRasterMorph() {
         const s = sim.current;
         if (s.id === id) {
           s.aktiv = false;
-          s.ziel = Math.round(s.ziel); // auf ganze Spalte, Feder läuft dorthin aus
+          const rund = s.zumNaechsten ? s.zumNaechsten(s.ziel) : Math.round(s.ziel);
+          s.ziel = rund; // auf ganze Spalte, Feder läuft dorthin aus
           starte();
         }
         try {
@@ -176,7 +179,7 @@ export function useRasterMorph() {
         const s = sim.current;
         if (s.id === id) {
           s.aktiv = false;
-          s.ziel = Math.round(s.wert);
+          s.ziel = s.zumNaechsten ? s.zumNaechsten(s.wert) : Math.round(s.wert);
           starte();
         }
       },

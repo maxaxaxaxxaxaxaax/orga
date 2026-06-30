@@ -1,5 +1,9 @@
 import { useState } from "react";
-import { neueAufgaben, macheOptionen } from "../lib/aufgabenGeneratoren";
+import {
+  neueAufgaben,
+  macheOptionen,
+  formatNegativeZahl,
+} from "../lib/aufgabenGeneratoren";
 import Fertig from "./Fertig";
 import "./Quiz.css";
 
@@ -22,18 +26,27 @@ function optText(opt) {
   return typeof opt === "string" ? opt : opt.text;
 }
 
+// Vergleichs-Normalisierung: typografisches Minus (−), En-/Em-Dash und ASCII-
+// Bindestrich gelten als dasselbe, damit getippte Antworten und die mit −
+// gesetzten Zahl-Optionen gleich gewertet werden.
+function normAntwort(x) {
+  return String(x).trim().toLowerCase().replace(/[−–—]/g, "-");
+}
+
 function istRichtig(aufgabe, antwort) {
-  const a = String(antwort).trim().toLowerCase();
+  const a = normAntwort(antwort);
   if (Array.isArray(aufgabe.loesung)) {
-    return aufgabe.loesung.some((l) => String(l).trim().toLowerCase() === a);
+    return aufgabe.loesung.some((l) => normAntwort(l) === a);
   }
-  return String(aufgabe.loesung).trim().toLowerCase() === a;
+  return normAntwort(aufgabe.loesung) === a;
 }
 
 function loesungText(aufgabe) {
-  return Array.isArray(aufgabe.loesung)
+  const l = Array.isArray(aufgabe.loesung)
     ? aufgabe.loesung[0]
-    : String(aufgabe.loesung);
+    : aufgabe.loesung;
+  // Zahlen mit typografischem Minus zeigen, genau wie in der Frage.
+  return typeof l === "number" ? formatNegativeZahl(l) : String(l);
 }
 
 export default function Quiz({ generatorKey, onAbgeschlossen }) {

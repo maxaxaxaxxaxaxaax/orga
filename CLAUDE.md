@@ -15,7 +15,7 @@ Wenn ein Vorschlag gegen die VISION verstößt oder doppelt zu APP.md ist, wird 
 
 ## Was ist das
 
-**Orgatool** ist ein Schul-Organisationstool (Konzept/Demo, kein Backend) für das
+**Orca** (früher „Orgatool") ist ein Schul-Organisationstool (Konzept/Demo, kein Backend) für das
 **Theresianum Mainz**, ein katholisches Ganztagsgymnasium. Zielgruppe: Schüler:in der
 Mittelstufe (~Klasse 7, 12–14 Jahre), die selbstreguliert lernt. Die ganze Oberfläche ist
 **auf Deutsch**, Sprache bewusst einfach und kindgerecht, Fachbegriffe werden erklärt.

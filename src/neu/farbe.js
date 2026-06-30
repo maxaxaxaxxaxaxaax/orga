@@ -1,3 +1,15 @@
+import { fachFarbe } from "../data/stundenplanWoche";
+
+// Fach-Label als farbiger Text auf hellem/neutralem Grund (Pillen, Listen, Bars):
+// die jeweilige Fachfarbe, aber zur Tinte abgedunkelt, damit auch helle Faecher
+// (Gelb, Hellblau, Hellgruen) als kleiner Text lesbar bleiben. Der Farbton bleibt
+// erkennbar. Geteilt von WegLeiste, Stundenplan (Heute) und Fokus.
+export function fachTextFarbe(fach) {
+  const farbe = fachFarbe[fach];
+  if (!farbe) return "var(--text-2)";
+  return `color-mix(in srgb, ${farbe} 70%, var(--text))`;
+}
+
 // Lesbare Textfarbe auf einer Vollton-Fachfarbe: helle Farbe -> dunkle Schrift,
 // dunkle Farbe -> weisse Schrift. Geteilt von Etappenplan und Wochenplan, damit
 // die bunten KB-Kacheln ueberall gleich aussehen.

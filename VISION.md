@@ -1,4 +1,4 @@
-# VISION.md - Orgatool
+# VISION.md - Orca
 
 Dieses Dokument hält die Mission, den Catch und die Grenzen der App fest.
 **Vor jedem Feature-Brainstorming, Konzept-Vorschlag oder Design-Entscheidung lesen.**

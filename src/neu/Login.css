@@ -1,28 +1,37 @@
-/* Anmeldung: ruhiger Vollbild-Einstieg, über allem (auch Fokus z-200). */
+/* Login als editoriale Hero-Section: ruhiges Papier, Fraunces-Display + Hanken-Sans
+   (die im System angelegte Editorial-Paarung), alles auf dem 800px-Pillenraster. */
 .login {
   position: fixed;
   inset: 0;
   z-index: 300;
-  display: grid;
-  place-items: center;
-  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-text);
+  overflow: hidden;
   background: radial-gradient(
-    120% 80% at 50% -10%,
-    color-mix(in srgb, var(--accent) 12%, var(--bg)),
-    var(--bg)
-  );
+      120% 70% at 14% -8%,
+      color-mix(in srgb, var(--accent) 13%, var(--bg)),
+      transparent 58%
+    ),
+    var(--bg);
 }
-.login-karte {
-  position: relative;
+/* Die Login-Pille nutzt die Glas-Leiste (.weg) aus dem App-Shell. */
+.login-weg {
+  z-index: 2;
+}
+
+/* Inhaltsspalte auf der gemeinsamen Pillenbreite (800px), damit Hero und CTA auf
+   demselben Raster sitzen. Füllt die Höhe; unten Platz für die Pille. */
+.login-inhalt {
+  flex: 1;
   box-sizing: border-box;
-  width: min(420px, 100%);
-  padding: 40px 34px 28px;
-  text-align: center;
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: 24px;
-  box-shadow: var(--shadow-lg);
-  animation: login-rein 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  width: min(1080px, calc(100% - 2 * var(--seite-x)));
+  margin: 0 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: clamp(26px, 5vh, 54px) 0 calc(var(--seite-bottom) + 10px);
+  animation: login-rein 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) both;
 }
 @keyframes login-rein {
   from {
@@ -34,102 +43,119 @@
     transform: none;
   }
 }
-.login-marke {
-  display: inline-flex;
+
+/* Masthead: Logo links, Rubrik rechts, dünne Regel darunter. */
+.login-masthead {
+  flex-shrink: 0;
+  display: flex;
   align-items: center;
-  gap: 9px;
-  margin-bottom: 22px;
+  justify-content: space-between;
+  gap: 16px;
 }
-.login-logo {
-  width: 34px;
-  height: 34px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 10px;
-  background: var(--accent-soft);
-  color: var(--accent-strong);
-}
-.login-logo-svg {
-  width: 20px;
-  height: 20px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.8;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-.login-schule {
-  font-size: 0.92rem;
-  font-weight: 600;
-  color: var(--text-2);
-}
-.login-titel {
-  margin: 0 0 8px;
-  font-family: var(--font-display);
-  font-size: 2.4rem;
-  font-weight: 600;
-  letter-spacing: -0.01em;
+.login-wortmarke {
+  width: clamp(118px, 16vw, 178px);
+  height: auto;
   color: var(--text);
-}
-.login-text {
-  margin: 0 auto 26px;
-  max-width: 300px;
-  font-size: 0.98rem;
-  line-height: 1.5;
-  color: var(--text-2);
-}
-.login-haupt {
-  display: block;
-  width: 100%;
-  padding: 14px;
-  border: none;
-  border-radius: 14px;
-  background: var(--accent);
-  color: #fff;
-  font-size: 0.98rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background 0.16s ease, transform 0.12s ease;
-}
-.login-haupt:hover {
-  background: var(--accent-strong);
-}
-.login-haupt:active {
-  transform: scale(0.99);
-}
-.login-gast {
-  display: block;
-  width: 100%;
-  margin-top: 10px;
-  padding: 12px;
-  border: none;
-  border-radius: 14px;
-  background: transparent;
-  color: var(--text-2);
-  font-size: 0.92rem;
-  font-weight: 600;
-  cursor: pointer;
-}
-.login-gast:hover {
-  color: var(--text);
-}
-.login-fuss {
-  margin: 22px 0 0;
-  font-size: 0.8rem;
-  color: var(--muted);
 }
 
-/* Schritt 2: Schulaccount verknüpfen. */
-.login-zurueck {
+/* Hero: mittig in der verbleibenden Höhe. */
+.login-hero {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: clamp(14px, 2.4vh, 22px);
+}
+.login-kicker {
+  margin: 0;
+  font-size: 0.86rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--accent-strong);
+}
+.login-display {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(2.7rem, 7.4vw, 5rem);
+  line-height: 1;
+  letter-spacing: -0.015em;
+  color: var(--text);
+}
+.login-display em {
+  font-style: italic;
+  font-weight: 500;
+}
+.login-deck {
+  margin: 0;
+  max-width: 42ch;
+  font-size: clamp(1rem, 1.5vw, 1.18rem);
+  line-height: 1.55;
+  color: var(--text-2);
+}
+
+/* Start-Hero: zweispaltig (Text links, Produktbild rechts). */
+.login-hero-start {
+  display: grid;
+  grid-template-columns: 1.04fr 0.96fr;
+  align-items: center;
+  gap: clamp(28px, 5vw, 64px);
+}
+.login-hero-text {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(14px, 2.4vh, 22px);
+}
+.login-hero-start .login-display {
+  font-size: clamp(2.3rem, 5.4vw, 4rem);
+}
+
+/* Produktbild rechts, Logo oben links darüber. */
+.login-bild {
+  position: relative;
+  margin: 0;
+}
+.login-bild img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--r-lg, 20px);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-md);
+}
+.login-bild-logo {
   position: absolute;
   top: 18px;
-  left: 18px;
+  left: 20px;
+  width: clamp(92px, 11vw, 128px);
+  height: auto;
+  color: var(--text);
+  z-index: 2;
+}
+
+/* Schritt 2: Konto verknüpfen, in einer ruhigen Karte mittig im Hero-Bereich. */
+.login-hero-konto {
+  justify-content: center;
+}
+.login-karte {
+  position: relative;
+  box-sizing: border-box;
+  width: min(440px, 100%);
+  padding: 24px 28px 24px;
+  text-align: left;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-xl, 28px);
+  box-shadow: var(--shadow-lg);
+}
+.login-zurueck {
   width: 34px;
   height: 34px;
+  margin: 0 0 14px;
   border: 1px solid var(--line);
   border-radius: 50%;
-  background: var(--card);
+  background: var(--bg);
   color: var(--text-2);
   font-size: 1.2rem;
   line-height: 1;
@@ -139,7 +165,7 @@
   color: var(--text);
 }
 .login-eyebrow {
-  margin: 6px 0 18px;
+  margin: 0 0 16px;
   font-size: 0.74rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -206,4 +232,32 @@
   top: 0;
   color: var(--accent-strong);
   font-weight: 700;
+}
+
+/* Schmaler: Hero stapelt, Bild unter den Text (oben begrenzt). */
+@media (max-width: 760px) {
+  .login-hero-start {
+    grid-template-columns: 1fr;
+    gap: clamp(20px, 4vh, 32px);
+  }
+  .login-bild {
+    max-width: 420px;
+  }
+}
+/* Schmal: enger Seitenrand. */
+@media (max-width: 560px) {
+  .login-inhalt {
+    width: calc(100% - 2 * var(--seite-x-eng));
+    padding-top: 22px;
+  }
+}
+/* Sehr niedrige Viewports: lieber scrollen als die Hero-Section beschneiden. */
+@media (max-height: 600px) {
+  .login {
+    overflow: auto;
+  }
+  .login-inhalt {
+    min-height: 100%;
+    height: auto;
+  }
 }

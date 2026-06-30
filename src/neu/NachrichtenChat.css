@@ -1,0 +1,170 @@
+/* Chat-Fenster mit der Lerncoach: ruhiges Overlay, Karte mittig, Verlauf als
+   Blasen (Coach links, eigene rechts), Eingabe unten. Farben über Variablen. */
+.nc-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: color-mix(in srgb, var(--text) 32%, transparent);
+  animation: nc-fade 0.18s ease;
+}
+.nc {
+  width: min(440px, 100%);
+  max-height: min(620px, 90vh);
+  display: flex;
+  flex-direction: column;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg, 16px);
+  box-shadow: 0 18px 50px -12px color-mix(in srgb, var(--text) 40%, transparent);
+  overflow: hidden;
+  animation: nc-auf 0.2s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.nc-kopf {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--line);
+}
+.nc-avatar {
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--on-accent);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+.nc-wer {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+.nc-name {
+  font-weight: 700;
+  color: var(--text);
+}
+.nc-rolle {
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+.nc-schliessen {
+  margin-left: auto;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  border-radius: 999px;
+  color: var(--text-2);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.nc-schliessen:hover {
+  background: var(--card-2);
+}
+.nc-verlauf {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.nc-msg {
+  max-width: 78%;
+  padding: 9px 12px;
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.nc-coach {
+  align-self: flex-start;
+  background: var(--card-2);
+  border-bottom-left-radius: 4px;
+}
+.nc-ich {
+  align-self: flex-end;
+  background: var(--accent);
+  border-bottom-right-radius: 4px;
+}
+.nc-text {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.35;
+  color: var(--text);
+}
+.nc-ich .nc-text {
+  color: var(--on-accent);
+}
+.nc-zeit {
+  align-self: flex-end;
+  font-size: 0.66rem;
+  color: var(--muted);
+}
+.nc-ich .nc-zeit {
+  color: color-mix(in srgb, var(--on-accent) 75%, transparent);
+}
+.nc-eingabe {
+  display: flex;
+  gap: 8px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--line);
+}
+.nc-eingabe input {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 14px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: var(--card-2);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.9rem;
+}
+.nc-eingabe input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.nc-senden {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+.nc-senden:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+@keyframes nc-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes nc-auf {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .nc-backdrop,
+  .nc {
+    animation: none;
+  }
+}

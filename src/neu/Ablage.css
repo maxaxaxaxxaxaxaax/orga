@@ -9,6 +9,9 @@
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-satoshi);
+  /* Spalte, damit die Netz-Ansicht die volle Höhe füllen kann (wie die Übersicht). */
+  display: flex;
+  flex-direction: column;
 }
 .ab-screen :is(h1, h2, h3) {
   font-family: var(--font-satoshi);
@@ -103,6 +106,54 @@
 /* Eine Spalte: nur noch die Materialien-Karte (die Fächer sind oben drin). */
 .ab-grid {
   position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+/* Netz-Ansicht: Karte + Netz füllen die verbleibende Höhe bis zur unteren Leiste. */
+.ab-card.ab-fuellt {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.ab-fuellt .ab-netz {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+/* Fächer-Ordner als schwebende Pille oben mittig auf dem Netz (nur Netz-Ansicht). */
+.ab-faecher-overlay {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 4;
+  flex-wrap: nowrap;
+  margin: 0;
+  padding: 6px 8px;
+  border-bottom: none;
+  background: color-mix(in srgb, var(--card) 82%, transparent);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  box-shadow: var(--shadow-sm);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  max-width: calc(100% - 20px);
+}
+.ab-fuellt .netz {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.ab-fuellt .netz-flaeche {
+  flex: 1;
+  height: auto;
+  min-height: 0;
 }
 
 .ab-card {
@@ -165,6 +216,15 @@
 }
 .ab-ordner svg {
   filter: drop-shadow(0 4px 6px rgba(54, 44, 26, 0.14));
+}
+/* Eigene Fach-Ordner-SVGs (80x59) auf eine einheitliche Höhe bringen. */
+.ab-ordner-svg {
+  display: inline-flex;
+}
+.ab-ordner-svg svg {
+  display: block;
+  width: auto;
+  height: 48px;
 }
 .ab-ordner-name {
   font-size: 0.78rem;
@@ -351,10 +411,11 @@
   color: var(--accent);
 }
 
-/* Listenkopf: Suche links (wo früher "Alle" stand), Raster + Sortieren rechts */
+/* Listenkopf: Raster + Sortieren rechts (die Suche liegt nur noch unten in der Pille). */
 .ab-liste-kopf {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 12px;
   margin-bottom: 12px;
 }
@@ -363,14 +424,6 @@
   align-items: center;
   gap: 10px;
   flex-shrink: 0;
-}
-.ab-suche-klein {
-  flex: 1;
-  padding: 8px 14px;
-  box-shadow: none;
-}
-.ab-suche-klein input {
-  font-size: 0.88rem;
 }
 
 /* Sortieren-Dropdown */
@@ -479,6 +532,18 @@
   font-size: 0.82rem;
   color: var(--muted);
   font-variant-numeric: tabular-nums;
+}
+/* Fach-Kennzeichen am Treffer bei globaler Suche (zeigt, aus welchem Fach). */
+.ab-zeile-fach {
+  flex-shrink: 0;
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--text-2);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 2px 9px;
+  white-space: nowrap;
 }
 .ab-liste-leer {
   margin: 0;

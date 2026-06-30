@@ -1,8 +1,9 @@
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { koennensbeweise, kbFarbe } from "../data/koennensbeweise";
 import {
   stundenWoche,
   fachFarbe,
+  istBelegbar,
   stundenId,
   lehrkraefte,
   artLabel,
@@ -11,8 +12,6 @@ import { etappen } from "../data/etappen";
 import { lernwegFuerKb } from "../data/wissen";
 import { generatorFuerKb } from "./uebungen";
 import Etappenring from "./Etappenring";
-import { RasterGriff } from "./raster";
-import { useRasterMorph } from "./rasterZiehen";
 import {
   lade,
   WOCHEN_KEY,
@@ -28,7 +27,42 @@ import {
 } from "./planung";
 import { ladeNotizen, addNotiz, entferneNotiz, toggleNotiz } from "./notizen";
 import { ladeSchritte } from "./lernschritte";
+import {
+  ladeMitteilungen,
+  markiereAlleGelesen,
+  MITTEILUNG_EVENT,
+} from "./benachrichtigungen";
+import Icon from "./Icon";
+import NachrichtenChat from "./NachrichtenChat";
+import { fachTextFarbe } from "./farbe";
 import "./Heute.css";
+
+// Coach-Mitteilung: kleines Personen-Symbol (kein eigenes Set-Icon dafür).
+const PersonIcon = () => (
+  <svg
+    viewBox="0 0 24 24"
+    className="hu-nachr-svg"
+    aria-hidden="true"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.7"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+    <circle cx="12" cy="7" r="4" />
+  </svg>
+);
+
+// Linke Position eines Reglers GENAU in der Mitte der Grid-Lücke. Bei `left: pct%`
+// allein säße er nur bei 50/50 mittig; sonst ist er um gap*(pct/100 - 0.5) versetzt,
+// weil die Spalten sich die Breite ohne die Lücke teilen. Diese Korrektur gleicht das
+// aus (der Regler hat translateX(-50%), `left` ist also seine Mitte).
+function teilerLinks(pct) {
+  const k = 0.5 - pct / 100;
+  const vz = k >= 0 ? "+" : "-";
+  return `calc(${pct}% ${vz} ${Math.abs(k).toFixed(4)} * var(--grid-gap, 18px))`;
+}
 
 // Sammelt die Zusatzinfos zu einem Etappenziel für die Tageskarte: Lernweg,
 // Schritt-Fortschritt (für die KB-Bereitschaft, SCHULE.md Cluster 4), Materialien
@@ -59,16 +93,6 @@ function kbInfo(kbId) {
 
 const ETAPPE = etappen.find((e) => e.id === 4) || etappen[0];
 
-// Raster-Standard und je Box die "größtmögliche" Aufteilung (b1=Fortschritt|
-// Notizen-Grenze, b2=…|Stundenplan-Grenze, in 12teln). Beim Antippen einer Box
-// wächst sie auf ihr Maximum, die anderen bleiben sichtbar (kein Vollbild).
-const GRENZEN_STD = { b1: 4, b2: 8 };
-const GRENZEN_MAX = {
-  fortschritt: { b1: 8, b2: 10 },
-  notizen: { b1: 2, b2: 10 },
-  aufgaben: { b1: 6, b2: 10 },
-  plan: { b1: 2, b2: 4 },
-};
 
 export default function Heute({ onFokus }) {
   const wochenZuordnung = lade(WOCHEN_KEY);
@@ -82,64 +106,153 @@ export default function Heute({ onFokus }) {
   // sieht, wie sich die App an dem Tag verhält. Global gespeichert, damit die
   // Weg-Leiste und der Rest mitziehen.
   const [tag, setTag] = useState(heuteTag);
+  // Aktuelle Uhrzeit in Minuten (einmal beim Öffnen erfasst): markiert im
+  // Stundenplan die Stunde, in der man gerade ist (nur am Demo-"heute").
+  const [jetztMin] = useState(() => {
+    const d = new Date();
+    return d.getHours() * 60 + d.getMinutes();
+  });
   // Erinnerungen (Brain-Dump aus dem Fokus), hier zum Abhaken/Löschen.
   const [notizen, setNotizen] = useState(ladeNotizen);
   const [wisch, setWisch] = useState(null); // { i, x0, dx } für Swipe-zum-Löschen
   const [neueErinnerung, setNeueErinnerung] = useState("");
+  // Nachrichten/Mitteilungen (früher in der Topbar-Glocke), jetzt als eigene Box.
+  const [mitteilungen, setMitteilungen] = useState(ladeMitteilungen);
+  // Chat-Fenster mit der Lerncoach (öffnet beim Tippen auf eine Nachricht).
+  const [chatOffen, setChatOffen] = useState(false);
+  useEffect(() => {
+    const f = () => setMitteilungen(ladeMitteilungen());
+    window.addEventListener(MITTEILUNG_EVENT, f);
+    return () => window.removeEventListener(MITTEILUNG_EVENT, f);
+  }, []);
+  // Box ist dauerhaft sichtbar: kurz den frischen Stand zeigen, dann als gelesen
+  // markieren (der "neu"-Punkt verschwindet ruhig).
+  useEffect(() => {
+    const id = setTimeout(() => markiereAlleGelesen(), 1500);
+    return () => clearTimeout(id);
+  }, []);
   // Lange Nachzügler-Liste ruhig eingeklappt halten (nicht überladen).
   const [nachzueglerAlle, setNachzueglerAlle] = useState(false);
-  // Prototyp: die zwei senkrechten Raster-Grenzen der Übersicht per Ziehen
-  // verschieben (geteilt mit Ablage/Fokus, siehe ./raster). B1 = Fortschritt|
-  // Notizen, B2 = Notizen/Aufgaben|Stundenplan.
-  const [b1, setB1] = useState(4);
-  const [b2, setB2] = useState(8);
-  // Beim Ziehen folgt die aktive Grenze kontinuierlich der Maus (g1/g2) und rastet
-  // nur nahe ganzer Spalten magnetisch ein; im Ruhezustand sind es die gerasteten
-  // b1/b2. So folgt die Box flüssig statt sprunghaft.
-  const { ref: gridRef, drag, grenzeZieh } = useRasterMorph();
-  const g1 = drag?.id === "b1" ? drag.wert : b1;
-  const g2 = drag?.id === "b2" ? drag.wert : b2;
-  // Inhaltsdichte hängt an der (beim Ziehen kontinuierlichen) Breite der Box.
-  const fSpan = g1; // Etappenfortschritt
-  const nSpan = g2 - g1; // Notizen
-  const aSpan = g2; // Aufgaben
-  const pSpan = 12 - g2; // Stundenplan
-  // Etappenfortschritt-Stufen: der glatte Ring bleibt immer gleich, je breiter die
-  // Box kommt nur mehr Info dazu. 3 = + Farb-Legende, 4 = + Balken je Fach mit Zahl.
-  const fortStufe = fSpan < 2.5 ? 1 : fSpan < 3.5 ? 2 : fSpan < 4.5 ? 3 : 4;
-  // Untertitel erklärt, was man auf der aktuellen Stufe gerade sieht.
-  const fortSub =
-    fortStufe === 1
-      ? "Dein Fortschritt"
-      : fortStufe === 2
-        ? "Dein Fortschritt je Fach"
-        : fortStufe === 3
-          ? "Je Fach, mit Farb-Legende"
-          : "Je Fach, mit Legende und Balken";
-
-  // Tippt man auf eine Box (nicht auf interaktive Inhalte wie Karten, Felder,
-  // Greifpunkte), wächst sie auf die größtmögliche Aufteilung im Raster; die
-  // anderen schrumpfen, bleiben aber sichtbar. Nochmal tippen stellt das Standard-
-  // Raster wieder her (Toggle).
-  const [expandiert, setExpandiert] = useState(null);
-  function boxTipp(e, id) {
-    if (
-      e.target.closest(
-        "button, input, textarea, select, a, .raster-griff, .hu-notiz-liste, .hu-notiz-add"
-      )
-    )
-      return;
-    const ziel = expandiert === id ? GRENZEN_STD : GRENZEN_MAX[id];
-    if (!ziel) return;
-    setB1(ziel.b1);
-    setB2(ziel.b2);
-    setExpandiert(expandiert === id ? null : id);
+  // Vier Boxen im 2x2, je Reihe ein eigener Breiten-Regler (oben Etappe|Nachrichten,
+  // unten Aufgaben|Erinnerungen). Beide rasten identisch: die linke Box auf 3, 4 oder
+  // 5 der 8 linken Spalten (drei Größen), die rechte behält so immer mindestens 3
+  // Spalten. Lebt nur im Speicher (Reload setzt zurück). Stundenplan rechts bleibt fest.
+  const gridRef = useRef(null);
+  // Start immer in der kleinsten Etappen-Stufe (2 Spalten, nur Ring); von dort zieht
+  // man auf. o = 25 entspricht 2 von 8 Spalten. p = Anteil der linken Fläche am
+  // Gesamtraster (Default 2/3, also Stundenplan rechts = 1/3). Lebt nur im Speicher.
+  const [splits, setSplits] = useState({ o: 25, u: 50, p: 200 / 3 });
+  const [zieh, setZieh] = useState(null); // { key, rect } beim seitlichen Ziehen
+  function ziehStart(e, key) {
+    e.preventDefault();
+    // Container (.hu-row) über das Eltern-Element des Reglers.
+    const cont = e.currentTarget.parentElement;
+    if (!cont) return;
+    setZieh({ key, rect: cont.getBoundingClientRect() });
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId);
+    } catch {
+      /* kein echter Zeiger */
+    }
   }
+  function ziehBewegen(e) {
+    if (!zieh) return;
+    const { rect, key } = zieh;
+    const roh = ((e.clientX - rect.left) / rect.width) * 100;
+    let pct;
+    if (key === "p") {
+      // Stundenplan-Regler: linke Fläche auf 7, 8 oder 9 von 12 Spalten rasten,
+      // der Stundenplan rechts also auf 5, 4 oder 3 Spalten.
+      const cols = Math.max(7, Math.min(9, Math.round((roh / 100) * 12)));
+      pct = (cols / 12) * 100;
+    } else {
+      // o/u: beide Reihen rasten identisch auf drei Stufen der linken Fläche (8 von 12
+      // Spalten): Stufe 1 = 2 Spalten (schmalster Block, glatter Kreis ohne Segmente),
+      // Stufe 2 = 4 Spalten (Ring mit Segmenten + Fächer-Legende), Stufe 3 = 5 Spalten
+      // (zusätzlich der Segment-Balken je Fach). Die 3 dazwischen rastet nicht; die
+      // rechte Box behält dadurch mindestens 3 Spalten.
+      const rawSpalten = (roh / 100) * 8;
+      const spalten = rawSpalten < 3 ? 2 : rawSpalten < 4.5 ? 4 : 5;
+      pct = (spalten / 8) * 100;
+    }
+    setSplits((s) => (s[key] === pct ? s : { ...s, [key]: pct }));
+  }
+  function ziehEnde(e) {
+    setZieh(null);
+    try {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    } catch {
+      /* schon freigegeben */
+    }
+  }
+  function reglerProps(key) {
+    return {
+      onPointerDown: (e) => ziehStart(e, key),
+      onPointerMove: ziehBewegen,
+      onPointerUp: ziehEnde,
+      onPointerCancel: ziehEnde,
+    };
+  }
+  // Inhaltsdichte je Box aus den Reglern (12tel-Äquivalent; links = 2/3 des Rasters,
+  // Stundenplan fest 1/3). So bleibt die bestehende Stufen-Logik gültig.
+  const LINKS = 2 / 3;
+  const fSpan = LINKS * (splits.o / 100) * 12; // Etappenfortschritt
+  const aSpan = LINKS * (splits.u / 100) * 12; // Aufgaben
+  const eSpan = LINKS * ((100 - splits.u) / 100) * 12; // Erinnerungen
+  const pSpan = ((100 - splits.p) / 100) * 12; // Stundenplan (rechte Spalte, regelbar)
+  // Stufe 1 (2 Spalten): nur der glatte Ring ohne Segmente, keine Legende.
+  // Ab 3 Spalten kommt die Fächer-Legende dazu (Stufe 3), ab 5 Spalten die Balken
+  // (Stufe 4). Schwellen auf den Mitten (2.5 / 4.5), damit Rundungs-/Float-Werte an
+  // den Spaltengrenzen (fSpan ≈ 2, 3, 4, 5) sicher auf der richtigen Seite landen.
+  const fortStufe = fSpan < 2.5 ? 1 : fSpan < 4.5 ? 3 : 4;
+  // Untertitel beschreibt knapp, was zu sehen ist (ohne Zieh-Hinweis). Ab der
+  // Balken-Stufe kommt die Wochen-Ebene dazu, der Untertitel wird also genauer.
+  const fortSub =
+    fortStufe < 4
+      ? "Dein Fortschritt je Fach."
+      : "Dein Fortschritt je Fach und Woche.";
 
   useEffect(() => {
     localStorage.setItem(ERLEDIGT_KEY, JSON.stringify(erledigt));
     meldeAenderung();
   }, [erledigt]);
+
+  // Ring-Größe = Innenbreite der kleinsten Fortschritt-Box (2 von 12 Spalten),
+  // abhängig nur von der Gesamtbreite (nicht vom Regler). So bleibt der Ring konstant
+  // groß und links verankert und springt beim Resize nicht (wie früher).
+  useEffect(() => {
+    const grid = gridRef.current;
+    if (!grid || typeof ResizeObserver === "undefined") return undefined;
+    const messen = () => {
+      const gap = parseFloat(getComputedStyle(grid).columnGap) || 18;
+      const spalte2 = ((grid.clientWidth - gap) * 2) / 12;
+      const ringW = Math.max(0, spalte2 - 44);
+      grid.style.setProperty("--ring-groesse", ringW + "px");
+      // Feste, in der Namens-Stufe (4 Spalten) zentrierte Startposition der Legende.
+      // Sie gilt auch in der Balken-Stufe (5 Spalten), damit die Namen beim Vergrößern
+      // NICHT verrutschen: nur der Balken füllt den Platz rechts davon. Unabhängig vom
+      // aktuellen Regler berechnet (über die feste Breite der linken Fläche).
+      const links = grid.querySelector(".hu-left");
+      const karte = grid.querySelector(".hu-fortschritt");
+      if (links && karte) {
+        const box4 = (links.clientWidth - gap) / 2; // 4 von 8 Spalten = halbe Fläche
+        const pad = parseFloat(getComputedStyle(karte).paddingLeft) || 0;
+        const inhalt = box4 - 2 * pad;
+        const namenBreite = 18 + 6.8 * 0.86 * 16; // Punkt + Lücke + Fach-Spalte (6.8em)
+        const ml = Math.max(0, (inhalt - ringW - gap - namenBreite) / 2);
+        grid.style.setProperty("--legende-links", ml + "px");
+      }
+    };
+    messen();
+    const ro = new ResizeObserver(messen);
+    ro.observe(grid);
+    // Auch die linke Fläche beobachten: ändert sich ihre Breite durch den
+    // Stundenplan-Regler (p), muss --legende-links neu berechnet werden.
+    const links = grid.querySelector(".hu-left");
+    if (links) ro.observe(links);
+    return () => ro.disconnect();
+  }, []);
+
 
   // Der Erledigt-Stand kann auch von außen kommen (der Fokus-Modus hakt ein Ziel
   // ab). Auf den Planungs-Melder hören und neu einlesen, aber nur bei echter
@@ -264,84 +377,35 @@ export default function Heute({ onFokus }) {
         onClick={() => onFokus(k.id)}
         title="Im Fokus öffnen und Schritt für Schritt machen"
       >
-        <span className="hu-auf-icon" aria-hidden="true">
-          <svg
-            viewBox="0 0 24 24"
-            width="20"
-            height="20"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <circle cx="6" cy="6" r="2.3" />
-            <circle cx="18" cy="18" r="2.3" />
-            <path d="M6 8.3v3.4a4 4 0 0 0 4 4h5.4" />
-          </svg>
+        <span className="hu-auf-kopf">
+          <span className="hu-auf-fachzeile">
+            <span className="hu-auf-fach">{k.fach}</span>
+            <span className="hu-auf-icon" aria-hidden="true">
+              <Icon name="lernweg" width={20} height={20} />
+            </span>
+          </span>
+          <span className="hu-auf-titel">{k.titel}</span>
         </span>
-        <span className="hu-auf-titel">{k.titel}</span>
-        <span className="hu-auf-fach">{k.fach}</span>
         <span className="hu-auf-chips">
           {aSpan >= 5 && (
             <span className="hu-auf-chip">
-              <svg
-                className="hu-auf-chip-icon"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-              >
-                <rect x="4" y="5" width="16" height="15" rx="2.5" />
-                <path d="M4 9.5h16M8 3.5v3M16 3.5v3" />
-              </svg>
+              <Icon name="week" className="hu-auf-chip-icon" />
               {st ? `${st.von} - ${st.bis}` : "frei einteilbar"}
             </span>
           )}
           {anzahlStunden > 0 && aSpan >= 8 && (
             <span className="hu-auf-chip">
-              <svg
-                className="hu-auf-chip-icon"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-              >
-                <circle cx="12" cy="12" r="9" />
-                <path d="M12 7.5v5l3 2" />
-              </svg>
+              <Icon name="clock" className="hu-auf-chip-icon" />
               {anzahlStunden} {anzahlStunden === 1 ? "Stunde" : "Stunden"}
             </span>
           )}
           {st && aSpan >= 6 && (
             <span className="hu-auf-chip">
-              <svg
-                className="hu-auf-chip-icon"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-              >
-                <path d="M12 21s7-5.2 7-11a7 7 0 1 0-14 0c0 5.8 7 11 7 11Z" />
-                <circle cx="12" cy="10" r="2.4" />
-              </svg>
+              <Icon name="location" className="hu-auf-chip-icon" />
               {st.raum}
             </span>
           )}
         </span>
-        {aSpan >= 9 &&
-          (info.schritte > 0 ||
-            (aSpan >= 10 && (info.materialien > 0 || info.hatUebung))) && (
-            <span className="hu-auf-meta">
-              {info.schritte > 0 && (
-                <span className="hu-auf-meta-teil">
-                  {info.fertigeSchritte}/{info.schritte} Schritte
-                </span>
-              )}
-              {aSpan >= 10 && info.materialien > 0 && (
-                <span className="hu-auf-meta-teil">
-                  {info.materialien} Materialien
-                </span>
-              )}
-              {aSpan >= 10 && info.hatUebung && (
-                <span className="hu-auf-meta-teil">Übung dabei</span>
-              )}
-            </span>
-          )}
         {done ? (
           <span className="hu-auf-status done">✓ Erledigt</span>
         ) : prog > 0 ? (
@@ -392,6 +456,15 @@ export default function Heute({ onFokus }) {
     )
     .sort((a, b) => fruehesteStundeHeute(a) - fruehesteStundeHeute(b));
   const tagStunden = stundenWoche.filter((s) => s.tag === tag);
+  // "Wo man gerade ist": am Demo-"heute" die laufende bzw. nächste Stunde (die erste,
+  // die noch nicht vorbei ist; nach Schulschluss die letzte), sonst keine.
+  const jetztStunde =
+    tag === heuteTag()
+      ? tagStunden.find((s) => minutenAusZeit(s.bis) > jetztMin) ||
+        tagStunden[tagStunden.length - 1] ||
+        null
+      : null;
+  const jetztId = jetztStunde ? stundenId(jetztStunde) : null;
   // Nachzügler: noch offene Ziele, deren geplante Stunden alle in der
   // Vergangenheit liegen (stilles Carry-over, ohne Schuld-Ton, SCHULE.md 2 + 8).
   const fruehesterTag = (k) =>
@@ -426,12 +499,27 @@ export default function Heute({ onFokus }) {
     const total = f.wochen.reduce((s, w) => s + w.total, 0);
     const fertig = f.wochen.reduce((s, w) => s + w.fertig, 0);
     const done = f.wochen.reduce((s, w) => s + w.done, 0);
+    // Wochen-Segmente für den Balken: Breite ∝ Wochen-Größe (total), durchgehend
+    // von vorne gefüllt mit dem erledigten Anteil (done) – genau wie der Ring, nur
+    // linear ausgerollt. So zeigt der Balken vollständig, was der Kreis anzeigt.
+    let restDone = done;
+    const segmente = f.wochen.map((w) => {
+      const fuell = Math.max(0, Math.min(w.total, restDone));
+      restDone -= fuell;
+      return {
+        woche: w.woche,
+        total: w.total,
+        fuellFrac: w.total > 0 ? fuell / w.total : 0,
+        istAktuell: w.istAktuell,
+      };
+    });
     return {
       fach: f.fach,
       color: f.color,
       total,
       fertig,
       frac: total > 0 ? done / total : 0,
+      segmente,
     };
   });
 
@@ -484,25 +572,27 @@ export default function Heute({ onFokus }) {
   return (
     <div className="hu-screen">
       <div
-        className={"hu-grid" + (drag ? " raster-zieht" : "")}
+        className="hu-grid"
         ref={gridRef}
         style={{
-          "--col-a": g1 + "fr",
-          "--col-b": g2 - g1 + "fr",
-          "--col-c": 12 - g2 + "fr",
+          gridTemplateColumns: `minmax(0, ${splits.p}fr) minmax(0, ${
+            100 - splits.p
+          }fr)`,
         }}
       >
-        {/* Kein Bänder-Overlay mehr: beim Ziehen zeigt die aktive Kante selbst
-            eine dünne Linie über die volle Box-Höhe (siehe .raster-griff.aktiv). */}
-        {/* Links oben: Etappenfortschritt */}
-        <section
-          className="hu-karte hu-fortschritt"
-          onClick={(e) => boxTipp(e, "fortschritt")}
-        >
+        <div className="hu-left">
+          <div
+            className="hu-row hu-row-1"
+            style={{
+              gridTemplateColumns: `minmax(0, ${splits.o}fr) minmax(0, ${
+                100 - splits.o
+              }fr)`,
+            }}
+          >
+            {/* Links oben: Etappenfortschritt */}
+            <section className="hu-karte hu-fortschritt">
           <h2 className="hu-karte-titel">
-            <svg className="hu-karte-icon" viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M4 19V5M4 19h16M7.5 15l3.5-4 3 2 4.5-6" />
-            </svg>
+            <Icon name="graph" className="hu-karte-icon" />
             Etappenfortschritt
           </h2>
           <p className="hu-karte-sub">{fortSub}</p>
@@ -531,17 +621,25 @@ export default function Heute({ onFokus }) {
                     <span className="hu-fort-legende-fach">{f.fach}</span>
                     {fortStufe >= 4 && (
                       <span className="hu-fort-legende-bar">
-                        <span
-                          style={{
-                            width: Math.round(f.frac * 100) + "%",
-                            background: f.color,
-                          }}
-                        />
-                      </span>
-                    )}
-                    {fortStufe >= 4 && (
-                      <span className="hu-fort-legende-wert">
-                        {f.fertig}/{f.total}
+                        {f.segmente.map((s, i) => (
+                          <span
+                            key={i}
+                            className={
+                              "hu-fort-bar-seg" + (s.istAktuell ? " aktuell" : "")
+                            }
+                            style={{
+                              flexGrow: s.total || 1,
+                              "--seg-farbe": f.color,
+                            }}
+                          >
+                            <span
+                              style={{
+                                width: Math.round(s.fuellFrac * 100) + "%",
+                                background: f.color,
+                              }}
+                            />
+                          </span>
+                        ))}
                       </span>
                     )}
                   </li>
@@ -549,25 +647,69 @@ export default function Heute({ onFokus }) {
               </ul>
             )}
           </div>
-          <RasterGriff
-            aktiv={drag?.id === "b1"}
-            {...grenzeZieh("b1", b1, { min: 2, max: b2 - 2, commit: setB1 })}
-          />
-        </section>
+            </section>
 
-        {/* Mitte oben: Erinnerungen (Abhaken, Hinzufügen, Wischen zum Löschen) */}
-        <section
-          className="hu-karte hu-notizen"
-          onClick={(e) => boxTipp(e, "notizen")}
-        >
+            {/* Rechts oben: Nachrichten (früher Topbar-Glocke, jetzt eigene Box) */}
+            <section className="hu-karte hu-nachrichten">
           <h2 className="hu-karte-titel">
-            <svg className="hu-karte-icon" viewBox="0 0 24 24" aria-hidden="true">
-              <rect x="5" y="3.5" width="14" height="17" rx="2.5" />
-              <path d="M9 8.5h6M9 12h6M9 15.5h4" />
-            </svg>
+            <Icon name="chat" className="hu-karte-icon" />
+            Nachrichten
+          </h2>
+          {mitteilungen.length === 0 ? (
+            <p className="hu-nachr-leer">Noch nichts Neues.</p>
+          ) : (
+            <ul className="hu-nachr-liste">
+              {mitteilungen.map((m) => (
+                <li key={m.id}>
+                  <button
+                    type="button"
+                    className={"hu-nachr" + (m.gelesen ? "" : " neu")}
+                    onClick={() => setChatOffen(true)}
+                  >
+                  <span className={"hu-nachr-icon art-" + m.art}>
+                    {m.art === "coach" ? (
+                      <PersonIcon />
+                    ) : (
+                      <Icon name="document" className="hu-nachr-svg" />
+                    )}
+                  </span>
+                  <span className="hu-nachr-text">
+                    <span className="hu-nachr-kopf">
+                      <span className="hu-nachr-titel">{m.titel}</span>
+                      <span className="hu-nachr-zeit">{m.zeit}</span>
+                    </span>
+                    <span className="hu-nachr-body">{m.text}</span>
+                  </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+            </section>
+
+            <div
+              className={"hu-teiler hu-teiler-v" + (zieh?.key === "o" ? " zieht" : "")}
+              style={{ left: teilerLinks(splits.o) }}
+              aria-hidden="true"
+              {...reglerProps("o")}
+            />
+          </div>
+
+          <div
+            className="hu-row hu-row-2"
+            style={{
+              gridTemplateColumns: `minmax(0, ${splits.u}fr) minmax(0, ${
+                100 - splits.u
+              }fr)`,
+            }}
+          >
+            {/* Unten rechts: Erinnerungen (per CSS order rechts) */}
+            <section className="hu-karte hu-notizen">
+          <h2 className="hu-karte-titel">
+            <Icon name="erinnerung" className="hu-karte-icon" />
             Erinnerungen
           </h2>
-          {nSpan >= 4 && (
+          {eSpan >= 4 && (
             <p className="hu-karte-sub">Was du nicht vergessen willst</p>
           )}
           {notizen.length === 0 ? (
@@ -609,7 +751,7 @@ export default function Heute({ onFokus }) {
                   </button>
                   <span className="hu-notiz-text">
                     {n.text}
-                    {n.kontext && nSpan >= 3 && (
+                    {n.kontext && eSpan >= 3 && (
                       <span className="hu-notiz-kontext">{n.kontext}</span>
                     )}
                   </span>
@@ -642,21 +784,12 @@ export default function Heute({ onFokus }) {
               aria-label="Neue Erinnerung"
             />
           </form>
-          <RasterGriff
-            aktiv={drag?.id === "b2"}
-            {...grenzeZieh("b2", b2, { min: b1 + 2, max: 10, commit: setB2 })}
-          />
-        </section>
+            </section>
 
-        {/* Links/Mitte unten: Aufgaben (über zwei Spalten) */}
-        <section
-          className="hu-karte hu-aufgaben"
-          onClick={(e) => boxTipp(e, "aufgaben")}
-        >
+            {/* Unten links: Aufgaben (per CSS order links) */}
+            <section className="hu-karte hu-aufgaben">
           <h2 className="hu-karte-titel hu-aufgaben-titel">
-            <svg className="hu-karte-icon" viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M3.5 7l1.5 1.5L7.5 5M3.5 15.5l1.5 1.5 3-3.5M11 7h9.5M11 16h9.5" />
-            </svg>
+            <Icon name="task" className="hu-karte-icon" />
             Aufgaben
             <span className="hu-aufgaben-datum">
               {tagDatum.toLocaleDateString("de-DE", {
@@ -703,22 +836,22 @@ export default function Heute({ onFokus }) {
               )}
             </div>
           )}
-          <RasterGriff
-            aktiv={drag?.id === "b2"}
-            {...grenzeZieh("b2", b2, { min: b1 + 2, max: 10, commit: setB2 })}
-          />
-        </section>
+            </section>
+
+            <div
+              className={"hu-teiler hu-teiler-v" + (zieh?.key === "u" ? " zieht" : "")}
+              style={{ left: teilerLinks(splits.u) }}
+              aria-hidden="true"
+              {...reglerProps("u")}
+            />
+          </div>
+
+        </div>
 
         {/* Rechte Spalte (volle Höhe): Stundenplan als Tages-Timeline */}
-        <aside
-          className="hu-karte hu-plan-karte"
-          onClick={(e) => boxTipp(e, "plan")}
-        >
+        <aside className="hu-karte hu-plan-karte">
           <h2 className="hu-karte-titel">
-            <svg className="hu-karte-icon" viewBox="0 0 24 24" aria-hidden="true">
-              <rect x="4" y="5" width="16" height="15" rx="2.5" />
-              <path d="M4 9.5h16M8 3.5v3M16 3.5v3" />
-            </svg>
+            <Icon name="week" className="hu-karte-icon" />
             Stundenplan
           </h2>
           <ul className="hu-plan">
@@ -729,6 +862,7 @@ export default function Heute({ onFokus }) {
                 : 0;
               const lernzeit = s.art === "studierzeit" || s.art === "selbst";
               const istPause = s.art === "pause";
+              const istJetzt = jetztId != null && stundenId(s) === jetztId;
               // Welche heutigen Ziele sind in dieser Stunde eingeplant?
               const geplant = tagKbs.filter((k) =>
                 (stundenZuord[k.id] || []).includes(stundenId(s))
@@ -744,12 +878,20 @@ export default function Heute({ onFokus }) {
                     className={
                       "hu-stunde" +
                       (lernzeit ? " lernzeit" : "") +
-                      (istPause ? " neutral" : "")
+                      (istPause ? " neutral" : "") +
+                      (istJetzt ? " jetzt" : "")
                     }
                   >
+                    {/* Farbbalken nur bei Haupt-/Studierzeit-Stunden (deine
+                        Fokusfächer); Nebenfächer bleiben neutral, der Platz bleibt
+                        transparent erhalten, damit die Fächer bündig anfangen. */}
                     <span
                       className="hu-stunde-strich"
-                      style={{ background: fachFarbe[s.fach] || "#cbd5d1" }}
+                      style={{
+                        background: istBelegbar(s)
+                          ? fachFarbe[s.fach] || "#cbd5d1"
+                          : "transparent",
+                      }}
                     />
                     <span className="hu-stunde-info">
                       <span className="hu-stunde-fach">{s.fach}</span>
@@ -765,7 +907,12 @@ export default function Heute({ onFokus }) {
                         <span className="hu-stunde-raum">{s.raum}</span>
                       )}
                       {pSpan >= 5 && artLabel[s.art] && (
-                        <span className="hu-stunde-art">{artLabel[s.art]}</span>
+                        <span
+                          className="hu-stunde-art"
+                          style={{ color: fachTextFarbe(s.fach) }}
+                        >
+                          {artLabel[s.art]}
+                        </span>
                       )}
                       {pSpan >= 6 && geplant.length > 0 && (
                         <span className="hu-stunde-geplant">
@@ -782,7 +929,22 @@ export default function Heute({ onFokus }) {
             })}
           </ul>
         </aside>
+
+        {/* Regler zwischen linker Fläche und Stundenplan (volle Höhe). */}
+        <div
+          className={"hu-teiler hu-teiler-v" + (zieh?.key === "p" ? " zieht" : "")}
+          style={{ left: teilerLinks(splits.p) }}
+          aria-hidden="true"
+          {...reglerProps("p")}
+        />
       </div>
+
+      {chatOffen && (
+        <NachrichtenChat
+          mitteilungen={mitteilungen}
+          onClose={() => setChatOffen(false)}
+        />
+      )}
     </div>
   );
 }

@@ -1,8 +1,10 @@
 .hu-screen {
-  min-height: 100vh;
+  min-height: 100dvh;
   box-sizing: border-box;
-  /* Oben Platz für die "Mein Weg"-Leiste, unten für die Nav. */
-  padding: var(--seite-top) var(--seite-x) var(--seite-bottom);
+  /* Gleichmäßiger Rahmen: ~28px Abstand zur Nav (oben), zur Leiste (unten) und zu
+     den Rändern; der Inhalt füllt den Raum dazwischen (siehe .hu-grid min-height).
+     93 = Nav-Unterkante (~65) + 28, 101 = untere Leiste (~73) + 28. */
+  padding: 93px var(--seite-x) 101px;
   background: var(--bg);
   color: var(--text);
   /* Übersicht-Redesign: Satoshi nur hier; der Rest der App bleibt Fraunces/Hanken. */
@@ -166,63 +168,259 @@
    der Stundenplan. */
 .hu-grid {
   position: relative;
-  margin-top: 8px;
   display: grid;
-  /* Drei fr-Spalten: Fortschritt | Notizen | Stundenplan (Aufgaben spannt die
-     ersten beiden). Die zwei Grenzen liegen in --col-a/b/c (aus b1/b2, in
-     12tel). Beim Ziehen sind sie kontinuierlich, daher folgt die Box flüssig der
-     Maus; im Ruhezustand sind es ganze Spalten. Standard 4/4/4. */
-  grid-template-columns:
-    minmax(0, var(--col-a, 4fr))
-    minmax(0, var(--col-b, 4fr))
-    minmax(0, var(--col-c, 4fr));
+  /* Links das 2x2 (.hu-left), rechts der Stundenplan in fester Breite (2:1). */
+  grid-template-columns: 2fr 1fr;
+  grid-template-rows: minmax(0, 1fr);
+  /* Höhe konstant deckeln: zu hohe Box-Inhalte scrollen INNERHALB ihrer Zeile,
+     statt das Raster zu strecken. Mobil wird der Deckel aufgehoben. */
+  min-height: calc(100dvh - 93px - 101px);
+  max-height: calc(100dvh - 93px - 101px);
   gap: var(--grid-gap);
-  align-items: start;
-  /* Die Spaltenbreite wird beim Ziehen per Feder (JS, rAF) animiert; eine
-     CSS-Transition auf grid-template-columns greift hier nicht. */
+  align-items: stretch;
+}
+/* Linkes 2x2: zwei Reihen (Höhe per Regler), je Reihe zwei Boxen (Breite per
+   Regler). Jede Reihe hat ihren EIGENEN Breiten-Regler, daher ändert das Ziehen
+   oben nicht die untere Reihe. */
+.hu-left {
+  position: relative;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--grid-gap);
+  min-height: 0;
+  height: 100%;
+}
+.hu-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+  gap: var(--grid-gap);
+  min-height: 0;
+  height: 100%;
+}
+/* Untere Reihe: Aufgaben links, Erinnerungen rechts (DOM-Reihenfolge umgekehrt). */
+.hu-row-2 .hu-aufgaben {
+  order: 0;
+}
+.hu-row-2 .hu-notizen {
+  order: 1;
+}
+/* Regler: dünne Greifkante in der Lücke zwischen den Boxen. */
+.hu-teiler {
+  position: absolute;
+  z-index: 3;
+  background: transparent;
+  touch-action: none;
+}
+/* Dezenter, dauerhaft sichtbarer Zieh-Anfasser (auch ohne Hover, z.B. auf dem iPad):
+   ein feiner Strich mit weichem Akzent-Glow in der Mitte des Teilers. Beim Ziehen
+   kräftiger; am Desktop hebt Hover ihn zusätzlich leicht an. Der col-resize-Cursor
+   bleibt das Maus-Signal, die Grifffläche ist breiter als der sichtbare Strich. */
+.hu-teiler::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  border-radius: 999px;
+  background: var(--accent);
+  opacity: 0.32;
+  box-shadow: 0 0 6px 0 color-mix(in srgb, var(--accent) 30%, transparent);
+  transition: opacity 0.2s ease, box-shadow 0.2s ease;
+}
+/* Kein Hover-Effekt (auf Touch/iPad ohnehin wirkungslos). Stattdessen kommt beim
+   Ziehen (per .zieht-Klasse aus dem State) genau der weiche Glow, der vorher beim
+   Hover kam. */
+.hu-teiler.zieht::after {
+  opacity: 0.7;
+  box-shadow: 0 0 10px 1px color-mix(in srgb, var(--accent) 45%, transparent);
+}
+.hu-teiler-v {
+  top: 0;
+  bottom: 0;
+  width: var(--grid-gap, 18px);
+  transform: translateX(-50%);
+  cursor: col-resize;
+}
+.hu-teiler-v::after {
+  width: 2.5px;
+  height: 60px;
+  transform: translate(-50%, -50%);
+}
+.hu-teiler-h {
+  left: 0;
+  right: 0;
+  height: var(--grid-gap, 18px);
+  transform: translateY(-50%);
+  cursor: row-resize;
+}
+.hu-teiler-h::after {
+  width: 24px;
+  height: 4px;
+  transform: translate(-50%, -50%);
+}
+.hu-teiler-h:hover::after,
+.hu-teiler-h:active::after {
+  width: 40px;
 }
 .hu-fortschritt {
   position: relative;
-  grid-column: 1;
-  grid-row: 1;
+}
+/* Nachrichten-Box (früher Topbar-Glocke): rechts oben im 2x2, Liste scrollt. */
+.hu-nachrichten {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  align-self: stretch;
+}
+.hu-nachr-leer {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+.hu-nachr-liste {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.hu-nachr {
+  width: 100%;
+  display: flex;
+  gap: 10px;
+  padding: 9px 8px;
+  border-radius: var(--r-sm, 9px);
+  border: none;
+  background: transparent;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.hu-nachr:hover {
+  background: var(--card-2);
+}
+.hu-nachr.neu {
+  background: var(--accent-soft);
+}
+.hu-nachr.neu:hover {
+  background: color-mix(in srgb, var(--accent-soft) 85%, var(--accent));
+}
+.hu-nachr-icon {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: var(--card-2);
+  color: var(--muted);
+}
+.hu-nachr.neu .hu-nachr-icon {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+.hu-nachr-svg {
+  width: 16px;
+  height: 16px;
+}
+.hu-nachr-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.hu-nachr-kopf {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.hu-nachr-titel {
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.hu-nachr-zeit {
+  margin-left: auto;
+  flex-shrink: 0;
+  font-size: 0.7rem;
+  color: var(--muted);
+}
+.hu-nachr-body {
+  font-size: 0.8rem;
+  color: var(--text-2);
+  line-height: 1.3;
 }
 .hu-notizen {
   position: relative;
-  grid-column: 2;
-  grid-row: 1;
   /* Auf die Zeilenhöhe strecken, damit die Karte so hoch ist wie der
      Etappenfortschritt daneben (statt nur so hoch wie ihr Inhalt). */
   align-self: stretch;
-}
-.hu-aufgaben {
-  position: relative;
-  grid-column: 1 / 3;
-  grid-row: 2;
+  /* Spalte, damit die Eingabe per margin-top:auto unten in der Karte hängt
+     (Liste/Leer-Text oben, Hinzufügen-Feld am Boden). */
   display: flex;
   flex-direction: column;
 }
+.hu-aufgaben {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  /* Auf die volle Zeilenhöhe strecken, damit die Karte unten bündig mit dem
+     Stundenplan (volle Höhe rechts) abschließt und nicht kürzer wirkt. */
+  align-self: stretch;
+}
+/* Gleicher Innenabstand ringsum (22px wie seitlich), damit die Karten unten
+   denselben Abstand zum Rand haben wie zu den Seiten. Höhere Spezifität, weil
+   .hu-karte (später definiert) sonst sein 20px-vertikales Padding durchsetzt. */
+.hu-karte.hu-aufgaben {
+  padding: 22px;
+}
 .hu-plan-karte {
-  grid-column: 3;
-  grid-row: 1 / 3;
+  grid-column: 2;
   align-self: stretch;
 }
 /* Greifpunkt (.raster-griff) und Raster-Overlay (.raster-overlay) sind global in
    index.css definiert (geteilt mit Ablage und Fokus). */
 @media (max-width: 960px) {
   .hu-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr !important;
+    grid-template-rows: auto;
+    max-height: none;
   }
-  .hu-fortschritt,
-  .hu-notizen,
-  .hu-aufgaben,
+  .hu-left {
+    grid-template-rows: auto auto !important;
+  }
+  .hu-row {
+    grid-template-columns: 1fr !important;
+  }
   .hu-plan-karte {
     grid-column: auto;
-    grid-row: auto;
+  }
+  .hu-teiler {
+    display: none;
   }
   /* Greifpunkte und Raster nur im breiten Layout. */
   .raster-griff,
   .raster-overlay {
     display: none;
+  }
+  /* Einspaltig gibt es keine 2/12-Spalte: den Ring wieder normal mittig und
+     mitwachsend (die gemessene --ring-groesse gilt nur im breiten Raster). */
+  .hu-fort-mitte {
+    justify-content: center;
+  }
+  .hu-fort-mitte .hu-ring-wrap {
+    width: 100%;
+    max-width: 220px;
+    margin: 0 auto;
   }
 }
 
@@ -276,30 +474,39 @@
   aspect-ratio: 1;
   margin: 4px auto 0;
 }
-/* Ring und Fächer-Legende nebeneinander (ab Stufe 3, sobald die Box breit genug
-   ist): der Ring links in fester Größe verankert, die Legende rechts daneben in
-   der frei werdenden Fläche. Auf den schmalen Stufen 1-2 enthält die Reihe nur
-   den Ring. So bleibt der Ring beim Verbreitern an derselben Stelle, die Legende
-   geht seitlich auf statt darunter zu stapeln. */
+/* Ring (und ab Stufe 3 die Fächer-Legende daneben). WICHTIG: das Layout ist in
+   ALLEN Größen identisch, damit der Ring beim Ziehen NICHT springt:
+   - Ring links verankert (linke Kante = Box-Anfang), senkrecht mittig im Kasten.
+   - Ring-Breite max. 200px, schrumpft per max-width:100% in schmalen Boxen mit. In
+     der kleinsten (Standard-)Größe füllt er die Box also komplett und wirkt mittig.
+   - Die Legende öffnet rechts daneben in der frei werdenden Fläche, OHNE den Ring
+     zu verschieben. So bleibt der Kreis an jeder Stelle des Ziehens am selben Ort. */
 .hu-fort-mitte {
   display: flex;
   align-items: center;
-  /* Ring links verankert: bleibt beim Ziehen an derselben Stelle (linke Kante =
-     Box-Anfang), die Legende geht rechts daneben auf. */
   justify-content: flex-start;
-  gap: 14px;
-  margin-top: 6px;
+  gap: var(--grid-gap, 18px);
+  flex: 1;
+  min-height: 0;
 }
 .hu-fort-mitte .hu-ring-wrap {
   flex: 0 0 auto;
-  width: 200px;
+  /* Feste Größe = Innenbreite der KLEINSTEN Spalte (2/12), per JS gemessen und als
+     --ring-groesse gesetzt. Dadurch ist der Ring in JEDER Box-Breite genau so groß
+     und (links verankert = ) an derselben Stelle wie in der ersten, kleinsten Größe:
+     dort füllt er die Box und sitzt mittig, beim Verbreitern bleibt er exakt dort. */
+  width: var(--ring-groesse, 150px);
   max-width: 100%;
   margin: 0;
 }
+/* Legende an der festen, in der Namens-Stufe zentrierten Position verankert
+   (--legende-links per JS). Dadurch sitzt sie ausgewogen (nicht links am Ring
+   geklemmt) UND bleibt beim Vergrößern zur Balken-Stufe an genau derselben Stelle:
+   nur der Balken füllt den Platz rechts davon. */
 .hu-fort-mitte .hu-fort-legende {
   flex: 1 1 auto;
   min-width: 0;
-  margin: 0;
+  margin: 0 0 0 var(--legende-links, 0px);
 }
 .hu-ring {
   width: 100%;
@@ -327,7 +534,7 @@
 .hu-fort-legende {
   animation: hu-fort-fade 0.4s cubic-bezier(0.2, 0.7, 0.2, 1) both;
 }
-.hu-fort-legende-bar > span {
+.hu-fort-bar-seg > span {
   transition: width 0.55s cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 @keyframes hu-fort-fade {
@@ -340,7 +547,7 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .hu-ring-animiert .hu-ring circle,
-  .hu-fort-legende-bar > span {
+  .hu-fort-bar-seg > span {
     transition: none;
   }
   .hu-ring-fach,
@@ -417,22 +624,28 @@
 }
 .hu-fort-legende-bar {
   flex: 1;
-  min-width: 24px;
+  min-width: 64px;
   height: 6px;
+  display: flex;
+  gap: 2px;
+}
+/* Wochen-Stück: eigener heller Fachton als Track (wie der Ring), Breite ∝ total. */
+.hu-fort-bar-seg {
+  position: relative;
+  height: 100%;
+  min-width: 2px;
   border-radius: 999px;
-  background: var(--line);
+  background: color-mix(in srgb, var(--seg-farbe) 22%, var(--card));
   overflow: hidden;
 }
-.hu-fort-legende-bar > span {
+/* Aktuelle Woche dezent hervorheben, genau wie im Ring. */
+.hu-fort-bar-seg.aktuell {
+  background: color-mix(in srgb, var(--seg-farbe) 38%, var(--card));
+}
+.hu-fort-bar-seg > span {
   display: block;
   height: 100%;
   border-radius: 999px;
-}
-.hu-fort-legende-wert {
-  flex-shrink: 0;
-  font-weight: 700;
-  color: var(--text);
-  font-variant-numeric: tabular-nums;
 }
 .hu-leer {
   margin: 0;
@@ -568,41 +781,46 @@
 .hu-notiz-weg:hover {
   color: var(--text);
 }
-/* Erinnerung hinzufügen: Eingabe + Plus, unten in der Karte. */
+/* Erinnerung hinzufügen: Plus-Knopf sitzt links im Eingabefeld. Hängt unten in
+   der Karte (margin-top:auto schiebt die Form an den Boden der Flex-Spalte). */
 .hu-notiz-add {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-top: 12px;
+  gap: 0;
+  margin-top: auto;
+  padding-top: 12px;
+  padding: 3px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  transition: border-color 0.12s ease;
+}
+.hu-notiz-add:focus-within {
+  border-color: var(--accent);
 }
 .hu-notiz-add-feld {
   flex: 1;
   min-width: 0;
   font: inherit;
   font-size: 0.9rem;
-  padding: 8px 12px;
+  padding: 5px 10px 5px 7px;
   color: var(--text);
-  background: var(--bg);
-  border: 1px solid var(--line);
-  border-radius: 999px;
+  background: transparent;
+  border: none;
   outline: none;
 }
 .hu-notiz-add-feld::placeholder {
   color: var(--muted);
 }
-.hu-notiz-add-feld:focus-visible {
-  border-color: var(--accent);
-}
 .hu-notiz-add-knopf {
   flex-shrink: 0;
-  width: 34px;
-  height: 34px;
+  width: 28px;
+  height: 28px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   line-height: 1;
-  /* Gleicher Look wie die aktive Nav-Pille oben: helles Teal, dunkler Teal-Text. */
   color: var(--accent-strong);
   background: var(--accent-soft);
   border: none;
@@ -631,13 +849,22 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 14px;
+  /* Füllt die Höhe der Aufgaben-Karte: die Karten wachsen bis zum unteren Rand
+     (gleicher Abstand wie seitlich), statt oben zu kleben und unten Leerraum zu
+     lassen. align-content streckt die Kartenreihe(n) auf die volle Höhe. */
+  flex: 1;
+  min-height: 0;
+  align-content: stretch;
 }
 .hu-auf {
   display: flex;
   flex-direction: column;
+  /* Inhalt oben bündig (Fach, Titel, Chips von oben nach unten); der freie Platz
+     der gestreckten Karte bleibt als ruhiger Weißraum unten. */
+  justify-content: flex-start;
   gap: 7px;
   min-height: 196px;
-  padding: 16px;
+  padding: 18px;
   text-align: left;
   font: inherit;
   color: inherit;
@@ -657,10 +884,22 @@
 .hu-auf.done {
   opacity: 0.62;
 }
+/* Kopf-Block der Aufgaben-Karte: Icon, Titel und Fach bleiben als Einheit oben
+   zusammen (eng), während space-between den Rest nach unten verteilt. */
+.hu-auf-kopf {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+/* Erste Zeile der Karte: Fach zuerst, dann das Icon dahinter. */
+.hu-auf-fachzeile {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
 .hu-auf-icon {
   display: inline-flex;
   color: var(--muted);
-  margin-bottom: 2px;
 }
 /* Figma-Hierarchie: der konkrete Lernweg (Titel) groß und schwarz, das Fach als
    farbige Unterzeile darunter. */
@@ -692,7 +931,11 @@
 }
 .hu-auf-chips {
   display: flex;
-  flex-wrap: wrap;
+  /* Jede Pill (Zeit, Dauer, Raum) in einer eigenen Zeile untereinander, statt
+     im umbrechenden Fließtext. align-items:flex-start, damit jede Pill nur so
+     breit wie ihr Inhalt ist. */
+  flex-direction: column;
+  align-items: flex-start;
   gap: 6px;
   margin-top: 6px;
 }
@@ -720,25 +963,9 @@
   stroke-linejoin: round;
   color: var(--muted);
 }
-/* Breit gezogene Aufgaben-Karte: nützliche Zusatzinfos (Schritte, Materialien,
-   Übung) als ruhige Meta-Zeile. */
-.hu-auf-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 3px 14px;
-  margin-top: 8px;
-  font-size: 0.74rem;
-  color: var(--muted);
-}
-.hu-auf-meta-teil {
-  position: relative;
-}
-.hu-auf-meta-teil:not(:first-child)::before {
-  content: "·";
-  position: absolute;
-  left: -8px;
-}
 .hu-auf-prog {
+  /* Unten an den Karten-Rand: margin-top:auto schiebt den Fortschritt ans untere
+     Ende, der Abstand zum Rand ist das Karten-Padding (= gleich wie oben). */
   margin-top: auto;
   padding-top: 12px;
   display: flex;
@@ -824,8 +1051,9 @@
 }
 .hu-stunde-strich {
   width: 3px;
-  align-self: stretch;
-  min-height: 26px;
+  /* Nur etwas höher als die Fach-Schrift (0.92rem), nicht über die ganze Zeile;
+     durch align-items:center der Zeile sitzt der Strich mittig zum Fachnamen. */
+  height: 1.1rem;
   border-radius: 2px;
   flex-shrink: 0;
 }
@@ -875,11 +1103,10 @@
 /* Bei breitem Stundenplan: die Lernform (Unterricht/Ankerstunde/betreut). */
 .hu-stunde-art {
   flex-shrink: 0;
-  font-size: 0.64rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  color: var(--accent);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--text-2);
   white-space: nowrap;
 }
 /* Noch breiter: das in dieser Stunde eingeplante Ziel. */
@@ -894,9 +1121,11 @@
 }
 .hu-stunde-zeit {
   flex-shrink: 0;
-  /* Einheitlich breite Zeit-Pille (alle gleich groß, statt je nach Zeitstring). */
+  /* Einheitlich breite Zeit-Pille (alle gleich groß), die Zeit immer in EINER Zeile
+     (kein Umbruch in zwei Zeilen, daher nowrap + Breite für den längsten String). */
   box-sizing: border-box;
-  width: 6.6em;
+  width: 8.7em;
+  white-space: nowrap;
   text-align: center;
   font-size: 0.73rem;
   color: var(--text-2);
@@ -908,16 +1137,19 @@
 }
 /* Studierzeit/Selbstlernzeit: hier werden die geplanten Ziele bearbeitet. Als
    aktiver Block teal umrandet und leicht hinterlegt (Figma-Markierung). */
-.hu-stunde.lernzeit {
-  background: color-mix(in srgb, var(--accent-soft) 50%, transparent);
-  box-shadow: inset 0 0 0 1.5px var(--accent);
-}
+/* Studierzeit/Selbstlernzeit nur noch dezent am Fach-Namen erkennbar (kein eigener
+   Rahmen mehr): die einzige hervorgehobene Stunde ist die aktuelle (.jetzt). */
 .hu-stunde.lernzeit .hu-stunde-fach {
   color: var(--accent-strong);
 }
-.hu-stunde.lernzeit .hu-stunde-zeit {
-  background: color-mix(in srgb, var(--card) 75%, transparent);
-  border-color: transparent;
+/* Aktuelle Stunde ("wo man gerade ist"): kräftiger Teal-Rahmen + Hinterlegung und
+   ein "Jetzt"-Marker, damit man sich im Tag sofort verortet. */
+/* Aktuelle Stunde: nur die farbige Box (wie die aktive Pille in der Nav-Leiste),
+   ohne Outline und ohne „Jetzt"-Label. Voller Radius (999px) wie die Nav-Pille.
+   Seitenpolster bleibt wie bei den anderen Zeilen, damit die Spalten fluchten. */
+.hu-stunde.jetzt {
+  background: var(--accent-soft);
+  border-radius: 999px;
 }
 /* Mittagessen u. ä.: ruhig zurückgenommen. */
 .hu-stunde.neutral {

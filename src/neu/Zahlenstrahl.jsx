@@ -3,6 +3,10 @@ import Fertig from "./Fertig";
 import UebungHinweis from "./UebungHinweis";
 import "./Zahlenstrahl.css";
 
+// Negative Zahlen mit typografischem Minus (−) zeigen, genau wie in den
+// Aufgabentexten. So sieht die Achse aus wie die Frage (kein ASCII-Bindestrich).
+const fmt = (n) => (n < 0 ? `−${Math.abs(n)}` : String(n));
+
 // Interaktiver Zahlenstrahl als Lern-Session: eine Aufgabe nennt eine Zahl, der
 // Schüler klickt die Stelle auf der Linie. Der Klick rastet auf die nächste
 // Ganzzahl ein, sofort Feedback (die richtige Stelle wird mitgezeigt). Falsch
@@ -147,7 +151,7 @@ export default function Zahlenstrahl({ daten, onAbgeschlossen }) {
               className={"zs-strich" + (w === 0 ? " null" : "")}
               aria-hidden="true"
             />
-            <span className={"zs-zahl" + (w === 0 ? " null" : "")}>{w}</span>
+            <span className={"zs-zahl" + (w === 0 ? " null" : "")}>{fmt(w)}</span>
           </span>
         ))}
         {/* Bezugszahl (z.B. bei Gegenzahl): zeigt die Ausgangszahl, damit die
@@ -158,7 +162,7 @@ export default function Zahlenstrahl({ daten, onAbgeschlossen }) {
             style={{ left: pct(aufgabe.quelle) + "%" }}
           >
             <span className="zs-marke-punkt" />
-            <span className="zs-marke-text">{aufgabe.quelle}</span>
+            <span className="zs-marke-text">{fmt(aufgabe.quelle)}</span>
           </span>
         )}
         {beantwortet && !warRichtig && (
@@ -176,7 +180,7 @@ export default function Zahlenstrahl({ daten, onAbgeschlossen }) {
             style={{ left: pct(klick) + "%" }}
           >
             <span className="zs-marke-punkt" />
-            <span className="zs-marke-text">{klick}</span>
+            <span className="zs-marke-text">{fmt(klick)}</span>
           </span>
         )}
       </button>
@@ -186,7 +190,7 @@ export default function Zahlenstrahl({ daten, onAbgeschlossen }) {
           <p className="zs-feedback-text">
             {warRichtig
               ? "Genau getroffen! ✓"
-              : `Nicht ganz: du warst bei ${klick}, gesucht war ${aufgabe.ziel}.`}
+              : `Nicht ganz: du warst bei ${fmt(klick)}, gesucht war ${fmt(aufgabe.ziel)}.`}
           </p>
           {aufgabe.warum && <p className="zs-warum">{aufgabe.warum}</p>}
           <button type="button" className="zs-weiter" onClick={weiter}>

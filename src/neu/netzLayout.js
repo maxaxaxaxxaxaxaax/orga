@@ -52,6 +52,54 @@ function gridLayout(nodes, links, zentrumId, W, H, PAD, cx, cy) {
   return out;
 }
 
+// Radiales Baum-Layout (tidy tree) fuer die Karten-Ansicht: gedachte Wurzel = Fach
+// in der Mitte, Kategorien (Ebene 1) auf dem inneren Ring, Subkategorien (2) und
+// Lernwege (3) auf weiteren Ringen NACH AUSSEN. Jeder Ast bekommt einen eigenen
+// Winkelsektor, dessen Breite sich nach der Blattzahl richtet; Kinder faechern in
+// diesem Sektor auf. So ueberlappt nichts und es breitet sich wie eine Mindmap aus.
+// Deterministisch. Map id -> {x, y}.
+export function layoutKarte(nodes, opt = {}) {
+  const W = opt.width || 680;
+  const H = opt.height || 520;
+  const cx = W / 2, cy = H / 2;
+  // Radien proportional zur Box, damit der Baum die (auch hohe) Fläche füllt.
+  // Ebene 0 = Fächer (innen), dann Kategorien, Subkategorien, Lernwege nach außen.
+  const basis = Math.min(W, H);
+  const ringR = { 0: basis * 0.16, 1: basis * 0.4, 2: basis * 0.64, 3: basis * 0.88 };
+  const kinderVon = (id) => nodes.filter((n) => n.parent === id);
+  const blattZahl = (n) => {
+    const kids = kinderVon(n.id);
+    return kids.length ? kids.reduce((s, k) => s + blattZahl(k), 0) : 1;
+  };
+  const pos = {};
+  // Knoten in die Mitte seines Winkelsektors auf den Ring seiner Ebene setzen und
+  // den Sektor anteilig (nach Blattzahl) auf die Kinder verteilen.
+  const setze = (node, aVon, aBis) => {
+    const ang = (aVon + aBis) / 2;
+    const r = ringR[node.ebene] || ringR[3];
+    pos[node.id] = { x: cx + Math.cos(ang) * r, y: cy + Math.sin(ang) * r };
+    const kids = kinderVon(node.id);
+    if (!kids.length) return;
+    const total = kids.reduce((s, k) => s + blattZahl(k), 0) || 1;
+    let a = aVon;
+    for (const kid of kids) {
+      const span = (aBis - aVon) * (blattZahl(kid) / total);
+      setze(kid, a, a + span);
+      a += span;
+    }
+  };
+  // Wurzeln = elternlose Knoten (im fachübergreifenden Netz die Fächer).
+  const wurzeln = nodes.filter((n) => !n.parent);
+  const total = wurzeln.reduce((s, k) => s + blattZahl(k), 0) || 1;
+  let a = -Math.PI / 2; // oben beginnen
+  for (const w of wurzeln) {
+    const span = Math.PI * 2 * (blattZahl(w) / total);
+    setze(w, a, a + span);
+    a += span;
+  }
+  return pos;
+}
+
 // Deterministisches Layout. Mit opt.zentrumId als Grid (Zentrum mittig, Rest im
 // ausgerichteten Raster); sonst als Fallback ein eingefrorenes Kraft-Layout.
 // Gleiche Eingabe -> gleiche Ausgabe. Gibt eine Map id -> {x, y} zurueck.

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { wegStatus } from "./weg";
+import { fachTextFarbe } from "./farbe";
 import "./WegLeiste.css";
 
 // Schwebende "Mein Weg"-Leiste unten mittig. In der Planungsphase (noch nichts
@@ -65,7 +66,13 @@ export default function WegLeiste({ onGo }) {
             title={`${aufgabe.fach}: ${aufgabe.titel} öffnen`}
           >
             <span className="weg-aufgabe-text">
-              <span className="weg-aufgabe-fach">{aufgabe.fach}</span>
+              <span
+                className="weg-aufgabe-fach"
+                style={{ color: fachTextFarbe(aufgabe.fach) }}
+              >
+                {aufgabe.fach}
+              </span>
+              <span className="weg-aufgabe-sep" aria-hidden="true" />
               <span className="weg-aufgabe-titel">{aufgabe.titel}</span>
             </span>
             <span className="weg-aufgabe-cta">

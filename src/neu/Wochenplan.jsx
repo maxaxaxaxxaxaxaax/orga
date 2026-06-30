@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { koennensbeweise, kbFaecher, kbFarbe } from "../data/koennensbeweise";
 import {
   stundenWoche,
-  fachFarbe,
   istBelegbar,
   stundenId,
   tagStart,
@@ -10,8 +10,9 @@ import {
 } from "../data/stundenplanWoche";
 import { etappen } from "../data/etappen";
 import KbChip from "./KbChip";
+import Icon from "./Icon";
 import { textAuf } from "./farbe";
-import { meldeAenderung, ladeStunden } from "./planung";
+import { meldeAenderung, ladeStunden, heuteTag } from "./planung";
 import "./Wochenplan.css";
 
 // Woche planen als Kalender-Raster, im selben Layout wie der Etappenplan:
@@ -39,6 +40,54 @@ const SPANNE = T_BIS - T_VON;
 const PPM = 1.25; // Pixel pro Minute
 const STUNDEN_LINIEN = [];
 for (let h = Math.ceil(T_VON / 60); h * 60 <= T_BIS; h++) STUNDEN_LINIEN.push(h);
+
+// Tages-Slots + synthetische Pause-Blöcke für die Lücken (große Pausen, Mittag).
+// Nur hier im Kalender, damit die geteilten Stundenplan-Daten und die Heute-Ansicht
+// (eigene Lücken-Logik) unberührt bleiben.
+function tagMitPausen(i) {
+  const tag = stundenWoche
+    .filter((s) => s.tag === i)
+    .sort((a, b) => MIN(a.von) - MIN(b.von));
+  const out = [];
+  for (let k = 0; k < tag.length; k++) {
+    if (k > 0) {
+      const luecke = MIN(tag[k].von) - MIN(tag[k - 1].bis);
+      if (luecke >= 15) {
+        out.push({
+          tag: i,
+          von: tag[k - 1].bis,
+          bis: tag[k].von,
+          fach: luecke >= 30 ? "Mittagspause" : "Pause",
+          art: "pause",
+        });
+      }
+    }
+    out.push(tag[k]);
+  }
+  return out;
+}
+
+// Slot-ID -> Fach der Stunde. Für fach-priorisiertes Auto-Einsortieren: eine Aufgabe
+// soll bevorzugt in eine Stunde DESSELBEN Fachs (dann ist die Fachlehrkraft da).
+const slotFachVon = {};
+for (const s of stundenWoche) slotFachVon[stundenId(s)] = s.fach;
+
+// Wählt den am wenigsten belegten freien Slot, BEVORZUGT einen mit passendem Fach
+// (damit man die Aufgabe in der Stunde des Fachs macht und fragen kann); gibt es
+// keinen freien Fach-Slot, irgendeinen freien Slot (ausgewogen). null = keiner frei.
+function besterSlot(slots, have, last, fach) {
+  let best = null;
+  for (const sid of slots) {
+    if (have.has(sid) || slotFachVon[sid] !== fach) continue;
+    if (best === null || last[sid] < last[best]) best = sid;
+  }
+  if (best !== null) return best;
+  for (const sid of slots) {
+    if (have.has(sid)) continue;
+    if (best === null || last[sid] < last[best]) best = sid;
+  }
+  return best;
+}
 
 function lade(key) {
   try {
@@ -77,7 +126,13 @@ function alleBelegbarenSlots() {
   return slots;
 }
 
-export default function Wochenplan({ onZurueck, onWeiter, woche = 0 }) {
+export default function Wochenplan({
+  onZurueck,
+  onWeiter,
+  woche = 0,
+  untenSlot,
+  vorn,
+}) {
   const wochenZuordnung = lade(WOCHEN_KEY); // kbId -> Woche
   const [stunden, setStunden] = useState(ladeStunden); // kbId -> [Slot-IDs]
   const [ueber, setUeber] = useState(null); // aktuelles Drop-Ziel (Hover)
@@ -87,6 +142,13 @@ export default function Wochenplan({ onZurueck, onWeiter, woche = 0 }) {
   const [umgeplant, setUmgeplant] = useState(false);
   const [aktiveWoche, setAktiveWoche] = useState(woche);
   const [zuFaecher, setZuFaecher] = useState(() => new Set()); // eingeklappte Fächer
+  // Demo-"heute" + aktuelle Uhrzeit (einmal erfasst): markieren im Kalender den gerade
+  // laufenden Block, im selben Stil wie die aktuelle Stunde im Stundenplan.
+  const heuteIdx = heuteTag();
+  const [jetztMin] = useState(() => {
+    const d = new Date();
+    return d.getHours() * 60 + d.getMinutes();
+  });
 
   // Wizard (Planungsschritt mit "Weiter") oder stehende Plan-Übersicht (Plan-Tab,
   // mit "Etappe anpassen"). Steuert, ob die Schritt-Pille unten erscheint oder die
@@ -141,6 +203,9 @@ export default function Wochenplan({ onZurueck, onWeiter, woche = 0 }) {
   // Ist in dieser Woche schon etwas verteilt? Dann bietet die Leiste "Umplanen"
   // (neu verteilen) an, wie beim ersten Planen, sobald etwas steht.
   const hatPlan = wocheKbs.some((k) => (stunden[k.id]?.length || 0) > 0);
+  // Alle Ziele dieser Woche verplant? Dann verblasst die "Plane deine Woche"-Karte.
+  const allesPlatziert =
+    wocheKbs.length > 0 && wocheKbs.every((k) => restVon(k) === 0);
   const montag = wochenStart(ETAPPE, aktiveWoche);
   const monatLabel = montag.toLocaleDateString("de-DE", {
     month: "long",
@@ -233,11 +298,7 @@ export default function Wochenplan({ onZurueck, onWeiter, woche = 0 }) {
           const have = new Set(next[kb.id] || []);
           let fehlend = kb.cluster - have.size;
           while (fehlend > 0) {
-            let best = null;
-            for (const sid of slots) {
-              if (have.has(sid)) continue;
-              if (best === null || last[sid] < last[best]) best = sid;
-            }
+            const best = besterSlot(slots, have, last, kb.fach);
             if (best === null) break;
             have.add(best);
             last[best]++;
@@ -276,11 +337,7 @@ export default function Wochenplan({ onZurueck, onWeiter, woche = 0 }) {
         const have = new Set();
         let fehlend = kb.cluster;
         while (fehlend > 0) {
-          let best = null;
-          for (const sid of slots) {
-            if (have.has(sid)) continue;
-            if (best === null || last[sid] < last[best]) best = sid;
-          }
+          const best = besterSlot(slots, have, last, kb.fach);
           if (best === null) break;
           have.add(best);
           last[best]++;
@@ -321,6 +378,12 @@ export default function Wochenplan({ onZurueck, onWeiter, woche = 0 }) {
       top: (MIN(s.von) - T_VON) * PPM + "px",
       height: (MIN(s.bis) - MIN(s.von)) * PPM - 4 + "px",
     };
+    // Der gerade laufende Block am Demo-"heute" (wie die aktuelle Stunde im Stundenplan).
+    const istJetzt =
+      s.art !== "pause" &&
+      s.tag === heuteIdx &&
+      MIN(s.von) <= jetztMin &&
+      jetztMin < MIN(s.bis);
     if (s.art === "pause") {
       return (
         <div className="wp-blk wp-blk-pause" key={sid} style={stil}>
@@ -329,17 +392,21 @@ export default function Wochenplan({ onZurueck, onWeiter, woche = 0 }) {
       );
     }
     if (!istBelegbar(s)) {
+      // Fach oben, darunter Zeitspanne + Raum (wie im Stundenplan-Mockup).
       return (
-        <div className="wp-blk wp-blk-fix" key={sid} style={stil}>
+        <div
+          className={"wp-blk wp-blk-fix" + (istJetzt ? " jetzt" : "")}
+          key={sid}
+          style={stil}
+        >
+          {istJetzt && <span className="wp-blk-jetzt">Jetzt</span>}
           <span className="wp-blk-fach">{s.fach}</span>
-          <span className="wp-blk-zeit">
-            {s.von} bis {s.bis}
+          <span className="wp-blk-meta">
+            <span className="wp-blk-zeit">
+              {s.von.replace(/^0/, "")} – {s.bis.replace(/^0/, "")}
+            </span>
+            {s.raum && <span className="wp-blk-raum">{s.raum}</span>}
           </span>
-          <span className="wp-blk-raum">{s.raum}</span>
-          <span
-            className="wp-blk-strich"
-            style={{ background: fachFarbe[s.fach] || "#868e96" }}
-          />
         </div>
       );
     }
@@ -353,6 +420,7 @@ export default function Wochenplan({ onZurueck, onWeiter, woche = 0 }) {
           "wp-blk wp-blk-frei" +
           (leer ? " leer" : " belegt") +
           (aktiv ? " ueber" : "") +
+          (istJetzt ? " jetzt" : "") +
           (leer && gewaehltId != null ? " tippbar" : "")
         }
         style={stil}
@@ -375,13 +443,21 @@ export default function Wochenplan({ onZurueck, onWeiter, woche = 0 }) {
           tippZuSlot(sid);
         }}
       >
+        {istJetzt && <span className="wp-blk-jetzt">Jetzt</span>}
         {leer ? (
           <>
             <span className="wp-frei-label">
-              {aktiv || gewaehltId != null ? "hier ablegen" : "Freiarbeit"}
+              {aktiv || gewaehltId != null
+                ? "hier ablegen"
+                : s.fach === "Studierzeit"
+                  ? "Studierzeit"
+                  : "Freiarbeit"}
             </span>
+            {s.fach !== "Studierzeit" && (
+              <span className="wp-frei-fach">{s.fach}</span>
+            )}
             <span className="wp-frei-zeit">
-              {s.von} bis {s.bis}
+              {s.von.replace(/^0/, "")} – {s.bis.replace(/^0/, "")}
             </span>
           </>
         ) : (
@@ -406,8 +482,8 @@ export default function Wochenplan({ onZurueck, onWeiter, woche = 0 }) {
                   <span className="wp-kb-uhr" aria-hidden="true">
                     ◷
                   </span>
-                  {k.cluster}
-                  {k.code && <span className="wp-kb-code">{k.code}</span>}
+                  {s.von.replace(/^0/, "")} – {s.bis.replace(/^0/, "")}
+                  <span className="wp-kb-fach">{k.fach}</span>
                 </span>
               </div>
             );
@@ -426,12 +502,66 @@ export default function Wochenplan({ onZurueck, onWeiter, woche = 0 }) {
     setUmgeplant(false);
   };
 
+  // Untere Leiste wie im Etappenplan: führt durch den Schritt. Wird in den festen
+  // App-Anker portaliert, damit sie beim Screen-Wechsel nicht mitwischt.
+  const untenLeiste = (
+    <div className="ep-bar">
+      {onZurueck && (
+        <button
+          type="button"
+          className="ep-bar-zurueck"
+          onClick={onZurueck}
+          aria-label="Zurück zum Etappenplan"
+          title="Zurück zum Etappenplan"
+        >
+          <Icon name="chevron-left" width={20} height={20} />
+        </button>
+      )}
+      {onZurueck && <span className="ep-bar-sep" aria-hidden="true" />}
+      <span className="ep-bar-label">
+        <Icon name="week" size={16} /> Wochenplanung
+      </span>
+      {!hatPlan ? (
+        <>
+          <span className="ep-bar-text">
+            Verteile die Uhren auf deine freien Stunden
+          </span>
+          <button
+            type="button"
+            className="ep-bar-aktion"
+            onClick={vorschlagVerteilen}
+            title="Die offenen Uhren aller Wochen ausgewogen auf die Stunden verteilen"
+          >
+            <span aria-hidden="true">✦</span> Automatisch einsortieren
+          </button>
+        </>
+      ) : (
+        <>
+          {zielVerplant ? (
+            <button type="button" className="ep-bar-weiter" onClick={onWeiter}>
+              Weiter
+            </button>
+          ) : (
+            <button
+              type="button"
+              className="ep-bar-aktion"
+              onClick={vorschlagVerteilen}
+              title="Die offenen Uhren ausgewogen auf die Stunden verteilen"
+            >
+              <span aria-hidden="true">✦</span> Automatisch einsortieren
+            </button>
+          )}
+        </>
+      )}
+    </div>
+  );
+
   return (
     <div
       className={"wp-screen" + (istWizard ? " wp-wizard" : "")}
       onClick={() => gewaehltId != null && setGewaehltId(null)}
     >
-      <div className="wp-layout">
+      <div className={"wp-layout" + (allesPlatziert ? " wp-fertig" : "")}>
         {/* Linke Spalte: Kopf-Karte + Lernwege je Fach, zum Platzieren */}
         <aside
           className={"wp-seite" + (ueber === "pool" ? " ueber" : "")}
@@ -446,9 +576,7 @@ export default function Wochenplan({ onZurueck, onWeiter, woche = 0 }) {
           <div className="ep-kopf-karte">
             <div className="ep-kopf-text">
               <h1 className="ep-kopf-titel">
-                <span className="ep-kopf-icon" aria-hidden="true">
-                  🗓
-                </span>
+                <Icon name="week" className="ep-kopf-icon" size={19} />
                 Plane deine Woche
                 <span className="wp-kopf-pfeil" aria-hidden="true">
                   ⌄
@@ -482,10 +610,7 @@ export default function Wochenplan({ onZurueck, onWeiter, woche = 0 }) {
                 title="Neu planen: die Woche automatisch neu verteilen"
                 aria-label="Neu planen"
               >
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M12 20h9" />
-                  <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
-                </svg>
+                <Icon name="marker" />
               </button>
             )}
           </div>
@@ -600,14 +725,7 @@ export default function Wochenplan({ onZurueck, onWeiter, woche = 0 }) {
               </div>
               {TAGE.map((name, i) => (
                 <div className="wp-kal-col" key={i}>
-                  {STUNDEN_LINIEN.map((h) => (
-                    <span
-                      className="wp-kal-linie"
-                      key={h}
-                      style={{ top: (h * 60 - T_VON) * PPM + "px" }}
-                    />
-                  ))}
-                  {stundenWoche.filter((s) => s.tag === i).map((s) => block(s))}
+                  {tagMitPausen(i).map((s) => block(s))}
                 </div>
               ))}
             </div>
@@ -615,76 +733,11 @@ export default function Wochenplan({ onZurueck, onWeiter, woche = 0 }) {
         </section>
       </div>
 
-      {/* Untere Leiste wie im Etappenplan: führt durch den Schritt. Ist die Woche
-         voll verplant, fällt der Hinweis weg und es erscheint "Weiter". Nur im
-         Wizard; die stehende Plan-Übersicht hat die Werkzeuge oben + die Nav. */}
-      {istWizard && (
-        <div className="ep-bar">
-          {onZurueck && (
-            <button
-              type="button"
-              className="ep-bar-zurueck"
-              onClick={onZurueck}
-              aria-label="Zurück zum Etappenplan"
-              title="Zurück zum Etappenplan"
-            >
-              <svg
-                viewBox="0 0 24 24"
-                width="20"
-                height="20"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.4"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M15 5l-7 7 7 7" />
-              </svg>
-            </button>
-          )}
-          {onZurueck && <span className="ep-bar-sep" aria-hidden="true" />}
-          <span className="ep-bar-label">
-            <span aria-hidden="true">🗓</span> Wochenplanung
-          </span>
-          {!hatPlan ? (
-            <>
-              <span className="ep-bar-text">
-                Verteile die Uhren auf deine freien Stunden
-              </span>
-              <button
-                type="button"
-                className="ep-bar-aktion"
-                onClick={vorschlagVerteilen}
-                title="Die offenen Uhren aller Wochen ausgewogen auf die Stunden verteilen"
-              >
-                <span aria-hidden="true">✦</span> Automatisch einsortieren
-              </button>
-            </>
-          ) : (
-            <>
-              {zielVerplant ? (
-                <button
-                  type="button"
-                  className="ep-bar-weiter"
-                  onClick={onWeiter}
-                >
-                  Weiter
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  className="ep-bar-aktion"
-                  onClick={vorschlagVerteilen}
-                  title="Die offenen Uhren ausgewogen auf die Stunden verteilen"
-                >
-                  <span aria-hidden="true">✦</span> Automatisch einsortieren
-                </button>
-              )}
-            </>
-          )}
-        </div>
-      )}
+      {/* Untere Leiste nur im Wizard; in den festen App-Anker portaliert, damit sie
+         beim Screen-Wechsel nicht mitwischt (vorn = aktiver Screen). */}
+      {istWizard &&
+        vorn !== false &&
+        (untenSlot ? createPortal(untenLeiste, untenSlot) : untenLeiste)}
 
       {hinweis && (
         <div className="ep-hinweis" role="status" aria-live="polite" aria-atomic="true">

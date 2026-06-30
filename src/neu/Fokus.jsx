@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { lernwegFuerKb } from "../data/wissen";
 import { lehrkraefte } from "../data/stundenplanWoche";
 import { ladeErledigt, fachWochenFortschritt } from "./planung";
+import { fachTextFarbe } from "./farbe";
 import Etappenring from "./Etappenring";
 import { ART_LABEL } from "./material";
 import { eigeneFuerThema, speichereEigenes } from "./eigeneMaterialien";
@@ -36,6 +37,7 @@ import {
 } from "./interaktiv";
 import { CHIPS, iconFuerMaterial, chipFuerMaterial } from "./materialTypen";
 import Quiz from "./Quiz";
+import Icon from "./Icon";
 import MaterialInhalt from "./MaterialInhalt";
 import MaterialUpload from "./MaterialUpload";
 import MaterialChat from "./MaterialChat";
@@ -93,54 +95,9 @@ function Lernzeit() {
   }, []);
   return (
     <span className="fokus-lernzeit" title="So lange arbeitest du in dieser Sitzung schon an diesem Ziel">
-      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-        <path d="M9 2.5h6" />
-        <circle cx="12" cy="13" r="8" />
-        <path d="M12 9.5V13l2.4 1.6" />
-      </svg>
+      <Icon name="clock" width={13} height={13} />
       {mmss(sek)}
     </span>
-  );
-}
-
-// ---- Werkzeug-Icons (Toolbar) -------------------------------------------
-function IcOrdner(p) {
-  return (
-    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}>
-      <path d="M3 7a2 2 0 0 1 2-2h4l2 2h6a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-    </svg>
-  );
-}
-function IcNotizen(p) {
-  return (
-    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}>
-      <path d="M6 3h8l4 4v14a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z" />
-      <path d="M14 3v4h4M8 12h8M8 16h6" />
-    </svg>
-  );
-}
-function IcStift(p) {
-  return (
-    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}>
-      <path d="M12 20h9" />
-      <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />
-    </svg>
-  );
-}
-function IcKamera(p) {
-  return (
-    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}>
-      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
-      <circle cx="12" cy="13" r="4" />
-    </svg>
-  );
-}
-function IcLive(p) {
-  return (
-    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}>
-      <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z" />
-      <circle cx="12" cy="12" r="3" />
-    </svg>
   );
 }
 
@@ -680,7 +637,7 @@ export default function Fokus({
               aria-label="Materialien"
               title="Passende Materialien"
             >
-              <IcOrdner aria-hidden="true" />
+              <Icon name="folder" width={22} height={22} />
             </button>
             <button
               type="button"
@@ -690,7 +647,7 @@ export default function Fokus({
               aria-label="Notizen"
               title="Notizen"
             >
-              <IcNotizen aria-hidden="true" />
+              <Icon name="erinnerung" width={22} height={22} />
               {meineNotizen.length > 0 && (
                 <span className="fokus-wz-zahl">{meineNotizen.length}</span>
               )}
@@ -702,7 +659,7 @@ export default function Fokus({
               aria-label="Markieren und fragen"
               title="Stift: markieren und den KI-Coach fragen"
             >
-              <IcStift aria-hidden="true" />
+              <Icon name="marker" width={22} height={22} />
             </button>
             <span className="fokus-wz-spacer" aria-hidden="true" />
             <button
@@ -712,7 +669,7 @@ export default function Fokus({
               aria-label="Aufschrieb digitalisieren"
               title="Kamera: deinen Aufschrieb digitalisieren"
             >
-              <IcKamera aria-hidden="true" />
+              <Icon name="camera" width={22} height={22} />
             </button>
           </nav>
 
@@ -809,12 +766,33 @@ export default function Fokus({
                 </div>
               ) : (
                 <>
+                  {/* Gleicher Aufbau wie die Planungs-Pille (.ep-bar): links der
+                     Zurück-Chevron, dann Hairline, Fach, Hairline, der Schritt-Text
+                     (mit Hinweis darunter), Hairline, der Button. */}
+                  {aktuell > 0 && (
+                    <button
+                      type="button"
+                      className="fokus-sl-zurueck"
+                      onClick={zurueck}
+                      aria-label="Ein Schritt zurück"
+                      title="Ein Schritt zurück"
+                    >
+                      <Icon name="chevron-left" width={20} height={20} />
+                    </button>
+                  )}
+                  {aktuell > 0 && (
+                    <span className="fokus-sl-trenner" aria-hidden="true" />
+                  )}
+                  <span
+                    className="fokus-sl-fach"
+                    style={{ color: fachTextFarbe(kb.fach) }}
+                  >
+                    {kb.fach}
+                  </span>
+                  <span className="fokus-sl-trenner" aria-hidden="true" />
                   <div className="fokus-sl-info">
-                    <span className="fokus-sl-kopf">
-                      <span className="fokus-sl-fach">{kb.fach}</span>
-                      <span className="fokus-sl-text">
-                        {schritte[aktuell]?.text}
-                      </span>
+                    <span className="fokus-sl-text">
+                      {schritte[aktuell]?.text}
                     </span>
                     {!kannWeiter && (
                       <span className="fokus-sl-hinweis">
@@ -823,32 +801,19 @@ export default function Fokus({
                     )}
                   </div>
                   <span className="fokus-sl-trenner" aria-hidden="true" />
-                  <div className="fokus-sl-nav">
-                    {aktuell > 0 && (
-                      <button
-                        type="button"
-                        className="fokus-sl-zurueck"
-                        onClick={zurueck}
-                        aria-label="Ein Schritt zurück"
-                        title="Ein Schritt zurück"
-                      >
-                        ‹
-                      </button>
-                    )}
-                    <button
-                      type="button"
-                      className="fokus-sl-weiter"
-                      onClick={schrittGeschafft}
-                      disabled={!kannWeiter}
-                      title={
-                        kannWeiter
-                          ? undefined
-                          : "Arbeite die Übung erst ganz durch"
-                      }
-                    >
-                      Schritt geschafft →
-                    </button>
-                  </div>
+                  <button
+                    type="button"
+                    className="fokus-sl-weiter"
+                    onClick={schrittGeschafft}
+                    disabled={!kannWeiter}
+                    title={
+                      kannWeiter
+                        ? undefined
+                        : "Arbeite die Übung erst ganz durch"
+                    }
+                  >
+                    Schritt geschafft →
+                  </button>
                 </>
               )}
             </div>
@@ -1054,17 +1019,7 @@ export default function Fokus({
 
                 <p className="fokus-rail-sektion">Alle</p>
                 <div className="fokus-rail-suche">
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    aria-hidden="true"
-                  >
-                    <circle cx="11" cy="11" r="7" />
-                    <path d="M21 21l-4.35-4.35" />
-                  </svg>
+                  <Icon name="search" />
                   <input
                     type="text"
                     value={suche}
@@ -1137,7 +1092,7 @@ export default function Fokus({
                   aria-label="Live-Coach: schaut beim Arbeiten mit"
                   title="Live-Coach: schaut beim Arbeiten mit"
                 >
-                  <IcLive aria-hidden="true" />
+                  <Icon name="eye" width={22} height={22} />
                 </button>
                 <button
                   type="button"

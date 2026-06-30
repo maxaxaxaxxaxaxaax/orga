@@ -6,7 +6,7 @@ function zufallsZahl(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-function formatNegativeZahl(n) {
+export function formatNegativeZahl(n) {
   return n < 0 ? `−${Math.abs(n)}` : `${n}`;
 }
 
@@ -563,7 +563,9 @@ function optionenZahlen(aufgabe) {
   add(r - 2, "Daneben: rechne Schritt fuer Schritt nach.");
   const auswahl = distraktoren.slice(0, 3);
   const optionen = mischen([{ wert: r }, ...auswahl]);
-  return optionen.map((o) => ({ text: String(o.wert), warum: o.warum }));
+  // Anzeige mit typografischem Minus (−), damit die Optionen genauso aussehen wie
+  // die Frage. Die Prüfung in Quiz normalisiert das Minus, der Vergleich passt.
+  return optionen.map((o) => ({ text: formatNegativeZahl(o.wert), warum: o.warum }));
 }
 
 // Latein: nutzt die existierenden Vokabel-/Satz-Pools für Distraktoren.

@@ -19,22 +19,31 @@
 .wp-screen.wp-wizard {
   padding-top: var(--seite-top);
 }
+/* Seitenleiste 4/12, Kalender 8/12 (gleicher Bruchteil wie die anderen Seiten),
+   als zwei fr-Spuren, damit der Übergang animierbar ist. */
 .wp-layout {
   flex: 1;
   min-height: 0;
   display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
+  grid-template-columns: 4fr 8fr;
   grid-template-rows: minmax(0, 1fr);
   gap: var(--grid-gap);
   align-items: stretch;
-}
-/* Seitenleiste 4/12, Kalender 8/12 (gleicher Bruchteil wie die anderen Seiten). */
-.wp-layout > .wp-seite {
-  grid-column: span 4;
+  transition: grid-template-columns 0.5s ease, gap 0.5s ease;
 }
 .wp-layout > .wp-kal {
-  grid-column: span 8;
   min-width: 0;
+}
+/* Ist alles verplant, fadet der "Plane deine Woche"-Kasten nach links weg und der
+   Kalender wächst in den frei gewordenen Platz (wie im Etappenplan). */
+.wp-layout.wp-fertig {
+  grid-template-columns: 0fr 12fr;
+  gap: 0;
+}
+.wp-layout.wp-fertig > .wp-seite {
+  opacity: 0;
+  pointer-events: none;
+  overflow: hidden;
 }
 @media (max-width: 860px) {
   .wp-screen {
@@ -45,13 +54,11 @@
   .wp-screen.wp-wizard {
     padding-top: var(--seite-top);
   }
-  .wp-layout {
+  .wp-layout,
+  .wp-layout.wp-fertig {
     grid-template-columns: 1fr;
     grid-template-rows: auto;
-  }
-  .wp-layout > .wp-seite,
-  .wp-layout > .wp-kal {
-    grid-column: auto;
+    gap: var(--grid-gap);
   }
   .wp-seite-liste {
     overflow-y: visible;
@@ -78,6 +85,7 @@
   min-width: 0;
   min-height: 0;
   max-height: 100%;
+  transition: opacity 0.45s ease;
 }
 /* Beim Zurückziehen in den Vorrat den scrollenden Bereich markieren. */
 .wp-seite.ueber .wp-seite-liste {
@@ -265,6 +273,29 @@
   position: relative;
   border-left: 1px solid var(--line);
 }
+/* Der gerade laufende Block (wie die aktuelle Stunde im Stundenplan): Teal-Rahmen
+   + kleiner "Jetzt"-Marker, damit man sieht, welche Stunde gerade ist. */
+.wp-blk.jetzt {
+  box-shadow: inset 0 0 0 1.5px var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, var(--card));
+}
+.wp-blk-fix.jetzt {
+  opacity: 1;
+  color: var(--text);
+}
+.wp-blk-jetzt {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  font-size: 0.54rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--on-accent);
+  background: var(--accent);
+  border-radius: 999px;
+  padding: 1px 6px;
+}
 .wp-kal-linie {
   position: absolute;
   left: 0;
@@ -278,29 +309,44 @@
   position: absolute;
   left: 3px;
   right: 3px;
-  border-radius: var(--r-sm, 8px);
-  padding: 6px 8px;
+  border-radius: 11px;
+  padding: 6px 10px;
   overflow: hidden;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 1px;
+  /* Kurze 45-Min-Blöcke: straffe Zeilen, damit Fach + Zeit/Raum sicher hineinpassen. */
+  line-height: 1.2;
 }
-/* Feste Stunde (Nebenfach, Projekt): ruhiger Kontext, ausgegraut. */
+/* Feste Stunde (Nebenfach, Projekt): klar ausgegrauter, inaktiver Kontext-Block,
+   damit sichtbar nur die Freiarbeit beplanbar ist. */
 .wp-blk-fix {
-  background: var(--bg);
-  border: 1px solid var(--line);
+  background: var(--card-2);
+  border: 1px solid transparent;
   color: var(--muted);
+  opacity: 0.62;
+}
+.wp-blk-fix .wp-blk-fach {
+  color: var(--muted);
+  font-weight: 500;
 }
 .wp-blk-fach {
   font-size: 0.8rem;
   font-weight: 600;
   color: var(--text-2);
 }
+.wp-blk-meta {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 7px;
+}
 .wp-blk-zeit,
 .wp-blk-raum {
   font-size: 0.68rem;
   color: var(--muted);
+  font-variant-numeric: tabular-nums;
 }
 .wp-blk-strich {
   position: absolute;
@@ -310,23 +356,23 @@
   width: 3px;
   opacity: 0.5;
 }
-/* Pause / Mittagessen. */
+/* Pause / Mittagessen: heller Vollblock mit ruhiger Hairline (kein Strichrahmen).
+   Deckend, damit die Stunden-Gitterlinie nicht durchscheint. */
 .wp-blk-pause {
   align-items: center;
   justify-content: center;
-  background: transparent;
-  border: 1px dashed var(--line);
+  background: var(--card);
+  border: 1px solid var(--line);
   color: var(--muted);
   font-size: 0.72rem;
 }
-/* Freiarbeit-Slot (belegbar): leer = gestrichelte Ablagefläche. */
+/* Freiarbeit-Slot (belegbar): leer = gestrichelte Ablagefläche mit dunklem Label.
+   Linksbündig oben wie die festen Stunden (Konsistenz). Deckender Hintergrund,
+   damit die Stunden-Gitterlinie nicht durch den Slot läuft. */
 .wp-blk-frei.leer {
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  background: transparent;
-  border: 1px dashed var(--line-strong);
-  color: var(--muted);
+  background: var(--card);
+  border: 1.5px dashed var(--line-strong);
+  color: var(--text);
   cursor: pointer;
 }
 .wp-blk-frei.leer.ueber,
@@ -339,8 +385,23 @@
   font-size: 0.78rem;
   font-weight: 600;
 }
+/* Welcher Fachunterricht in dieser Freiarbeit läuft (Lehrkraft ist da). */
+.wp-frei-fach {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-2);
+}
 .wp-frei-zeit {
   font-size: 0.66rem;
+  color: var(--muted);
+}
+.wp-blk-frei.leer.ueber .wp-frei-fach,
+.wp-blk-frei.leer.tippbar .wp-frei-fach {
+  color: inherit;
+}
+.wp-blk-frei.leer.ueber .wp-frei-zeit,
+.wp-blk-frei.leer.tippbar .wp-frei-zeit {
+  color: inherit;
 }
 .wp-blk-frei.belegt {
   padding: 3px;
@@ -400,8 +461,9 @@
 .wp-kb-uhr {
   font-size: 0.75rem;
 }
-.wp-kb-code {
-  opacity: 0.85;
+.wp-kb-fach {
+  color: var(--text-2);
+  font-weight: 600;
 }
 
 /* Der Zurück-Knopf (.ep-bar-zurueck) in der unteren Pille liegt in

@@ -46,7 +46,6 @@ export default function KbChip({
           ◷
         </span>
         {zahlWert}
-        {k.code && <span className="kbc-code">{k.code}</span>}
       </span>
     </button>
   );

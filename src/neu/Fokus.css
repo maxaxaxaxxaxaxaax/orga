@@ -334,11 +334,14 @@
   z-index: 6;
   box-sizing: border-box;
   width: min(var(--leiste-breite), calc(100% - 28px));
+  /* Gleiche feste Höhe + Polster wie Weg-/Planungs-Leiste, damit die Pille beim
+     Screen-Wechsel nicht springt (nur der Inhalt wechselt). */
+  min-height: 66px;
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 10px;
   flex-wrap: nowrap;
-  padding: 8px 8px 8px 20px;
+  padding: 7px 8px 7px 10px;
   background: linear-gradient(
     180deg,
     color-mix(in srgb, var(--card) 52%, transparent),
@@ -353,6 +356,7 @@
 .fokus-sl-info {
   display: flex;
   flex-direction: column;
+  justify-content: center;
   min-width: 0;
   flex: 1;
 }
@@ -366,14 +370,12 @@
 }
 .fokus-sl-fach {
   flex-shrink: 0;
-  font-size: 0.62rem;
+  font-size: 0.72rem;
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--accent);
+  letter-spacing: 0.01em;
+  color: var(--text-2);
 }
 .fokus-sl-text {
-  flex: 1;
   min-width: 0;
   font-size: 0.95rem;
   font-weight: 600;
@@ -411,12 +413,12 @@
   color: var(--muted);
 }
 /* Trennlinie zwischen den Bereichen der Schritt-Leiste. */
+/* Identisch zur Planungs-Pille (.ep-bar-sep): feine 22px-Hairline. */
 .fokus-sl-trenner {
   flex-shrink: 0;
   width: 1px;
-  align-self: stretch;
-  margin: 5px 0;
-  background: color-mix(in srgb, var(--line) 85%, transparent);
+  height: 22px;
+  background: var(--line-strong);
 }
 /* Reflexion nach dem Schritt: zentriert, ruhig, ein Tap. */
 .fokus-sl-reflexion {
@@ -503,24 +505,23 @@
   font-size: 0.7rem;
   font-weight: 700;
 }
+/* Identisch zur Planungs-Pille (.ep-bar-zurueck): randlos, grau, runder Hover. */
 .fokus-sl-zurueck {
   flex-shrink: 0;
-  width: 34px;
-  height: 34px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid var(--line-strong);
-  background: var(--card);
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
   color: var(--text-2);
-  font-size: 1.3rem;
-  line-height: 1;
-  border-radius: 50%;
   cursor: pointer;
-  transition: border-color 0.12s ease, color 0.12s ease;
+  border-radius: 999px;
+  transition: background 0.12s ease, color 0.12s ease;
 }
 .fokus-sl-zurueck:hover {
-  border-color: var(--accent);
+  background: color-mix(in srgb, var(--text) 8%, transparent);
   color: var(--accent);
 }
 .fokus-sl-weiter {
@@ -549,9 +550,11 @@
 }
 /* Hinweis, wenn die Übung des Schritts noch nicht durchgearbeitet ist. */
 .fokus-sl-hinweis {
-  font-size: 0.74rem;
-  /* Ruhiger Hinweis statt Warnfarbe: er erklärt nur, warum der Knopf noch
-     wartet, und soll nicht alarmieren. */
+  /* Untertitel direkt unter dem Schritt-Text: erklärt ruhig, warum der Knopf noch
+     wartet, ohne zu alarmieren (keine Warnfarbe). */
+  margin-top: 2px;
+  font-size: 0.72rem;
+  line-height: 1.2;
   color: var(--muted);
 }
 

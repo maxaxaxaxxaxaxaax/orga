@@ -1,4 +1,4 @@
-# Orgatool · Theresianum Mainz
+# Orca · Theresianum Mainz
 
 Eine Lern-App-Konzeptstudie, maßgeschneidert für das **selbstständige Lernen am
 Theresianum Mainz** (Ganztagsgymnasium, Orientierungs-/Mittelstufe). Sie bündelt

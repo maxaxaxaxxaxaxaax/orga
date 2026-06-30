@@ -14,8 +14,8 @@
   gap: 10px;
   padding: 7px 8px 7px 10px;
   /* Feste Höhe, damit die Box in allen Phasen (Abruf/Aufgabe/Endzustand) gleich
-     groß bleibt und der blaue Knopf nicht springt. */
-  min-height: 57px;
+     groß bleibt und der blaue Knopf nicht springt. Gleiche Höhe wie Planung/Fokus. */
+  min-height: 66px;
   box-sizing: border-box;
   /* Liquid Glass: transparent genug, dass der Blur des Hintergrunds klar
      durchscheint, dazu Sättigung + ein heller Glanzrand oben (Specular) und ein
@@ -194,11 +194,17 @@
 }
 .weg-aufgabe-fach {
   flex-shrink: 0;
-  font-size: 0.62rem;
+  font-size: 0.72rem;
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--accent);
+  letter-spacing: 0.01em;
+  color: var(--text-2);
+}
+.weg-aufgabe-sep {
+  flex-shrink: 0;
+  align-self: center;
+  width: 1px;
+  height: 0.95rem;
+  background: var(--line-strong);
 }
 .weg-aufgabe-titel {
   font-size: 0.86rem;
@@ -235,6 +241,7 @@
   color: var(--muted);
 }
 /* CTA-Pille: direkt in die Aufgabe springen. */
+/* Mach-Phase-CTA („Loslegen") im selben Button-Stil wie „Schritt geschafft". */
 .weg-aufgabe-cta {
   flex-shrink: 0;
   display: inline-flex;
@@ -242,15 +249,18 @@
   gap: 5px;
   background: var(--accent);
   color: var(--on-accent);
-  font-size: 0.78rem;
+  font-size: 0.9rem;
   font-weight: 700;
-  padding: 7px 13px;
+  padding: 10px 18px;
   border-radius: 999px;
-  box-shadow: 0 4px 12px -3px var(--accent-shadow);
-  transition: background 0.15s ease;
+  box-shadow: 0 6px 16px -7px var(--accent-shadow);
+  transition: background 0.15s ease, transform 0.12s ease;
 }
 .weg-aufgabe:hover .weg-aufgabe-cta {
   background: var(--accent-strong);
+}
+.weg-aufgabe:active .weg-aufgabe-cta {
+  transform: scale(0.98);
 }
 .weg-aufgabe-pfeil {
   flex-shrink: 0;
@@ -323,6 +333,8 @@
   color: var(--muted);
   white-space: nowrap;
 }
+/* Gleicher Button wie „Schritt geschafft" im Fokus (.fokus-sl-weiter): einheitliche
+   Größe, Polster, Schatten und Druck-Feedback über alle unteren Leisten/Pillen. */
 .weg-planen-knopf {
   flex-shrink: 0;
   display: inline-flex;
@@ -332,15 +344,18 @@
   cursor: pointer;
   background: var(--accent);
   color: var(--on-accent);
-  font-size: 0.78rem;
+  font-size: 0.9rem;
   font-weight: 700;
-  padding: 8px 15px;
+  padding: 10px 18px;
   border-radius: 999px;
-  box-shadow: 0 4px 12px -3px var(--accent-shadow);
-  transition: background 0.15s ease;
+  box-shadow: 0 6px 16px -7px var(--accent-shadow);
+  transition: background 0.15s ease, transform 0.12s ease;
 }
 .weg-planen-knopf:hover {
   background: var(--accent-strong);
+}
+.weg-planen-knopf:active {
+  transform: scale(0.98);
 }
 
 /* Schmal: erledigte/kommende Schritte zeigen nur ihre Marke, der aktuelle bleibt

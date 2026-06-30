@@ -3,7 +3,6 @@ import { faecher } from "../data/wissen";
 import { koennensbeweise, kbFarbe } from "../data/koennensbeweise";
 import { ladeEigene, speichereEigenes } from "./eigeneMaterialien";
 import { istOeffenbar } from "./interaktiv";
-import { FACH_STRUKTUR } from "../data/fachStruktur";
 import { lade, ERLEDIGT_KEY } from "./planung";
 import { IcLernweg } from "./materialIcons";
 import { CHIPS, chipFuerMaterial, iconFuerMaterial } from "./materialTypen";
@@ -11,6 +10,7 @@ import MaterialUpload from "./MaterialUpload";
 import MaterialAnsicht from "./MaterialAnsicht";
 import KbInhalt from "./KbInhalt";
 import Netz from "./Netz";
+import Icon from "./Icon";
 import "./Ablage.css";
 
 // Ablage: eine Karte "Materialien". Oben drin die Fächer als bunte Ordner (Wahl
@@ -19,9 +19,39 @@ import "./Ablage.css";
 // Sortierung. Jede Zeile trägt ein Typ-Icon, Titel und Datum. Icons/Chips kommen
 // aus materialIcons (geteilt mit dem Fokus).
 
-function FolderIcon({ color, offen }) {
+// Eigene Fach-Ordner (in Figma erstellt, Fach-Farbe + Buchstabe eingebaut), je
+// offen/geschlossen. Als Rohtext eingelesen und 1:1 eingefügt (Farben bleiben).
+const ORDNER_SVGS = import.meta.glob("./icons/folders/*.svg", {
+  query: "?raw",
+  eager: true,
+  import: "default",
+});
+const ORDNER = {};
+for (const [pfad, raw] of Object.entries(ORDNER_SVGS)) {
+  ORDNER[pfad.split("/").pop().replace(/\.svg$/, "")] = raw;
+}
+// App-Fachname -> Dateibasis der Ordner-SVGs.
+const FACH_ORDNER = {
+  Mathematik: "mathe",
+  Deutsch: "deutsch",
+  Englisch: "englisch",
+  Französisch: "franzoesisch",
+};
+
+function FolderIcon({ fach, color, offen }) {
+  const basis = FACH_ORDNER[fach];
+  const svg = basis ? ORDNER[`${basis}-${offen ? "auf" : "zu"}`] : null;
+  if (svg) {
+    return (
+      <span
+        className="ab-ordner-svg"
+        aria-hidden="true"
+        dangerouslySetInnerHTML={{ __html: svg }}
+      />
+    );
+  }
+  // Fallback: bisheriger eingefärbter Ordner (Fächer ohne eigenes SVG).
   if (offen) {
-    // Geöffneter Ordner: hintere Wand + nach vorne geklappte, oben breitere Lasche.
     return (
       <svg viewBox="0 0 64 52" width="58" height="47" aria-hidden="true">
         <path
@@ -60,11 +90,10 @@ function datumLang(iso) {
   });
 }
 
-const STD_FACH =
-  faecher.find((f) => f.fach === "Mathematik")?.id || faecher[0]?.id || null;
-
 export default function Ablage() {
-  const [fachId, setFachId] = useState(STD_FACH);
+  // Standard: kein Fach gewählt -> alle Fächer (global). Ein Ordner-Klick filtert,
+  // nochmaliger Klick auf denselben Ordner schließt ihn wieder (zurück zu global).
+  const [fachId, setFachId] = useState(null);
   const [chip, setChip] = useState("alle");
   const [suche, setSuche] = useState("");
   const [sort, setSort] = useState("neu"); // neu | az
@@ -76,41 +105,45 @@ export default function Ablage() {
   const [ansicht, setAnsicht] = useState("liste"); // liste | netz
 
   const fach = faecher.find((f) => f.id === fachId) || null;
-  const struktur = fach ? FACH_STRUKTUR[fach.id] : null;
   const erledigt = lade(ERLEDIGT_KEY);
 
-  // Aktive Lernwege des Fachs (die mit echtem Könnensbeweis in der Etappe).
-  const lernwege = fach
-    ? fach.themen.filter((t) => koennensbeweise.some((k) => k.id === t.kbId))
-    : [];
-  const materialien = fach
-    ? [
-        ...(fach.materialien || []),
-        ...eigene.filter((m) => m.fachId === fach.id),
-      ]
-    : [];
+  // Lernwege + Materialien eines Fachs als Listenzeilen (Typ-Chip, Icon, Fach).
+  const zeilenFuerFach = (f) => {
+    if (!f) return [];
+    const lernwege = f.themen.filter((t) =>
+      koennensbeweise.some((k) => k.id === t.kbId)
+    );
+    const materialien = [
+      ...(f.materialien || []),
+      ...eigene.filter((m) => m.fachId === f.id),
+    ];
+    const lwRows = lernwege.map((t) => ({
+      key: f.id + "-lw-" + t.id,
+      chip: "lernwege",
+      titel: t.label,
+      fach: f.fach,
+      datum: null,
+      Icon: IcLernweg,
+      onOpen: () => setOffenerLernweg({ id: t.kbId, label: t.label }),
+    }));
+    const mRows = materialien.map((m) => ({
+      key: f.id + "-m-" + m.id,
+      chip: chipFuerMaterial(m),
+      titel: m.titel,
+      fach: f.fach,
+      datum: m.datum || null,
+      Icon: iconFuerMaterial(m),
+      onOpen: istOeffenbar(m) ? () => setOffenesMaterial(m) : null,
+    }));
+    return [...lwRows, ...mRows];
+  };
 
-  // Alles in eine Liste: Lernwege + Materialien, je mit Typ-Chip und Icon.
-  const lernwegRows = lernwege.map((t) => ({
-    key: "lw-" + t.id,
-    chip: "lernwege",
-    titel: t.label,
-    datum: null,
-    Icon: IcLernweg,
-    onOpen: () => setOffenerLernweg({ id: t.kbId, label: t.label }),
-  }));
-  const matRows = materialien.map((m) => ({
-    key: "m-" + m.id,
-    chip: chipFuerMaterial(m),
-    titel: m.titel,
-    datum: m.datum || null,
-    Icon: iconFuerMaterial(m),
-    onOpen: istOeffenbar(m) ? () => setOffenesMaterial(m) : null,
-  }));
-
-  let rows = [...lernwegRows, ...matRows];
-  if (chip !== "alle") rows = rows.filter((r) => r.chip === chip);
   const q = suche.trim().toLowerCase();
+  // Ein Fach gewählt -> nur dieses; sonst alle Fächer (global). Die Suche filtert
+  // jeweils innerhalb dieses Bereichs.
+  const quellFaecher = fach ? [fach] : faecher;
+  let rows = quellFaecher.flatMap(zeilenFuerFach);
+  if (chip !== "alle") rows = rows.filter((r) => r.chip === chip);
   if (q) rows = rows.filter((r) => r.titel.toLowerCase().includes(q));
   rows = rows.sort((a, b) => {
     if (sort === "az") return a.titel.localeCompare(b.titel, "de");
@@ -128,29 +161,50 @@ export default function Ablage() {
     if (m.fachId) setFachId(m.fachId);
   }
 
+  // Fächer-Ordner (Buttons), in beiden Ansichten genutzt: in der Liste über den
+  // Materialien, im Netz als Overlay oben auf dem Netz. Toggle: gleiches Fach
+  // erneut -> zu (global); kein Ansicht-Wechsel, damit man im Netz bleibt.
+  const ordnerButtons = faecher.map((f) => (
+    <button
+      key={f.id}
+      type="button"
+      className={"ab-ordner" + (f.id === fachId ? " aktiv" : "")}
+      onClick={() => {
+        setFachId((cur) => (cur === f.id ? null : f.id));
+        setChip("alle");
+      }}
+      aria-pressed={f.id === fachId}
+    >
+      <FolderIcon
+        fach={f.fach}
+        color={kbFarbe[f.fach] || f.farbe || "#868e96"}
+        offen={f.id === fachId}
+      />
+      <span className="ab-ordner-name">{f.fach}</span>
+    </button>
+  ));
+
   return (
     <>
       <div className="ab-screen">
         <div className="ab-grid">
           {/* Eine Karte: Materialien, mit den Fächer-Ordnern oben drin. */}
-          <section className="ab-card ab-materialien">
+          <section
+            className={
+              "ab-card ab-materialien" + (ansicht === "netz" ? " ab-fuellt" : "")
+            }
+          >
             <div className="ab-mat-kopf">
               <div>
                 <h2 className="ab-card-titel">
-                  <svg
-                    className="ab-card-icon"
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                  >
-                    <rect x="5.5" y="3.5" width="13" height="17" rx="2" />
-                    <path d="M9.5 3.5v17M12.5 8.5h4M12.5 12h4" />
-                  </svg>
+                  <Icon name="material" className="ab-card-icon" />
                   Materialien
                 </h2>
-                <p className="ab-mat-fach">{fach ? `${fach.fach} Gesamt` : ""}</p>
+                <p className="ab-mat-fach">
+                  {fach ? `${fach.fach} Gesamt` : "Alle Fächer"}
+                </p>
               </div>
-              {struktur && (
-                <div className="ab-ansicht" role="tablist" aria-label="Ansicht">
+              <div className="ab-ansicht" role="tablist" aria-label="Ansicht">
                   <button
                     type="button"
                     role="tab"
@@ -170,46 +224,21 @@ export default function Ablage() {
                     Netz
                   </button>
                 </div>
-              )}
             </div>
 
-            {/* Fächer-Ordner (vormals eigene Box): jetzt oben in der Materialien-
-                Karte. Auswahl filtert die Liste darunter. */}
-            <div className="ab-faecher-leiste">
-              {faecher.map((f) => (
-                <button
-                  key={f.id}
-                  type="button"
-                  className={"ab-ordner" + (f.id === fachId ? " aktiv" : "")}
-                  onClick={() => {
-                    setFachId(f.id);
-                    setChip("alle");
-                  }}
-                  aria-pressed={f.id === fachId}
-                >
-                  <FolderIcon
-                    color={kbFarbe[f.fach] || f.farbe || "#868e96"}
-                    offen={f.id === fachId}
-                  />
-                  <span className="ab-ordner-name">{f.fach}</span>
-                </button>
-              ))}
-            </div>
-
-            {ansicht === "netz" && struktur ? (
+            {ansicht === "netz" ? (
               <div className="ab-netz">
                 <Netz
-                  fach={fach}
-                  struktur={struktur}
                   erledigt={erledigt}
-                  onSelect={(themaId) => {
-                    const t = fach.themen.find((x) => x.id === themaId);
-                    if (t) setOffenerLernweg({ id: t.kbId, label: t.label });
-                  }}
+                  onSelect={(node) =>
+                    setOffenerLernweg({ id: node.kbId, label: node.label })
+                  }
                 />
               </div>
             ) : (
               <>
+                {/* Fächer-Ordner über der Liste (Auswahl filtert die Liste). */}
+                <div className="ab-faecher-leiste">{ordnerButtons}</div>
                 <div className="ab-chips" role="tablist" aria-label="Material-Typ">
                   {CHIPS.map((c) => (
                     <button
@@ -227,19 +256,6 @@ export default function Ablage() {
                 </div>
 
                 <div className="ab-liste-kopf">
-                  <div className="ab-suche ab-suche-klein">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
-                      <circle cx="11" cy="11" r="7" />
-                      <path d="M21 21l-4.35-4.35" />
-                    </svg>
-                    <input
-                      type="text"
-                      value={suche}
-                      onChange={(e) => setSuche(e.target.value)}
-                      placeholder="Suche"
-                      aria-label="Materialien durchsuchen"
-                    />
-                  </div>
                   <div className="ab-liste-werkzeuge">
                     <div className="ab-sort">
                       <button
@@ -290,6 +306,9 @@ export default function Ablage() {
                             <r.Icon />
                           </span>
                           <span className="ab-zeile-titel">{r.titel}</span>
+                          {!fach && r.fach && (
+                            <span className="ab-zeile-fach">{r.fach}</span>
+                          )}
                           <span className="ab-zeile-datum">
                             {r.datum ? datumLang(r.datum) : ""}
                           </span>
@@ -363,14 +382,12 @@ export default function Ablage() {
           statt an den Viewport hängen. */}
       <div className="ab-top">
         <div className="ab-suche">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
-            <circle cx="11" cy="11" r="7" />
-            <path d="M21 21l-4.35-4.35" />
-          </svg>
+          <Icon name="search" />
           <input
             type="text"
             value={suche}
             onChange={(e) => setSuche(e.target.value)}
+            onFocus={() => setFachId(null)}
             placeholder="Suche"
             aria-label="Ablage durchsuchen"
           />

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import {
   koennensbeweise,
   kbFaecher,
@@ -9,6 +10,7 @@ import {
 import { etappen } from "../data/etappen";
 import { meldeAenderung } from "./planung";
 import { textAuf } from "./farbe";
+import Icon from "./Icon";
 import "./Etappenplan.css";
 
 // Etappe planen: links der Vorrat (Könnensbeweise je Fach als bunte Chips) plus
@@ -54,7 +56,7 @@ function lade() {
   }
 }
 
-export default function Etappenplan({ onWeiter, onZurueck }) {
+export default function Etappenplan({ onWeiter, onZurueck, untenSlot, vorn }) {
   const [zuordnung, setZuordnung] = useState(lade); // kbId -> Wochen-Index
   const [ueber, setUeber] = useState(null); // Drop-Ziel ("w0".."w5" | "pool")
   const [gewaehltId, setGewaehltId] = useState(null); // angetippter Chip (Touch)
@@ -222,18 +224,71 @@ export default function Etappenplan({ onWeiter, onZurueck }) {
             ◷
           </span>
           {k.cluster}
-          {k.code && <span className="ep-kb-code">{k.code}</span>}
         </span>
       </button>
     );
   }
+
+  // Untere Leiste: führt durch den Schritt. Ist alles verteilt, fällt der Hinweis
+  // weg und es erscheint "Weiter" (wie im Mockup).
+  const untenLeiste = (
+    <div className="ep-bar">
+      {onZurueck && (
+        <button
+          type="button"
+          className="ep-bar-zurueck"
+          onClick={onZurueck}
+          aria-label="Zurück zur Übersicht"
+          title="Zurück zur Übersicht"
+        >
+          <Icon name="chevron-left" width={20} height={20} />
+        </button>
+      )}
+      {onZurueck && <span className="ep-bar-sep" aria-hidden="true" />}
+      <span className="ep-bar-label">
+        <Icon name="etappe" size={16} /> Etappenplanung
+      </span>
+      {!hatPlan ? (
+        <>
+          <span className="ep-bar-text">
+            Ziehe die Lernwege in die jeweiligen Wochen
+          </span>
+          <button
+            type="button"
+            className="ep-bar-aktion"
+            onClick={vorschlagVerteilung}
+            title="Die noch offenen Ziele ausgewogen auf die Wochen verteilen"
+          >
+            <span aria-hidden="true">✦</span> Automatisch einsortieren
+          </button>
+        </>
+      ) : (
+        <>
+          {alleZugeordnet ? (
+            <button type="button" className="ep-bar-weiter" onClick={onWeiter}>
+              Weiter
+            </button>
+          ) : (
+            <button
+              type="button"
+              className="ep-bar-aktion"
+              onClick={vorschlagVerteilung}
+              title="Die noch offenen Ziele ausgewogen auf die Wochen verteilen"
+            >
+              <span aria-hidden="true">✦</span> Automatisch einsortieren
+            </button>
+          )}
+        </>
+      )}
+    </div>
+  );
 
   return (
     <div
       className="ep-screen"
       onClick={() => gewaehltId != null && setGewaehltId(null)}
     >
-      <div className="ep-layout">
+      <div className={"ep-layout" + (alleZugeordnet ? " ep-fertig" : "")}>
         {/* Linke Spalte: Vorrat */}
         <aside
           className={"ep-vorrat" + (ueber === "pool" ? " ueber" : "")}
@@ -252,9 +307,7 @@ export default function Etappenplan({ onWeiter, onZurueck }) {
           <div className="ep-kopf-karte">
             <div className="ep-kopf-text">
               <h1 className="ep-kopf-titel">
-                <span className="ep-kopf-icon" aria-hidden="true">
-                  🗓
-                </span>
+                <Icon name="etappe" className="ep-kopf-icon" size={19} />
                 Plane deine Etappe
               </h1>
               <p className="ep-kopf-meta">
@@ -269,10 +322,7 @@ export default function Etappenplan({ onWeiter, onZurueck }) {
                 title="Neu planen: alles neu und ausgewogen verteilen"
                 aria-label="Neu planen"
               >
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M12 20h9" />
-                  <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
-                </svg>
+                <Icon name="marker" />
               </button>
             )}
           </div>
@@ -352,69 +402,8 @@ export default function Etappenplan({ onWeiter, onZurueck }) {
         </div>
       </div>
 
-      {/* Untere Leiste: führt durch den Schritt. Ist alles verteilt, fällt der
-         Hinweis weg und es erscheint "Weiter" (wie im Mockup). */}
-      <div className="ep-bar">
-        {onZurueck && (
-          <button
-            type="button"
-            className="ep-bar-zurueck"
-            onClick={onZurueck}
-            aria-label="Zurück zur Übersicht"
-            title="Zurück zur Übersicht"
-          >
-            <svg
-              viewBox="0 0 24 24"
-              width="20"
-              height="20"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.4"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-            >
-              <path d="M15 5l-7 7 7 7" />
-            </svg>
-          </button>
-        )}
-        {onZurueck && <span className="ep-bar-sep" aria-hidden="true" />}
-        <span className="ep-bar-label">
-          <span aria-hidden="true">🗓</span> Etappenplanung
-        </span>
-        {!hatPlan ? (
-          <>
-            <span className="ep-bar-text">
-              Ziehe die Lernwege in die jeweiligen Wochen
-            </span>
-            <button
-              type="button"
-              className="ep-bar-aktion"
-              onClick={vorschlagVerteilung}
-              title="Die noch offenen Ziele ausgewogen auf die Wochen verteilen"
-            >
-              <span aria-hidden="true">✦</span> Automatisch einsortieren
-            </button>
-          </>
-        ) : (
-          <>
-            {alleZugeordnet ? (
-              <button type="button" className="ep-bar-weiter" onClick={onWeiter}>
-                Weiter
-              </button>
-            ) : (
-              <button
-                type="button"
-                className="ep-bar-aktion"
-                onClick={vorschlagVerteilung}
-                title="Die noch offenen Ziele ausgewogen auf die Wochen verteilen"
-              >
-                <span aria-hidden="true">✦</span> Automatisch einsortieren
-              </button>
-            )}
-          </>
-        )}
-      </div>
+      {vorn !== false &&
+        (untenSlot ? createPortal(untenLeiste, untenSlot) : untenLeiste)}
 
       {hinweis && (
         <div className="ep-hinweis" role="status" aria-live="polite" aria-atomic="true">
