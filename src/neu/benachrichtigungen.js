@@ -6,7 +6,8 @@
 const KEY = "neu.mitteilungen";
 export const MITTEILUNG_EVENT = "neu:mitteilung";
 
-// art steuert nur das Icon: "coach" (Lerncoach), "material" (geteilt/hochgeladen).
+// art steuert Icon und Filter: "coach" (Nachricht der Lerncoach), "material"
+// (geteiltes/hochgeladenes Material), "link" (geteilter Link).
 const SEED = [
   {
     id: "seed-berg",
@@ -19,9 +20,22 @@ const SEED = [
   {
     id: "seed-material",
     art: "material",
-    titel: "Neu geteilt",
-    text: "Fr. Berg hat „Übungsblatt: Vorzeichen-Memo“ zu Mathematik gelegt.",
+    titel: "Übungsblatt: Vorzeichen-Memo",
+    text: "Fr. Berg hat es zu Mathematik gelegt.",
+    materialId: "m2",
+    tags: ["Mathematik", "Vorzeichen"],
     zeit: "7:40",
+    gelesen: false,
+  },
+  {
+    id: "seed-link",
+    art: "link",
+    titel: "Zahlengerade erklärt",
+    text: "In der Ablage bei Mathematik einsortiert.",
+    materialId: "m1",
+    quelle: "link",
+    tags: ["Mathematik", "Zahlengerade"],
+    zeit: "7:20",
     gelesen: false,
   },
 ];
@@ -55,13 +69,20 @@ function speichere(liste) {
 }
 
 // Neue Mitteilung vorne einreihen (A2: wird beim Hochladen von Material gerufen).
-export function addMitteilung({ titel, text, art }) {
+export function addMitteilung({ titel, text, art, materialId, quelle, tags }) {
   const liste = ladeMitteilungen();
   liste.unshift({
     id: "m" + Date.now(),
     art: art || "material",
     titel,
     text,
+    // Optionales Ziel: die id des Materials in der Ablage, damit ein Klick auf die
+    // Benachrichtigung direkt dorthin springt (geteilte Links/Material).
+    materialId: materialId || null,
+    // Herkunft (youtube/tiktok/instagram/link) und Auto-Tags, damit die Box
+    // dokumentiert, was und woher etwas in der Ablage gelandet ist.
+    quelle: quelle || null,
+    tags: Array.isArray(tags) ? tags : [],
     zeit: "gerade eben",
     gelesen: false,
   });
@@ -72,4 +93,12 @@ export function markiereAlleGelesen() {
   const liste = ladeMitteilungen();
   if (liste.every((m) => m.gelesen)) return;
   speichere(liste.map((m) => ({ ...m, gelesen: true })));
+}
+
+// Eine einzelne Mitteilung als gelesen markieren (Klick auf einen Eintrag).
+export function markiereGelesen(id) {
+  const liste = ladeMitteilungen();
+  const m = liste.find((x) => x.id === id);
+  if (!m || m.gelesen) return;
+  speichere(liste.map((x) => (x.id === id ? { ...x, gelesen: true } : x)));
 }

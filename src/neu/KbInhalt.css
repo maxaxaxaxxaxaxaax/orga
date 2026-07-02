@@ -180,10 +180,10 @@
   height: 9px;
   border-radius: 50%;
   background: var(--line-strong);
-  transition: background 0.25s ease;
+  transition: background var(--dur-slow) var(--ease-out);
 }
 .ki-bereit-text {
-  transition: color 0.25s ease;
+  transition: color var(--dur-slow) var(--ease-out);
 }
 .ki-bereit[data-stand="unterwegs"] .ki-bereit-punkt {
   background: var(--warn-text);
@@ -235,7 +235,7 @@
   cursor: pointer;
   text-align: left;
   font: inherit;
-  transition: background 0.12s ease;
+  transition: background var(--dur-press) var(--ease-out);
 }
 .ki-schritt:hover {
   background: color-mix(in srgb, var(--text) 5%, transparent);
@@ -254,7 +254,8 @@
   font-size: 0.7rem;
   font-weight: 700;
   color: var(--on-accent);
-  transition: background 0.15s ease, border-color 0.15s ease;
+  transition: background var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out);
 }
 .ki-schritt:hover .ki-schritt-box {
   border-color: var(--ok-text);
@@ -321,7 +322,8 @@
   border-radius: 999px;
   cursor: pointer;
   box-shadow: 0 4px 12px -4px var(--accent-shadow);
-  transition: background 0.15s ease, transform 0.12s ease;
+  transition: background var(--dur-fast) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
 }
 .ki-schritt-weiter:hover {
   background: var(--accent-strong);

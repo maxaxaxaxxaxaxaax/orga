@@ -32,6 +32,8 @@
   font-weight: 600;
 }
 .netz-krume-sep {
+  display: inline-flex;
+  align-items: center;
   color: var(--muted);
 }
 .netz-krume-punkt {
@@ -66,7 +68,7 @@
 }
 /* Sanftes Einblenden der neuen Ebene beim Drilldown (key-Wechsel der Gruppe). */
 .netz-ebene {
-  animation: netz-ebene-rein 0.32s ease both;
+  animation: netz-ebene-rein var(--dur-overlay) var(--ease-out) both;
 }
 @keyframes netz-ebene-rein {
   from {

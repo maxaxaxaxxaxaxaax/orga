@@ -12,7 +12,7 @@
   gap: 12px;
   /* Marker-Farbe als Variable (anpassbar), wird in JS ausgelesen. */
   --mf-marker: rgba(245, 197, 24, 0.4);
-  animation: mf-rein 0.2s ease both;
+  animation: mf-rein var(--dur-base) var(--ease-out) both;
 }
 @keyframes mf-rein {
   from {
@@ -38,7 +38,7 @@
   color: var(--text-2);
   font-size: 1rem;
   cursor: pointer;
-  transition: border-color 0.12s ease, color 0.12s ease;
+  transition: border-color var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out);
 }
 .mf-zu:hover {
   border-color: var(--accent);
@@ -65,7 +65,7 @@
   padding: 7px 12px;
   border-radius: 999px;
   cursor: pointer;
-  transition: border-color 0.12s ease, color 0.12s ease;
+  transition: border-color var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out);
 }
 .mf-werkzeug:disabled {
   opacity: 0.45;
@@ -236,7 +236,7 @@
   padding: 11px 20px;
   border-radius: 999px;
   cursor: pointer;
-  transition: background 0.15s ease;
+  transition: background var(--dur-fast) var(--ease-out);
 }
 .mf-senden:hover:not(:disabled) {
   background: var(--accent-strong);

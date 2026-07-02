@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import Fertig from "./Fertig";
+import Icon from "./Icon";
 import UebungHinweis from "./UebungHinweis";
 import "./Merkblatt.css";
 
@@ -119,7 +120,7 @@ export default function Merkblatt({ daten }) {
                   className={"mb-pfeil" + (istOffen ? " auf" : "")}
                   aria-hidden="true"
                 >
-                  ›
+                  <Icon name="chevron-right" size={18} />
                 </span>
               </button>
 

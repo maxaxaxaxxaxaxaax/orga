@@ -1,6 +1,14 @@
 import { useEffect, useState } from "react";
 import { faecher } from "../data/wissen";
 import { MATHE_KATEGORIEN } from "../data/matheKategorien";
+import {
+  leseSeite,
+  analysiereInhalt,
+  youtubeId,
+  leseYoutube,
+  titelAusUrl,
+} from "./linkLeser";
+import { baueTags } from "./eigeneMaterialien";
 import "./MaterialUpload.css";
 
 // Eigenes Material hinzufügen (Demo): Datei wählen, die App erkennt Fach und
@@ -65,6 +73,18 @@ export default function MaterialUpload({
   const [thema, setThema] = useState(startThema);
   const [titel, setTitel] = useState("");
   const [bereich, setBereich] = useState("selbstlernen");
+  const [linkUrl, setLinkUrl] = useState("");
+  const [liest, setLiest] = useState(false);
+  const [istLink, setIstLink] = useState(false);
+  const [linkInhalt, setLinkInhalt] = useState(null);
+  const [linkErkannt, setLinkErkannt] = useState(null);
+  const [linkStichwort, setLinkStichwort] = useState(null);
+  // Ein gepasteter YouTube-Link wird als Video abgelegt (spielt inline).
+  const [linkArt, setLinkArt] = useState("link"); // "link" | "video"
+  const [linkVideoId, setLinkVideoId] = useState(null);
+  const [linkKanal, setLinkKanal] = useState(null);
+  // sicher = genauer Lernweg-Treffer; sonst nur das Fach erkannt.
+  const [sicher, setSicher] = useState(false);
 
   const fach = faecher.find((f) => f.id === fachId) || faecher[0];
 
@@ -93,7 +113,96 @@ export default function MaterialUpload({
     }
   }
 
+  // Link einfügen: orca holt Titel und Inhalt und schlägt die Zuordnung vor. Bei
+  // YouTube die echten Video-Metadaten (Titel + Kanal) und Ablage als Video; sonst
+  // den Seiteninhalt (r.jina.ai). Die Analyse vergibt Titel, Fach/Lernweg und Tags.
+  async function linkLesen(e) {
+    e.preventDefault();
+    let url = linkUrl.trim();
+    if (!url) return;
+    if (!/^https?:\/\//i.test(url)) url = "https://" + url;
+    setLinkUrl(url);
+    setLiest(true);
+
+    const vid = youtubeId(url);
+    let titelText;
+    let inhalt = null;
+    let kanal = null;
+    if (vid) {
+      const meta = await leseYoutube(vid);
+      titelText = meta?.titel || titelAusUrl(url);
+      kanal = meta?.kanal || null;
+      setLinkArt("video");
+      setLinkVideoId(vid);
+      setLinkKanal(kanal);
+      setLinkInhalt(null);
+    } else {
+      const seite = await leseSeite(url);
+      titelText = seite?.titel || titelAusUrl(url);
+      inhalt = seite?.inhalt ? seite.inhalt.slice(0, 4000) : null;
+      setLinkArt("link");
+      setLinkVideoId(null);
+      setLinkKanal(null);
+      setLinkInhalt(inhalt);
+    }
+
+    const analyse = analysiereInhalt({ titel: titelText, inhalt, url, kanal });
+    setTitel(titelText);
+    if (analyse) {
+      setFachId(analyse.fachId);
+      setThema(analyse.thema);
+      setErkannt(true);
+      setSicher(analyse.sicher);
+      setLinkErkannt(analyse.erkannt);
+      setLinkStichwort(analyse.stichwort);
+    } else {
+      setErkannt(false);
+      setSicher(false);
+      setLinkErkannt(null);
+      setLinkStichwort(null);
+    }
+    setIstLink(true);
+    setLiest(false);
+  }
+
   function speichern() {
+    if (istLink) {
+      const tags = baueTags({
+        fachId,
+        thema,
+        erkannt: linkErkannt,
+        stichwort: linkStichwort,
+      });
+      if (linkArt === "video") {
+        // Gepasteter YouTube-Link: als Video ablegen, damit es inline spielt und den
+        // YouTube-Badge bekommt (wie ein gelikte Video).
+        onSpeichern({
+          titel: titel.trim() || linkUrl,
+          fachId,
+          thema,
+          art: "video",
+          quelle: "youtube",
+          url: linkUrl,
+          videoId: linkVideoId,
+          kanal: linkKanal,
+          bereich,
+          tags,
+        });
+        return;
+      }
+      onSpeichern({
+        titel: titel.trim() || linkUrl,
+        fachId,
+        thema,
+        art: "link",
+        quelle: "link",
+        url: linkUrl,
+        inhalt: linkInhalt,
+        bereich,
+        tags,
+      });
+      return;
+    }
     const endung = (datei?.name.split(".").pop() || "").toLowerCase();
     onSpeichern({
       titel: titel.trim() || datei?.name || "Eigenes Material",
@@ -101,8 +210,11 @@ export default function MaterialUpload({
       thema,
       art: ART_AUS_ENDUNG[endung] || "notiz",
       bereich,
+      tags: baueTags({ fachId, thema }),
     });
   }
+
+  const gelesen = linkArt === "video" ? "Video erkannt" : "Seite gelesen";
 
   return (
     <div className="mu-overlay" onClick={onClose}>
@@ -118,21 +230,63 @@ export default function MaterialUpload({
         </button>
         <h2 className="mu-titel">Material hinzufügen</h2>
 
-        {!datei ? (
-          <label className="mu-drop">
-            <input type="file" onChange={waehleDatei} />
-            <span className="mu-drop-gross">Datei auswählen</span>
-            <span className="mu-drop-klein">
-              Foto, PDF oder Notiz von deinem Gerät
-            </span>
-          </label>
+        {!datei && !istLink ? (
+          <>
+            <label className="mu-drop">
+              <input type="file" onChange={waehleDatei} />
+              <span className="mu-drop-gross">Datei auswählen</span>
+              <span className="mu-drop-klein">
+                Foto, PDF oder Notiz von deinem Gerät
+              </span>
+            </label>
+            <div className="mu-oder">
+              <span>oder</span>
+            </div>
+            <form className="mu-link" onSubmit={linkLesen}>
+              <input
+                type="url"
+                className="mu-link-feld"
+                placeholder="Link einfügen (https://…)"
+                value={linkUrl}
+                onChange={(e) => setLinkUrl(e.target.value)}
+                disabled={liest}
+              />
+              <button
+                type="submit"
+                className="mu-link-knopf"
+                disabled={liest || !linkUrl.trim()}
+              >
+                {liest ? (
+                  <>
+                    <span className="mu-scan" aria-hidden="true">
+                      <i />
+                      <i />
+                      <i />
+                    </span>
+                    orca liest…
+                  </>
+                ) : (
+                  "Einfügen"
+                )}
+              </button>
+            </form>
+            <p className="mu-link-info">
+              orca liest den Seiteninhalt und schlägt vor, wohin es passt.
+            </p>
+          </>
         ) : (
           <>
-            <p className="mu-datei">{datei.name}</p>
-            <p className={"mu-hinweis" + (erkannt ? " ok" : "")}>
-              {erkannt
-                ? "Automatisch zugeordnet. Passt das?"
-                : "Keine automatische Zuordnung erkannt: wähle selbst, wohin es soll."}
+            <p className="mu-datei">{istLink ? linkUrl : datei.name}</p>
+            <p className={"mu-hinweis" + ((istLink ? sicher : erkannt) ? " ok" : "")}>
+              {istLink
+                ? sicher
+                  ? `${gelesen} und automatisch zugeordnet. Passt das?`
+                  : erkannt
+                    ? `${gelesen}, Fach erkannt. Wähle den passenden Lernweg oder lass es im Fach.`
+                    : `${gelesen}. orca konnte es nicht sicher zuordnen: wähle selbst.`
+                : erkannt
+                  ? "Automatisch zugeordnet. Passt das?"
+                  : "Keine automatische Zuordnung erkannt: wähle selbst, wohin es soll."}
             </p>
 
             <label className="mu-feld">

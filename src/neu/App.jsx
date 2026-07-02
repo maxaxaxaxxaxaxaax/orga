@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Etappenplan from "./Etappenplan";
 import Wochenplan from "./Wochenplan";
 import Heute from "./Heute";
@@ -18,6 +18,19 @@ import {
   meldeAenderung,
 } from "./planung";
 import { heuteOffeneZiele, nachzuegler } from "./weg";
+import DiscordModal from "./DiscordModal";
+import {
+  ladeDiscord,
+  speichereDiscord,
+  holeNeueNachrichten,
+  neuesteNachrichtId,
+  antworteImKanal,
+  urlsAus,
+  DISCORD_EVENT,
+} from "./discord";
+import { importiereLinkAuto } from "./linkImport";
+import { addMitteilung } from "./benachrichtigungen";
+import { quelleLabel } from "./material";
 
 const INTRO_KEY = "neu.intro.gesehen";
 const LOGIN_KEY = "neu.login";
@@ -54,6 +67,10 @@ export default function App() {
   // Startansicht für bereits angemeldete Rückkehrer (Reload). Nach einem echten
   // Login führt anmelden() bewusst direkt in die Planung (siehe dort).
   const [screen, setScreen] = useState("heute");
+  // Screen, von dem aus die Planung geöffnet wurde: der Zurück-Knopf im Etappenplan führt
+  // dorthin zurück (nicht fix auf "heute"). Wird auf jedem Nicht-Planungs-Screen (heute/ablage)
+  // aktualisiert, hält also beim Betreten der Planung den Ursprung.
+  const planungHerRef = useRef("heute");
   // Wechsel zwischen Nav-Bereichen wird als horizontaler Wisch gezeigt: der alte
   // Screen läuft kurz mit, der neue schiebt sich in Pillen-Richtung herein.
   const [anzeige, setAnzeige] = useState(() => ({
@@ -62,12 +79,114 @@ export default function App() {
     dir: 0,
   }));
   const [fokusKbId, setFokusKbId] = useState(null); // Ziel im Fokus-Modus (Vollbild)
+  // Rechteck der angeklickten Übersichts-Karte, damit der Fokus-Kopf von dort
+  // nach oben wandert (FLIP). null = ohne Karten-Übergang geöffnet (z. B. "Weiter").
+  const [fokusUrsprung, setFokusUrsprung] = useState(null);
+  // Deep-Link in die Ablage: id des Materials, das dort automatisch geöffnet werden
+  // soll (Klick auf eine Link-/Material-Benachrichtigung). null = nichts öffnen.
+  const [ablageMaterialId, setAblageMaterialId] = useState(null);
   // Fester Anker für die untere Leiste außerhalb der wischenden Schiene: die
   // Planungs-Leiste wird hierher portaliert, damit sie beim Screen-Wechsel nicht
   // mitrutscht, sondern als Leiste stehen bleibt und nur ihr Inhalt wechselt.
   const [untenSlot, setUntenSlot] = useState(null);
   const [toast, setToast] = useState(null); // kurze Rückmeldung unten mittig
   const [speicherOk] = useState(speicherGeht); // einmal beim Start pruefen
+  const [discordOffen, setDiscordOffen] = useState(false); // Discord-Einstellungen
+
+  // Ursprung der Planung merken: der letzte Nicht-Planungs-Screen (heute/ablage). Beim
+  // Betreten der Planung bleibt er stehen, damit der Zurück-Knopf dorthin zurückführt.
+  useEffect(() => {
+    if (screen === "heute" || screen === "ablage") planungHerRef.current = screen;
+  }, [screen]);
+
+  // Discord-Poller: liest den verbundenen Kanal, gibt neue Links an die Import-
+  // Pipeline (scrapen + kategorisieren + in die Ablage) und lässt den Bot kurz
+  // bestätigen. Läuft nur, solange die App offen ist. Ein DISCORD_EVENT (Verbinden
+  // oder "Jetzt prüfen") stößt sofort einen Durchlauf an.
+  useEffect(() => {
+    let aktiv = true;
+    let timer = null;
+    let laeuft = false;
+    async function tick() {
+      if (!aktiv) return;
+      if (timer) {
+        clearTimeout(timer);
+        timer = null;
+      }
+      if (laeuft) return; // ein Durchlauf läuft schon; der plant den nächsten
+      const cfg = ladeDiscord();
+      if (!cfg.aktiv || !cfg.relayUrl) {
+        timer = setTimeout(tick, 10000);
+        return;
+      }
+      laeuft = true;
+      try {
+        if (!cfg.letzteId) {
+          // Basislinie setzen: nur ab jetzt neue Nachrichten importieren.
+          const basis = await neuesteNachrichtId(cfg);
+          speichereDiscord({ ...ladeDiscord(), letzteId: basis });
+        } else {
+          const neue = await holeNeueNachrichten(cfg, cfg.letzteId);
+          if (neue === null) {
+            console.warn("[Discord] Kanal nicht lesbar (Relay/Netz?), nächster Versuch folgt.");
+          } else if (neue.length) {
+            let verarbeitetBis = cfg.letzteId;
+            for (const msg of neue) {
+              let msgOk = true;
+              for (const url of urlsAus(msg.content)) {
+                try {
+                  const res = await importiereLinkAuto(url);
+                  if (!res || res.doppelt) continue;
+                  const { material, analyse } = res;
+                  const fach = analyse?.erkannt?.fach || "Weiteres";
+                  addMitteilung({
+                    art: material.art === "link" ? "link" : "material",
+                    titel: material.titel,
+                    text: analyse?.thema
+                      ? `In der Ablage bei ${fach} · ${analyse.thema}`
+                      : `In der Ablage bei ${fach}`,
+                    materialId: material.id,
+                    quelle: material.quelle,
+                    tags: material.tags,
+                  });
+                  if (cfg.antwort !== false) {
+                    const wohin = analyse?.thema ? `${fach} · ${analyse.thema}` : fach;
+                    antworteImKanal(
+                      cfg,
+                      `✓ „${material.titel}" bei ${wohin} einsortiert (${quelleLabel(material)}).`
+                    );
+                  }
+                } catch (err) {
+                  console.warn("[Discord] Link-Import fehlgeschlagen:", url, err);
+                  msgOk = false;
+                }
+              }
+              // letzteId nur bis zur letzten vollständig verarbeiteten Nachricht vorrücken:
+              // ein Fehler überspringt die Nachricht so nicht, der nächste Poll versucht sie erneut.
+              if (!msgOk) break;
+              verarbeitetBis = msg.id;
+            }
+            if (verarbeitetBis !== cfg.letzteId) {
+              speichereDiscord({ ...ladeDiscord(), letzteId: verarbeitetBis });
+            }
+          }
+        }
+      } catch {
+        /* Netzfehler: nächster Durchlauf versucht es erneut */
+      } finally {
+        laeuft = false;
+        if (aktiv) timer = setTimeout(tick, 10000);
+      }
+    }
+    tick();
+    const sofort = () => tick();
+    window.addEventListener(DISCORD_EVENT, sofort);
+    return () => {
+      aktiv = false;
+      if (timer) clearTimeout(timer);
+      window.removeEventListener(DISCORD_EVENT, sofort);
+    };
+  }, []);
   // Anmeldung (Demo): die App startet hinter einem Login mit Schulaccount.
   const [eingeloggt, setEingeloggt] = useState(() => {
     try {
@@ -76,6 +195,9 @@ export default function App() {
       return false;
     }
   });
+  // Bei welchem Schritt die Login-Screens öffnen. Normal "willkommen"; geht man aus der
+  // Onboarding-Planung zurück, direkt beim letzten Login-Schritt "konto".
+  const [loginSchritt, setLoginSchritt] = useState("willkommen");
   function anmelden() {
     try {
       localStorage.setItem(LOGIN_KEY, "1");
@@ -87,6 +209,8 @@ export default function App() {
     // Nav-Button "Planung"). So landet man auch nach Abmelden/Anmelden verlässlich
     // dort und nicht auf einem zufällig zuletzt offenen Screen.
     setFokusKbId(null);
+    // Ursprung der Planung = Onboarding: der Zurück-Knopf führt zurück in die Login-Screens.
+    planungHerRef.current = "login";
     const ziel = planungFertig() ? "plan" : planungsScreen();
     setScreen(ziel);
     // Ohne Wisch in die App einsteigen (kein Slide direkt aus dem Login).
@@ -99,6 +223,18 @@ export default function App() {
     } catch {
       /* localStorage blockiert: dann nur diese Sitzung */
     }
+    setLoginSchritt("willkommen"); // echtes Abmelden startet wieder von vorn
+    setEingeloggt(false);
+  }
+  // Zurück aus der Onboarding-Planung in die Login-Screens (Dienste-Seite, der
+  // letzte Schritt mit Aktion; "konto" gibt es nicht mehr).
+  function zurueckZumLogin() {
+    try {
+      localStorage.removeItem(LOGIN_KEY);
+    } catch {
+      /* localStorage blockiert: dann nur diese Sitzung */
+    }
+    setLoginSchritt("dienste");
     setEingeloggt(false);
   }
   // Erststart-Intro: einmal zeigen, bis es weggeklickt ist.
@@ -168,7 +304,10 @@ export default function App() {
     else if (ziel === "woche") setScreen("wochenplan");
     else {
       setScreen("heute");
-      if (kbId) setFokusKbId(kbId);
+      if (kbId) {
+        setFokusUrsprung(null);
+        setFokusKbId(kbId);
+      }
     }
   }
 
@@ -216,7 +355,7 @@ export default function App() {
   // Schulaccount-Einstieg (alle Hooks laufen davor, daher ist der frühe Ausstieg
   // hier sicher).
   if (!eingeloggt) {
-    return <Login onLogin={anmelden} />;
+    return <Login onLogin={anmelden} startSchritt={loginSchritt} />;
   }
 
   // vorn = dieser Screen ist der aktive (nicht der gerade hinauswischende). Nur der
@@ -235,14 +374,38 @@ export default function App() {
         />
       );
     }
-    if (s === "heute") return <Heute onFokus={setFokusKbId} />;
-    if (s === "ablage") return <Ablage />;
+    if (s === "heute")
+      return (
+        <Heute
+          onFokus={(id, rect) => {
+            setFokusUrsprung(rect || null);
+            setFokusKbId(id);
+          }}
+          onOeffneAblage={(materialId) => {
+            setAblageMaterialId(materialId || null);
+            setScreen("ablage");
+          }}
+        />
+      );
+    if (s === "ablage")
+      return (
+        <Ablage
+          untenSlot={untenSlot}
+          vorn={vorn}
+          oeffneMaterialId={ablageMaterialId}
+          onGeoeffnet={() => setAblageMaterialId(null)}
+        />
+      );
     return (
       <Etappenplan
         untenSlot={untenSlot}
         vorn={vorn}
         onWeiter={() => setScreen("wochenplan")}
-        onZurueck={() => setScreen("heute")}
+        onZurueck={() =>
+          planungHerRef.current === "login"
+            ? zurueckZumLogin()
+            : setScreen(planungHerRef.current)
+        }
       />
     );
   }
@@ -311,8 +474,10 @@ export default function App() {
         <Topbar
           onResetDemo={() => window.location.reload()}
           onAbmelden={abmelden}
+          onDiscord={() => setDiscordOffen(true)}
         />
       )}
+      {discordOffen && <DiscordModal onClose={() => setDiscordOffen(false)} />}
       {introOffen && screen === "etappenplan" && (
         <IntroOverlay onLos={introFertig} />
       )}
@@ -321,8 +486,12 @@ export default function App() {
           key={fokusKb.id}
           kb={fokusKb}
           naechste={fokusNaechste}
+          ursprung={fokusUrsprung}
           onFertig={fokusFertig}
-          onWeiter={(id) => setFokusKbId(id)}
+          onWeiter={(id) => {
+            setFokusUrsprung(null);
+            setFokusKbId(id);
+          }}
           onPlanung={fokusZurPlanung}
           onClose={() => setFokusKbId(null)}
         />

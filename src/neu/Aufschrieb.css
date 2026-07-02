@@ -6,7 +6,7 @@
   background: var(--bg);
   display: flex;
   flex-direction: column;
-  animation: au-rein 0.25s ease both;
+  animation: au-rein var(--dur-overlay) var(--ease-out) both;
 }
 @keyframes au-rein {
   from {

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useLayoutEffect, useRef } from "react";
 import { lernwegFuerKb } from "../data/wissen";
 import { lehrkraefte } from "../data/stundenplanWoche";
 import { ladeErledigt, fachWochenFortschritt } from "./planung";
@@ -108,6 +108,7 @@ export default function Fokus({
   onWeiter,
   onPlanung,
   onClose,
+  ursprung,
 }) {
   const lw = lernwegFuerKb(kb.id);
   const thema = lw?.thema || null;
@@ -122,6 +123,61 @@ export default function Fokus({
   // Abschluss: die genau gemessene Lernzeit dieser Sitzung in Sekunden (einmal
   // beim Erreichen des Abschlusses erfasst, nicht auf Minuten gerundet).
   const [gemessenSek, setGemessenSek] = useState(null);
+
+  // FLIP-Übergang (Shared Element): Wird der Fokus aus einer Übersichts-Karte
+  // geöffnet, liefert ursprung deren Rechteck. Der Kopf (Fach + Titel) startet an
+  // der Karten-Position/-Größe und gleitet an seinen Platz oben, die Karte „wird"
+  // der Kopf. Bewegungs-Design nach Emil Kowalski:
+  //  - starke Ease-out-Kurve (--ease-out-strong), ein eintretendes Element soll
+  //    schnell anlaufen und sanft ankommen (kein Bounce),
+  //  - Dauer 340ms (Sheet-Klasse, unter 500ms, wirkt reaktionsschnell),
+  //  - Opacity startet bei 0.55, nicht 0 (nichts erscheint aus dem Nichts),
+  //  - kurzer Blur überbrückt den Größen-/Text-Mismatch zwischen Karte und Kopf,
+  //  - nur transform/opacity/filter (GPU), will-change nur während der Animation.
+  const kopfRef = useRef(null);
+  useLayoutEffect(() => {
+    const el = kopfRef.current;
+    if (!el || !ursprung) return undefined;
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches)
+      return undefined;
+    const ziel = el.getBoundingClientRect();
+    if (!ziel.width || !ziel.height) return undefined;
+    const dx = ursprung.left + ursprung.width / 2 - (ziel.left + ziel.width / 2);
+    const dy = ursprung.top + ursprung.height / 2 - (ziel.top + ziel.height / 2);
+    // Kopf startet etwa in Kartengröße und schrumpft an seinen Platz (Größen-
+    // Kontinuität), gedeckelt gegen Textverzerrung; den Rest kaschiert der Blur.
+    const skala = Math.min(1.3, Math.max(1, ursprung.width / ziel.width));
+    if (!dx && !dy && skala === 1) return undefined;
+    el.style.willChange = "transform, opacity, filter";
+    el.style.transformOrigin = "center center";
+    el.style.transition = "none";
+    el.style.transform = `translate(${dx}px, ${dy}px) scale(${skala})`;
+    el.style.opacity = "0.55";
+    el.style.filter = "blur(5px)";
+    void el.offsetWidth; // Reflow, damit der Startzustand greift, dann animieren
+    const raf = requestAnimationFrame(() => {
+      el.style.transition =
+        "transform var(--dur-overlay) var(--ease-out-strong)," +
+        " opacity var(--dur-slow) var(--ease-out)," +
+        " filter var(--dur-slow) var(--ease-out)";
+      el.style.transform = "translate(0, 0) scale(1)";
+      el.style.opacity = "1";
+      el.style.filter = "blur(0px)";
+    });
+    const aufraeumen = () => {
+      el.style.transition = "";
+      el.style.transform = "";
+      el.style.opacity = "";
+      el.style.filter = "";
+      el.style.transformOrigin = "";
+      el.style.willChange = "";
+    };
+    const t = setTimeout(aufraeumen, 440); // knapp nach --dur-overlay (340ms)
+    return () => {
+      cancelAnimationFrame(raf);
+      clearTimeout(t);
+    };
+  }, [ursprung]);
 
   // Linkes Panel: über die Werkzeug-Leiste geöffnet. "materialien" | "notizen" |
   // "live" | null (zu). Erneuter Klick auf dasselbe Icon schließt. Start: Materialien.
@@ -337,6 +393,7 @@ export default function Fokus({
     schritt: aktSchrittText,
     zeit: zeitText || null,
     inhalt: aufgabenInhalt,
+    aktivId: aktivesMaterial?.id,
   });
 
   // Schritt abschliessen: erst die kurze Selbsteinschätzung zeigen, dann erst
@@ -489,9 +546,14 @@ export default function Fokus({
         >
           ✕
         </button>
-        <span className="fokus-kb">
-          <span className="fokus-kb-eyebrow">Lernweg</span>
-          {kb.fach}: {kb.titel}
+        <span className="fokus-kb" ref={kopfRef}>
+          <span
+            className="fokus-kb-eyebrow"
+            style={{ color: fachTextFarbe(kb.fach) }}
+          >
+            {kb.fach}
+          </span>
+          {kb.titel}
         </span>
         <div className="fokus-kopf-rechts">
           <Lernzeit />
@@ -783,13 +845,6 @@ export default function Fokus({
                   {aktuell > 0 && (
                     <span className="fokus-sl-trenner" aria-hidden="true" />
                   )}
-                  <span
-                    className="fokus-sl-fach"
-                    style={{ color: fachTextFarbe(kb.fach) }}
-                  >
-                    {kb.fach}
-                  </span>
-                  <span className="fokus-sl-trenner" aria-hidden="true" />
                   <div className="fokus-sl-info">
                     <span className="fokus-sl-text">
                       {schritte[aktuell]?.text}
@@ -1003,7 +1058,7 @@ export default function Fokus({
                               className="fokus-rail-icon"
                               aria-hidden="true"
                             >
-                              ▸
+                              <Icon name="chevron-right" size={18} />
                             </span>
                             <span className="fokus-rail-mat-titel">
                               Dazu üben
@@ -1103,7 +1158,8 @@ export default function Fokus({
                     chatsOffen ? "Chats einklappen" : "Chats ausklappen"
                   }
                 >
-                  {chatsOffen ? "⌄" : "⌃"}
+                  {/* Ein Chevron, das per [aria-expanded] animiert dreht (zu = zeigt hoch). */}
+                  <Icon name="chevron-down" className="klapp-chevron" size={18} />
                 </button>
               </div>
             </header>

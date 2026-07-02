@@ -44,7 +44,7 @@
   height: 100%;
   background: var(--accent);
   border-radius: 999px;
-  transition: width 0.25s ease;
+  transition: width 0.25s var(--ease-out);
 }
 
 /* Meilensteine: klickbare Wochen-Marken unter der Leiste. */

@@ -408,7 +408,6 @@ export default function Wochenplan({
           key={sid}
           style={stil}
         >
-          {istJetzt && <span className="wp-blk-jetzt">Jetzt</span>}
           <span className="wp-blk-fach">{s.fach}</span>
           <span className="wp-blk-meta">
             <span className="wp-blk-zeit">
@@ -453,7 +452,6 @@ export default function Wochenplan({
           tippZuSlot(sid);
         }}
       >
-        {istJetzt && <span className="wp-blk-jetzt">Jetzt</span>}
         {leer ? (
           <>
             <span className="wp-frei-label">
@@ -585,9 +583,6 @@ export default function Wochenplan({
               <h1 className="ep-kopf-titel">
                 <Icon name="week" className="ep-kopf-icon" size={19} />
                 Plane deine Woche
-                <span className="wp-kopf-pfeil" aria-hidden="true">
-                  ⌄
-                </span>
               </h1>
               <p className="ep-kopf-meta">
                 {langDatum(ETAPPE.von)} - {langDatum(ETAPPE.bis)} ·{" "}
@@ -643,7 +638,7 @@ export default function Wochenplan({
                     >
                       <span className="ep-fachgruppe-name">{g.fach}</span>
                       <span className="ep-fachgruppe-pfeil" aria-hidden="true">
-                        {zu ? "▸" : "▾"}
+                        <Icon name="chevron-down" className="klapp-chevron" size={16} />
                       </span>
                     </button>
                     {!zu && (
@@ -676,12 +671,6 @@ export default function Wochenplan({
           <header className="wp-kal-kopf">
             <div className="wp-kal-titel">
               <h2 className="wp-kal-monat">{monatLabel}</h2>
-              <span className="wp-kal-monat-pfeil" aria-hidden="true">
-                ⌄
-              </span>
-              {aktiveWoche === woche && wochenMitKbs.length > 1 && (
-                <span className="wp-kal-jetzt">diese Woche</span>
-              )}
             </div>
             <div className="wp-kal-nav">
               {/* Nur die Wochen-Navigation: so erreicht man alle Wochen der Etappe
@@ -694,7 +683,7 @@ export default function Wochenplan({
                 disabled={aktiverIdx <= 0}
                 aria-label="Woche zurück"
               >
-                ‹
+                <Icon name="chevron-left" size={18} />
               </button>
               <button
                 type="button"
@@ -703,7 +692,7 @@ export default function Wochenplan({
                 disabled={aktiverIdx < 0 || aktiverIdx >= wochenMitKbs.length - 1}
                 aria-label="Woche vor"
               >
-                ›
+                <Icon name="chevron-right" size={18} />
               </button>
             </div>
           </header>

@@ -3,7 +3,10 @@ import { useEffect, useRef, useState } from "react";
 // Fach-Farben je Buchstabe (wie in der App).
 const FARBE = { o: "#61DA85", r: "#7DC0FE", c: "#FF7DA9", a: "#FFE37D" };
 
-// Die gefüllten Buchstaben-Glyphen (aus dem orca-Wortmark).
+// Die gefüllten Buchstaben-Glyphen (aus dem orca-Wortmark). Das o (und die a-Bowl) haben
+// einen bewussten Cutout oben-rechts (~1-2 Uhr, die Ring-Öffnung des Wortmarks). Immer mit
+// fillRule="evenodd" rendern, sonst zeigt der Rasterizer dort einen Zwickel statt der sauberen
+// Öffnung. (Früher fälschlich durch einen geschlossenen Doppelkreis ersetzt = Cutout verloren.)
 const PFAD = {
   o: "M6.53803 35.9289C13.1312 22.3719 22.5513 14.7438 28.5456 10.6619C34.5399 6.57995 46.5153 0.788397 61.0714 0.122182C68.6644 -0.225345 74.9964 0.318432 83.2976 2.96167C89.9226 5.0712 91.0929 12.5703 89.1512 16.6831C87.2095 20.7958 82.0299 23.509 77.1783 21.9794C72.1131 20.3824 68.0872 19.5795 61.0714 20.0132C52.1121 20.567 45.0374 24.1478 41.4638 26.1278C31.7604 31.5037 26.2156 40.7499 24.3082 44.8331C19.9994 53.432 18.6109 64.9745 21.0599 74.2589C23.008 83.6656 28.586 91.9994 35.9629 98.2153C43.3398 104.431 53.1165 107.869 62.7865 108.252C72.4565 108.635 82.2195 105.419 90.0722 99.8068C97.9249 94.1941 103.726 85.7737 106.423 76.551C109.121 67.3284 108.847 57.228 105.242 48.3156C101.884 39.5085 96.1401 33.4899 93.1867 30.8562C90.2333 28.2225 89.2498 22.1059 92.5688 17.7396C93.9281 15.9514 97.525 13.2751 102.073 14.1399C104.77 14.6526 106.96 16.5274 108.924 18.4452C113.722 23.1325 119.274 30.1143 123.732 40.8792C129.034 53.9887 129.433 68.4719 125.465 82.0379C121.497 95.6039 113.287 107.573 101.736 115.829C90.1853 124.085 76.2507 128.591 62.0267 128.028C47.8027 127.464 33.8981 122.458 23.0471 113.315C12.1961 104.172 4.16809 91.1146 1.30257 77.2779C-1.56296 63.4412 0.350582 48.6517 6.53803 35.9289Z",
   r: "M193.011 1.6708C199.507 0.192835 206.683 -0.61059 209.955 0.562406C215.11 2.26761 216.781 6.3955 216.781 10.1913C216.951 15.7698 211.923 19.8273 206.39 19.7235C190.505 19.4253 181.656 25.732 176.924 29.33C174.353 31.2848 173.104 32.6574 171.009 34.9765C167.488 38.8741 165.419 43.9076 165.439 49.1601L165.702 118.242C165.702 123.765 161.224 128.242 155.702 128.242C150.179 128.242 145.702 123.765 145.702 118.242V32.1884C145.613 31.47 145.611 30.7438 145.702 30.0253V10.1913C145.702 4.66853 150.179 0.191425 155.702 0.191312C161.224 0.191312 165.702 4.66847 165.702 10.1913V15.1786C166.244 14.7467 166.582 14.3856 167.304 13.8495C174.223 8.71042 178.392 6.71752 182.277 5.03799C184.74 3.97311 188.709 2.64968 193.011 1.6708Z",
@@ -23,8 +26,8 @@ const PFAD_A = [
 // komplett. Zentren/Winkel aus den gemessenen Glyph-Boxen (Mittellinie R54).
 // von/bis = Anteil am Gesamt-Fortschritt (nach Bogenlänge gewichtet).
 const KREISE = [
-  { id: "o", cx: 64.1, cy: 64.1, a0: 180, sweep: 360, von: 0, bis: 0.325, farbe: FARBE.o, pfade: [PFAD.o], eo: false },
-  { id: "c", cx: 279.5, cy: 64.2, a0: -58.9, sweep: -242, von: 0.457, bis: 0.675, farbe: FARBE.c, pfade: [PFAD.c], eo: false },
+  { id: "o", cx: 64.1, cy: 64.1, a0: 180, sweep: 360, von: 0, bis: 0.325, farbe: FARBE.o, pfade: [PFAD.o], eo: true },
+  { id: "c", cx: 279.5, cy: 64.2, a0: -58.9, sweep: -242, von: 0.457, bis: 0.675, farbe: FARBE.c, pfade: [PFAD.c], eo: true },
   { id: "a", cx: 400.2, cy: 64.2, a0: -90, sweep: 360, von: 0.675, bis: 1, farbe: FARBE.a, pfade: PFAD_A, eo: true },
 ];
 const R_VON = 0.325;
@@ -62,24 +65,147 @@ function leitFarbe(p) {
   return FARBE.a;
 }
 
-export default function OrcaLogo({ className, interaktiv = false, onVoll }) {
+// cubic-bezier(x1,y1,x2,y2) als JS-Funktion (Newton-Raphson), damit der rAF-Treiber
+// im Auto-Modus exakt die CSS-Easing-Tokens der App nachbildet.
+function cubicBezier(x1, y1, x2, y2) {
+  const cx = 3 * x1;
+  const bx = 3 * (x2 - x1) - cx;
+  const ax = 1 - cx - bx;
+  const cy = 3 * y1;
+  const by = 3 * (y2 - y1) - cy;
+  const ay = 1 - cy - by;
+  const fx = (t) => ((ax * t + bx) * t + cx) * t;
+  const fy = (t) => ((ay * t + by) * t + cy) * t;
+  const dfx = (t) => (3 * ax * t + 2 * bx) * t + cx;
+  return (x) => {
+    let t = x;
+    for (let i = 0; i < 8; i++) {
+      const dx = fx(t) - x;
+      if (Math.abs(dx) < 1e-4) break;
+      const d = dfx(t);
+      if (Math.abs(d) < 1e-6) break;
+      t -= dx / d;
+    }
+    return fy(Math.max(0, Math.min(1, t)));
+  };
+}
+// Lebendige, handschriftliche Zeichenbewegung (Emil Kowalski: starke ease-in-out für
+// Bewegung auf dem Screen). Der „Stift" setzt an, zieht mit Schwung durch den Strich und
+// bremst am Ende ab: energischer, schnellerer Kern als eine weiche ease-in-out.
+const easeZeichnen = cubicBezier(0.77, 0, 0.175, 1);
+
+// Auto-Hero, einmalige Ring-Fill-Welle mit den EXAKTEN Original-Glyphen. Je Buchstabe eine
+// graue Ruhespur (echte Glyphe) und darüber dieselbe Glyphe in Fachfarbe, die ein
+// animierter Masken-Strich freilegt. Der Strich folgt der aus den Glyphen GEMESSENEN Mitte
+// (Radius 54, Dicke ~20) und wird per stroke-dashoffset gezogen; die Maske beschneidet die
+// Farbe exakt auf die Glyphe, kann also nie überquellen, und die Form bleibt das echte
+// Wortmark. Welle o->r->c->a füllt sich einmal und bleibt dann voll stehen.
+// Alle Glyphen mit fill-rule evenodd: o (und a) sind als eine Kontur mit Einschnürung
+// exportiert und füllen nur mit evenodd sauber als Ring (nonzero ließ oben am o einen
+// Zwickel). Für r/c (ohne Loch) ist evenodd identisch, also unbedenklich.
+const GLYPHEN = [
+  { key: "o", farbe: FARBE.o, pfade: [PFAD.o], eo: true },
+  { key: "r", farbe: FARBE.r, pfade: [PFAD.r], eo: true },
+  { key: "c", farbe: FARBE.c, pfade: [PFAD.c], eo: true },
+  { key: "a", farbe: FARBE.a, pfade: PFAD_A, eo: true },
+];
+// Masken-Mittellinie + Breite je Buchstabe (aus den Glyphen gemessen: Mitte Radius 54,
+// Dicke ~19,6). WICHTIG (per Test belegt): die sichtbare Farbe = Glyphe ∩ Masken-Strich, die
+// Glyphe BESCHNEIDET den Strich. Daher ist ein BREITER Strich gefahrlos (Überschuss wird
+// weggeschnitten, nie fetter als das Logo); ein zu SCHMALER Strich erzeugt Lücken (erreicht
+// enge/konkave Stellen nicht). Ausnahme Stamm: schmal halten, weil seine Anfangs-Kappe oben in
+// der breiten Schulter liegt und dort NICHT beschnitten wird (breit = fette Kappe). Start/Richtung wie ein Fortschrittsring: o + a oben (12 Uhr) im
+// Uhrzeigersinn; c ab der oberen Spitze den offenen Bogen; r von unten hoch. a = Bowl (voll),
+// danach der gerade Stamm rechts (x=454, = rechter Spine-Punkt), im selben Pfad.
+// Füll-Führung je Buchstabe, in Segmenten. Ein einfacher Buchstabe (o, c) hat ein Segment,
+// ein verzweigter zwei: r = Stamm + Arm, a = Bowl + Stamm. Die Segmente eines Buchstabens
+// füllen sich NACHEINANDER (nach Länge getaktet), damit immer nur EIN Punkt wandert; der
+// Übergang ist ein kurzer „Feder-Absetzer" wie beim Schreiben, kein zweiter Punkt. So füllt
+// sich die a-Bowl wie das o von oben, dann der Stamm. Breite: gerade/runde Segmente in
+// Strichdicke (W_STRICH), Kurven-Ecken (r-Arm) breiter, damit sie voll decken (Glyphe schneidet zu).
+// Laufrichtung nach den roten Pfeilen des Nutzers: alle runden Teile GEGEN den Uhrzeigersinn
+// (o, c, a-Bowl); r-Stamm von unten hoch, dann Arm zur Spitze; a-Stamm von oben runter.
+// Logo-Strichdicke (~20): Basisbreite für gerade/runde Segmente. Da die Glyphe den Strich
+// beschneidet, dürfen Kurven-Ecken breiter sein (Überschuss wird weggeschnitten).
+const W_STRICH = 20;
+const AUTO_LETTERS = [
+  // o: Bogen von Start (12-Seite des Cutouts, +18°) gegen den Uhrzeigersinn einmal rum zum
+  // Endpunkt (2-Seite, +42°). Dazwischen bleibt die LÜCKE (Cutout, ~1 Uhr) offen. Start/Ende
+  // ein Stück neben den Cutout gerückt, damit die runde Kappe nicht überreicht.
+  { w: W_STRICH, seg: ["M80.8 12.75 A54 54 0 1 0 100.2 24"] },
+  // r: Stamm oben->unten, dann der Arm. Stamm schmal (W_STRICH), damit die Kappe oben nicht
+  // fett wird. Arm BREIT (28): so deckt er Schulter-Bogen UND die konkave Achsel voll; die
+  // Glyphe schneidet den Überschuss auf die exakte Armform zu (kein Fett, keine Lücke). Führung
+  // ist die gemessene Arm-Mittellinie (Schulter -> Spitze), Start im Stamm (x162), kein Vorab-Punkt.
+  { w: W_STRICH, seg: ["M155.7 8 L155.7 118", { d: "M162 28 L165 40 L167 30 L170 24 L174 20 L178 18 L183 15 L189 12.5 L196 11 L204 10 L214 9.8", w: 28 }] },
+  // c: gegen den Uhrzeigersinn, obere Spitze -> untere Spitze (läuft schon so).
+  { w: W_STRICH, seg: ["M307.4 17.9 A54 54 0 1 0 307.4 110.5"] },
+  // a: Bowl-Bogen von Start (10-Seite des Cutouts, -42°) gegen den Uhrzeigersinn einmal rum
+  // zum Endpunkt (12-Seite, -18°). Dazwischen bleibt die LÜCKE (Cutout, ~11 Uhr) offen.
+  // Verbinder über die gefüllte Oberkante zum Stamm-Kopf, dann Stamm nach unten.
+  { w: W_STRICH, seg: ["M364.1 24.1 A54 54 0 1 0 383.5 12.85 L454.2 22", "M454.2 22 L454.2 126"] },
+];
+// Flache Segmentliste (mit Buchstaben-Index) für Render und Treiber. Ein Segment ist ein
+// Pfad-String (nutzt die Buchstaben-Breite w) oder ein Objekt { d, w } mit eigener Breite.
+const AUTO_SEG = [];
+AUTO_LETTERS.forEach((L, li) =>
+  L.seg.forEach((s) => {
+    const d = typeof s === "string" ? s : s.d;
+    const w = typeof s === "string" ? L.w : s.w;
+    AUTO_SEG.push({ li, d, w });
+  })
+);
+
+// Handschrift-Rhythmus: ungleiche Zug-Dauern + Pausen je Buchstabe, damit es lebendig/
+// menschlich wirkt statt metronomisch gleich (Emil: die Bewegung zur Stimmung passen lassen).
+// Der r-Stamm ist ein schneller Abstrich, o und a mit Bogen ziehen etwas länger. Nacheinander:
+// ein Buchstabe füllt komplett, dann (nach kurzer Pause) der nächste. Kein Overlap.
+const LETTER_FILL = [720, 560, 620, 780]; // Zug-Dauer je Buchstabe (o, r, c, a)
+const LETTER_PAUSE = [95, 70, 95, 0]; // kurzes Absetzen NACH dem Buchstaben (letzter braucht keins)
+const LETTER_START = [0, 0, 0, 0]; // kumulative Startzeit je Buchstabe
+for (let i = 1; i < 4; i++)
+  LETTER_START[i] = LETTER_START[i - 1] + LETTER_FILL[i - 1] + LETTER_PAUSE[i - 1];
+const W_FILLENDE = LETTER_START[3] + LETTER_FILL[3]; // alles gezeichnet, danach stehen bleiben
+const W_HALT = 550; // kurz das fertige, bunte Logo zeigen, bevor onFertig weiterschaltet
+
+export default function OrcaLogo({
+  className,
+  interaktiv = false,
+  auto = false,
+  bunt = false, // statischer Modus: Glyphen in den Fachfarben statt currentColor
+  starten = false, // Auto-Modus: Animation erst starten, wenn true (sonst ruht das Logo)
+  ruheFarbe = "#e1e4e3", // Farbe der Ruhespur; null = keine Spur (nur die Farb-Füllung)
+  onVoll,
+  onFertig, // Auto-Modus: aufgerufen, wenn die Füllung fertig ist (nach kurzem Halt)
+}) {
   const svgRef = useRef(null);
   const mitteRef = useRef(null);
   const letztPunkt = useRef(null);
   const vollRef = useRef(false);
   const progRef = useRef(0); // aktueller Stand, unabhängig vom Render-Takt
   const ziehtRef = useRef(false);
+  // Auto-Modus (endlose Ring-Fill-Welle): Refs statt State, damit rAF nicht 60x/s neu
+  // rendert. Je Buchstabe der farbige Füll-Strich, der per dashoffset über die graue
+  // Spur gezogen wird.
+  const maskRefs = useRef([]);
+  const rafRef = useRef(0);
   const [len, setLen] = useState(0);
   const [progress, setProgress] = useState(0);
   const [griff, setGriff] = useState({ x: 10.1, y: 64.1 });
   const [zieht, setZieht] = useState(false);
   const [reduce] = useState(
     () =>
-      interaktiv &&
+      (interaktiv || auto) &&
       typeof window !== "undefined" &&
       typeof window.matchMedia === "function" &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches
   );
+
+  // onFertig als Latest-Ref, damit der Animations-Effekt nicht bei jedem Render neu anläuft.
+  const onFertigRef = useRef(onFertig);
+  useEffect(() => {
+    onFertigRef.current = onFertig;
+  });
 
   useEffect(() => {
     if (interaktiv && mitteRef.current) {
@@ -88,6 +214,93 @@ export default function OrcaLogo({ className, interaktiv = false, onVoll }) {
       setGriff({ x: q.x, y: q.y });
     }
   }, [interaktiv]);
+
+  // Auto-Hero, einmalige Ring-Fill-Welle (Konstanten oben): je Buchstabe legt ein Masken-
+  // Strich (Breite ~Glyph-Dicke) entlang der gemessenen Mitte die farbige Glyphe frei,
+  // per stroke-dashoffset. Die Maske beschneidet exakt auf die Form, kein Überstand.
+  // Ablauf: Das Logo RUHT zunächst in der Ruhespur (Button-Farbe), alle Farb-Masken aus.
+  // Erst wenn `starten` true wird (Klick), läuft die Welle o->r->c->a einmal durch, bleibt
+  // voll stehen und ruft nach kurzem Halt onFertig (Login schaltet dann weiter).
+  // Ref-getrieben (kein setState/Frame). Reduced Motion: sofort volles Logo, dann onFertig.
+  useEffect(() => {
+    if (!auto) return undefined;
+    const segs = maskRefs.current;
+    const lens = segs.map((m) => (m ? m.getTotalLength() : 0));
+    // Je Buchstabe: Gesamtlänge + Vorlauf (Länge der früheren Segmente desselben Buchstabens),
+    // damit die Segmente eines Buchstabens nacheinander (nach Länge) gefüllt werden.
+    const letterTot = {};
+    const vorlauf = [];
+    const acc = {};
+    AUTO_SEG.forEach((s, gi) => {
+      vorlauf[gi] = acc[s.li] || 0;
+      acc[s.li] = (acc[s.li] || 0) + lens[gi];
+      letterTot[s.li] = acc[s.li];
+    });
+    // Ausgangszustand: alle Farb-Masken aus -> nur die Ruhespur (ruheFarbe) ist sichtbar.
+    segs.forEach((m, gi) => {
+      if (m) {
+        m.style.strokeDasharray = `${lens[gi]}`;
+        m.style.strokeDashoffset = `${lens[gi]}`;
+        m.style.opacity = "0";
+      }
+    });
+    if (!starten) return undefined; // ruht, bis der Nutzer den Button klickt
+
+    const setzeVoll = () =>
+      segs.forEach((m) => {
+        if (m) {
+          m.style.strokeDashoffset = "0";
+          m.style.opacity = "1";
+        }
+      });
+    let fertigTimer = 0;
+    const fertig = () => {
+      fertigTimer = setTimeout(() => {
+        if (onFertigRef.current) onFertigRef.current();
+      }, W_HALT);
+    };
+    if (reduce) {
+      setzeVoll();
+      fertig();
+      return () => {
+        if (fertigTimer) clearTimeout(fertigTimer);
+      };
+    }
+    let start = 0;
+    const tick = (now) => {
+      if (!start) start = now;
+      const tc = now - start; // läuft einmal durch, kein Loop
+      for (let gi = 0; gi < segs.length; gi++) {
+        const m = segs[gi];
+        if (!m) continue;
+        const li = AUTO_SEG[gi].li;
+        const fillStart = LETTER_START[li];
+        const dauer = LETTER_FILL[li];
+        let local; // Gesamt-Fortschritt des Buchstabens 0..1
+        if (tc < fillStart) local = 0;
+        else if (tc < fillStart + dauer) local = easeZeichnen((tc - fillStart) / dauer);
+        else local = 1;
+        // Eigen-Fortschritt des Segments (nacheinander): erst Segment 1 voll, dann Segment 2.
+        const Lt = letterTot[li] || 1;
+        const eigen = Math.max(0, Math.min(1, (local * Lt - vorlauf[gi]) / (lens[gi] || 1)));
+        m.style.strokeDashoffset = `${(lens[gi] * (1 - eigen)).toFixed(1)}`;
+        // Segment erst sichtbar, wenn es wirklich dran ist (sonst runde Kappe = Vorab-Punkt).
+        m.style.opacity = eigen > 0.003 ? "1" : "0";
+      }
+      // Einmal füllen, dann stehen bleiben (kein Entleeren, kein Loop).
+      if (tc < W_FILLENDE) rafRef.current = requestAnimationFrame(tick);
+      else {
+        setzeVoll();
+        fertig();
+      }
+    };
+    rafRef.current = requestAnimationFrame(tick);
+    return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      rafRef.current = 0;
+      if (fertigTimer) clearTimeout(fertigTimer);
+    };
+  }, [auto, reduce, starten]);
 
   function punktBei(t) {
     const path = mitteRef.current;
@@ -170,22 +383,94 @@ export default function OrcaLogo({ className, interaktiv = false, onVoll }) {
     }
   }
 
-  // Statisch (z. B. Masthead): einfache gefüllte Glyphen in currentColor.
-  if (!interaktiv) {
+  // Statisch (z. B. Masthead): einfache gefüllte Glyphen in currentColor. Mit bunt
+  // stattdessen in den vier Fachfarben (wie das Ergebnis der Auto-Animation).
+  if (!interaktiv && !auto) {
     return (
       <svg
         viewBox="0 0 465 129"
         className={className}
         role="img"
         aria-label="Orca"
-        fill="currentColor"
+        fill={bunt ? undefined : "currentColor"}
         xmlns="http://www.w3.org/2000/svg"
       >
-        <path d={PFAD.o} />
-        <path d={PFAD.r} />
-        <path d={PFAD.c} />
+        {/* evenodd: o ist eine Kontur mit Einschnürung, füllt nur so sauber als Ring */}
+        <path d={PFAD.o} fill={bunt ? FARBE.o : undefined} fillRule="evenodd" clipRule="evenodd" />
+        <path d={PFAD.r} fill={bunt ? FARBE.r : undefined} fillRule="evenodd" clipRule="evenodd" />
+        <path d={PFAD.c} fill={bunt ? FARBE.c : undefined} fillRule="evenodd" clipRule="evenodd" />
         {PFAD_A.map((d, i) => (
-          <path key={i} fillRule="evenodd" clipRule="evenodd" d={d} />
+          <path key={i} fill={bunt ? FARBE.a : undefined} fillRule="evenodd" clipRule="evenodd" d={d} />
+        ))}
+      </svg>
+    );
+  }
+
+  // Auto-Hero (Ring-Fill-Welle): je Buchstabe die EXAKTE Glyphe zweimal. Unten grau als
+  // Ruhespur, darüber dieselbe Glyphe in Fachfarbe, die ein Masken-Strich freilegt. Die
+  // Maske ist ein Strich (Breite ~Glyph-Dicke) entlang der gemessenen Mitte, per stroke-
+  // dashoffset gezogen (Treiber im useEffect oben). Weil die Farbe die echte Glyphe IST und
+  // die Maske sie nur beschneidet, bleibt die Form exakt und quillt nie über. overflow:
+  // visible, damit die runde Kappe oben nicht am viewBox-Rand abgeschnitten wird.
+  if (auto) {
+    return (
+      <svg
+        viewBox="0 0 465 129"
+        className={className}
+        role="img"
+        aria-label="Orca"
+        xmlns="http://www.w3.org/2000/svg"
+        style={{ overflow: "visible" }}
+      >
+        <defs>
+          {AUTO_SEG.map((s, gi) => (
+            <mask
+              key={gi}
+              id={`orca-seg-${gi}`}
+              maskUnits="userSpaceOnUse"
+              x="-40"
+              y="-40"
+              width="545"
+              height="209"
+            >
+              <path
+                ref={(el) => {
+                  maskRefs.current[gi] = el;
+                }}
+                d={s.d}
+                fill="none"
+                stroke="#fff"
+                strokeWidth={s.w}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </mask>
+          ))}
+        </defs>
+        {GLYPHEN.map((g, li) => (
+          <g key={g.key}>
+            {/* Ruhespur: echte Glyphe in ruheFarbe (Login: Button-Farbe). Zeigt die Logoform
+                vorab, deckt kleine Masken-Ungenauigkeiten, und die Fachfarbe füllt sauber
+                darüber auf. ruheFarbe=null lässt sie weg: dann zeichnet NUR die Farbe auf
+                leerem Grund (Lade-Animation). */}
+            {ruheFarbe && (
+              <g fill={ruheFarbe}>
+                {g.pfade.map((d, j) => (
+                  <path key={j} d={d} fillRule={g.eo ? "evenodd" : "nonzero"} clipRule="evenodd" />
+                ))}
+              </g>
+            )}
+            {/* farbige Glyphe, je Segment eine Maske (Segmente füllen nacheinander) */}
+            {AUTO_SEG.map((s, gi) =>
+              s.li === li ? (
+                <g key={gi} mask={`url(#orca-seg-${gi})`} fill={g.farbe}>
+                  {g.pfade.map((d, j) => (
+                    <path key={j} d={d} fillRule={g.eo ? "evenodd" : "nonzero"} clipRule="evenodd" />
+                  ))}
+                </g>
+              ) : null
+            )}
+          </g>
         ))}
       </svg>
     );
@@ -209,11 +494,14 @@ export default function OrcaLogo({ className, interaktiv = false, onVoll }) {
       role="img"
       aria-label="Orca, zum Füllen am Punkt entlang der Kreise ziehen"
       xmlns="http://www.w3.org/2000/svg"
-      onPointerDown={beiDown}
-      onPointerMove={beiMove}
-      onPointerUp={beiUp}
-      onPointerCancel={beiUp}
-      style={{ touchAction: "none", cursor: zieht ? "grabbing" : "grab" }}
+      onPointerDown={interaktiv ? beiDown : undefined}
+      onPointerMove={interaktiv ? beiMove : undefined}
+      onPointerUp={interaktiv ? beiUp : undefined}
+      onPointerCancel={interaktiv ? beiUp : undefined}
+      style={{
+        touchAction: "none",
+        cursor: interaktiv ? (zieht ? "grabbing" : "grab") : "default",
+      }}
     >
       <defs>
         {sektoren.map(({ k, d }) =>
@@ -230,11 +518,11 @@ export default function OrcaLogo({ className, interaktiv = false, onVoll }) {
         )}
       </defs>
 
-      {/* Blasse Spur: alle Buchstaben ungefüllt. */}
+      {/* Blasse Spur: alle Buchstaben ungefüllt (evenodd, damit das o sauber ringt). */}
       <g fill="#e1e4e3">
-        <path d={PFAD.o} />
-        <path d={PFAD.r} />
-        <path d={PFAD.c} />
+        <path d={PFAD.o} fillRule="evenodd" clipRule="evenodd" />
+        <path d={PFAD.r} fillRule="evenodd" clipRule="evenodd" />
+        <path d={PFAD.c} fillRule="evenodd" clipRule="evenodd" />
         {PFAD_A.map((d, i) => (
           <path key={i} fillRule="evenodd" clipRule="evenodd" d={d} />
         ))}
@@ -274,21 +562,26 @@ export default function OrcaLogo({ className, interaktiv = false, onVoll }) {
 
       {/* Griff-Punkt: führt die Spur, pulst am Start als Einladung. */}
       <g>
-        {progress < 0.02 && !zieht && !reduce && (
+        {interaktiv && progress < 0.02 && !zieht && !reduce && (
           <circle cx={griff.x} cy={griff.y} r="12" fill="none" stroke={griffFarbe} strokeWidth="2.5">
             <animate attributeName="r" values="12;24" dur="1.7s" repeatCount="indefinite" />
             <animate attributeName="opacity" values="0.55;0" dur="1.7s" repeatCount="indefinite" />
           </circle>
         )}
-        <circle
-          cx={griff.x}
-          cy={griff.y}
-          r="13"
-          fill={griffFarbe}
-          stroke="#fff"
-          strokeWidth="3.5"
-          style={{ filter: "drop-shadow(0 2px 6px rgba(0, 24, 24, 0.28))" }}
-        />
+        {/* Der „Stift": geführter Punkt. Interaktiv immer sichtbar; im Auto-Modus
+            nur während des Zeichnens (bei voll/leer verschwindet er, damit das fertige
+            Logo ruhig steht). */}
+        {(interaktiv || (progress > 0.001 && progress < 0.999)) && (
+          <circle
+            cx={griff.x}
+            cy={griff.y}
+            r="13"
+            fill={griffFarbe}
+            stroke="#fff"
+            strokeWidth="3.5"
+            style={{ filter: "drop-shadow(0 2px 6px rgba(0, 24, 24, 0.28))" }}
+          />
+        )}
       </g>
     </svg>
   );

@@ -29,11 +29,15 @@ import { ladeNotizen, addNotiz, entferneNotiz, toggleNotiz } from "./notizen";
 import { ladeSchritte } from "./lernschritte";
 import {
   ladeMitteilungen,
-  markiereAlleGelesen,
+  markiereGelesen,
   MITTEILUNG_EVENT,
 } from "./benachrichtigungen";
 import Icon from "./Icon";
+import LeerZustand from "./LeerZustand";
 import NachrichtenChat from "./NachrichtenChat";
+import { IcLink } from "./materialIcons";
+import { quelleLabel } from "./material";
+import { useScrollFade } from "./useScrollFade";
 import { fachTextFarbe } from "./farbe";
 import "./Heute.css";
 
@@ -53,6 +57,15 @@ const PersonIcon = () => (
     <circle cx="12" cy="7" r="4" />
   </svg>
 );
+
+// Filter-Chips der Benachrichtigungen (wie die Ablage-Chips): "alle" plus die drei
+// Typen. art der Mitteilung: coach = Nachricht, link = Link, material = Material.
+const NACHR_CHIPS = [
+  { key: "alle", label: "Alle" },
+  { key: "coach", label: "Nachrichten" },
+  { key: "link", label: "Links" },
+  { key: "material", label: "Material" },
+];
 
 // Linke Position eines Reglers GENAU in der Mitte der Grid-Lücke. Bei `left: pct%`
 // allein säße er nur bei 50/50 mittig; sonst ist er um gap*(pct/100 - 0.5) versetzt,
@@ -94,7 +107,7 @@ function kbInfo(kbId) {
 const ETAPPE = etappen.find((e) => e.id === 4) || etappen[0];
 
 
-export default function Heute({ onFokus }) {
+export default function Heute({ onFokus, onOeffneAblage }) {
   const wochenZuordnung = lade(WOCHEN_KEY);
   const stundenZuord = ladeStunden(); // kbId -> Liste der geplanten Stunden-IDs
   const [erledigt, setErledigt] = useState(ladeErledigt);
@@ -118,18 +131,28 @@ export default function Heute({ onFokus }) {
   const [neueErinnerung, setNeueErinnerung] = useState("");
   // Nachrichten/Mitteilungen (früher in der Topbar-Glocke), jetzt als eigene Box.
   const [mitteilungen, setMitteilungen] = useState(ladeMitteilungen);
+  // Filter der Benachrichtigungen (wie die Ablage-Chips): alle | coach | link | material.
+  const [nachrFilter, setNachrFilter] = useState("alle");
+  const [nachrSuche, setNachrSuche] = useState("");
+  const nachrSuchWort = nachrSuche.trim().toLowerCase();
+  const sichtbareMitteilungen = mitteilungen.filter((m) => {
+    if (nachrFilter !== "alle" && m.art !== nachrFilter) return false;
+    if (
+      nachrSuchWort &&
+      !(m.titel + " " + m.text).toLowerCase().includes(nachrSuchWort)
+    )
+      return false;
+    return true;
+  });
   // Chat-Fenster mit der Lerncoach (öffnet beim Tippen auf eine Nachricht).
   const [chatOffen, setChatOffen] = useState(false);
+  // Weiche Ränder für die scrollbaren Bereiche (Benachrichtigungen, Aufgaben).
+  const nachrListeRef = useScrollFade();
+  const aufGridRef = useScrollFade();
   useEffect(() => {
     const f = () => setMitteilungen(ladeMitteilungen());
     window.addEventListener(MITTEILUNG_EVENT, f);
     return () => window.removeEventListener(MITTEILUNG_EVENT, f);
-  }, []);
-  // Box ist dauerhaft sichtbar: kurz den frischen Stand zeigen, dann als gelesen
-  // markieren (der "neu"-Punkt verschwindet ruhig).
-  useEffect(() => {
-    const id = setTimeout(() => markiereAlleGelesen(), 1500);
-    return () => clearTimeout(id);
   }, []);
   // Lange Nachzügler-Liste ruhig eingeklappt halten (nicht überladen).
   const [nachzueglerAlle, setNachzueglerAlle] = useState(false);
@@ -247,12 +270,6 @@ export default function Heute({ onFokus }) {
   // (Stufe 4). Schwellen auf den Mitten (2.5 / 4.5), damit Rundungs-/Float-Werte an
   // den Spaltengrenzen (fSpan ≈ 2, 3, 4, 5) sicher auf der richtigen Seite landen.
   const fortStufe = fSpan < 2.5 ? 1 : fSpan < 4.5 ? 3 : 4;
-  // Untertitel beschreibt knapp, was zu sehen ist (ohne Zieh-Hinweis). Ab der
-  // Balken-Stufe kommt die Wochen-Ebene dazu, der Untertitel wird also genauer.
-  const fortSub =
-    fortStufe < 4
-      ? "Dein Fortschritt je Fach."
-      : "Dein Fortschritt je Fach und Woche.";
 
   useEffect(() => {
     localStorage.setItem(ERLEDIGT_KEY, JSON.stringify(erledigt));
@@ -427,7 +444,16 @@ export default function Heute({ onFokus }) {
         className={"hu-auf" + (done ? " done" : "")}
         key={k.id}
         style={{ "--c": kbFarbe[k.fach] || "#868e96" }}
-        onClick={() => onFokus(k.id)}
+        onClick={(e) => {
+          const kopf = e.currentTarget.querySelector(".hu-auf-kopf");
+          const r = (kopf || e.currentTarget).getBoundingClientRect();
+          onFokus(k.id, {
+            top: r.top,
+            left: r.left,
+            width: r.width,
+            height: r.height,
+          });
+        }}
         title="Im Fokus öffnen und Schritt für Schritt machen"
       >
         <span className="hu-auf-kopf">
@@ -483,6 +509,8 @@ export default function Heute({ onFokus }) {
     day: "numeric",
     month: "long",
   });
+  // Kurzer Wochentag (Mo.–Fr.) für das Label zwischen den Stundenplan-Chevrons.
+  const wochentagKurz = tagDatum.toLocaleDateString("de-DE", { weekday: "short" });
 
   // Heute geplant: Ziele mit mindestens einer Stunde an diesem Tag, sortiert
   // nach der fruehesten Stunde des Tages (folgt dem zeitlichen Tagesrhythmus).
@@ -651,7 +679,6 @@ export default function Heute({ onFokus }) {
             <Icon name="graph" className="hu-karte-icon" />
             Etappenfortschritt
           </h2>
-          <p className="hu-karte-sub">{fortSub}</p>
           {/* Ring und (ab Stufe 3) die Fächer-Legende nebeneinander, damit die
               Legende seitlich aufgeht statt unter dem Ring zu stapeln. */}
           <div className="hu-fort-mitte">
@@ -712,22 +739,68 @@ export default function Heute({ onFokus }) {
             >
           <h2 className="hu-karte-titel">
             <Icon name="chat" className="hu-karte-icon" />
-            Nachrichten
+            Benachrichtigungen
           </h2>
-          {mitteilungen.length === 0 ? (
-            <p className="hu-nachr-leer">Noch nichts Neues.</p>
+          <div className="hu-nachr-chips" role="tablist" aria-label="Filter">
+            {NACHR_CHIPS.map((c) => (
+              <button
+                key={c.key}
+                type="button"
+                role="tab"
+                aria-selected={nachrFilter === c.key}
+                className={"hu-nachr-chip" + (nachrFilter === c.key ? " an" : "")}
+                onClick={() => setNachrFilter(c.key)}
+              >
+                {c.label}
+              </button>
+            ))}
+          </div>
+          <div className="hu-nachr-suche">
+            <Icon name="search" />
+            <input
+              type="text"
+              value={nachrSuche}
+              onChange={(e) => setNachrSuche(e.target.value)}
+              placeholder="Suchen"
+              aria-label="Benachrichtigungen durchsuchen"
+            />
+          </div>
+          {sichtbareMitteilungen.length === 0 ? (
+            <LeerZustand
+              kompakt
+              titel={nachrSuchWort ? "Nichts gefunden" : "Noch nichts Neues"}
+              text={
+                nachrSuchWort
+                  ? "Keine Benachrichtigung passt zu deiner Suche."
+                  : "Neue Nachrichten und Links tauchen hier auf."
+              }
+            />
           ) : (
-            <ul className="hu-nachr-liste">
-              {mitteilungen.map((m) => (
+            <ul className="hu-nachr-liste fade-scroll" ref={nachrListeRef}>
+              {sichtbareMitteilungen.map((m) => (
                 <li key={m.id}>
                   <button
                     type="button"
                     className={"hu-nachr" + (m.gelesen ? "" : " neu")}
-                    onClick={() => setChatOffen(true)}
+                    onClick={() => {
+                      markiereGelesen(m.id);
+                      // Geteilte Links/Material springen in die Ablage (dort öffnet
+                      // sich der Inhalt), Nachrichten der Lerncoach öffnen den Chat.
+                      if (
+                        (m.art === "link" || m.art === "material") &&
+                        onOeffneAblage
+                      ) {
+                        onOeffneAblage(m.materialId || null);
+                      } else {
+                        setChatOffen(true);
+                      }
+                    }}
                   >
                   <span className={"hu-nachr-icon art-" + m.art}>
                     {m.art === "coach" ? (
                       <PersonIcon />
+                    ) : m.art === "link" ? (
+                      <IcLink className="hu-nachr-svg" />
                     ) : (
                       <Icon name="document" className="hu-nachr-svg" />
                     )}
@@ -736,8 +809,41 @@ export default function Heute({ onFokus }) {
                     <span className="hu-nachr-kopf">
                       <span className="hu-nachr-titel">{m.titel}</span>
                       <span className="hu-nachr-zeit">{m.zeit}</span>
+                      {!m.gelesen && (
+                        <span className="hu-nachr-punkt" aria-hidden="true" />
+                      )}
                     </span>
                     <span className="hu-nachr-body">{m.text}</span>
+                    {(m.quelle || (m.tags && m.tags.length > 0)) && (
+                      <span className="hu-nachr-meta">
+                        {(m.tags || []).map((t, i) => {
+                          // Erstes Tag = Fach: in Fachfarbe. Rest (Kategorie) farblos.
+                          const fachHex = i === 0 ? fachFarbe[t] : null;
+                          if (fachHex)
+                            return (
+                              <span
+                                className="hu-nachr-tag hu-nachr-fachtag"
+                                key={t}
+                                style={{
+                                  color: fachTextFarbe(t),
+                                  borderColor: `color-mix(in srgb, ${fachHex} 45%, var(--line))`,
+                                  background: `color-mix(in srgb, ${fachHex} 10%, var(--card-2))`,
+                                }}
+                              >
+                                {t}
+                              </span>
+                            );
+                          return (
+                            <span className="hu-nachr-tag" key={t}>
+                              {t}
+                            </span>
+                          );
+                        })}
+                        {m.quelle && (
+                          <span className="hu-nachr-tag">{quelleLabel(m)}</span>
+                        )}
+                      </span>
+                    )}
                   </span>
                   </button>
                 </li>
@@ -775,14 +881,7 @@ export default function Heute({ onFokus }) {
             <Icon name="erinnerung" className="hu-karte-icon" />
             Erinnerungen
           </h2>
-          {eSpan >= 4 && (
-            <p className="hu-karte-sub">Was du nicht vergessen willst</p>
-          )}
-          {notizen.length === 0 ? (
-            <p className="hu-notizen-leer">
-              Noch keine Erinnerung. Schreib unten deine erste rein.
-            </p>
-          ) : (
+          {notizen.length > 0 && (
             <ul className="hu-notiz-liste">
               {notizen.map((n, i) => (
                 <li
@@ -833,6 +932,9 @@ export default function Heute({ onFokus }) {
               ))}
             </ul>
           )}
+          {notizen.length === 0 && (
+            <LeerZustand kompakt titel="Noch keine Erinnerung" />
+          )}
           <form className="hu-notiz-add" onSubmit={erinnerungHinzufuegen}>
             <button
               type="submit"
@@ -880,7 +982,9 @@ export default function Heute({ onFokus }) {
                 : "Für heute hast du nichts eingeplant."}
             </p>
           ) : (
-            <div className="hu-auf-grid">{tagKbs.map((k) => karte(k))}</div>
+            <div className="hu-auf-grid fade-scroll" ref={aufGridRef}>
+              {tagKbs.map((k) => karte(k))}
+            </div>
           )}
 
           {nachzueglerList.length > 0 && (
@@ -926,10 +1030,42 @@ export default function Heute({ onFokus }) {
           className="hu-karte hu-plan-karte"
           onClick={(e) => maximiereBox(e, "plan")}
         >
-          <h2 className="hu-karte-titel">
-            <Icon name="week" className="hu-karte-icon" />
-            Stundenplan
-          </h2>
+          <div className="hu-plan-kopf">
+            <h2 className="hu-karte-titel">
+              <Icon name="week" className="hu-karte-icon" />
+              Stundenplan
+            </h2>
+            {/* Durch die Tage der Woche (Mo–Fr) blättern, wie die Wochen-Chevrons in
+                der Planung. Verschiebt den Demo-Tag; stopPropagation, damit der Klick
+                nicht die Box maximiert. */}
+            <div className="hu-plan-nav">
+              <button
+                type="button"
+                className="hu-plan-pfeil"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  springeZuTag(tag - 1);
+                }}
+                disabled={tag <= 0}
+                aria-label="Tag zurück"
+              >
+                <Icon name="chevron-left" size={18} />
+              </button>
+              <span className="hu-plan-tag">{wochentagKurz}</span>
+              <button
+                type="button"
+                className="hu-plan-pfeil"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  springeZuTag(tag + 1);
+                }}
+                disabled={tag >= 4}
+                aria-label="Tag vor"
+              >
+                <Icon name="chevron-right" size={18} />
+              </button>
+            </div>
+          </div>
           <ul className="hu-plan">
             {tagStunden.map((s, i) => {
               const prev = tagStunden[i - 1];

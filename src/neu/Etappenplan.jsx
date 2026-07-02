@@ -238,8 +238,8 @@ export default function Etappenplan({ onWeiter, onZurueck, untenSlot, vorn }) {
           type="button"
           className="ep-bar-zurueck"
           onClick={onZurueck}
-          aria-label="Zurück zur Übersicht"
-          title="Zurück zur Übersicht"
+          aria-label="Zurück"
+          title="Zurück"
         >
           <Icon name="chevron-left" width={20} height={20} />
         </button>
@@ -345,7 +345,7 @@ export default function Etappenplan({ onWeiter, onZurueck, untenSlot, vorn }) {
                   >
                     <span className="ep-fachgruppe-name">{sp.fach}</span>
                     <span className="ep-fachgruppe-pfeil" aria-hidden="true">
-                      {zu ? "▸" : "▾"}
+                      <Icon name="chevron-down" className="klapp-chevron" size={16} />
                     </span>
                   </button>
                   {!zu && (

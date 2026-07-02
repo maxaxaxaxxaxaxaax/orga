@@ -13,6 +13,7 @@ import {
   SATZBAU,
   BILDZUORDNUNG,
   MARKIEREN,
+  RECHENTRAINER,
 } from "./interaktivAgenten";
 import { UEBUNGEN_EXTRA } from "../data/uebungenExtra";
 import { UEBUNGEN_FRANZOESISCH } from "../data/uebungenFranzoesisch";
@@ -272,6 +273,8 @@ for (const [id, daten] of Object.entries(BILDZUORDNUNG))
   INTERAKTIV[id] = { typ: "bildzuordnung", daten };
 for (const [id, daten] of Object.entries(MARKIEREN))
   INTERAKTIV[id] = { typ: "markieren", daten };
+for (const [id, daten] of Object.entries(RECHENTRAINER))
+  INTERAKTIV[id] = { typ: "rechentrainer", daten };
 // Zusatz-Uebungen (Rollout): nach Typ gruppiert, generisch einmischen.
 for (const [typ, eintraege] of Object.entries(UEBUNGEN_EXTRA))
   for (const [id, daten] of Object.entries(eintraege))
@@ -298,6 +301,7 @@ export const AUFGABE_TYPEN = [
   "markieren",
   "zahlenstrahl",
   "karteikarten",
+  "rechentrainer",
 ];
 export function istAufgabeMaterial(material) {
   const e = INTERAKTIV[material.id];
@@ -316,6 +320,7 @@ export const TYP_LABEL = {
   satzbau: "Satz bauen",
   bildzuordnung: "Plan-Übung",
   markieren: "Im Satz markieren",
+  rechentrainer: "Rechnen üben",
 };
 
 // Aktivitäts-Label für ein Material: die Übungsform, sonst "Lesen" für reinen
@@ -327,9 +332,15 @@ export function aktivitaetLabel(material) {
   return null;
 }
 
-// Ein Material ist öffenbar, wenn es Volltext oder einen interaktiven Inhalt hat.
+// Ein Material ist öffenbar, wenn es Volltext, einen interaktiven Inhalt oder eine
+// eigene Ansicht (z. B. YouTube-Video) hat.
 export function istOeffenbar(material) {
-  return !!material.inhalt || !!INTERAKTIV[material.id];
+  return (
+    !!material.inhalt ||
+    !!INTERAKTIV[material.id] ||
+    material.art === "video" ||
+    material.art === "link"
+  );
 }
 
 // Konkreter Inhalt einer Aufgabe als kompakter Text für die KI (damit der Coach
@@ -396,6 +407,17 @@ export function materialKontext(material) {
     }
     return label;
   }
-  if (material.inhalt) return String(material.inhalt).slice(0, 600);
-  return "";
+  // Eigenes Material (Link, Video, Notiz, Lernzettel ...): dem Coach möglichst die
+  // vollen Daten geben, damit man mit ihm über genau dieses Material sprechen kann.
+  const kopf = [];
+  if (material.art === "link" || material.quelle === "link") {
+    kopf.push(`Webseite „${material.titel}“`);
+    if (material.url) kopf.push(`Adresse: ${material.url}`);
+  } else if (material.art === "video") {
+    kopf.push(`YouTube-Video „${material.titel}“`);
+    if (material.kanal) kopf.push(`Kanal: ${material.kanal}`);
+  }
+  if (material.tags?.length) kopf.push(`Schlagwörter: ${material.tags.join(", ")}`);
+  if (material.inhalt) kopf.push(`Inhalt:\n${String(material.inhalt).slice(0, 3500)}`);
+  return kopf.join("\n");
 }

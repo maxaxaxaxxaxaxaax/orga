@@ -6,7 +6,7 @@
   background: var(--bg);
   display: flex;
   flex-direction: column;
-  animation: rw-rein 0.25s ease both;
+  animation: rw-rein var(--dur-slow) var(--ease-out) both;
 }
 @keyframes rw-rein {
   from {
@@ -203,7 +203,7 @@
     border-radius: var(--r-lg) var(--r-lg) 0 0;
     box-shadow: var(--shadow-lg);
     z-index: 220;
-    animation: rw-sheet-rein 0.22s ease both;
+    animation: rw-sheet-rein var(--dur-base) var(--ease-out) both;
   }
 }
 @keyframes rw-sheet-rein {

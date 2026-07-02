@@ -30,7 +30,7 @@
   padding: 8px 14px;
   border-radius: 999px;
   cursor: pointer;
-  transition: border-color 0.12s ease, color 0.12s ease, background 0.12s ease;
+  transition: border-color var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out), background var(--dur-press) var(--ease-out);
 }
 .cb-knopf:hover {
   border-color: var(--accent);
@@ -125,7 +125,7 @@
   padding: 7px 14px;
   border-radius: 999px;
   cursor: pointer;
-  transition: border-color 0.12s ease, color 0.12s ease;
+  transition: border-color var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out);
 }
 .cb-frage-save:hover:not(:disabled) {
   border-color: var(--accent);

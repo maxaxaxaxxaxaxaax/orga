@@ -6,26 +6,32 @@
 // tag: 0=Mo … 4=Fr. Zeiten "HH:MM".
 // art: "angeleitet" | "anker" | "selbst" | "studierzeit" | "pause"
 
+// Ein einheitliches Kategorie-Farbsystem in HELLEN, KLAREN PASTELLTÖNEN: alle Fächer im
+// selben hellen Band, klar getrennte, gleichmäßig verteilte Farbtöne (kein Grau-/Erdton,
+// nichts Dunkles). Das Teal-Band (~185°) bleibt dem Akzent (--accent #009094) vorbehalten,
+// kein Fach liegt darin. Alle Töne sind hell genug, dass textAuf() überall dunkle Schrift
+// wählt (konsistent), und fachTextFarbe() sie für Labels sauber abdunkelt. Nebenfächer sind
+// in der App meist neutral dargestellt, liegen aber im selben Pastellband.
 export const fachFarbe = {
-  Deutsch: "#61DA85",
-  Mathematik: "#7DC0FE",
-  Englisch: "#FF7DA9",
-  Französisch: "#FFE37D",
-  Latein: "#7048e8",
-  Griechisch: "#0c8599",
-  Biologie: "#2f9e44",
-  Chemie: "#0ca678",
-  Physik: "#4263eb",
-  Geschichte: "#9c36b5",
-  Erdkunde: "#2b8a3e",
-  Sozialkunde: "#e8590c",
-  Religion: "#845ef7",
-  Musik: "#e64980",
-  Kunst: "#f08c00",
-  Sport: "#fa5252",
-  KS: "#495057",
-  Studierzeit: "#868e96",
-  Mittagessen: "#adb5bd",
+  Deutsch: "#75E0A0", // Grün
+  Mathematik: "#7DC0FE", // Blau
+  Englisch: "#FF7DA9", // Rosa
+  Französisch: "#FFE37D", // Gelb
+  Latein: "#B9A6FA", // Flieder/Violett
+  Griechisch: "#FFB392", // Pfirsich (früher Teal, kollidierte mit dem Akzent)
+  Biologie: "#A6E88C", // Limette
+  Chemie: "#8CE3C6", // Mint (hell, klar vom Akzent-Teal getrennt)
+  Physik: "#A6B0FA", // Bleu/Periwinkle
+  Geschichte: "#E4A6EC", // Orchidee
+  Erdkunde: "#EBCFA0", // Sand
+  Sozialkunde: "#FFC199", // Apricot
+  Religion: "#CBB6FB", // Lavendel
+  Musik: "#FF9ECB", // Rosé
+  Kunst: "#FFDA8C", // Butter/Gold
+  Sport: "#FF9E9E", // Koralle
+  KS: "#A8AEB4", // neutral (Kernstunde)
+  Studierzeit: "#B4BABF", // neutral
+  Mittagessen: "#CCD0D4", // neutral
 };
 
 // Fachlehrkräfte (Kürzel) für die Stundenplan-Anzeige. Pro Fach eine feste

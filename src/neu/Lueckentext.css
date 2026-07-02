@@ -39,7 +39,7 @@
   height: 100%;
   background: var(--accent);
   border-radius: 2px;
-  transition: width 0.25s ease;
+  transition: width var(--dur-base) var(--ease-out);
 }
 /* Banner zur Nacharbeits-Runde: ruhig und ermutigend, kein Tadel. */
 .lt-nacharbeit {
@@ -154,7 +154,7 @@
   padding: 12px;
   border-radius: 999px;
   cursor: pointer;
-  transition: background 0.12s ease, opacity 0.12s ease;
+  transition: background var(--dur-press) var(--ease-out), opacity var(--dur-press) var(--ease-out);
 }
 .lt-pruefen:hover:not(:disabled) {
   background: var(--accent-strong);
@@ -174,7 +174,7 @@
   padding: 12px;
   border-radius: 999px;
   cursor: pointer;
-  transition: border-color 0.12s ease, color 0.12s ease;
+  transition: border-color var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out);
 }
 .lt-weiter:hover {
   border-color: var(--accent);

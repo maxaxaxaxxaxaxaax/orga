@@ -46,7 +46,7 @@
   border-radius: 999px;
   cursor: pointer;
   white-space: nowrap;
-  transition: background 0.14s ease, color 0.14s ease;
+  transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
 }
 .lc-quelle-tab.an {
   background: var(--accent);
@@ -104,7 +104,7 @@
   padding: 11px 16px;
   border-radius: 999px;
   cursor: pointer;
-  transition: background 0.15s ease;
+  transition: background var(--dur-fast) var(--ease-out);
 }
 .lc-start:hover {
   background: var(--accent-strong);
@@ -120,7 +120,7 @@
   padding: 10px 14px;
   border-radius: 999px;
   cursor: pointer;
-  transition: border-color 0.12s ease, color 0.12s ease;
+  transition: border-color var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out);
 }
 .lc-stop:hover,
 .lc-pause:hover {

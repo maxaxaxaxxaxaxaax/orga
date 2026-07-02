@@ -15,7 +15,9 @@
   padding: 9px 13px;
   cursor: grab;
   user-select: none;
-  transition: border-color 0.12s ease, background 0.12s ease, box-shadow 0.12s ease;
+  transition: border-color var(--dur-press) var(--ease-out),
+    background var(--dur-press) var(--ease-out),
+    box-shadow var(--dur-press) var(--ease-out);
 }
 .kbc:hover {
   background: color-mix(in srgb, var(--c) 12%, var(--card));

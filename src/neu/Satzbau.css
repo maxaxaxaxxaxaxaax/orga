@@ -97,7 +97,7 @@
   box-shadow: var(--shadow-sm);
   cursor: pointer;
   transition:
-    border-color 0.12s ease,
+    border-color var(--dur-press) ease,
     transform 0.08s ease;
 }
 .sb-wort:hover:not(:disabled) {

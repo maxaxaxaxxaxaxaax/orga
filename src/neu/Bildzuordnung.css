@@ -37,7 +37,7 @@
   height: 100%;
   background: var(--accent);
   border-radius: 2px;
-  transition: width 0.25s ease;
+  transition: width var(--dur-base) var(--ease-out);
 }
 .bz-frage {
   margin: 6px 0 12px;
@@ -65,8 +65,8 @@
   stroke: var(--line-strong);
   stroke-width: 1.5;
   transition:
-    fill 0.15s ease,
-    stroke 0.15s ease;
+    fill var(--dur-fast) var(--ease-out),
+    stroke var(--dur-fast) var(--ease-out);
 }
 .bz-raum text {
   fill: var(--text);

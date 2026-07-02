@@ -1,0 +1,57 @@
+/* Leer-Zustand: ruhig und zentriert. Füllt die verfügbare Fläche seines Containers
+   und bleibt dabei vertikal/horizontal mittig. Bewusst leise (muted), damit ein
+   leeres Feld einladend statt kaputt wirkt. */
+.leerzustand {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 30px 20px;
+  text-align: center;
+  animation: leerzustand-rein var(--dur-base, 200ms) var(--ease-out, ease) both;
+}
+.leerzustand-titel {
+  margin: 2px 0 0;
+  font-size: 1.02rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.leerzustand-text {
+  margin: 0;
+  max-width: 32ch;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: var(--muted);
+  text-wrap: balance;
+}
+
+/* Kompakt: für enge Boxen (Dashboard-Kacheln). Kleineres Icon, weniger Luft. */
+.leerzustand.kompakt {
+  gap: 7px;
+  padding: 16px 12px;
+}
+.leerzustand.kompakt .leerzustand-titel {
+  font-size: 0.94rem;
+}
+.leerzustand.kompakt .leerzustand-text {
+  font-size: 0.84rem;
+}
+
+@keyframes leerzustand-rein {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .leerzustand {
+    animation: none;
+  }
+}

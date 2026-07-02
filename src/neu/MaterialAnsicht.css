@@ -15,7 +15,7 @@
   background: var(--card);
   color: var(--text);
   border-radius: var(--r-lg, 18px);
-  border-top: 4px solid var(--accent);
+  border: 1px solid var(--line);
   padding: 24px 26px;
   box-shadow: 0 16px 40px rgba(17, 20, 26, 0.28);
 }
@@ -84,4 +84,152 @@
   font-size: 0.95rem;
   line-height: 1.5;
   color: var(--text);
+}
+
+/* YouTube-Video-Vorschau (Ablage-Detail). */
+.ma-video {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+/* Eingebetteter Player: 16:9, spielt direkt in der App (kein Wechsel zu YouTube). */
+.ma-video-frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--r-md, 14px);
+  overflow: hidden;
+  background: #000;
+}
+.ma-video-frame iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+.ma-video-thumb {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--r-md, 14px);
+  background: linear-gradient(135deg, #ff4d4d, #c30000);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ma-video-dauer {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.75);
+  color: #fff;
+  font-size: 0.74rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.ma-video-kanal {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-2);
+}
+.ma-video-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 16px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background var(--dur-fast) var(--ease-out);
+}
+.ma-video-link:hover {
+  background: var(--accent-strong);
+}
+.ma-video-hinweis {
+  margin: 4px 0 0;
+  font-size: 0.86rem;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+/* TikTok/Instagram-Embed: die Plattform rendert den Beitrag im iframe. Hochformate,
+   darum zentriert mit fester Höhe (diese Embeds skalieren nicht über aspect-ratio). */
+.ma-embed {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.ma-embed-frame {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  height: min(660px, 78vh);
+  margin: 0 auto;
+  border-radius: var(--r-md, 14px);
+  overflow: hidden;
+  background: var(--card-2);
+  border: 1px solid var(--line);
+}
+.ma-embed-frame.tiktok {
+  max-width: 330px;
+  height: min(730px, 82vh);
+  background: #000;
+  border: none;
+}
+.ma-embed-frame.instagram {
+  max-width: 400px;
+  height: min(680px, 80vh);
+}
+.ma-embed-frame iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+/* Gepasteter Link: Kopf mit Domain + "Seite öffnen", darunter der gelesene Inhalt. */
+.ma-link {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.ma-link-kopf {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.ma-link-domain {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ma-link-inhalt {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 340px;
+  overflow-y: auto;
+  padding: 12px 14px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md, 14px);
+}
+.ma-link-inhalt .ma-zeile {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--text-2);
 }

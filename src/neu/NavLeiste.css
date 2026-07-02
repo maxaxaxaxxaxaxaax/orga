@@ -20,7 +20,7 @@
   border: 1px solid rgba(255, 255, 255, 0.6);
   border-radius: 999px;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), var(--shadow-lg);
-  animation: nav-rein 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) 0.12s both;
+  animation: nav-rein 0.6s var(--ease-out) 0.12s both;
 }
 @keyframes nav-rein {
   from {
@@ -41,8 +41,8 @@
   border-radius: 999px;
   background: var(--accent-soft);
   z-index: 0;
-  transition: left 0.34s cubic-bezier(0.4, 0, 0.2, 1),
-    width 0.34s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: left var(--dur-overlay) var(--ease-in-out),
+    width var(--dur-overlay) var(--ease-in-out);
 }
 .nav-punkt {
   position: relative;
@@ -60,7 +60,7 @@
   font-weight: 600;
   letter-spacing: -0.005em;
   cursor: pointer;
-  transition: color 0.18s ease, transform 0.12s ease;
+  transition: color 0.18s ease, transform var(--dur-press) ease;
 }
 .nav-punkt:hover {
   color: var(--text);

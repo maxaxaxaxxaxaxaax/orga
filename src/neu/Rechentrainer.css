@@ -1,0 +1,253 @@
+.rt {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.rt-kopf {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+.rt-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+.rt-serie {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--accent-strong);
+  background: var(--accent-soft);
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-variant-numeric: tabular-nums;
+}
+.rt-fortschritt {
+  height: 4px;
+  background: var(--line);
+  border-radius: 2px;
+  overflow: hidden;
+  margin: 8px 0 4px;
+}
+.rt-fortschritt-fuell {
+  height: 100%;
+  width: 100%;
+  transform-origin: left;
+  background: var(--accent);
+  border-radius: 2px;
+  transition: transform 0.25s var(--ease-out, ease);
+}
+.rt-nacharbeit {
+  margin: 4px 0 0;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--accent-strong);
+}
+.rt-thema {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+/* Aufgabe: Term + Eingabe + Prüfen in einer Zeile, umbruchfähig. */
+.rt-aufgabe {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 4px 0 0;
+}
+.rt-term {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
+}
+.rt-eingabe {
+  width: 96px;
+  box-sizing: border-box;
+  padding: 8px 12px;
+  font-size: 1.35rem;
+  font-weight: 700;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+  background: var(--bg);
+  border: 2px solid var(--line-strong);
+  border-radius: var(--r-sm, 8px);
+  outline: none;
+  transition:
+    border-color var(--dur-fast, 160ms) var(--ease-out, ease),
+    background var(--dur-fast, 160ms) var(--ease-out, ease);
+}
+.rt-eingabe:focus {
+  border-color: var(--accent);
+}
+.rt-eingabe.ok {
+  border-color: var(--ok-text);
+  background: var(--ok-bg);
+  color: var(--ok-text);
+}
+.rt-eingabe.no {
+  border-color: var(--warn-text);
+  background: var(--warn-bg);
+  color: var(--warn-text);
+}
+.rt-eingabe:disabled {
+  cursor: default;
+}
+.rt-pruef {
+  border: none;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: 0.9rem;
+  font-weight: 700;
+  padding: 9px 18px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition:
+    background var(--dur-fast, 160ms) var(--ease-out, ease),
+    transform var(--dur-press, 120ms) var(--ease-out, ease);
+}
+.rt-pruef:hover:not(:disabled) {
+  background: var(--accent-strong);
+}
+.rt-pruef:active:not(:disabled) {
+  transform: scale(0.97);
+}
+.rt-pruef:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* Zahlenstrahl-Stütze (Plus/Minus). */
+.rt-strahl-toggle {
+  align-self: flex-start;
+  border: 1px solid var(--line);
+  background: var(--card);
+  color: var(--accent-strong);
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.rt-strahl-toggle:hover {
+  background: var(--card-2);
+}
+.rt-strahl {
+  position: relative;
+  width: 100%;
+  height: 56px;
+  margin: 2px 0 4px;
+}
+.rt-achse {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 16px;
+  height: 3px;
+  background: var(--line-strong);
+  border-radius: 2px;
+}
+.rt-tick {
+  position: absolute;
+  top: 8px;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+.rt-strich {
+  width: 1.5px;
+  height: 11px;
+  background: var(--line-strong);
+}
+.rt-strich.null {
+  background: var(--text-2);
+  width: 2.5px;
+  height: 15px;
+}
+.rt-zahl {
+  font-size: 0.68rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.rt-zahl.null {
+  color: var(--text-2);
+  font-weight: 700;
+}
+.rt-start {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.rt-start-punkt {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 2px solid var(--card);
+  box-shadow: var(--shadow-sm);
+}
+.rt-start-text {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--accent-strong);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Feedback: Tipp (no) oder Bestätigung (ok). */
+.rt-feedback {
+  border-radius: var(--r-sm, 8px);
+  padding: 10px 12px;
+}
+.rt-feedback.ok {
+  background: var(--ok-bg);
+}
+.rt-feedback.no {
+  background: var(--warn-bg);
+}
+.rt-feedback-text {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--text);
+}
+.rt-weg {
+  margin: 8px 0 0;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--text-2);
+}
+.rt-weiter {
+  margin-top: 10px;
+  border: none;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: 0.88rem;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.rt-weiter:hover {
+  background: var(--accent-strong);
+}
+
+.rt-leer {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+}

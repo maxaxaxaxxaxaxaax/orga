@@ -1,16 +1,19 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { faecher } from "../data/wissen";
 import { koennensbeweise, kbFarbe } from "../data/koennensbeweise";
-import { ladeEigene, speichereEigenes } from "./eigeneMaterialien";
+import { FACH_STRUKTUR } from "../data/fachStruktur";
+import { ladeEigene, speichereEigenes, EIGENE_EVENT } from "./eigeneMaterialien";
 import { istOeffenbar } from "./interaktiv";
-import { lade, ERLEDIGT_KEY } from "./planung";
 import { IcLernweg } from "./materialIcons";
 import { CHIPS, chipFuerMaterial, iconFuerMaterial } from "./materialTypen";
 import MaterialUpload from "./MaterialUpload";
-import MaterialAnsicht from "./MaterialAnsicht";
+import MaterialInhalt from "./MaterialInhalt";
+import { quelleLabel } from "./material";
 import KbInhalt from "./KbInhalt";
-import Netz from "./Netz";
 import Icon from "./Icon";
+import LeerZustand from "./LeerZustand";
+import { useScrollFade } from "./useScrollFade";
 import "./Ablage.css";
 
 // Ablage: eine Karte "Materialien". Oben drin die Fächer als bunte Ordner (Wahl
@@ -90,22 +93,152 @@ function datumLang(iso) {
   });
 }
 
-export default function Ablage() {
+// Baut aus den (gefilterten) Zeilen eines Fachs den geordneten Baum
+//   Kategorie > Subkategorie > Lernweg (Aufgabe/Koennensbeweis) > Materialien.
+// Reihenfolge von Kategorie/Subkategorie aus FACH_STRUKTUR (lehrplan-treu), die
+// Lernwege in Themen-Reihenfolge, die Materialien je Lernweg per sortFn. Zeilen ohne
+// Gliederung (z. B. Franzoesisch) landen unter "Weiteres". Faecher ohne Struktur ->
+// null (Aufrufer zeigt dann die flache Liste).
+function baueFachBaum(rows, fach, sortFn) {
+  const struktur = FACH_STRUKTUR[fach.id];
+  if (!struktur) return null;
+  const themaIndex = new Map((fach.themen || []).map((t, i) => [t.label, i]));
+  const tree = new Map();
+  const weiteres = [];
+  for (const r of rows) {
+    if (!r.kategorie || !r.subkategorie) {
+      weiteres.push(r);
+      continue;
+    }
+    if (!tree.has(r.kategorie)) tree.set(r.kategorie, new Map());
+    const subMap = tree.get(r.kategorie);
+    if (!subMap.has(r.subkategorie)) subMap.set(r.subkategorie, new Map());
+    const lwMap = subMap.get(r.subkategorie);
+    const key = r.lernweg || "—";
+    if (!lwMap.has(key))
+      lwMap.set(key, { label: r.lernweg || null, kopf: null, material: [] });
+    const g = lwMap.get(key);
+    if (r.istLernweg) g.kopf = r;
+    else g.material.push(r);
+  }
+  const kategorien = [];
+  for (const kat of struktur.kategorien) {
+    const subMap = tree.get(kat);
+    if (!subMap) continue;
+    const subOrder = struktur.subkategorien[kat] || [];
+    const subKeys = [
+      ...subOrder.filter((s) => subMap.has(s)),
+      ...[...subMap.keys()].filter((s) => !subOrder.includes(s)),
+    ];
+    const subs = subKeys.map((s) => {
+      const gruppen = [...subMap.get(s).values()];
+      gruppen.forEach((g) => g.material.sort(sortFn));
+      gruppen.sort(
+        (a, b) =>
+          (themaIndex.get(a.label) ?? 999) - (themaIndex.get(b.label) ?? 999)
+      );
+      return { sub: s, gruppen };
+    });
+    kategorien.push({ kat, subs });
+  }
+  return { kategorien, weiteres: [...weiteres].sort(sortFn) };
+}
+
+export default function Ablage({
+  untenSlot,
+  vorn,
+  oeffneMaterialId,
+  onGeoeffnet,
+} = {}) {
+  // Deep-Link-Ziel (Klick auf eine Benachrichtigung) auflösen: erst unter den eigenen
+  // Materialien (z. B. Discord-Import), sonst unter den Seed-Materialien eines Fachs.
+  const zielMaterial = (id) => {
+    if (!id) return null;
+    const eig = ladeEigene().find((x) => x.id === id);
+    if (eig) return eig;
+    for (const f of faecher) {
+      const s = (f.materialien || []).find((x) => x.id === id);
+      if (s) return { ...s, fachId: f.id };
+    }
+    return null;
+  };
+
   // Standard: kein Fach gewählt -> alle Fächer (global). Ein Ordner-Klick filtert,
   // nochmaliger Klick auf denselben Ordner schließt ihn wieder (zurück zu global).
-  const [fachId, setFachId] = useState(null);
+  // Kommt der Screen per Deep-Link, ist direkt das Ziel-Fach/-Material offen.
+  const [fachId, setFachId] = useState(
+    () => zielMaterial(oeffneMaterialId)?.fachId || null
+  );
   const [chip, setChip] = useState("alle");
   const [suche, setSuche] = useState("");
   const [sort, setSort] = useState("neu"); // neu | az
   const [sortOffen, setSortOffen] = useState(false);
   const [uploadOffen, setUploadOffen] = useState(false);
   const [eigene, setEigene] = useState(ladeEigene);
-  const [offenesMaterial, setOffenesMaterial] = useState(null);
+  const [offenesMaterial, setOffenesMaterial] = useState(() =>
+    zielMaterial(oeffneMaterialId)
+  );
   const [offenerLernweg, setOffenerLernweg] = useState(null);
-  const [ansicht, setAnsicht] = useState("liste"); // liste | netz
+  // Ordner + Filter beim Runterscrollen einziehen, beim Hochscrollen wieder zeigen.
+  const [eingezogen, setEingezogen] = useState(false);
+  const letzterScroll = useRef(0);
+  // Weiche Ränder für die scrollbare Materialliste (statt harter Kante).
+  const matScrollRef = useScrollFade();
+
+  // Scroll-Richtung der Material-Liste: runter (über kleiner Schwelle) zieht Kopf ein,
+  // hoch zieht ihn wieder auf. Nahe am Anfang immer offen.
+  function beiListenScroll(e) {
+    const y = e.currentTarget.scrollTop;
+    const vorher = letzterScroll.current;
+    if (y <= 8) setEingezogen(false);
+    else if (y > vorher + 4) setEingezogen(true);
+    else if (y < vorher - 4) setEingezogen(false);
+    letzterScroll.current = y;
+    setSortOffen(false);
+  }
 
   const fach = faecher.find((f) => f.id === fachId) || null;
-  const erledigt = lade(ERLEDIGT_KEY);
+
+  // Ein Dokument/Lernweg ist rechts im Split geöffnet. Esc schließt es.
+  const detailOffen = offenesMaterial || offenerLernweg;
+  // Tags im Detail wie in der Zeile: das Fach weglassen (steht schon im Ordner),
+  // damit beide Ansichten dieselben, konkreten Schlagwörter zeigen.
+  const detailFachLabel = offenesMaterial
+    ? faecher.find((f) => f.id === offenesMaterial.fachId)?.fach
+    : null;
+  const detailTags = offenesMaterial
+    ? (offenesMaterial.tags || []).filter((t) => t !== detailFachLabel)
+    : [];
+  function schliesseDetail() {
+    setOffenesMaterial(null);
+    setOffenerLernweg(null);
+  }
+  useEffect(() => {
+    if (!detailOffen) return undefined;
+    const onKey = (e) => {
+      if (e.key === "Escape") {
+        setOffenesMaterial(null);
+        setOffenerLernweg(null);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [detailOffen]);
+
+  // Neu gespeicherte Materialien live nachladen (z. B. Discord-Import im Hintergrund).
+  useEffect(() => {
+    const f = () => setEigene(ladeEigene());
+    window.addEventListener(EIGENE_EVENT, f);
+    return () => window.removeEventListener(EIGENE_EVENT, f);
+  }, []);
+
+  // Deep-Link (Klick auf eine Link-/Material-Benachrichtigung): Das Ziel-Material ist
+  // beim Mounten schon als offenes Detail gesetzt (useState-Initializer oben). Hier nur
+  // das Ziel im Parent zurücksetzen, damit ein späterer Wechsel es nicht erneut öffnet.
+  useEffect(() => {
+    if (oeffneMaterialId) onGeoeffnet?.();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [oeffneMaterialId]);
 
   // Lernwege + Materialien eines Fachs als Listenzeilen (Typ-Chip, Icon, Fach).
   const zeilenFuerFach = (f) => {
@@ -124,17 +257,32 @@ export default function Ablage() {
       fach: f.fach,
       datum: null,
       Icon: IcLernweg,
+      kategorie: t.kategorie || null,
+      subkategorie: t.subkategorie || null,
+      lernweg: t.label,
+      istLernweg: true,
       onOpen: () => setOffenerLernweg({ id: t.kbId, label: t.label }),
     }));
-    const mRows = materialien.map((m) => ({
-      key: f.id + "-m-" + m.id,
-      chip: chipFuerMaterial(m),
-      titel: m.titel,
-      fach: f.fach,
-      datum: m.datum || null,
-      Icon: iconFuerMaterial(m),
-      onOpen: istOeffenbar(m) ? () => setOffenesMaterial(m) : null,
-    }));
+    const mRows = materialien.map((m) => {
+      // Material gehoert ueber thema === Lernweg-Label zu einem Lernweg; dessen
+      // Kategorie/Subkategorie erbt es fuer die Gruppierung.
+      const eltern = f.themen.find((t) => t.label === m.thema) || null;
+      return {
+        key: f.id + "-m-" + m.id,
+        chip: chipFuerMaterial(m),
+        titel: m.titel,
+        fach: f.fach,
+        datum: m.datum || null,
+        Icon: iconFuerMaterial(m),
+        quelle: m.quelle || null,
+        tags: m.tags || [],
+        kategorie: eltern?.kategorie || null,
+        subkategorie: eltern?.subkategorie || null,
+        lernweg: eltern?.label || m.thema || null,
+        istLernweg: false,
+        onOpen: istOeffenbar(m) ? () => setOffenesMaterial(m) : null,
+      };
+    });
     return [...lwRows, ...mRows];
   };
 
@@ -145,14 +293,18 @@ export default function Ablage() {
   let rows = quellFaecher.flatMap(zeilenFuerFach);
   if (chip !== "alle") rows = rows.filter((r) => r.chip === chip);
   if (q) rows = rows.filter((r) => r.titel.toLowerCase().includes(q));
-  rows = rows.sort((a, b) => {
+  const sortFn = (a, b) => {
     if (sort === "az") return a.titel.localeCompare(b.titel, "de");
     // Neueste: Lernwege oben (kein Datum), dann Materialien nach Datum absteigend.
     const al = a.chip === "lernwege",
       bl = b.chip === "lernwege";
     if (al !== bl) return al ? -1 : 1;
     return (b.datum || "").localeCompare(a.datum || "");
-  });
+  };
+  // In einem offenen Fach-Ordner: nach Kategorie > Subkategorie > Lernweg gruppieren,
+  // die Materialien unter ihrem Lernweg. Global oder ohne Gliederung: flache Liste.
+  const baum = fach ? baueFachBaum(rows, fach, sortFn) : null;
+  const flachSortiert = baum ? null : [...rows].sort(sortFn);
 
   function uploadSpeichern(m) {
     speichereEigenes(m);
@@ -161,9 +313,8 @@ export default function Ablage() {
     if (m.fachId) setFachId(m.fachId);
   }
 
-  // Fächer-Ordner (Buttons), in beiden Ansichten genutzt: in der Liste über den
-  // Materialien, im Netz als Overlay oben auf dem Netz. Toggle: gleiches Fach
-  // erneut -> zu (global); kein Ansicht-Wechsel, damit man im Netz bleibt.
+  // Fächer-Ordner (Buttons) über der Liste. Toggle: dasselbe Fach erneut -> zu
+  // (zurück zu global, alle Fächer).
   const ordnerButtons = faecher.map((f) => (
     <button
       key={f.id}
@@ -184,15 +335,84 @@ export default function Ablage() {
     </button>
   ));
 
+  // Eine Listenzeile (Lernweg oder Material). extra setzt z. B. die Einrückung der
+  // Materialien (ab-unter) oder die Kopf-Betonung des Lernwegs (ab-lw-kopf).
+  const zeileInhalt = (r) => (
+    <>
+      <span className="ab-zeile-icon" aria-hidden="true">
+        <r.Icon />
+      </span>
+      <span className="ab-zeile-titel">{r.titel}</span>
+      {!fach && r.fach && <span className="ab-zeile-fach">{r.fach}</span>}
+      {r.quelle === "youtube" && (
+        <span className="ab-zeile-quelle">YouTube</span>
+      )}
+      {/* Auto-Tags "was es ist": das Fach lassen wir weg (steht schon im Ordner),
+         damit die konkreten Schlagwörter sichtbar werden. */}
+      {r.tags && r.tags.filter((t) => t !== r.fach).length > 0 && (
+        <span className="ab-zeile-tags">
+          {r.tags
+            .filter((t) => t !== r.fach)
+            .slice(0, 2)
+            .map((t) => (
+              <span className="ab-tag" key={t}>
+                {t}
+              </span>
+            ))}
+        </span>
+      )}
+      <span className="ab-zeile-datum">{r.datum ? datumLang(r.datum) : ""}</span>
+    </>
+  );
+  const zeileLi = (r, extra) => (
+    <li key={r.key} className={extra || undefined}>
+      {r.onOpen ? (
+        <button
+          type="button"
+          className="ab-zeile ab-zeile-klick"
+          onClick={r.onOpen}
+        >
+          {zeileInhalt(r)}
+        </button>
+      ) : (
+        <div className="ab-zeile">{zeileInhalt(r)}</div>
+      )}
+    </li>
+  );
+
+  // Untere Leiste (Suche + Hinzufügen). Wird in den festen Anker (untenSlot)
+  // portaliert, damit sie beim Screen-Wechsel NICHT mit der wischenden Schiene
+  // mitrutscht, sondern wie die anderen Leisten stehen bleibt.
+  const untenLeiste = (
+    <div className="ab-top">
+      <div className="ab-suche">
+        <Icon name="search" />
+        <input
+          type="text"
+          value={suche}
+          onChange={(e) => setSuche(e.target.value)}
+          onFocus={() => setFachId(null)}
+          placeholder="Suche"
+          aria-label="Ablage durchsuchen"
+        />
+      </div>
+      <button
+        type="button"
+        className="ab-add"
+        onClick={() => setUploadOffen(true)}
+      >
+        <span aria-hidden="true">✦</span> Hinzufügen
+      </button>
+    </div>
+  );
+
   return (
     <>
       <div className="ab-screen">
-        <div className="ab-grid">
+        <div className={"ab-grid" + (detailOffen ? " ab-split" : "")}>
           {/* Eine Karte: Materialien, mit den Fächer-Ordnern oben drin. */}
           <section
-            className={
-              "ab-card ab-materialien" + (ansicht === "netz" ? " ab-fuellt" : "")
-            }
+            className={"ab-card ab-materialien" + (eingezogen ? " eingezogen" : "")}
           >
             <div className="ab-mat-kopf">
               <div>
@@ -204,137 +424,178 @@ export default function Ablage() {
                   {fach ? `${fach.fach} Gesamt` : "Alle Fächer"}
                 </p>
               </div>
-              <div className="ab-ansicht" role="tablist" aria-label="Ansicht">
-                  <button
-                    type="button"
-                    role="tab"
-                    aria-selected={ansicht === "liste"}
-                    className={"ab-ansicht-chip" + (ansicht === "liste" ? " an" : "")}
-                    onClick={() => setAnsicht("liste")}
-                  >
-                    Liste
-                  </button>
-                  <button
-                    type="button"
-                    role="tab"
-                    aria-selected={ansicht === "netz"}
-                    className={"ab-ansicht-chip" + (ansicht === "netz" ? " an" : "")}
-                    onClick={() => setAnsicht("netz")}
-                  >
-                    Netz
-                  </button>
-                </div>
             </div>
 
-            {ansicht === "netz" ? (
-              <div className="ab-netz">
-                <Netz
-                  erledigt={erledigt}
-                  onSelect={(node) =>
-                    setOffenerLernweg({ id: node.kbId, label: node.label })
-                  }
-                />
-              </div>
-            ) : (
-              <>
-                {/* Fächer-Ordner über der Liste (Auswahl filtert die Liste). */}
+            {/* Fächer-Ordner über der Liste (Auswahl filtert die Liste). */}
                 <div className="ab-faecher-leiste">{ordnerButtons}</div>
-                <div className="ab-chips" role="tablist" aria-label="Material-Typ">
-                  {CHIPS.map((c) => (
-                    <button
-                      key={c.key}
-                      type="button"
-                      role="tab"
-                      aria-selected={chip === c.key}
-                      className={"ab-chip" + (chip === c.key ? " an" : "")}
-                      onClick={() => setChip(c.key)}
-                    >
-                      {c.Icon && <c.Icon className="ab-chip-icon" />}
-                      {c.label}
-                    </button>
-                  ))}
-                </div>
-
-                <div className="ab-liste-kopf">
-                  <div className="ab-liste-werkzeuge">
-                    <div className="ab-sort">
+                <div
+                  className={"ab-filterzeile" + (sortOffen ? " sort-offen" : "")}
+                >
+                  <div className="ab-chips" role="tablist" aria-label="Material-Typ">
+                    {/* "Lernwege" und "KI" hier ausgeblendet: die Materialien bleiben
+                       unter "Alle" sichtbar, nur die zwei Filter-Chips entfallen. */}
+                    {CHIPS.filter(
+                      (c) => c.key !== "lernwege" && c.key !== "ki"
+                    ).map((c) => (
                       <button
+                        key={c.key}
                         type="button"
-                        className="ab-sort-knopf"
-                        onClick={() => setSortOffen((v) => !v)}
-                        aria-haspopup="listbox"
-                        aria-expanded={sortOffen}
+                        role="tab"
+                        aria-selected={chip === c.key}
+                        className={"ab-chip" + (chip === c.key ? " an" : "")}
+                        onClick={() => setChip(c.key)}
                       >
-                        Sortieren
-                        <span aria-hidden="true">⌄</span>
+                        {c.Icon && <c.Icon className="ab-chip-icon" />}
+                        {c.label}
                       </button>
-                      {sortOffen && (
-                        <ul className="ab-sort-menue" role="listbox">
-                          {[
-                            ["neu", "Neueste"],
-                            ["az", "A–Z"],
-                          ].map(([k, l]) => (
-                            <li key={k}>
-                              <button
-                                type="button"
-                                role="option"
-                                aria-selected={sort === k}
-                                className={"ab-sort-opt" + (sort === k ? " an" : "")}
-                                onClick={() => {
-                                  setSort(k);
-                                  setSortOffen(false);
-                                }}
-                              >
-                                {l}
-                              </button>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                    </div>
+                    ))}
+                  </div>
+                  {/* Sortieren auf derselben Höhe wie die Filter (rechts in der Zeile). */}
+                  <div className="ab-sort">
+                    <button
+                      type="button"
+                      className="ab-sort-knopf"
+                      onClick={() => setSortOffen((v) => !v)}
+                      aria-haspopup="listbox"
+                      aria-expanded={sortOffen}
+                    >
+                      Sortieren
+                      <Icon name="chevron-down" className="ab-sort-chevron" size={14} />
+                    </button>
+                    {sortOffen && (
+                      <ul className="ab-sort-menue" role="listbox">
+                        {[
+                          ["neu", "Neueste"],
+                          ["az", "A–Z"],
+                        ].map(([k, l]) => (
+                          <li key={k}>
+                            <button
+                              type="button"
+                              role="option"
+                              aria-selected={sort === k}
+                              className={"ab-sort-opt" + (sort === k ? " an" : "")}
+                              onClick={() => {
+                                setSort(k);
+                                setSortOffen(false);
+                              }}
+                            >
+                              {l}
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
                   </div>
                 </div>
 
+                <div
+                  className="ab-mat-scroll fade-scroll"
+                  ref={matScrollRef}
+                  onScroll={beiListenScroll}
+                >
                 {rows.length === 0 ? (
-                  <p className="ab-liste-leer">Nichts gefunden.</p>
+                  <LeerZustand
+                    titel={suche ? "Nichts gefunden" : "Noch keine Materialien"}
+                    text={
+                      suche
+                        ? "Für deine Suche gibt es hier nichts. Probier ein anderes Wort."
+                        : "Materialien, die du hinzufügst oder aus Discord schickst, landen hier."
+                    }
+                  />
+                ) : baum ? (
+                  <div className="ab-baum">
+                    {baum.kategorien.map((k) => (
+                      <section className="ab-kat" key={k.kat}>
+                        <h3 className="ab-kat-titel">{k.kat}</h3>
+                        {k.subs.map((su) => (
+                          <div className="ab-sub" key={su.sub}>
+                            <h4 className="ab-sub-titel">{su.sub}</h4>
+                            {su.gruppen.map((g, gi) => (
+                              <ul
+                                className="ab-liste ab-lw-liste"
+                                key={(g.label || "rest") + gi}
+                              >
+                                {g.kopf ? (
+                                  zeileLi(g.kopf, "ab-lw-kopf")
+                                ) : g.label ? (
+                                  <li className="ab-lw-label">
+                                    <span>{g.label}</span>
+                                  </li>
+                                ) : null}
+                                {g.material.map((r) => zeileLi(r, "ab-unter"))}
+                              </ul>
+                            ))}
+                          </div>
+                        ))}
+                      </section>
+                    ))}
+                    {baum.weiteres.length > 0 && (
+                      <section className="ab-kat">
+                        <h3 className="ab-kat-titel">Weiteres</h3>
+                        <ul className="ab-liste">
+                          {baum.weiteres.map((r) => zeileLi(r))}
+                        </ul>
+                      </section>
+                    )}
+                  </div>
                 ) : (
                   <ul className="ab-liste">
-                    {rows.map((r) => {
-                      const Inhalt = (
-                        <>
-                          <span className="ab-zeile-icon" aria-hidden="true">
-                            <r.Icon />
-                          </span>
-                          <span className="ab-zeile-titel">{r.titel}</span>
-                          {!fach && r.fach && (
-                            <span className="ab-zeile-fach">{r.fach}</span>
-                          )}
-                          <span className="ab-zeile-datum">
-                            {r.datum ? datumLang(r.datum) : ""}
-                          </span>
-                        </>
-                      );
-                      return (
-                        <li key={r.key}>
-                          {r.onOpen ? (
-                            <button
-                              type="button"
-                              className="ab-zeile ab-zeile-klick"
-                              onClick={r.onOpen}
-                            >
-                              {Inhalt}
-                            </button>
-                          ) : (
-                            <div className="ab-zeile">{Inhalt}</div>
-                          )}
-                        </li>
-                      );
-                    })}
+                    {flachSortiert.map((r) => zeileLi(r))}
                   </ul>
                 )}
-              </>
-            )}
+                </div>
           </section>
+
+          {detailOffen && (
+            <aside
+              key={
+                offenesMaterial
+                  ? "m" + offenesMaterial.id
+                  : "l" + offenerLernweg.id
+              }
+              className="ab-card ab-detail"
+              aria-label="Dokument"
+            >
+              <div className="ab-detail-kopf">
+                <div className="ab-detail-titel-wrap">
+                  {offenesMaterial && (
+                    <span className="ab-detail-art">
+                      {quelleLabel(offenesMaterial)}
+                    </span>
+                  )}
+                  <h2 className="ab-detail-titel">
+                    {offenesMaterial
+                      ? offenesMaterial.titel
+                      : offenerLernweg.label}
+                  </h2>
+                  {detailTags.length > 0 && (
+                    <div className="ab-detail-tags">
+                      {detailTags.map((t) => (
+                        <span className="ab-tag" key={t}>
+                          {t}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <button
+                  type="button"
+                  className="ab-detail-zu"
+                  onClick={schliesseDetail}
+                  aria-label="Schließen"
+                >
+                  ✕
+                </button>
+              </div>
+              <div className="ab-detail-inhalt">
+                {offenesMaterial ? (
+                  <MaterialInhalt material={offenesMaterial} />
+                ) : (
+                  <KbInhalt key={offenerLernweg.id} kb={offenerLernweg} kompakt />
+                )}
+              </div>
+            </aside>
+          )}
         </div>
 
         {uploadOffen && (
@@ -344,62 +605,9 @@ export default function Ablage() {
             onClose={() => setUploadOffen(false)}
           />
         )}
-        {offenesMaterial && (
-          <MaterialAnsicht
-            material={offenesMaterial}
-            onClose={() => setOffenesMaterial(null)}
-          />
-        )}
-        {offenerLernweg && (
-          <div
-            className="ab-overlay"
-            role="dialog"
-            aria-modal="true"
-            onClick={() => setOffenerLernweg(null)}
-          >
-            <div className="ab-overlay-karte" onClick={(e) => e.stopPropagation()}>
-              <div className="ab-overlay-kopf">
-                <h2 className="ab-overlay-titel">{offenerLernweg.label}</h2>
-                <button
-                  type="button"
-                  className="ab-overlay-zu"
-                  onClick={() => setOffenerLernweg(null)}
-                  aria-label="Schließen"
-                >
-                  ✕
-                </button>
-              </div>
-              <div className="ab-overlay-inhalt">
-                <KbInhalt key={offenerLernweg.id} kb={offenerLernweg} kompakt />
-              </div>
-            </div>
-          </div>
-        )}
       </div>
-      {/* Untere Leiste (konsistent mit Weg-Leiste/Planung): Suche + Hinzufügen.
-          Bewusst außerhalb von .ab-screen: dessen screen-rein-Animation hält einen
-          Identity-Transform und würde die fixe Pille sonst an den (hohen) Screen
-          statt an den Viewport hängen. */}
-      <div className="ab-top">
-        <div className="ab-suche">
-          <Icon name="search" />
-          <input
-            type="text"
-            value={suche}
-            onChange={(e) => setSuche(e.target.value)}
-            onFocus={() => setFachId(null)}
-            placeholder="Suche"
-            aria-label="Ablage durchsuchen"
-          />
-        </div>
-        <button
-          type="button"
-          className="ab-add"
-          onClick={() => setUploadOffen(true)}
-        >
-          <span aria-hidden="true">✦</span> Hinzufügen
-        </button>
-      </div>
+      {vorn !== false &&
+        (untenSlot ? createPortal(untenLeiste, untenSlot) : untenLeiste)}
     </>
   );
 }

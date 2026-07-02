@@ -32,7 +32,7 @@
   height: 100%;
   background: var(--ok-text);
   border-radius: 2px;
-  transition: width 0.3s ease;
+  transition: width var(--dur-slow) var(--ease-out);
 }
 
 /* Abschnitte als auf-/zuklappbare Karten */
@@ -82,10 +82,10 @@
 }
 .mb-pfeil {
   flex: none;
-  font-size: 1.25rem;
-  line-height: 1;
+  display: inline-flex;
+  align-items: center;
   color: var(--muted);
-  transition: transform 0.18s ease;
+  transition: transform var(--dur-base) var(--ease-in-out);
 }
 .mb-pfeil.auf {
   transform: rotate(90deg);
@@ -123,7 +123,8 @@
   text-align: left;
   padding: 10px 12px;
   cursor: pointer;
-  transition: border-color 0.12s ease, background 0.12s ease;
+  transition: border-color var(--dur-press) var(--ease-out),
+    background var(--dur-press) var(--ease-out);
 }
 .mb-regel:hover {
   border-color: var(--line-strong);
@@ -146,7 +147,8 @@
   font-weight: 700;
   color: var(--on-accent);
   background: transparent;
-  transition: background 0.12s ease, border-color 0.12s ease;
+  transition: background var(--dur-press) var(--ease-out),
+    border-color var(--dur-press) var(--ease-out);
 }
 .mb-regel.ok .mb-haken {
   background: var(--ok-text);
@@ -195,7 +197,7 @@
 }
 .mb-tabelle tbody tr {
   cursor: pointer;
-  transition: background 0.12s ease;
+  transition: background var(--dur-press) var(--ease-out);
 }
 .mb-tabelle tbody tr:hover {
   background: var(--card-2);

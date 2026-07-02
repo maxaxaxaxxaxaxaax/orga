@@ -12,7 +12,7 @@
   background: color-mix(in srgb, var(--bg) 58%, transparent);
   -webkit-backdrop-filter: blur(2px);
   backdrop-filter: blur(2px);
-  animation: intro-fade 0.3s ease both;
+  animation: intro-fade var(--dur-overlay) var(--ease-out) both;
 }
 @keyframes intro-fade {
   from {
@@ -33,7 +33,7 @@
   border-radius: var(--r-lg, 20px);
   box-shadow: var(--shadow-lg);
   padding: 26px 26px 22px;
-  animation: intro-auf 0.4s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  animation: intro-auf var(--dur-overlay) var(--ease-out) both;
 }
 @keyframes intro-auf {
   from {
@@ -72,7 +72,7 @@
   border-radius: 999px;
   cursor: pointer;
   box-shadow: 0 6px 18px -6px color-mix(in srgb, var(--intro-teal) 70%, transparent);
-  transition: background 0.15s ease, transform 0.12s ease;
+  transition: background var(--dur-fast) var(--ease-out), transform var(--dur-press) var(--ease-out);
 }
 .intro-los:hover {
   background: var(--intro-teal-strong);

@@ -6,9 +6,16 @@
   inset: 0;
   z-index: 200;
   background: var(--bg);
+  color: var(--text);
+  /* Gleiche Werkschrift wie Übersicht und Ablage (Satoshi), damit die ganze App
+     eine Designsprache spricht. */
+  font-family: var(--font-satoshi);
   display: flex;
   flex-direction: column;
-  animation: fokus-rein 0.3s ease both;
+  animation: fokus-rein var(--dur-overlay) var(--ease-out) both;
+}
+.fokus :is(h1, h2, h3) {
+  font-family: var(--font-satoshi);
 }
 @keyframes fokus-rein {
   from {
@@ -41,7 +48,7 @@
   color: var(--text-2);
   font-size: 1rem;
   cursor: pointer;
-  transition: border-color 0.12s ease, color 0.12s ease;
+  transition: border-color var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out);
 }
 .fokus-zu:hover {
   border-color: var(--accent);
@@ -108,7 +115,7 @@
   padding: 7px 13px;
   border-radius: 999px;
   cursor: pointer;
-  transition: border-color 0.12s ease, color 0.12s ease;
+  transition: border-color var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out);
 }
 .fokus-wechsel:hover {
   border-color: var(--accent);
@@ -126,7 +133,7 @@
   height: 100%;
   background: var(--accent);
   border-radius: 2px;
-  transition: width 0.35s cubic-bezier(0.2, 0.7, 0.2, 1);
+  transition: width var(--dur-overlay) var(--ease-out);
 }
 
 /* ---- Körper: gemeinsames 12-Spalten-Raster ----------------------------- */
@@ -168,7 +175,9 @@
   border: 1px solid var(--line);
   border-radius: 999px;
   box-shadow: var(--shadow-sm);
-  /* Volle Höhe wie die Mitte (Werkzeuge bleiben oben). */
+  /* Nur so hoch wie die Icons und oben verankert: nicht auf die volle Spaltenhöhe
+     ziehen (sonst eine lange, halb leere Pille). */
+  align-self: start;
 }
 .fokus-wz {
   position: relative;
@@ -182,7 +191,7 @@
   color: var(--text-2);
   border-radius: 50%;
   cursor: pointer;
-  transition: background 0.14s ease, color 0.14s ease, border-color 0.14s ease;
+  transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out);
 }
 .fokus-wz:hover {
   background: var(--bg);
@@ -244,7 +253,8 @@
   min-height: 100%;
   background: var(--card);
   border: 1px solid var(--line);
-  border-radius: var(--r-lg, 16px);
+  border-radius: var(--r-lg, 20px);
+  box-shadow: var(--shadow-sm);
   overflow: hidden;
 }
 .fokus-material-kopf {
@@ -257,20 +267,16 @@
 }
 .fokus-mat-art {
   flex-shrink: 0;
-  font-size: 0.66rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--accent);
-  background: var(--accent-soft);
-  padding: 3px 8px;
-  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--muted);
 }
 .fokus-material-titel {
   flex: 1;
   min-width: 0;
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
   color: var(--text);
   white-space: nowrap;
   overflow: hidden;
@@ -300,10 +306,11 @@
 }
 .fokus-mitte-leer-titel {
   margin: 0;
-  font-family: var(--font-display);
-  font-weight: 600;
+  font-family: var(--font-satoshi);
+  font-weight: 700;
   font-size: 1.5rem;
   line-height: 1.2;
+  letter-spacing: -0.01em;
   color: var(--text);
 }
 .fokus-eyebrow {
@@ -462,7 +469,7 @@
   border: 1px solid var(--line);
   border-radius: 999px;
   cursor: pointer;
-  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  transition: background var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
 }
 .fokus-gefuehl-knopf:hover {
   border-color: var(--line-strong);
@@ -521,7 +528,7 @@
   color: var(--text-2);
   cursor: pointer;
   border-radius: 999px;
-  transition: background 0.12s ease, color 0.12s ease;
+  transition: background var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out);
 }
 .fokus-sl-zurueck:hover {
   background: color-mix(in srgb, var(--text) 8%, transparent);
@@ -531,13 +538,13 @@
   border: none;
   background: var(--accent);
   color: var(--on-accent);
-  font-size: 0.9rem;
+  font-size: 0.92rem;
   font-weight: 700;
-  padding: 10px 18px;
+  padding: 11px 20px;
   border-radius: 999px;
   cursor: pointer;
-  box-shadow: 0 6px 16px -7px var(--accent-shadow);
-  transition: background 0.15s ease, transform 0.12s ease;
+  box-shadow: 0 4px 14px -4px var(--accent-shadow);
+  transition: background var(--dur-fast) var(--ease-out), transform var(--dur-press) var(--ease-out);
 }
 .fokus-sl-weiter:hover:not(:disabled) {
   background: var(--accent-strong);
@@ -573,10 +580,10 @@
   flex-direction: column;
   background: var(--card);
   border: 1px solid var(--line);
-  border-radius: var(--r-lg, 16px);
+  border-radius: var(--r-lg, 20px);
   box-shadow: var(--shadow-lg);
   overflow: hidden;
-  animation: fokus-panel-rein 0.22s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  animation: fokus-panel-rein var(--dur-base) var(--ease-out) both;
 }
 @keyframes fokus-panel-rein {
   from {
@@ -622,7 +629,7 @@
   border-radius: 999px;
   cursor: pointer;
   white-space: nowrap;
-  transition: background 0.14s ease, color 0.14s ease;
+  transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
 }
 .fokus-panel-tab.an {
   background: var(--accent);
@@ -719,7 +726,7 @@
   padding: 9px 16px;
   border-radius: 999px;
   cursor: pointer;
-  transition: background 0.15s ease;
+  transition: background var(--dur-fast) var(--ease-out);
 }
 .fokus-lc-senden:hover:not(:disabled) {
   background: var(--accent-strong);
@@ -862,13 +869,14 @@
   gap: 10px;
   background: var(--card);
   border: 1px solid var(--line);
-  border-radius: var(--r-lg, 16px);
-  padding: 14px;
+  border-radius: var(--r-lg, 20px);
+  padding: 20px;
+  box-shadow: var(--shadow-sm);
   box-sizing: border-box;
   overflow: hidden;
-  /* Endet auf Höhe der Schrittleiste, damit die Seitenpanels nicht weiter
-     nach unten reichen als der Inhalt der anderen Screens. */
-  margin-bottom: 64px;
+  /* Volle Höhe wie Mitte und Chats: der 90px-Boden des .fokus-koerper hält unten
+     schon Platz für die schwebende Schrittleiste frei (keine extra Marge nötig,
+     sonst wäre die Leiste kürzer als die anderen Panels). */
 }
 
 /* ---- Rechtes Panel: Chats (Lerncoach = KI, Tutor = Mensch) ------------ */
@@ -882,8 +890,9 @@
   gap: 12px;
   background: var(--card);
   border: 1px solid var(--line);
-  border-radius: var(--r-lg, 16px);
-  padding: 14px;
+  border-radius: var(--r-lg, 20px);
+  padding: 20px;
+  box-shadow: var(--shadow-sm);
   box-sizing: border-box;
   overflow: hidden;
   /* Volle Höhe wie die Mitte (der .fokus-koerper-Boden lässt unten schon Platz
@@ -900,12 +909,18 @@
   flex-shrink: 0;
   width: 30px;
   height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border-radius: 50%;
   border: 1px solid var(--line);
   background: var(--card);
   color: var(--text-2);
-  font-size: 0.9rem;
   cursor: pointer;
+}
+/* Die Chats klappen nach OBEN auf: zugeklappt zeigt das Chevron hoch (nicht rechts). */
+.fokus-chats-toggle[aria-expanded="false"] .klapp-chevron {
+  transform: rotate(180deg);
 }
 .fokus-chats-toggle:hover {
   border-color: var(--accent);
@@ -930,7 +945,7 @@
   background: var(--card);
   color: var(--text-2);
   cursor: pointer;
-  transition: border-color 0.12s ease, color 0.12s ease, background 0.12s ease;
+  transition: border-color var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out), background var(--dur-press) var(--ease-out);
 }
 .fokus-chats-auge svg {
   width: 18px;
@@ -1034,7 +1049,7 @@
 }
 .fokus-chats-titel {
   font-family: var(--font-satoshi);
-  font-size: 1.25rem;
+  font-size: 1.05rem;
   font-weight: 700;
   letter-spacing: -0.01em;
   color: var(--text);
@@ -1059,7 +1074,7 @@
   border-radius: 999px;
   cursor: pointer;
   white-space: nowrap;
-  transition: background 0.14s ease, color 0.14s ease;
+  transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
 }
 .fokus-chats-tab.an {
   background: var(--accent-soft);
@@ -1077,13 +1092,6 @@
   font-size: 0.75rem;
   line-height: 1.4;
   color: var(--muted);
-}
-/* Sanfter Glas-Effekt auf den seitlichen Panels (Figma "Glas"). */
-.fokus-rail,
-.fokus-chats {
-  background: color-mix(in srgb, var(--card) 82%, transparent);
-  -webkit-backdrop-filter: blur(16px) saturate(1.3);
-  backdrop-filter: blur(16px) saturate(1.3);
 }
 .fokus-rail-kopf {
   flex-shrink: 0;
@@ -1124,7 +1132,7 @@
 .fokus-rail-titel {
   margin: 0;
   font-family: var(--font-satoshi);
-  font-size: 1.25rem;
+  font-size: 1.05rem;
   font-weight: 700;
   letter-spacing: -0.01em;
   color: var(--text);
@@ -1166,16 +1174,16 @@
   padding: 5px 10px;
   border-radius: 999px;
   cursor: pointer;
-  transition: border-color 0.12s ease, color 0.12s ease, background 0.12s ease;
+  transition: border-color var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out), background var(--dur-press) var(--ease-out);
 }
 .fokus-chip:hover {
   border-color: var(--accent);
   color: var(--accent);
 }
 .fokus-chip.an {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--on-accent);
+  background: var(--accent-soft);
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--line));
+  color: var(--accent-strong);
 }
 .fokus-chip-icon {
   width: 14px;
@@ -1235,7 +1243,7 @@
 }
 .fokus-rail-klick {
   cursor: pointer;
-  transition: border-color 0.12s ease, background 0.12s ease;
+  transition: border-color var(--dur-press) var(--ease-out), background var(--dur-press) var(--ease-out);
 }
 .fokus-rail-klick:hover {
   border-color: var(--accent);
@@ -1301,7 +1309,7 @@
   padding: 8px 14px;
   border-radius: 999px;
   cursor: pointer;
-  transition: border-color 0.12s ease, color 0.12s ease;
+  transition: border-color var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out);
 }
 .fokus-mat-add:hover {
   border-color: var(--accent);
@@ -1447,8 +1455,8 @@
 }
 .fokus-titel {
   margin: 0;
-  font-family: var(--font-display);
-  font-weight: 600;
+  font-family: var(--font-satoshi);
+  font-weight: 700;
   font-size: 2rem;
   line-height: 1.12;
   letter-spacing: -0.01em;
@@ -1472,7 +1480,7 @@
   border-radius: 999px;
   cursor: pointer;
   box-shadow: 0 6px 18px -6px var(--accent-shadow);
-  transition: background 0.15s ease, transform 0.12s ease;
+  transition: background var(--dur-fast) var(--ease-out), transform var(--dur-press) var(--ease-out);
 }
 .fokus-weiter:hover {
   background: var(--accent-strong);
@@ -1490,7 +1498,7 @@
   padding: 13px 18px;
   border-radius: 999px;
   cursor: pointer;
-  transition: border-color 0.12s ease, color 0.12s ease;
+  transition: border-color var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out);
 }
 .fokus-sekundaer:hover {
   border-color: var(--accent);

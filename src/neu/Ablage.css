@@ -2,14 +2,14 @@
    Materialien mit Typ-Chips, Suche/Sortierung und Liste. Nutzt die globalen
    CSS-Variablen (Hell). */
 .ab-screen {
-  min-height: 100vh;
+  min-height: 100dvh;
   box-sizing: border-box;
-  /* oben Platz für die Nav-Pille, unten für die schwebende Suche/Hinzufügen-Pille */
-  padding: var(--seite-top) var(--seite-x) var(--seite-bottom);
+  /* Exakt derselbe Rahmen wie die Übersicht (.hu-screen): ~28px zur Nav (oben), zur
+     Leiste (unten) und zu den Rändern. 93 = Nav-Unterkante + 28, 101 = Leiste + 28. */
+  padding: 93px var(--seite-x) 101px;
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-satoshi);
-  /* Spalte, damit die Netz-Ansicht die volle Höhe füllen kann (wie die Übersicht). */
   display: flex;
   flex-direction: column;
 }
@@ -31,6 +31,8 @@
   left: 50%;
   transform: translateX(-50%);
   z-index: 60;
+  /* Weich einblenden statt zu springen; die Leiste sitzt fest (portaliert). */
+  animation: ab-top-rein var(--dur-base) var(--ease-out) both;
   display: inline-flex;
   align-items: center;
   gap: 10px;
@@ -46,6 +48,19 @@
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), var(--shadow-lg);
   -webkit-backdrop-filter: blur(30px) saturate(1.9) brightness(1.03);
   backdrop-filter: blur(30px) saturate(1.9) brightness(1.03);
+}
+@keyframes ab-top-rein {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ab-top {
+    animation: none;
+  }
 }
 .ab-suche {
   width: min(360px, 56vw);
@@ -92,7 +107,8 @@
   border-radius: 999px;
   cursor: pointer;
   box-shadow: 0 4px 14px -4px var(--accent-shadow);
-  transition: background 0.15s ease, transform 0.12s ease;
+  transition: background var(--dur-fast) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
 }
 .ab-add:hover {
   background: var(--accent-strong);
@@ -106,76 +122,130 @@
 /* Eine Spalte: nur noch die Materialien-Karte (die Fächer sind oben drin). */
 .ab-grid {
   position: relative;
-  flex: 1;
-  min-height: 0;
   display: flex;
   flex-direction: column;
+  /* Höhe exakt wie das Übersicht-Raster deckeln: zu lange Box-Inhalte scrollen
+     INNERHALB der Box, statt unter die untere Pille zu wachsen. Mobil aufgehoben. */
+  min-height: calc(100dvh - 93px - 101px);
+  max-height: calc(100dvh - 93px - 101px);
 }
-/* Netz-Ansicht: Karte + Netz füllen die verbleibende Höhe bis zur unteren Leiste. */
-.ab-card.ab-fuellt {
-  flex: 1;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-}
-.ab-fuellt .ab-netz {
-  position: relative;
-  flex: 1;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-}
-/* Fächer-Ordner als schwebende Pille oben mittig auf dem Netz (nur Netz-Ansicht). */
-.ab-faecher-overlay {
-  position: absolute;
-  top: 8px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 4;
-  flex-wrap: nowrap;
-  margin: 0;
-  padding: 6px 8px;
-  border-bottom: none;
-  background: color-mix(in srgb, var(--card) 82%, transparent);
-  border: 1px solid var(--line);
-  border-radius: 16px;
-  box-shadow: var(--shadow-sm);
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
-  max-width: calc(100% - 20px);
-}
-.ab-fuellt .netz {
-  flex: 1;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-}
-.ab-fuellt .netz-flaeche {
-  flex: 1;
-  height: auto;
-  min-height: 0;
+@media (max-width: 960px) {
+  .ab-grid {
+    max-height: none;
+  }
 }
 
+/* Split-View: Liste links, ausgewähltes Dokument rechts. Beide sind eine Box wie
+   auf der Übersicht; das Dokument kommt von rechts herein. */
+.ab-grid.ab-split {
+  flex-direction: row;
+  gap: var(--grid-gap, 18px);
+  align-items: stretch;
+}
+.ab-detail {
+  flex: 1.1 1 0;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  animation: ab-detail-rein var(--dur-slow) var(--ease-out) both;
+}
+@keyframes ab-detail-rein {
+  from {
+    opacity: 0;
+    transform: translateX(40px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.ab-detail-kopf {
+  flex-shrink: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--line);
+}
+.ab-detail-titel-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.ab-detail-art {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+.ab-detail-titel {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+.ab-detail-zu {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--line-strong);
+  background: var(--card);
+  color: var(--text-2);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: border-color var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+.ab-detail-zu:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.ab-detail-inhalt {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  margin: 0 -4px;
+  padding: 0 4px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ab-detail {
+    animation: none;
+  }
+}
+/* Schmal: das Dokument nimmt die ganze Breite, die Liste tritt zurück. */
+@media (max-width: 860px) {
+  .ab-grid.ab-split .ab-materialien {
+    display: none;
+  }
+  .ab-detail {
+    flex: 1;
+  }
+}
 .ab-card {
   background: var(--card);
   border: 1px solid var(--line);
   border-radius: var(--r-lg, 20px);
-  padding: 18px 20px;
+  padding: 20px 22px;
   box-shadow: var(--shadow-sm);
 }
 .ab-card-titel {
   display: flex;
   align-items: center;
-  gap: 9px;
-  margin: 0 0 14px;
-  font-size: 1.15rem;
+  gap: 8px;
+  margin: 0 0 16px;
+  font-size: 1.05rem;
   font-weight: 700;
   letter-spacing: -0.01em;
   color: var(--text);
 }
 .ab-card-icon {
-  width: 19px;
-  height: 19px;
+  width: 18px;
+  height: 18px;
   flex-shrink: 0;
   fill: none;
   /* Aktiv-Farbe (Teal) wie die aktive Nav-Pille oben. */
@@ -192,8 +262,12 @@
   flex-wrap: wrap;
   gap: 6px 4px;
   margin: 0 0 14px;
-  padding-bottom: 14px;
-  border-bottom: 1px solid var(--line);
+  /* Beim Runterscrollen einziehen (siehe .ab-materialien.eingezogen). */
+  overflow: hidden;
+  max-height: 160px;
+  transition: max-height var(--dur-base) var(--ease-out),
+    opacity var(--dur-fast) var(--ease-out),
+    margin-bottom var(--dur-base) var(--ease-out);
 }
 .ab-ordner {
   display: flex;
@@ -205,7 +279,8 @@
   border-radius: var(--r-md, 14px);
   background: transparent;
   cursor: pointer;
-  transition: background 0.14s ease, border-color 0.14s ease;
+  transition: background var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out);
 }
 .ab-ordner:hover {
   background: var(--card-2);
@@ -332,12 +407,29 @@
 /* Materialien */
 .ab-materialien {
   min-width: 0;
+  /* Füllt die Höhe wie eine Übersicht-Box; nur die Liste scrollt innen. */
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
+.ab-materialien > .ab-mat-kopf,
+.ab-materialien > .ab-faecher-leiste,
+.ab-materialien > .ab-filterzeile {
+  flex-shrink: 0;
+}
+.ab-mat-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  margin: 0 -4px;
+  padding: 0 4px;
+}
+/* Untertitel unter dem Karten-Titel, exakt wie .hu-karte-sub der Übersicht. */
 .ab-mat-fach {
-  margin: -8px 0 14px;
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: var(--accent);
+  margin: -10px 0 14px;
+  font-size: 0.84rem;
+  color: var(--muted);
 }
 /* Kopf mit Liste/Netz-Umschalter */
 .ab-mat-kopf {
@@ -346,86 +438,80 @@
   justify-content: space-between;
   gap: 12px;
 }
-.ab-ansicht {
-  flex-shrink: 0;
-  display: inline-flex;
-  gap: 2px;
-  padding: 3px;
-  background: var(--card-2);
-  border: 1px solid var(--line);
-  border-radius: 999px;
-}
-.ab-ansicht-chip {
-  border: none;
-  background: transparent;
-  color: var(--text-2);
-  font-size: 0.82rem;
-  font-weight: 600;
-  padding: 6px 14px;
-  border-radius: 999px;
-  cursor: pointer;
-  transition: background 0.14s ease, color 0.14s ease;
-}
-.ab-ansicht-chip:hover {
-  color: var(--text);
-}
-.ab-ansicht-chip.an {
-  background: var(--accent);
-  color: var(--on-accent);
-}
-.ab-netz {
-  margin-top: 4px;
-}
-
 /* Typ-Chips */
+/* Filter-Chips und Sortieren teilen sich eine Zeile: Chips links, Sortieren rechts
+   auf gleicher Höhe. */
+.ab-filterzeile {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+  /* Beim Runterscrollen einziehen. overflow:hidden clippt sonst das Sortier-Menü,
+     daher wird es nur sichtbar, solange das Menü offen ist (.sort-offen). */
+  overflow: hidden;
+  max-height: 160px;
+  transition: max-height var(--dur-base) var(--ease-out),
+    opacity var(--dur-fast) var(--ease-out),
+    margin-bottom var(--dur-base) var(--ease-out);
+}
+.ab-filterzeile.sort-offen {
+  overflow: visible;
+}
+/* Ordner + Filter eingezogen (nach unten gescrollt): Höhe auf 0, ausgeblendet. */
+.ab-materialien.eingezogen .ab-faecher-leiste,
+.ab-materialien.eingezogen .ab-filterzeile {
+  max-height: 0;
+  opacity: 0;
+  margin-bottom: 0;
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ab-faecher-leiste,
+  .ab-filterzeile {
+    transition: none;
+  }
+}
 .ab-chips {
+  flex: 1;
+  min-width: 0;
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-bottom: 18px;
 }
+/* Filter-Chips: neutral (wie die Übersicht zurückhaltend mit Teal umgeht), nur der
+   aktive Chip in Accent-Soft wie die aktive Nav-Pille. */
 .ab-chip {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  border: 1px solid transparent;
-  background: var(--accent-soft);
-  color: var(--accent);
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--text-2);
   font-size: 0.82rem;
   font-weight: 600;
   padding: 7px 14px;
   border-radius: 999px;
   cursor: pointer;
-  transition: background 0.14s ease, border-color 0.14s ease, color 0.14s ease;
+  transition: background var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
 }
 .ab-chip:hover {
-  background: color-mix(in srgb, var(--accent) 16%, var(--card));
+  background: var(--card-2);
+  color: var(--text);
 }
 .ab-chip-icon {
   width: 15px;
   height: 15px;
 }
 .ab-chip.an {
-  background: var(--card);
-  border-color: var(--accent);
-  color: var(--accent);
+  background: var(--accent-soft);
+  border-color: transparent;
+  color: var(--accent-strong);
 }
 
 /* Listenkopf: Raster + Sortieren rechts (die Suche liegt nur noch unten in der Pille). */
-.ab-liste-kopf {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 12px;
-  margin-bottom: 12px;
-}
-.ab-liste-werkzeuge {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-shrink: 0;
-}
-
 /* Sortieren-Dropdown */
 .ab-sort {
   position: relative;
@@ -442,6 +528,13 @@
   font-weight: 600;
   padding: 8px 6px;
   cursor: pointer;
+}
+/* Dropdown-Chevron: dreht animiert nach oben, solange das Menü offen ist. */
+.ab-sort-chevron {
+  transition: transform var(--dur-base) var(--ease-in-out);
+}
+.ab-sort-knopf[aria-expanded="true"] .ab-sort-chevron {
+  transform: rotate(180deg);
 }
 .ab-sort-menue {
   position: absolute;
@@ -495,19 +588,21 @@
   text-align: left;
   font: inherit;
   color: inherit;
-  padding: 13px 16px;
-  background: color-mix(in srgb, var(--accent) 4%, var(--card));
-  border: 1px solid color-mix(in srgb, var(--accent) 9%, var(--line));
+  padding: 10px 12px;
+  background: transparent;
+  border: 1px solid transparent;
   border-radius: var(--r-md, 14px);
 }
 .ab-zeile-klick {
   cursor: pointer;
-  transition: background 0.14s ease, border-color 0.14s ease,
-    transform 0.1s ease;
+  transition: background var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
 }
+/* Ruhiger, neutraler Hover wie in der Übersicht (kein Teil-Teal je Zeile). */
 .ab-zeile-klick:hover {
-  background: var(--accent-soft);
-  border-color: color-mix(in srgb, var(--accent) 28%, var(--line));
+  background: var(--card-2);
+  border-color: var(--line);
 }
 .ab-zeile-klick:active {
   transform: scale(0.995);
@@ -515,7 +610,7 @@
 .ab-zeile-icon {
   flex-shrink: 0;
   display: inline-flex;
-  color: var(--accent);
+  color: var(--text-2);
 }
 .ab-zeile-titel {
   flex: 1;
@@ -545,12 +640,106 @@
   padding: 2px 9px;
   white-space: nowrap;
 }
+/* Quell-Badge: zeigt, dass orca das Material automatisch aus YouTube einsortiert hat. */
+.ab-zeile-quelle {
+  flex-shrink: 0;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #b3261e;
+  background: color-mix(in srgb, #ff0000 9%, var(--card));
+  border: 1px solid color-mix(in srgb, #ff0000 20%, var(--line));
+  border-radius: 999px;
+  padding: 2px 8px;
+  white-space: nowrap;
+}
+/* Auto-Tags "was es ist": kleine, ruhige Chips an der Zeile und im Detail. */
+.ab-zeile-tags {
+  flex-shrink: 0;
+  display: inline-flex;
+  gap: 6px;
+}
+.ab-tag {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-2);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 2px 9px;
+  white-space: nowrap;
+}
+.ab-detail-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
 .ab-liste-leer {
   margin: 0;
   padding: 18px 4px;
   font-size: 0.9rem;
   color: var(--muted);
   font-style: italic;
+}
+
+/* Gruppierter Fach-Baum: Kategorie > Subkategorie > Lernweg (Aufgabe) > Materialien.
+   Strukturiert den offenen Fach-Ordner statt einer flachen Liste. */
+.ab-baum {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.ab-kat {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.ab-kat-titel {
+  margin: 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--line);
+  font-size: 1.02rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+.ab-sub {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.ab-sub-titel {
+  margin: 0;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+/* Lernweg-Gruppe: der Lernweg-Kopf (Aufgabe) und darunter seine Materialien. */
+.ab-lw-liste {
+  gap: 4px;
+}
+.ab-lw-kopf .ab-zeile-titel {
+  font-weight: 700;
+}
+/* Teal nur am Lernweg-Kopf (die Aufgabe), nicht an jeder Material-Zeile. */
+.ab-lw-kopf .ab-zeile-icon {
+  color: var(--accent);
+}
+.ab-lw-label {
+  padding: 6px 4px 2px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text);
+}
+/* Material unter seinem Lernweg eingerückt (sonst dieselbe ruhige Zeile). */
+.ab-unter .ab-zeile {
+  margin-left: 22px;
+  width: calc(100% - 22px);
+}
+@media (max-width: 560px) {
+  .ab-unter .ab-zeile {
+    margin-left: 12px;
+    width: calc(100% - 12px);
+  }
 }
 
 /* Lernweg-Detail als Overlay */

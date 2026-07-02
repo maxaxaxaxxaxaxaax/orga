@@ -9,6 +9,8 @@ import {
   IcNotiz,
   IcBuch,
   IcKi,
+  IcVideo,
+  IcLink,
 } from "./materialIcons";
 
 // Material-Art -> Filter-Chip.
@@ -21,6 +23,8 @@ export const ART_CHIP = {
   zusammenfassung: "notizen",
   pdf: "buch",
   bild: "buch",
+  video: "video",
+  link: "link",
 };
 export const CHIP_ICON = {
   lernwege: IcLernweg,
@@ -29,6 +33,8 @@ export const CHIP_ICON = {
   notizen: IcNotiz,
   ki: IcKi,
   buch: IcBuch,
+  video: IcVideo,
+  link: IcLink,
 };
 export const CHIPS = [
   { key: "alle", label: "Alle", Icon: null },
@@ -38,6 +44,8 @@ export const CHIPS = [
   { key: "notizen", label: "Notizen", Icon: IcNotiz },
   { key: "ki", label: "KI", Icon: IcKi },
   { key: "buch", label: "Buchseiten", Icon: IcBuch },
+  { key: "video", label: "Videos", Icon: IcVideo },
+  { key: "link", label: "Links", Icon: IcLink },
 ];
 
 // Welcher Filter-Chip gehört zu einem Material? Interaktive Übungen zählen als

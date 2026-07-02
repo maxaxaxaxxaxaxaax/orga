@@ -33,7 +33,7 @@
   box-shadow: var(--shadow-md, 0 8px 24px rgba(0, 0, 0, 0.14));
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.12s ease;
+  transition: opacity var(--dur-fast) var(--ease-out);
   pointer-events: none;
   text-align: left;
   white-space: normal;

@@ -5,7 +5,7 @@ import "./Topbar.css";
 // Topbar oben rechts: ruhiger Anker für die Einstellungen (Dropdown). Die
 // Nachrichten/Mitteilungen sind jetzt eine eigene Box auf der Übersicht und nicht
 // mehr hier in einer Glocke. Ein Klick daneben schließt das Dropdown.
-export default function Topbar({ onResetDemo, onAbmelden }) {
+export default function Topbar({ onResetDemo, onAbmelden, onDiscord }) {
   const [offen, setOffen] = useState(false);
 
   return (
@@ -48,6 +48,18 @@ export default function Topbar({ onResetDemo, onAbmelden }) {
               Demo-Profil des Theresianum Mainz. Dein Stand bleibt nur auf diesem
               Gerät.
             </p>
+            {onDiscord && (
+              <button
+                type="button"
+                className="topbar-discord"
+                onClick={() => {
+                  setOffen(false);
+                  onDiscord();
+                }}
+              >
+                Discord verbinden
+              </button>
+            )}
             <button type="button" className="topbar-reset" onClick={onResetDemo}>
               Demo neu starten
             </button>

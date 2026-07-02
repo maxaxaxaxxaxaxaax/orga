@@ -73,7 +73,7 @@
   font-size: 0.8rem;
   border-radius: 50%;
   cursor: pointer;
-  transition: color 0.12s ease, border-color 0.12s ease;
+  transition: color var(--dur-press) var(--ease-out), border-color var(--dur-press) var(--ease-out);
 }
 .cf-weg:hover {
   color: var(--ok-text);

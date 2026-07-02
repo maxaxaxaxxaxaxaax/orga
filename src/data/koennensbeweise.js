@@ -9,12 +9,14 @@ export const etappeWochen = 6;
 // Reihenfolge wie auf dem Schulplaner-Blatt.
 export const kbFaecher = ["Mathematik", "Deutsch", "Englisch", "Französisch"];
 
+// Fach-Farben der Lernfächer: identisch mit fachFarbe (dieselben Töne aus dem einen
+// Kategorie-System), das Teal bleibt dem Akzent vorbehalten.
 export const kbFarbe = {
-  Latein: "#7048e8",
+  Latein: "#B9A6FA",
   Englisch: "#FF7DA9",
-  Deutsch: "#61DA85",
+  Deutsch: "#75E0A0",
   Mathematik: "#7DC0FE",
-  Griechisch: "#0c8599",
+  Griechisch: "#FFB392",
   Französisch: "#FFE37D",
 };
 

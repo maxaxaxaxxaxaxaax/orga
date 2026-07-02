@@ -65,26 +65,59 @@ export async function pruefeVision() {
   );
 }
 
+// Materialien als kompakte Liste für den System-Prompt: Titel, Tags (was es ist),
+// Art, Thema. Die Tags helfen der KI, jedes Material grob einzuordnen.
+function materialListe(materialien) {
+  if (!materialien.length) return "(noch keine Materialien)";
+  return materialien
+    .map((m) => {
+      const tags = m.tags?.length ? ` [${m.tags.join(", ")}]` : "";
+      const meta = [m.art, m.thema ? `Thema: ${m.thema}` : null]
+        .filter(Boolean)
+        .join(", ");
+      return `- ${m.titel}${tags} (${meta})`;
+    })
+    .join("\n");
+}
+
+// Volltext der eingefügten Webseiten (gescrapte Links): damit die KI wirklich über
+// den Seiteninhalt sprechen kann, nicht nur über den Titel. Gesamt-Budget begrenzt,
+// damit der Kontext nicht ausufert.
+function webseitenText(materialien, ausser) {
+  const links = (materialien || []).filter(
+    (m) =>
+      (m.art === "link" || m.quelle === "link") && m.inhalt && m.id !== ausser
+  );
+  if (!links.length) return null;
+  let budget = 3000;
+  const teile = [];
+  for (const m of links) {
+    if (budget < 300) break;
+    const txt = String(m.inhalt).slice(0, Math.min(1500, budget));
+    budget -= txt.length;
+    teile.push(`„${m.titel}“${m.url ? ` (${m.url})` : ""}:\n${txt}`);
+  }
+  return teile.join("\n\n");
+}
+
 function systemPrompt(kontextName, materialien) {
-  const liste = materialien.length
-    ? materialien
-        .map(
-          (m) =>
-            `- ${m.titel} (${m.art}${m.thema ? `, Thema: ${m.thema}` : ""})`
-        )
-        .join("\n")
-    : "(noch keine Materialien)";
+  const seiten = webseitenText(materialien);
   return [
     "Du bist ein freundlicher Lern-Assistent für eine Schülerin oder einen Schüler der Klasse 7 (12 bis 14 Jahre).",
     "Antworte ausschließlich auf Deutsch, niemals in einer anderen Sprache.",
     "Gib genau eine kurze, hilfreiche Antwort (höchstens vier Sätze). Erfinde keine weitere Unterhaltung und gib dir keine eigenen Folgefragen.",
     "Schreibe einfach und kindgerecht. Verwende keine Gedankenstriche.",
     `Es geht um die folgenden Lern-Materialien zu ${kontextName}:`,
-    liste,
+    materialListe(materialien),
+    seiten
+      ? `Inhalt der eingefügten Webseiten (nutze ihn, um über die Seiten zu sprechen):\n${seiten}`
+      : null,
     "Hilf, mit genau diesen Materialien zu lernen, und nenne passende Materialien beim Namen.",
     "Gib keine fertigen Lösungen für Aufgaben vor, sondern leite mit einer kurzen Rückfrage zum Selberdenken an.",
     "Wenn ein Bild mitgeschickt wird, schau es dir genau an und beziehe dich konkret auf das, was darauf zu sehen ist.",
-  ].join("\n");
+  ]
+    .filter(Boolean)
+    .join("\n");
 }
 
 function verlaufText(verlauf) {
@@ -104,15 +137,11 @@ export function systemPromptCoach({
   schritt,
   zeit,
   inhalt,
+  aktivId,
 }) {
-  const liste = materialien.length
-    ? materialien
-        .map(
-          (m) =>
-            `- ${m.titel} (${m.art}${m.thema ? `, Thema: ${m.thema}` : ""})`
-        )
-        .join("\n")
-    : "(noch keine Materialien)";
+  const liste = materialListe(materialien);
+  // Das aktive Material steckt schon voll im inhalt-Abschnitt: hier nicht doppeln.
+  const seiten = webseitenText(materialien, aktivId);
   return [
     "Du bist wie eine geduldige Lehrerin oder ein Lehrer, die einer Schülerin oder einem Schüler der Klasse 7 (12 bis 14 Jahre) hilft.",
     "Antworte ausschließlich auf Deutsch, niemals in einer anderen Sprache. Schreibe einfach und kindgerecht, höchstens vier Sätze.",
@@ -129,6 +158,9 @@ export function systemPromptCoach({
     "Spiegle ruhig, statt zu kontrollieren, und lobe echte Fortschritte ehrlich. Wenn jemand schon lange an einer Stelle hängt, biete an, den Schritt in einen kleineren Schritt zu zerlegen.",
     "Diese Materialien stehen bereit:",
     liste,
+    seiten
+      ? `Inhalt der eingefügten Webseiten (nutze ihn, um über die Seiten zu sprechen):\n${seiten}`
+      : null,
     "Beziehe dich auf genau diese Materialien und nenne passende beim Namen.",
     "Wenn ein Bild mitgeschickt wird, schau es dir genau an und beziehe dich konkret auf das, was darauf zu sehen ist.",
     "Verwende keine Gedankenstriche, nutze Doppelpunkt, Komma, Punkt oder Klammern. Erfinde keine weitere Unterhaltung und stell dir keine eigenen Folgefragen.",

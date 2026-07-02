@@ -1,4 +1,5 @@
 import { useMemo, useState, useRef, useEffect } from "react";
+import Icon from "./Icon";
 import { baueFaecherNetz } from "./netzModell";
 import "./Netz.css";
 
@@ -257,7 +258,9 @@ export default function Netz({ erledigt, onSelect }) {
             const aktuell = i === kette.length - 1;
             return (
               <span key={node.id} style={{ display: "contents" }}>
-                <span className="netz-krume-sep" aria-hidden="true">›</span>
+                <span className="netz-krume-sep" aria-hidden="true">
+                  <Icon name="chevron-right" size={13} />
+                </span>
                 {aktuell ? (
                   <span className="netz-krume aktuell" style={aktuellStil}>
                     {node.label}

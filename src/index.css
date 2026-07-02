@@ -64,6 +64,21 @@
   --shadow-lg: 0 10px 28px -10px rgba(54, 44, 26, 0.16),
     0 28px 64px -24px rgba(54, 44, 26, 0.22);
 
+  /* === Motion: eine gemeinsame Kurven-/Dauer-Sprache (nach Emil Kowalski) ===
+     ease-out fuer Auftritte und Abgaenge (startet schnell, wirkt responsiv),
+     ease-in-out fuer Bewegung/Morphing auf dem Schirm, ein starkes (aber
+     ueberschwingfreies) ease-out fuer Betonungs-Momente. UI bleibt unter 300ms,
+     nie ease-in (traege), kein Bounce (off-brand: ruhig/erwachsen). --ease-out
+     ist die ruhige Signatur der App und bleibt erhalten. */
+  --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-out-strong: cubic-bezier(0.16, 1, 0.3, 1); /* expo-artig, kein Bounce */
+  --dur-press: 120ms; /* Druck-Feedback an Knoepfen */
+  --dur-fast: 160ms; /* Hover, kleine Popovers, Chips */
+  --dur-base: 200ms; /* Dropdowns, Tabs, Standard */
+  --dur-slow: 280ms; /* groessere Wechsel, noch unter 300ms */
+  --dur-overlay: 340ms; /* Modals, Drawers, Sheets (gesehen, selten) */
+
   font-family: var(--font-satoshi);
   font-size: 15px;
   line-height: 1.55;
@@ -207,6 +222,26 @@ select:focus-visible {
 ::selection {
   background: var(--accent-soft);
   color: var(--text);
+}
+
+/* Weiche Ränder für scrollbare Bereiche statt harter Kante. --fade-top/--fade-bottom
+   setzt der useScrollFade-Hook je nach Scrollposition (nur ausblenden, wo noch Inhalt
+   verborgen ist); ohne JS bleiben sie 0 = kein Ausblenden (harmloser Rückfall). */
+.fade-scroll {
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 var(--fade-top, 0px),
+    #000 calc(100% - var(--fade-bottom, 0px)),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 var(--fade-top, 0px),
+    #000 calc(100% - var(--fade-bottom, 0px)),
+    transparent 100%
+  );
 }
 
 /* Ruhiger Hinweis, wenn der lokale Speicher nicht funktioniert (privater Modus,
@@ -548,5 +583,21 @@ select:focus-visible {
   }
   .screen-buehne.im-wechsel .screen-blatt-alt {
     display: none;
+  }
+}
+
+/* Geteiltes Klapp-Chevron (Icon chevron-down) an auf-/zuklappbaren Köpfen: dreht
+   animiert nach dem [aria-expanded]-Zustand des Buttons. Standard: zugeklappt zeigt
+   es nach rechts (Listen-Fold). Panels, die nach OBEN aufgehen (z. B. Fokus-Chats),
+   überschreiben die Richtung lokal. Eine Mechanik überall = konsistente Interaktion. */
+.klapp-chevron {
+  transition: transform var(--dur-base) var(--ease-in-out);
+}
+[aria-expanded="false"] .klapp-chevron {
+  transform: rotate(-90deg);
+}
+@media (prefers-reduced-motion: reduce) {
+  .klapp-chevron {
+    transition: none;
   }
 }

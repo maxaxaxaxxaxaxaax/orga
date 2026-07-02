@@ -45,7 +45,7 @@
   flex-direction: column;
   align-items: center;
   gap: 8px;
-  animation: hu-fertig-rein 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  animation: hu-fertig-rein 0.5s var(--ease-out) both;
 }
 @keyframes hu-fertig-rein {
   from {
@@ -70,7 +70,7 @@
   background: var(--ok-text);
   box-shadow: 0 14px 36px -10px color-mix(in srgb, var(--ok-text) 75%, transparent);
   margin-bottom: 10px;
-  animation: hu-haken-pop 0.55s cubic-bezier(0.2, 1.5, 0.4, 1) both;
+  animation: hu-haken-pop 0.55s var(--ease-out-strong) both;
 }
 @keyframes hu-haken-pop {
   from {
@@ -127,7 +127,7 @@
   border-radius: 999px;
   cursor: pointer;
   box-shadow: var(--shadow-md);
-  transition: transform 0.12s ease, filter 0.12s ease;
+  transition: transform var(--dur-press) var(--ease-out), filter var(--dur-press) var(--ease-out);
 }
 .hu-fertig-weiter:hover {
   filter: brightness(1.06);
@@ -144,7 +144,7 @@
   padding: 10px 20px;
   border-radius: 999px;
   cursor: pointer;
-  transition: border-color 0.12s ease, color 0.12s ease;
+  transition: border-color var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out);
 }
 .hu-fertig-ansehen:hover {
   border-color: var(--ok-text);
@@ -226,7 +226,7 @@
   background: var(--accent);
   opacity: 0.32;
   box-shadow: 0 0 6px 0 color-mix(in srgb, var(--accent) 30%, transparent);
-  transition: opacity 0.2s ease, box-shadow 0.2s ease;
+  transition: opacity var(--dur-base) var(--ease-out), box-shadow var(--dur-base) var(--ease-out);
 }
 /* Kein Hover-Effekt (auf Touch/iPad ohnehin wirkungslos). Stattdessen kommt beim
    Ziehen (per .zieht-Klasse aus dem State) genau der weiche Glow, der vorher beim
@@ -279,38 +279,107 @@
   color: var(--muted);
   font-size: 0.9rem;
 }
+/* Filter-Chips der Benachrichtigungen (wie die Ablage-Chips, etwas kompakter für
+   die kleine Box): neutral, der aktive Chip in Accent-Soft. */
+.hu-nachr-chips {
+  flex-shrink: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 10px 0 2px;
+}
+.hu-nachr-chip {
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--text-2);
+  font-size: 0.76rem;
+  font-weight: 600;
+  padding: 5px 11px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+.hu-nachr-chip:hover {
+  background: var(--card-2);
+  color: var(--text);
+}
+.hu-nachr-chip.an {
+  background: var(--accent-soft);
+  border-color: transparent;
+  color: var(--accent-strong);
+}
+/* Suchleiste der Benachrichtigungen (wie die Ablage-Suche, kompakt). */
+.hu-nachr-suche {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0 2px;
+  padding: 7px 12px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  transition: border-color var(--dur-fast) var(--ease-out);
+}
+.hu-nachr-suche:focus-within {
+  border-color: var(--accent);
+}
+.hu-nachr-suche svg {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+  color: var(--muted);
+}
+.hu-nachr-suche input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  font: inherit;
+  font-size: 0.84rem;
+  color: var(--text);
+}
+.hu-nachr-suche input::placeholder {
+  color: var(--muted);
+}
 .hu-nachr-liste {
   list-style: none;
-  margin: 8px 0 0;
-  padding: 0;
+  /* Wie die Ablage-Liste: 4px Luft zwischen Inhalt und Scrollbar (padding), der
+     negative Margin hält die Ausrichtung an der Kartenkante. */
+  margin: 8px -4px 0;
+  padding: 0 4px;
   flex: 1;
   min-height: 0;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 8px;
 }
 .hu-nachr {
   width: 100%;
   display: flex;
   gap: 10px;
-  padding: 9px 8px;
-  border-radius: var(--r-sm, 9px);
-  border: none;
-  background: transparent;
+  padding: 12px 14px;
+  /* Box wie die Aufgaben-Karte: weiße Fläche, großer Radius, sanfter Schatten. */
+  border-radius: var(--r-lg, 20px);
+  border: 1px solid var(--line);
+  background: var(--card);
+  box-shadow: var(--shadow-sm);
   font: inherit;
   text-align: left;
   cursor: pointer;
-  transition: background 0.15s ease;
+  transition: border-color var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-fast) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out),
+    background var(--dur-fast) var(--ease-out);
 }
 .hu-nachr:hover {
-  background: var(--card-2);
-}
-.hu-nachr.neu {
-  background: var(--accent-soft);
-}
-.hu-nachr.neu:hover {
-  background: color-mix(in srgb, var(--accent-soft) 85%, var(--accent));
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+  border-color: var(--line-strong);
 }
 .hu-nachr-icon {
   flex-shrink: 0;
@@ -322,10 +391,6 @@
   border-radius: 999px;
   background: var(--card-2);
   color: var(--muted);
-}
-.hu-nachr.neu .hu-nachr-icon {
-  background: var(--accent);
-  color: var(--on-accent);
 }
 .hu-nachr-svg {
   width: 16px;
@@ -354,10 +419,71 @@
   font-size: 0.7rem;
   color: var(--muted);
 }
+/* Ungelesen-Punkt (rechts neben der Zeit). Bewegung nach Emil Kowalski: sanft aus
+   scale 0.4 + fade einblenden (nichts erscheint aus dem Nichts), dann ein langsamer,
+   leiser Puls-Halo als "neu"-Signal. Erlischt, sobald die Nachricht angeklickt und
+   damit gelesen ist (dann wird der Punkt nicht mehr gerendert). Reduced-Motion:
+   statischer Punkt ohne Puls. */
+.hu-nachr-punkt {
+  flex-shrink: 0;
+  align-self: center;
+  width: 8px;
+  height: 8px;
+  margin-left: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: nachr-punkt-rein var(--dur-base, 200ms) var(--ease-out-strong) both,
+    nachr-punkt-puls 1.9s var(--ease-out) 240ms infinite;
+}
+@keyframes nachr-punkt-rein {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes nachr-punkt-puls {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 42%, transparent);
+  }
+  70%,
+  100% {
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--accent) 0%, transparent);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hu-nachr-punkt {
+    animation: nachr-punkt-rein var(--dur-fast, 160ms) var(--ease-out) both;
+  }
+}
 .hu-nachr-body {
   font-size: 0.8rem;
   color: var(--text-2);
   line-height: 1.3;
+}
+/* Meta-Zeile: dokumentiert Herkunft (Quellen-Badge) und Auto-Tags des Materials. */
+.hu-nachr-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
+  margin-top: 5px;
+}
+.hu-nachr-tag {
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--card-2);
+  border: 1px solid var(--line);
+  color: var(--text-2);
+  font-size: 0.68rem;
+  font-weight: 600;
+}
+/* Erstes Tag = Fach, in Fachfarbe (Farbe/Rahmen/Fläche inline gesetzt), etwas fetter. */
+.hu-nachr-fachtag {
+  font-weight: 700;
 }
 .hu-notizen {
   position: relative;
@@ -390,6 +516,51 @@
      einnimmt (kein toter Weißraum unten, der Tagesplan füllt das Feld). */
   display: flex;
   flex-direction: column;
+}
+/* Stundenplan-Kopf: Titel links, Tag-Navigation (Chevrons) rechts. Das Spacing zur
+   Liste sitzt jetzt am Kopf, nicht mehr am Titel. */
+.hu-plan-kopf {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 0 0 16px;
+}
+.hu-plan-kopf .hu-karte-titel {
+  margin: 0;
+}
+.hu-plan-nav {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+/* Chevron wie die Wochen-Navigation im Wochenplan (.wp-kal-pfeil). */
+.hu-plan-pfeil {
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: none;
+  color: var(--accent);
+  cursor: pointer;
+  transition: color var(--dur-press) var(--ease-out);
+}
+.hu-plan-pfeil:hover:not(:disabled) {
+  color: var(--accent-strong);
+}
+.hu-plan-pfeil:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.hu-plan-tag {
+  min-width: 2.2em;
+  text-align: center;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-2);
 }
 /* Greifpunkt (.raster-griff) und Raster-Overlay (.raster-overlay) sind global in
    index.css definiert (geteilt mit Ablage und Fokus). */
@@ -520,8 +691,8 @@
 /* Animierter Ring: der gefüllte Fach-Bogen wächst sanft mit, wenn ein
    Könnensbeweis abgenommen wird (Fokus-Abschluss und Übersicht). */
 .hu-ring-animiert .hu-ring circle {
-  transition: stroke-dasharray 0.85s cubic-bezier(0.2, 0.7, 0.2, 1),
-    stroke-dashoffset 0.85s cubic-bezier(0.2, 0.7, 0.2, 1);
+  transition: stroke-dasharray 0.85s var(--ease-out),
+    stroke-dashoffset 0.85s var(--ease-out);
 }
 /* Beim Ziehen den Glatt<->Segment-Morph ohne Verzögerung der Maus folgen lassen
    (die Fortschritt-Animation oben würde sonst nachziehen). */
@@ -533,13 +704,13 @@
    dann weich ein, OHNE zu skalieren oder die Position zu verschieben, damit der
    Ring ruhig an derselben Stelle bleibt. */
 .hu-ring-fach {
-  animation: hu-fort-fade 0.4s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  animation: hu-fort-fade 0.4s var(--ease-out) both;
 }
 .hu-fort-legende {
-  animation: hu-fort-fade 0.4s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  animation: hu-fort-fade 0.4s var(--ease-out) both;
 }
 .hu-fort-bar-seg > span {
-  transition: width 0.55s cubic-bezier(0.2, 0.7, 0.2, 1);
+  transition: width 0.55s var(--ease-out);
 }
 @keyframes hu-fort-fade {
   from {
@@ -724,7 +895,7 @@
   gap: 12px;
   touch-action: pan-y;
   user-select: none;
-  transition: transform 0.18s ease, opacity 0.18s ease;
+  transition: transform var(--dur-fast) var(--ease-out), opacity var(--dur-fast) var(--ease-out);
 }
 /* Während des Wischens dem Finger ohne Verzögerung folgen. */
 .hu-notiz.wischt {
@@ -744,7 +915,7 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background 0.12s ease;
+  transition: background var(--dur-press) var(--ease-out);
 }
 .hu-notiz.erledigt .hu-notiz-box {
   background: var(--accent);
@@ -777,7 +948,7 @@
   color: var(--muted);
   font-size: 0.82rem;
   cursor: pointer;
-  transition: opacity 0.12s ease, color 0.12s ease;
+  transition: opacity var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out);
 }
 .hu-notiz:hover .hu-notiz-weg {
   opacity: 1;
@@ -797,7 +968,7 @@
   background: var(--bg);
   border: 1px solid var(--line);
   border-radius: 999px;
-  transition: border-color 0.12s ease;
+  transition: border-color var(--dur-press) var(--ease-out);
 }
 .hu-notiz-add:focus-within {
   border-color: var(--accent);
@@ -823,17 +994,18 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.1rem;
+  font-size: 1.35rem;
   line-height: 1;
-  color: var(--accent-strong);
-  background: var(--accent-soft);
+  /* Kein Kreis mehr: nur das Plus in der Akzentfarbe (wie der aktive Zustand). */
+  color: var(--accent);
+  background: transparent;
   border: none;
   border-radius: 999px;
   cursor: pointer;
-  transition: background 0.12s ease;
+  transition: color var(--dur-press) var(--ease-out);
 }
 .hu-notiz-add-knopf:hover {
-  background: color-mix(in srgb, var(--accent-soft) 70%, var(--accent));
+  color: var(--accent-strong);
 }
 /* Meine Aufgaben: Lernweg-Karten. Fach in (kontrastsicher abgedunkelter)
    Fachfarbe, der konkrete Lernweg darunter, Zeit/Raum als Chips, unten ein
@@ -880,8 +1052,8 @@
   border: 1px solid var(--line);
   border-radius: var(--r-lg, 20px);
   box-shadow: var(--shadow-sm);
-  transition: border-color 0.14s ease, box-shadow 0.14s ease,
-    transform 0.14s ease;
+  transition: border-color var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out);
 }
 .hu-auf:hover {
   box-shadow: var(--shadow-md);
@@ -1036,7 +1208,7 @@
   height: 100%;
   border-radius: 999px;
   background: var(--accent);
-  transition: width 0.3s ease;
+  transition: width var(--dur-slow) var(--ease-out);
 }
 
 /* Stundenplan als Tages-Timeline (Figma): Fach + Raum links, Zeit als Pille
