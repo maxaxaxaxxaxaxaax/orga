@@ -26,9 +26,11 @@
     color var(--dur-press) var(--ease-out),
     transform var(--dur-press) var(--ease-out);
 }
-.mc-zettel:not(:disabled):hover {
-  border-color: var(--accent);
-  color: var(--accent);
+@media (hover: hover) {
+  .mc-zettel:not(:disabled):hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
 }
 .mc-zettel:active:not(:disabled) {
   transform: scale(0.98);
@@ -169,8 +171,10 @@
   transition: color var(--dur-press) var(--ease-out),
     transform var(--dur-press) var(--ease-out);
 }
-.mc-anhang-weg:hover {
-  color: var(--text);
+@media (hover: hover) {
+  .mc-anhang-weg:hover {
+    color: var(--text);
+  }
 }
 .mc-anhang-weg:active {
   transform: scale(0.98);
@@ -194,9 +198,11 @@
     background var(--dur-press) var(--ease-out),
     transform var(--dur-press) var(--ease-out);
 }
-.mc-bild-knopf:hover {
-  color: var(--accent);
-  background: var(--card);
+@media (hover: hover) {
+  .mc-bild-knopf:hover {
+    color: var(--accent);
+    background: var(--card);
+  }
 }
 .mc-bild-knopf:active {
   transform: scale(0.98);
@@ -241,9 +247,11 @@
     color var(--dur-press) var(--ease-out),
     transform var(--dur-press) var(--ease-out);
 }
-.mc-chip:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+@media (hover: hover) {
+  .mc-chip:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
 }
 .mc-chip:active {
   transform: scale(0.98);
@@ -292,8 +300,10 @@
   transition: background var(--dur-fast) var(--ease-out),
     transform var(--dur-press) var(--ease-out);
 }
-.mc-senden:hover {
-  background: var(--accent-strong);
+@media (hover: hover) {
+  .mc-senden:hover {
+    background: var(--accent-strong);
+  }
 }
 .mc-senden:active:not(:disabled) {
   transform: scale(0.98);

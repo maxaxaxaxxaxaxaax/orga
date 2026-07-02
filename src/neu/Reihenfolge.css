@@ -113,9 +113,11 @@
   transition: border-color var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out),
     transform var(--dur-press) var(--ease-out);
 }
-.rf-pfeil:hover:not(:disabled) {
-  border-color: var(--accent);
-  color: var(--accent);
+@media (hover: hover) {
+  .rf-pfeil:hover:not(:disabled) {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
 }
 .rf-pfeil:active:not(:disabled) {
   transform: scale(0.98);
@@ -136,8 +138,10 @@
   cursor: pointer;
   transition: background var(--dur-fast) var(--ease-out), transform var(--dur-press) var(--ease-out);
 }
-.rf-pruefen:hover:not(:disabled) {
-  background: var(--accent-strong);
+@media (hover: hover) {
+  .rf-pruefen:hover:not(:disabled) {
+    background: var(--accent-strong);
+  }
 }
 .rf-pruefen:active:not(:disabled) {
   transform: scale(0.98);
@@ -166,9 +170,11 @@
   border-radius: 999px;
   cursor: pointer;
 }
-.rf-loesung-btn:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+@media (hover: hover) {
+  .rf-loesung-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
 }
 .rf-loesung {
   width: 100%;

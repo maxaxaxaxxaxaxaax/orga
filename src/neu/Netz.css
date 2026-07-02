@@ -21,9 +21,11 @@
     color var(--dur-press) var(--ease-out),
     transform var(--dur-press) var(--ease-out);
 }
-.netz-krume:hover:not(:disabled) {
-  background: var(--card-2);
-  color: var(--text);
+@media (hover: hover) {
+  .netz-krume:hover:not(:disabled) {
+    background: var(--card-2);
+    color: var(--text);
+  }
 }
 .netz-krume:active:not(:disabled) {
   transform: scale(0.98);

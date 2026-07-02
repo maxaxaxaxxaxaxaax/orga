@@ -74,9 +74,11 @@
     color var(--dur-press) var(--ease-out),
     transform var(--dur-press) var(--ease-out);
 }
-.nc-schliessen:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+@media (hover: hover) {
+  .nc-schliessen:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
 }
 .nc-schliessen:active {
   transform: scale(0.98);

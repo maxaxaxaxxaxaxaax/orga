@@ -116,8 +116,10 @@
   cursor: pointer;
   transition: background var(--dur-fast) var(--ease-out), transform var(--dur-press) var(--ease-out);
 }
-.rt-pruef:hover:not(:disabled) {
-  background: var(--accent-strong);
+@media (hover: hover) {
+  .rt-pruef:hover:not(:disabled) {
+    background: var(--accent-strong);
+  }
 }
 .rt-pruef:active:not(:disabled) {
   transform: scale(0.98);
@@ -139,8 +141,10 @@
   border-radius: 999px;
   cursor: pointer;
 }
-.rt-strahl-toggle:hover {
-  background: var(--card-2);
+@media (hover: hover) {
+  .rt-strahl-toggle:hover {
+    background: var(--card-2);
+  }
 }
 .rt-strahl {
   position: relative;
@@ -245,8 +249,10 @@
   cursor: pointer;
   transition: background var(--dur-fast) var(--ease-out), transform var(--dur-press) var(--ease-out);
 }
-.rt-weiter:hover:not(:disabled) {
-  background: var(--accent-strong);
+@media (hover: hover) {
+  .rt-weiter:hover:not(:disabled) {
+    background: var(--accent-strong);
+  }
 }
 .rt-weiter:active:not(:disabled) {
   transform: scale(0.98);

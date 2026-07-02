@@ -37,9 +37,11 @@
     color var(--dur-press) var(--ease-out),
     transform var(--dur-press) var(--ease-out);
 }
-.mu-close:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+@media (hover: hover) {
+  .mu-close:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
 }
 .mu-close:active {
   transform: scale(0.98);
@@ -63,9 +65,11 @@
   cursor: pointer;
   text-align: center;
 }
-.mu-drop:hover {
-  border-color: var(--accent);
-  background: var(--accent-soft);
+@media (hover: hover) {
+  .mu-drop:hover {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+  }
 }
 .mu-drop input[type="file"] {
   display: none;
@@ -136,8 +140,10 @@
   transition: background var(--dur-fast) var(--ease-out),
     transform var(--dur-press) var(--ease-out);
 }
-.mu-link-knopf:hover:not(:disabled) {
-  background: var(--accent-strong);
+@media (hover: hover) {
+  .mu-link-knopf:hover:not(:disabled) {
+    background: var(--accent-strong);
+  }
 }
 .mu-link-knopf:active:not(:disabled) {
   transform: scale(0.98);
@@ -257,8 +263,10 @@
   border-radius: 999px;
   cursor: pointer;
 }
-.mu-abbrechen:hover {
-  color: var(--text);
+@media (hover: hover) {
+  .mu-abbrechen:hover {
+    color: var(--text);
+  }
 }
 .mu-speichern {
   border: none;
@@ -270,6 +278,8 @@
   border-radius: 999px;
   cursor: pointer;
 }
-.mu-speichern:hover {
-  background: var(--accent-strong);
+@media (hover: hover) {
+  .mu-speichern:hover {
+    background: var(--accent-strong);
+  }
 }

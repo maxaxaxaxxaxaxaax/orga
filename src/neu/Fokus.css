@@ -52,9 +52,11 @@
   transition: border-color var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out),
     transform var(--dur-press) var(--ease-out);
 }
-.fokus-zu:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+@media (hover: hover) {
+  .fokus-zu:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
 }
 .fokus-zu:active {
   transform: scale(0.98);
@@ -123,9 +125,11 @@
   transition: border-color var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out),
     transform var(--dur-press) var(--ease-out);
 }
-.fokus-wechsel:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+@media (hover: hover) {
+  .fokus-wechsel:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
 }
 .fokus-wechsel:active {
   transform: scale(0.98);
@@ -203,9 +207,11 @@
   transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out),
     transform var(--dur-press) var(--ease-out);
 }
-.fokus-wz:hover {
-  background: var(--bg);
-  color: var(--accent);
+@media (hover: hover) {
+  .fokus-wz:hover {
+    background: var(--bg);
+    color: var(--accent);
+  }
 }
 .fokus-wz:active {
   transform: scale(0.98);
@@ -505,8 +511,10 @@
   text-decoration: underline;
   cursor: pointer;
 }
-.fokus-sl-skip:hover {
-  color: var(--text-2);
+@media (hover: hover) {
+  .fokus-sl-skip:hover {
+    color: var(--text-2);
+  }
 }
 .fokus-sl-gefuehl {
   display: inline-flex;
@@ -525,8 +533,10 @@
   transition: background var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out),
     transform var(--dur-press) var(--ease-out);
 }
-.fokus-gefuehl-knopf:hover {
-  border-color: var(--line-strong);
+@media (hover: hover) {
+  .fokus-gefuehl-knopf:hover {
+    border-color: var(--line-strong);
+  }
 }
 .fokus-gefuehl-knopf:active {
   transform: scale(0.98);
@@ -565,8 +575,10 @@
   border-radius: 999px;
   cursor: pointer;
 }
-.fokus-sl-rechenweg:hover {
-  background: color-mix(in srgb, var(--accent) 16%, var(--card));
+@media (hover: hover) {
+  .fokus-sl-rechenweg:hover {
+    background: color-mix(in srgb, var(--accent) 16%, var(--card));
+  }
 }
 .fokus-sl-badge {
   font-size: 0.7rem;
@@ -588,9 +600,11 @@
   transition: background var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out),
     transform var(--dur-press) var(--ease-out);
 }
-.fokus-sl-zurueck:hover {
-  background: color-mix(in srgb, var(--text) 8%, transparent);
-  color: var(--accent);
+@media (hover: hover) {
+  .fokus-sl-zurueck:hover {
+    background: color-mix(in srgb, var(--text) 8%, transparent);
+    color: var(--accent);
+  }
 }
 .fokus-sl-zurueck:active {
   transform: scale(0.98);
@@ -609,8 +623,10 @@
   box-shadow: 0 4px 14px -4px var(--accent-shadow);
   transition: background var(--dur-fast) var(--ease-out), transform var(--dur-press) var(--ease-out);
 }
-.fokus-sl-weiter:hover:not(:disabled) {
-  background: var(--accent-strong);
+@media (hover: hover) {
+  .fokus-sl-weiter:hover:not(:disabled) {
+    background: var(--accent-strong);
+  }
 }
 .fokus-sl-weiter:active:not(:disabled) {
   transform: scale(0.98);
@@ -713,9 +729,11 @@
   font-size: 0.85rem;
   cursor: pointer;
 }
-.fokus-panel-zu:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+@media (hover: hover) {
+  .fokus-panel-zu:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
 }
 
 /* MaterialChat im Panel: füllt die Höhe, Verlauf scrollt. */
@@ -799,8 +817,10 @@
   transition: background var(--dur-fast) var(--ease-out),
     transform var(--dur-press) var(--ease-out);
 }
-.fokus-lc-senden:hover:not(:disabled) {
-  background: var(--accent-strong);
+@media (hover: hover) {
+  .fokus-lc-senden:hover:not(:disabled) {
+    background: var(--accent-strong);
+  }
 }
 .fokus-lc-senden:active:not(:disabled) {
   transform: scale(0.98);
@@ -872,9 +892,11 @@
   border-radius: 999px;
   cursor: pointer;
 }
-.fokus-notiz-add:hover:not(:disabled) {
-  background: var(--accent);
-  color: var(--on-accent);
+@media (hover: hover) {
+  .fokus-notiz-add:hover:not(:disabled) {
+    background: var(--accent);
+    color: var(--on-accent);
+  }
 }
 .fokus-notiz-add:disabled {
   opacity: 0.45;
@@ -930,8 +952,10 @@
   font-size: 0.7rem;
   cursor: pointer;
 }
-.fokus-notiz-weg:hover {
-  color: var(--danger-text, var(--text));
+@media (hover: hover) {
+  .fokus-notiz-weg:hover {
+    color: var(--danger-text, var(--text));
+  }
 }
 
 /* ---- Rechte Leiste: passende Materialien ------------------------------ */
@@ -1000,9 +1024,11 @@
 .fokus-chats-toggle[aria-expanded="false"] .klapp-chevron {
   transform: rotate(180deg);
 }
-.fokus-chats-toggle:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+@media (hover: hover) {
+  .fokus-chats-toggle:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
 }
 .fokus-chats-aktionen {
   flex-shrink: 0;
@@ -1033,9 +1059,11 @@
   width: 18px;
   height: 18px;
 }
-.fokus-chats-auge:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+@media (hover: hover) {
+  .fokus-chats-auge:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
 }
 .fokus-chats-auge.an {
   background: var(--accent);
@@ -1206,9 +1234,11 @@
   font-size: 0.85rem;
   cursor: pointer;
 }
-.fokus-rail-zu:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+@media (hover: hover) {
+  .fokus-rail-zu:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
 }
 /* Notizen im linken Panel. */
 .fokus-notiz-panel {
@@ -1267,9 +1297,11 @@
   transition: border-color var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out), background var(--dur-press) var(--ease-out),
     transform var(--dur-press) var(--ease-out);
 }
-.fokus-chip:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+@media (hover: hover) {
+  .fokus-chip:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
 }
 .fokus-chip:active {
   transform: scale(0.98);
@@ -1346,8 +1378,10 @@
   transition: border-color var(--dur-press) var(--ease-out), background var(--dur-press) var(--ease-out),
     transform var(--dur-press) var(--ease-out);
 }
-.fokus-rail-klick:hover {
-  border-color: var(--accent);
+@media (hover: hover) {
+  .fokus-rail-klick:hover {
+    border-color: var(--accent);
+  }
 }
 .fokus-rail-klick:active {
   transform: scale(0.98);
@@ -1426,9 +1460,11 @@
   transition: border-color var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out),
     transform var(--dur-press) var(--ease-out);
 }
-.fokus-mat-add:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+@media (hover: hover) {
+  .fokus-mat-add:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
 }
 .fokus-mat-add:active {
   transform: scale(0.98);
@@ -1444,9 +1480,11 @@
   cursor: pointer;
   text-align: left;
 }
-.fokus-luecke-aktion:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+@media (hover: hover) {
+  .fokus-luecke-aktion:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
 }
 .fokus-luecke-gesendet {
   margin: 0;
@@ -1481,8 +1519,10 @@
   text-decoration: underline;
   cursor: pointer;
 }
-.fokus-textlink:hover {
-  color: var(--text-2);
+@media (hover: hover) {
+  .fokus-textlink:hover {
+    color: var(--text-2);
+  }
 }
 
 /* ---- Abschluss-Screen (zentriert) ------------------------------------- */
@@ -1603,8 +1643,10 @@
   box-shadow: 0 6px 18px -6px var(--accent-shadow);
   transition: background var(--dur-fast) var(--ease-out), transform var(--dur-press) var(--ease-out);
 }
-.fokus-weiter:hover {
-  background: var(--accent-strong);
+@media (hover: hover) {
+  .fokus-weiter:hover {
+    background: var(--accent-strong);
+  }
 }
 .fokus-weiter:active {
   transform: scale(0.98);
@@ -1622,9 +1664,11 @@
   transition: border-color var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out),
     transform var(--dur-press) var(--ease-out);
 }
-.fokus-sekundaer:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+@media (hover: hover) {
+  .fokus-sekundaer:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
 }
 .fokus-sekundaer:active {
   transform: scale(0.98);
@@ -1641,7 +1685,9 @@
 
 /* ---- Schmaler: Materialien-Leiste unter die Mitte --------------------- */
 /* ---- Schmaler (<=1024): alles untereinander stapeln ------------------- */
-@media (max-width: 1024px) {
+/* Erst UNTERHALB von 1024 stapeln: das iPad quer (exakt 1024) bekommt das
+   volle dreispaltige Layout. */
+@media (max-width: 1023px) {
   .fokus-koerper {
     display: flex;
     flex-direction: column;

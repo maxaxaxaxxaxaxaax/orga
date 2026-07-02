@@ -14,6 +14,8 @@ export default function KbChip({
   onDragEnd,
   onTippen,
   zahl,
+  // Touch-Drag-Handler (useTouchDrag im Planer), werden auf den Button gelegt.
+  pressProps,
 }) {
   const zahlWert = zahl === undefined ? k.cluster : zahl;
   const farbe = kbFarbe[k.fach] || NEUTRAL_FARBE;
@@ -22,6 +24,7 @@ export default function KbChip({
       type="button"
       className={"kbc" + (gewaehlt ? " kbc-gewaehlt" : "")}
       style={{ "--c": farbe, "--kbt": textAuf(farbe) }}
+      {...pressProps}
       draggable
       onDragStart={(e) => onDragStart(e, k.id)}
       onDragEnd={onDragEnd}

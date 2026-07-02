@@ -80,8 +80,10 @@
   transition: border-color var(--dur-press) var(--ease-out), background var(--dur-press) var(--ease-out),
     transform var(--dur-press) var(--ease-out);
 }
-.qz-option:hover:not(:disabled) {
-  border-color: var(--accent);
+@media (hover: hover) {
+  .qz-option:hover:not(:disabled) {
+    border-color: var(--accent);
+  }
 }
 .qz-option:active:not(:disabled) {
   transform: scale(0.98);
@@ -129,8 +131,10 @@
   cursor: pointer;
   transition: background var(--dur-fast) var(--ease-out), transform var(--dur-press) var(--ease-out);
 }
-.qz-pruefen:hover:not(:disabled) {
-  background: var(--accent-strong);
+@media (hover: hover) {
+  .qz-pruefen:hover:not(:disabled) {
+    background: var(--accent-strong);
+  }
 }
 .qz-pruefen:active:not(:disabled) {
   transform: scale(0.98);
@@ -184,8 +188,10 @@
   cursor: pointer;
   transition: background var(--dur-fast) var(--ease-out), transform var(--dur-press) var(--ease-out);
 }
-.qz-weiter:hover:not(:disabled) {
-  background: var(--accent-strong);
+@media (hover: hover) {
+  .qz-weiter:hover:not(:disabled) {
+    background: var(--accent-strong);
+  }
 }
 .qz-weiter:active:not(:disabled) {
   transform: scale(0.98);

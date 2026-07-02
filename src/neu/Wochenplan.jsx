@@ -13,6 +13,7 @@ import KbChip from "./KbChip";
 import Icon from "./Icon";
 import { textAuf, NEUTRAL_FARBE } from "./farbe";
 import { meldeAenderung, ladeStunden, heuteTag } from "./planung";
+import { useTouchDrag } from "./touchDrag";
 import "./Wochenplan.css";
 
 // Woche planen als Kalender-Raster, im selben Layout wie der Etappenplan:
@@ -275,6 +276,27 @@ export default function Wochenplan({
     });
   }
 
+  // Touch/Stift: eigener Drag-Pfad (iOS kann kein HTML5-Drag), trifft dieselben
+  // Ziele wie der Maus-Drop (data-drop="pool" | Stunden-Slot-Id).
+  const { press: fingerZug, geist } = useTouchDrag({
+    onStart: () => setZiehend(true),
+    onHover: setUeber,
+    onEnde: () => {
+      setUeber(null);
+      setZiehend(false);
+    },
+    onDrop: ({ id, quelle }, ziel) => {
+      setUeber(null);
+      setZiehend(false);
+      if (!ziel) return;
+      if (ziel === "pool") {
+        if (quelle) entferneUhr(id, quelle);
+      } else {
+        platziereUhr(id, ziel, quelle || null);
+      }
+    },
+  });
+
   function waehle(id) {
     setGewaehltId((g) => (g === id ? null : id));
   }
@@ -330,34 +352,6 @@ export default function Wochenplan({
     setGewaehltId(null);
     setUmgeplant(false);
     setHinweis("Stunden dieser Woche zurückgesetzt. Dein Lernstand bleibt.");
-  }
-
-  // Umplanen: die angezeigte Woche frisch und ausgewogen neu verteilen (erst
-  // leeren, dann auffüllen). Danach erscheint daneben "Zurücksetzen".
-  function umplanen() {
-    const slots = alleBelegbarenSlots();
-    if (slots.length === 0) return;
-    setStunden((prev) => {
-      const next = { ...prev };
-      const last = {};
-      slots.forEach((sid) => (last[sid] = 0));
-      for (const kb of wocheKbs) {
-        const have = new Set();
-        let fehlend = kb.cluster;
-        while (fehlend > 0) {
-          const best = besterSlot(slots, have, last, kb.fach);
-          if (best === null) break;
-          have.add(best);
-          last[best]++;
-          fehlend--;
-        }
-        next[kb.id] = [...have];
-      }
-      return next;
-    });
-    setGewaehltId(null);
-    setUmgeplant(true);
-    setHinweis("Woche neu verteilt. Du kannst frei anpassen.");
   }
 
   function toggleFach(fach) {
@@ -432,6 +426,7 @@ export default function Wochenplan({
           (leer && (gewaehltId != null || ziehend) ? " tippbar" : "")
         }
         style={stil}
+        data-drop={sid}
         onDragOver={(e) => {
           e.preventDefault();
           setUeber(sid);
@@ -476,6 +471,7 @@ export default function Wochenplan({
                 draggable
                 onDragStart={(e) => dragStart(e, k.id, sid)}
                 onDragEnd={dragEnde}
+                {...fingerZug({ id: k.id, quelle: sid }, { titel: k.titel, farbe })}
                 onClick={(e) => {
                   e.stopPropagation();
                   entferneUhr(k.id, sid);
@@ -570,6 +566,7 @@ export default function Wochenplan({
         {/* Linke Spalte: Kopf-Karte + Lernwege je Fach, zum Platzieren */}
         <aside
           className={"wp-seite" + (ueber === "pool" ? " ueber" : "")}
+          data-drop="pool"
           onDragOver={(e) => {
             e.preventDefault();
             setUeber("pool");
@@ -590,7 +587,8 @@ export default function Wochenplan({
                 {wocheKbs.length === 1 ? "Lernweg" : "Lernwege"}
               </p>
 
-              {/* Nach dem Neu planen (Stift oben) erscheint hier "Zurücksetzen". */}
+              {/* Erscheint nur, solange umgeplant gesetzt ist (derzeit ohne
+                  Auslöser: der Neu-planen-Stift wurde bewusst entfernt). */}
               {!istWizard && umgeplant && (
                 <div className="wp-aktionen">
                   <button
@@ -604,17 +602,6 @@ export default function Wochenplan({
                 </div>
               )}
             </div>
-            {hatPlan && (
-              <button
-                type="button"
-                className="ep-kopf-neu"
-                onClick={umplanen}
-                title="Neu planen: die Woche automatisch neu verteilen"
-                aria-label="Neu planen"
-              >
-                <Icon name="marker" />
-              </button>
-            )}
           </div>
 
           <div className="wp-seite-liste">
@@ -655,6 +642,13 @@ export default function Wochenplan({
                             onTippen={waehle}
                             onDragStart={(e, id) => dragStart(e, id, null)}
                             onDragEnd={dragEnde}
+                            pressProps={fingerZug(
+                              { id: k.id, quelle: null },
+                              {
+                                titel: k.titel,
+                                farbe: kbFarbe[k.fach] || NEUTRAL_FARBE,
+                              }
+                            )}
                           />
                         ))}
                       </div>
@@ -740,6 +734,20 @@ export default function Wochenplan({
           {hinweis}
         </div>
       )}
+
+      {/* Geist-Chip beim Touch-Drag: folgt dem Finger (Portal, damit der
+          transform-animierte Screen-Wisch nicht zum Bezugsrahmen wird). */}
+      {geist &&
+        createPortal(
+          <div
+            className="drag-geist"
+            style={{ left: geist.x, top: geist.y, "--c": geist.farbe }}
+            aria-hidden="true"
+          >
+            {geist.titel}
+          </div>,
+          document.body
+        )}
     </div>
   );
 }

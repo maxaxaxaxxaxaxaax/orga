@@ -33,9 +33,11 @@
   transition: border-color var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out), background var(--dur-press) var(--ease-out),
     transform var(--dur-press) var(--ease-out);
 }
-.cb-knopf:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+@media (hover: hover) {
+  .cb-knopf:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
 }
 .cb-knopf:active {
   transform: scale(0.98);
@@ -45,8 +47,10 @@
   border-color: var(--accent);
   color: var(--accent);
 }
-.cb-knopf-stark:hover {
-  background: var(--accent-soft);
+@media (hover: hover) {
+  .cb-knopf-stark:hover {
+    background: var(--accent-soft);
+  }
 }
 .cb-status {
   display: inline-flex;
@@ -84,8 +88,10 @@
   opacity: 0.8;
   padding: 0;
 }
-.cb-zurueck:hover {
-  opacity: 1;
+@media (hover: hover) {
+  .cb-zurueck:hover {
+    opacity: 1;
+  }
 }
 
 /* Frage fuer den Lerncoach merken: leise, optional, wartet bis zum Termin. */
@@ -132,9 +138,11 @@
   transition: border-color var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out),
     transform var(--dur-press) var(--ease-out);
 }
-.cb-frage-save:hover:not(:disabled) {
-  border-color: var(--accent);
-  color: var(--accent);
+@media (hover: hover) {
+  .cb-frage-save:hover:not(:disabled) {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
 }
 .cb-frage-save:active:not(:disabled) {
   transform: scale(0.98);
@@ -153,8 +161,10 @@
   cursor: pointer;
   padding: 0;
 }
-.cb-frage-weg:hover {
-  color: var(--text);
+@media (hover: hover) {
+  .cb-frage-weg:hover {
+    color: var(--text);
+  }
 }
 .cb-frage-gemerkt {
   font-size: 0.8rem;

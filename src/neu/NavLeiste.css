@@ -65,8 +65,10 @@
   cursor: pointer;
   transition: color var(--dur-fast) var(--ease-out), transform var(--dur-press) var(--ease-out);
 }
-.nav-punkt:hover {
-  color: var(--text);
+@media (hover: hover) {
+  .nav-punkt:hover {
+    color: var(--text);
+  }
 }
 .nav-punkt:active {
   transform: scale(0.98);

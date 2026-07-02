@@ -40,9 +40,11 @@
     color var(--dur-press) var(--ease-out),
     transform var(--dur-press) var(--ease-out);
 }
-.kd-close:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+@media (hover: hover) {
+  .kd-close:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
 }
 .kd-close:active {
   transform: scale(0.98);

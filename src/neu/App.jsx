@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Etappenplan from "./Etappenplan";
 import Wochenplan from "./Wochenplan";
 import Heute from "./Heute";
@@ -67,10 +67,9 @@ export default function App() {
   // Startansicht für bereits angemeldete Rückkehrer (Reload). Nach einem echten
   // Login führt anmelden() bewusst direkt in die Planung (siehe dort).
   const [screen, setScreen] = useState("heute");
-  // Screen, von dem aus die Planung geöffnet wurde: der Zurück-Knopf im Etappenplan führt
-  // dorthin zurück (nicht fix auf "heute"). Wird auf jedem Nicht-Planungs-Screen (heute/ablage)
-  // aktualisiert, hält also beim Betreten der Planung den Ursprung.
-  const planungHerRef = useRef("heute");
+  // Der Zurück-Pfeil im Etappenplan führt IMMER zur Dienste-Seite des Logins
+  // ("Ein orca statt fünf Apps."), dem Schritt vor der Lade-Animation: der
+  // Wizard läuft rückwärts durch die Demo-Erzählung (Woche -> Etappe -> Login).
   // Wechsel zwischen Nav-Bereichen wird als horizontaler Wisch gezeigt: der alte
   // Screen läuft kurz mit, der neue schiebt sich in Pillen-Richtung herein.
   const [anzeige, setAnzeige] = useState(() => ({
@@ -92,12 +91,6 @@ export default function App() {
   const [toast, setToast] = useState(null); // kurze Rückmeldung unten mittig
   const [speicherOk] = useState(speicherGeht); // einmal beim Start pruefen
   const [discordOffen, setDiscordOffen] = useState(false); // Discord-Einstellungen
-
-  // Ursprung der Planung merken: der letzte Nicht-Planungs-Screen (heute/ablage). Beim
-  // Betreten der Planung bleibt er stehen, damit der Zurück-Knopf dorthin zurückführt.
-  useEffect(() => {
-    if (screen === "heute" || screen === "ablage") planungHerRef.current = screen;
-  }, [screen]);
 
   // Discord-Poller: liest den verbundenen Kanal, gibt neue Links an die Import-
   // Pipeline (scrapen + kategorisieren + in die Ablage) und lässt den Bot kurz
@@ -209,8 +202,6 @@ export default function App() {
     // Nav-Button "Planung"). So landet man auch nach Abmelden/Anmelden verlässlich
     // dort und nicht auf einem zufällig zuletzt offenen Screen.
     setFokusKbId(null);
-    // Ursprung der Planung = Onboarding: der Zurück-Knopf führt zurück in die Login-Screens.
-    planungHerRef.current = "login";
     const ziel = planungFertig() ? "plan" : planungsScreen();
     setScreen(ziel);
     // Ohne Wisch in die App einsteigen (kein Slide direkt aus dem Login).
@@ -401,11 +392,7 @@ export default function App() {
         untenSlot={untenSlot}
         vorn={vorn}
         onWeiter={() => setScreen("wochenplan")}
-        onZurueck={() =>
-          planungHerRef.current === "login"
-            ? zurueckZumLogin()
-            : setScreen(planungHerRef.current)
-        }
+        onZurueck={zurueckZumLogin}
       />
     );
   }

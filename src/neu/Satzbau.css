@@ -100,8 +100,10 @@
     border-color var(--dur-press) var(--ease-out),
     transform 0.08s ease;
 }
-.sb-wort:hover:not(:disabled) {
-  border-color: var(--accent);
+@media (hover: hover) {
+  .sb-wort:hover:not(:disabled) {
+    border-color: var(--accent);
+  }
 }
 .sb-wort:active:not(:disabled) {
   transform: translateY(1px);
@@ -177,9 +179,11 @@
   cursor: pointer;
   transition: background var(--dur-fast) var(--ease-out), transform var(--dur-press) var(--ease-out);
 }
-.sb-pruefen:hover:not(:disabled),
+@media (hover: hover) {
+  .sb-pruefen:hover:not(:disabled),
 .sb-weiter:hover:not(:disabled) {
-  background: var(--accent-strong);
+    background: var(--accent-strong);
+  }
 }
 .sb-pruefen:active:not(:disabled),
 .sb-weiter:active:not(:disabled) {
@@ -201,10 +205,12 @@
   border-radius: 999px;
   cursor: pointer;
 }
-.sb-nochmal:hover,
+@media (hover: hover) {
+  .sb-nochmal:hover,
 .sb-loesung-btn:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
 }
 .sb-leer {
   margin: 0;

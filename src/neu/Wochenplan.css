@@ -163,9 +163,11 @@
   transition: border-color var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out),
     transform var(--dur-press) var(--ease-out);
 }
-.wp-zuruecksetzen:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+@media (hover: hover) {
+  .wp-zuruecksetzen:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
 }
 .wp-zuruecksetzen:active {
   transform: scale(0.98);
@@ -182,8 +184,10 @@
   cursor: pointer;
   transition: background var(--dur-fast) var(--ease-out), transform var(--dur-press) var(--ease-out);
 }
-.wp-umplanen:hover {
-  background: var(--accent-strong);
+@media (hover: hover) {
+  .wp-umplanen:hover {
+    background: var(--accent-strong);
+  }
 }
 .wp-umplanen:active {
   transform: scale(0.98);
@@ -203,8 +207,10 @@
   transition: color var(--dur-press) var(--ease-out),
     transform var(--dur-press) var(--ease-out);
 }
-.wp-kal-pfeil:hover:not(:disabled) {
-  color: var(--accent-strong);
+@media (hover: hover) {
+  .wp-kal-pfeil:hover:not(:disabled) {
+    color: var(--accent-strong);
+  }
 }
 .wp-kal-pfeil:active:not(:disabled) {
   transform: scale(0.98);
@@ -401,6 +407,9 @@
   border-radius: var(--r-sm, 9px);
   padding: 6px 8px 6px 11px;
   cursor: grab;
+  /* Horizontal ziehen (Touch-Drag), vertikal weiter den Kalender scrollen. */
+  touch-action: pan-y;
+  user-select: none;
   overflow: hidden;
 }
 .wp-kb::before {

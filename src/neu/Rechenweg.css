@@ -39,9 +39,11 @@
     color var(--dur-press) var(--ease-out),
     transform var(--dur-press) var(--ease-out);
 }
-.rw-zu:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+@media (hover: hover) {
+  .rw-zu:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
 }
 .rw-zu:active {
   transform: scale(0.98);
@@ -70,9 +72,11 @@
   border-radius: 999px;
   cursor: pointer;
 }
-.rw-werkzeug:hover:not(:disabled) {
-  border-color: var(--accent);
-  color: var(--accent);
+@media (hover: hover) {
+  .rw-werkzeug:hover:not(:disabled) {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
 }
 .rw-werkzeug:disabled {
   opacity: 0.45;
@@ -162,8 +166,10 @@
   cursor: pointer;
   transition: background var(--dur-fast) var(--ease-out), transform var(--dur-press) var(--ease-out);
 }
-.rw-pruefen:hover:not(:disabled) {
-  background: var(--accent-strong);
+@media (hover: hover) {
+  .rw-pruefen:hover:not(:disabled) {
+    background: var(--accent-strong);
+  }
 }
 .rw-pruefen:active:not(:disabled) {
   transform: scale(0.98);
@@ -293,8 +299,10 @@
   font-size: 0.8rem;
   cursor: pointer;
 }
-.rw-chat-zu:hover {
-  color: var(--text);
+@media (hover: hover) {
+  .rw-chat-zu:hover {
+    color: var(--text);
+  }
 }
 
 .rw-chat-verlauf {
@@ -363,9 +371,11 @@
   border-radius: 999px;
   cursor: pointer;
 }
-.rw-chat-chip:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+@media (hover: hover) {
+  .rw-chat-chip:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
 }
 
 .rw-chat-eingabe {
@@ -408,8 +418,10 @@
   font-weight: 700;
   cursor: pointer;
 }
-.rw-chat-senden:hover:not(:disabled) {
-  background: var(--accent-strong);
+@media (hover: hover) {
+  .rw-chat-senden:hover:not(:disabled) {
+    background: var(--accent-strong);
+  }
 }
 .rw-chat-senden:disabled {
   opacity: 0.45;
@@ -441,8 +453,10 @@
   box-shadow: var(--shadow-md);
   cursor: pointer;
 }
-.rw-chat-fab:hover {
-  background: var(--accent-strong);
+@media (hover: hover) {
+  .rw-chat-fab:hover {
+    background: var(--accent-strong);
+  }
 }
 
 @media (pointer: coarse) {

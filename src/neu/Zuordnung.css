@@ -61,8 +61,10 @@
     color var(--dur-press) var(--ease-out), opacity var(--dur-press) var(--ease-out),
     transform var(--dur-press) var(--ease-out);
 }
-.zu-karte:hover:not(:disabled) {
-  border-color: var(--accent);
+@media (hover: hover) {
+  .zu-karte:hover:not(:disabled) {
+    border-color: var(--accent);
+  }
 }
 .zu-karte:active:not(:disabled) {
   transform: scale(0.98);

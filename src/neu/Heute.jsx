@@ -702,11 +702,11 @@ export default function Heute({ onFokus, onOeffneAblage }) {
             {/* Links oben: Etappenfortschritt */}
             <section
               className="hu-karte hu-fortschritt"
-              {...boxProps("fortschritt", "Etappenfortschritt")}
+              {...boxProps("fortschritt", "Fortschritt")}
             >
           <h2 className="hu-karte-titel">
             <Icon name="graph" className="hu-karte-icon" />
-            Etappenfortschritt
+            <span className="hu-karte-titel-text">Fortschritt</span>
           </h2>
           {/* Ring und (ab Stufe 3) die Fächer-Legende nebeneinander, damit die
               Legende seitlich aufgeht statt unter dem Ring zu stapeln. */}
@@ -768,7 +768,7 @@ export default function Heute({ onFokus, onOeffneAblage }) {
             >
           <h2 className="hu-karte-titel">
             <Icon name="chat" className="hu-karte-icon" />
-            Benachrichtigungen
+            <span className="hu-karte-titel-text">Benachrichtigungen</span>
           </h2>
           {/* Filter, keine echten Tabs: group + aria-pressed wie in der Ablage. */}
           <div className="hu-nachr-chips" role="group" aria-label="Filter">
@@ -908,7 +908,7 @@ export default function Heute({ onFokus, onOeffneAblage }) {
             >
           <h2 className="hu-karte-titel">
             <Icon name="erinnerung" className="hu-karte-icon" />
-            Erinnerungen
+            <span className="hu-karte-titel-text">Erinnerungen</span>
           </h2>
           {notizen.length > 0 && (
             <ul className="hu-notiz-liste">
@@ -991,7 +991,7 @@ export default function Heute({ onFokus, onOeffneAblage }) {
             >
           <h2 className="hu-karte-titel hu-aufgaben-titel">
             <Icon name="task" className="hu-karte-icon" />
-            Aufgaben
+            <span className="hu-karte-titel-text">Aufgaben</span>
             <span className="hu-aufgaben-datum">
               {tagDatum.toLocaleDateString("de-DE", {
                 day: "2-digit",

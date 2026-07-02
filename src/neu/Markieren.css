@@ -70,9 +70,11 @@
     color var(--dur-press) var(--ease-out),
     transform var(--dur-press) var(--ease-out);
 }
-.mk-wort:hover:not(:disabled) {
-  background: var(--accent-soft);
-  border-color: var(--accent);
+@media (hover: hover) {
+  .mk-wort:hover:not(:disabled) {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+  }
 }
 .mk-wort:active:not(:disabled) {
   transform: scale(0.98);
@@ -134,8 +136,10 @@
   cursor: pointer;
   transition: background var(--dur-fast) var(--ease-out), transform var(--dur-press) var(--ease-out);
 }
-.mk-weiter:hover:not(:disabled) {
-  background: var(--accent-strong);
+@media (hover: hover) {
+  .mk-weiter:hover:not(:disabled) {
+    background: var(--accent-strong);
+  }
 }
 .mk-weiter:active:not(:disabled) {
   transform: scale(0.98);

@@ -44,9 +44,11 @@
     color var(--dur-press) var(--ease-out),
     transform var(--dur-press) var(--ease-out);
 }
-.au-zu:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+@media (hover: hover) {
+  .au-zu:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
 }
 .au-zu:active {
   transform: scale(0.98);
@@ -75,9 +77,11 @@
   border-radius: 999px;
   cursor: pointer;
 }
-.au-werkzeug:hover:not(:disabled) {
-  border-color: var(--accent);
-  color: var(--accent);
+@media (hover: hover) {
+  .au-werkzeug:hover:not(:disabled) {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
 }
 .au-werkzeug:disabled {
   opacity: 0.45;
@@ -165,8 +169,10 @@
   border-radius: 999px;
   cursor: pointer;
 }
-.au-digitalisieren:hover:not(:disabled) {
-  background: var(--accent-strong);
+@media (hover: hover) {
+  .au-digitalisieren:hover:not(:disabled) {
+    background: var(--accent-strong);
+  }
 }
 .au-digitalisieren:disabled {
   background: var(--line-strong);
@@ -230,8 +236,10 @@
   border-radius: 999px;
   cursor: pointer;
 }
-.au-speichern:hover:not(:disabled) {
-  background: var(--accent-strong);
+@media (hover: hover) {
+  .au-speichern:hover:not(:disabled) {
+    background: var(--accent-strong);
+  }
 }
 .au-speichern:disabled {
   background: var(--line-strong);
@@ -249,10 +257,12 @@
   border-radius: 999px;
   cursor: pointer;
 }
-.au-nochmal:hover,
+@media (hover: hover) {
+  .au-nochmal:hover,
 .au-zurueck:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
 }
 
 @media (pointer: coarse) {

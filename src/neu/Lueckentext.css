@@ -160,8 +160,10 @@
   cursor: pointer;
   transition: background var(--dur-fast) var(--ease-out), transform var(--dur-press) var(--ease-out);
 }
-.lt-pruefen:hover:not(:disabled) {
-  background: var(--accent-strong);
+@media (hover: hover) {
+  .lt-pruefen:hover:not(:disabled) {
+    background: var(--accent-strong);
+  }
 }
 .lt-pruefen:active:not(:disabled) {
   transform: scale(0.98);
@@ -184,9 +186,11 @@
   transition: border-color var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out),
     transform var(--dur-press) var(--ease-out);
 }
-.lt-weiter:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+@media (hover: hover) {
+  .lt-weiter:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
 }
 .lt-weiter:active {
   transform: scale(0.98);

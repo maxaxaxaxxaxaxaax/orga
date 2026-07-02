@@ -130,8 +130,10 @@
   transition: transform var(--dur-press) var(--ease-out), background var(--dur-fast) var(--ease-out);
 }
 /* Wie die Teal-CTAs: Hover dunkelt die Fläche ab (ok-Grün hat kein strong-Token). */
-.hu-fertig-weiter:hover {
-  background: color-mix(in srgb, var(--ok-text) 84%, var(--text));
+@media (hover: hover) {
+  .hu-fertig-weiter:hover {
+    background: color-mix(in srgb, var(--ok-text) 84%, var(--text));
+  }
 }
 .hu-fertig-weiter:active {
   transform: scale(0.98);
@@ -148,9 +150,11 @@
   transition: border-color var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out),
     transform var(--dur-press) var(--ease-out);
 }
-.hu-fertig-ansehen:hover {
-  border-color: var(--ok-text);
-  color: var(--ok-text);
+@media (hover: hover) {
+  .hu-fertig-ansehen:hover {
+    border-color: var(--ok-text);
+    color: var(--ok-text);
+  }
 }
 .hu-fertig-ansehen:active {
   transform: scale(0.98);
@@ -264,9 +268,13 @@
   height: 4px;
   transform: translate(-50%, -50%);
 }
-.hu-teiler-h:hover::after,
 .hu-teiler-h:active::after {
   width: 40px;
+}
+@media (hover: hover) {
+  .hu-teiler-h:hover::after {
+    width: 40px;
+  }
 }
 .hu-fortschritt {
   position: relative;
@@ -302,9 +310,11 @@
     color var(--dur-fast) var(--ease-out),
     transform var(--dur-press) var(--ease-out);
 }
-.hu-nachr-chip:hover {
-  background: var(--card-2);
-  color: var(--text);
+@media (hover: hover) {
+  .hu-nachr-chip:hover {
+    background: var(--card-2);
+    color: var(--text);
+  }
 }
 .hu-nachr-chip:active {
   transform: scale(0.98);
@@ -382,10 +392,12 @@
     transform var(--dur-fast) var(--ease-out),
     background var(--dur-fast) var(--ease-out);
 }
-.hu-nachr:hover {
-  box-shadow: var(--shadow-md);
-  transform: translateY(-2px);
-  border-color: var(--line-strong);
+@media (hover: hover) {
+  .hu-nachr:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+    border-color: var(--line-strong);
+  }
 }
 .hu-nachr:active {
   transform: scale(0.98);
@@ -558,8 +570,10 @@
   transition: color var(--dur-press) var(--ease-out),
     transform var(--dur-press) var(--ease-out);
 }
-.hu-plan-pfeil:hover:not(:disabled) {
-  color: var(--accent-strong);
+@media (hover: hover) {
+  .hu-plan-pfeil:hover:not(:disabled) {
+    color: var(--accent-strong);
+  }
 }
 .hu-plan-pfeil:active:not(:disabled) {
   transform: scale(0.98);
@@ -629,6 +643,16 @@
   font-weight: 700;
   letter-spacing: -0.01em;
   color: var(--text);
+  min-width: 0;
+}
+/* Lange Titel ("Etappenfortschritt") brechen in schmalen Boxen sauber mit
+   Trennstrich um, statt bis an die Kartenkante zu laufen. Eigenes Element,
+   damit es im Flex-Titel schrumpfen darf (anonyme Textknoten dürfen das nicht). */
+.hu-karte-titel-text {
+  min-width: 0;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+  overflow-wrap: break-word;
 }
 .hu-karte-icon {
   width: 18px;
@@ -685,6 +709,9 @@
      dort füllt er die Box und sitzt mittig, beim Verbreitern bleibt er exakt dort. */
   width: var(--ring-groesse, 150px);
   max-width: 100%;
+  /* Nie höher als die Zeile: auf flachen Boxen (iPad) wäre die gemessene
+     Ringbreite höher als die Box; das SVG skaliert dann mit (bleibt rund). */
+  max-height: 100%;
   margin: 0;
 }
 /* Legende an der festen, in der Namens-Stufe zentrierten Position verankert
@@ -883,8 +910,10 @@
   text-decoration: underline;
   cursor: pointer;
 }
-.hu-nachzuegler-mehr:hover {
-  color: var(--text-2);
+@media (hover: hover) {
+  .hu-nachzuegler-mehr:hover {
+    color: var(--text-2);
+  }
 }
 /* Notizen: Häkchen-Liste (Figma). Box links zum Abhaken, Text, Kontext (z. B.
    Lehrkraft) grau dahinter, ✕ zum Entfernen erscheint beim Hovern. */
@@ -960,11 +989,15 @@
   transition: opacity var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out),
     transform var(--dur-press) var(--ease-out);
 }
-.hu-notiz:hover .hu-notiz-weg {
-  opacity: 1;
+@media (hover: hover) {
+  .hu-notiz:hover .hu-notiz-weg {
+    opacity: 1;
+  }
 }
-.hu-notiz-weg:hover {
-  color: var(--text);
+@media (hover: hover) {
+  .hu-notiz-weg:hover {
+    color: var(--text);
+  }
 }
 .hu-notiz-weg:active {
   transform: scale(0.98);
@@ -1020,8 +1053,10 @@
   transition: color var(--dur-press) var(--ease-out),
     transform var(--dur-press) var(--ease-out);
 }
-.hu-notiz-add-knopf:hover {
-  color: var(--accent-strong);
+@media (hover: hover) {
+  .hu-notiz-add-knopf:hover {
+    color: var(--accent-strong);
+  }
 }
 .hu-notiz-add-knopf:active {
   transform: scale(0.98);
@@ -1082,10 +1117,12 @@
   transition: border-color var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out),
     transform var(--dur-fast) var(--ease-out);
 }
-.hu-auf:hover {
-  box-shadow: var(--shadow-md);
-  transform: translateY(-2px);
-  border-color: var(--line-strong);
+@media (hover: hover) {
+  .hu-auf:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+    border-color: var(--line-strong);
+  }
 }
 .hu-auf:active {
   transform: scale(0.98);

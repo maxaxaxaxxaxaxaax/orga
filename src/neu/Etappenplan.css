@@ -109,38 +109,6 @@
   flex: 1;
   min-width: 0;
 }
-/* Stift = "Neu planen", oben in der Kopf-Kachel (statt in der unteren Leiste). */
-.ep-kopf-neu {
-  flex-shrink: 0;
-  width: 38px;
-  height: 38px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid var(--line-strong);
-  background: var(--card);
-  color: var(--text-2);
-  border-radius: 50%;
-  cursor: pointer;
-  transition: border-color var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out),
-    transform var(--dur-press) var(--ease-out);
-}
-.ep-kopf-neu svg {
-  width: 18px;
-  height: 18px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.8;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-.ep-kopf-neu:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-}
-.ep-kopf-neu:active {
-  transform: scale(0.98);
-}
 .ep-kopf-titel {
   margin: 0;
   display: flex;
@@ -212,9 +180,11 @@
   transition: background var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out),
     transform var(--dur-press) var(--ease-out);
 }
-.ep-bar-zurueck:hover {
-  background: color-mix(in srgb, var(--text) 8%, transparent);
-  color: var(--accent);
+@media (hover: hover) {
+  .ep-bar-zurueck:hover {
+    background: color-mix(in srgb, var(--text) 8%, transparent);
+    color: var(--accent);
+  }
 }
 .ep-bar-zurueck:active {
   transform: scale(0.98);
@@ -264,9 +234,11 @@
   box-shadow: 0 4px 14px -4px var(--accent-shadow);
   transition: background var(--dur-fast) var(--ease-out), transform var(--dur-press) var(--ease-out);
 }
-.ep-bar-aktion:hover,
+@media (hover: hover) {
+  .ep-bar-aktion:hover,
 .ep-bar-weiter:hover {
-  background: var(--ep-teal-strong);
+    background: var(--ep-teal-strong);
+  }
 }
 .ep-bar-aktion:active,
 .ep-bar-weiter:active {
@@ -291,9 +263,11 @@
   transition: border-color var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out),
     transform var(--dur-press) var(--ease-out);
 }
-.ep-bar-umplanen:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+@media (hover: hover) {
+  .ep-bar-umplanen:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
 }
 .ep-bar-umplanen:active {
   transform: scale(0.98);
@@ -392,12 +366,16 @@
   padding: 9px 13px;
   cursor: grab;
   user-select: none;
+  /* Horizontal ziehen (Touch-Drag), vertikal weiter die Liste scrollen. */
+  touch-action: pan-y;
   transition: border-color var(--dur-press) var(--ease-out), background var(--dur-press) var(--ease-out), box-shadow var(--dur-press) var(--ease-out);
 }
-.ep-kb:hover {
-  background: color-mix(in srgb, var(--c) 12%, var(--card));
-  border-color: color-mix(in srgb, var(--c) 34%, var(--line));
-  box-shadow: var(--shadow-sm);
+@media (hover: hover) {
+  .ep-kb:hover {
+    background: color-mix(in srgb, var(--c) 12%, var(--card));
+    border-color: color-mix(in srgb, var(--c) 34%, var(--line));
+    box-shadow: var(--shadow-sm);
+  }
 }
 .ep-kb:active {
   cursor: grabbing;

@@ -38,10 +38,15 @@
   text-align: left;
   white-space: normal;
 }
-.neu-begriff-text:hover + .neu-begriff-pop,
 .neu-begriff-text:focus + .neu-begriff-pop {
   opacity: 1;
   visibility: visible;
+}
+@media (hover: hover) {
+  .neu-begriff-text:hover + .neu-begriff-pop {
+    opacity: 1;
+    visibility: visible;
+  }
 }
 .neu-begriff-pop-titel {
   font-size: 0.78rem;

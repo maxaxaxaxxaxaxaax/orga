@@ -76,9 +76,11 @@
   transition: color var(--dur-press) var(--ease-out), border-color var(--dur-press) var(--ease-out),
     transform var(--dur-press) var(--ease-out);
 }
-.cf-weg:hover {
-  color: var(--ok-text);
-  border-color: var(--ok-text);
+@media (hover: hover) {
+  .cf-weg:hover {
+    color: var(--ok-text);
+    border-color: var(--ok-text);
+  }
 }
 .cf-weg:active {
   transform: scale(0.98);

@@ -109,8 +109,10 @@
   transition: background var(--dur-fast) var(--ease-out),
     transform var(--dur-press) var(--ease-out);
 }
-.lc-start:hover {
-  background: var(--accent-strong);
+@media (hover: hover) {
+  .lc-start:hover {
+    background: var(--accent-strong);
+  }
 }
 .lc-start:active {
   transform: scale(0.98);
@@ -129,10 +131,12 @@
   transition: border-color var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out),
     transform var(--dur-press) var(--ease-out);
 }
-.lc-stop:hover,
+@media (hover: hover) {
+  .lc-stop:hover,
 .lc-pause:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
 }
 .lc-stop:active,
 .lc-pause:active {
@@ -240,8 +244,10 @@
   font-weight: 700;
   cursor: pointer;
 }
-.lc-frage-senden:hover:not(:disabled) {
-  background: var(--accent-strong);
+@media (hover: hover) {
+  .lc-frage-senden:hover:not(:disabled) {
+    background: var(--accent-strong);
+  }
 }
 .lc-frage-senden:disabled {
   opacity: 0.45;

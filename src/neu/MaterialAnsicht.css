@@ -40,9 +40,11 @@
     color var(--dur-press) var(--ease-out),
     transform var(--dur-press) var(--ease-out);
 }
-.ma-close:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+@media (hover: hover) {
+  .ma-close:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
 }
 .ma-close:active {
   transform: scale(0.98);
@@ -162,8 +164,10 @@
   text-decoration: none;
   transition: background var(--dur-fast) var(--ease-out);
 }
-.ma-video-link:hover {
-  background: var(--accent-strong);
+@media (hover: hover) {
+  .ma-video-link:hover {
+    background: var(--accent-strong);
+  }
 }
 .ma-video-hinweis {
   margin: 4px 0 0;

@@ -74,8 +74,10 @@
   box-shadow: 0 6px 18px -6px color-mix(in srgb, var(--intro-teal) 70%, transparent);
   transition: background var(--dur-fast) var(--ease-out), transform var(--dur-press) var(--ease-out);
 }
-.intro-los:hover {
-  background: var(--intro-teal-strong);
+@media (hover: hover) {
+  .intro-los:hover {
+    background: var(--intro-teal-strong);
+  }
 }
 .intro-los:active {
   transform: scale(0.98);

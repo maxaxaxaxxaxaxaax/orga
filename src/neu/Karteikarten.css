@@ -41,8 +41,10 @@
     color var(--dur-fast) var(--ease-out),
     transform var(--dur-press) var(--ease-out);
 }
-.kk-werkzeug:hover {
-  border-color: var(--line-strong);
+@media (hover: hover) {
+  .kk-werkzeug:hover {
+    border-color: var(--line-strong);
+  }
 }
 .kk-werkzeug:active {
   transform: scale(0.98);
@@ -180,8 +182,10 @@
   transition: background var(--dur-fast) var(--ease-out),
     transform var(--dur-press) var(--ease-out);
 }
-.kk-aufdecken:hover {
-  background: var(--accent-strong);
+@media (hover: hover) {
+  .kk-aufdecken:hover {
+    background: var(--accent-strong);
+  }
 }
 .kk-aufdecken:active {
   transform: scale(0.98);
@@ -241,18 +245,22 @@
 .kk-nochmal {
   color: var(--text-2);
 }
-.kk-nochmal:hover {
-  border-color: var(--warn-text);
-  color: var(--warn-text);
+@media (hover: hover) {
+  .kk-nochmal:hover {
+    border-color: var(--warn-text);
+    color: var(--warn-text);
+  }
 }
 .kk-kann {
   color: var(--ok-text);
   border-color: color-mix(in srgb, var(--ok-text) 45%, var(--line-strong));
 }
-.kk-kann:hover {
-  background: var(--ok-text);
-  border-color: var(--ok-text);
-  color: var(--on-accent);
+@media (hover: hover) {
+  .kk-kann:hover {
+    background: var(--ok-text);
+    border-color: var(--ok-text);
+    color: var(--on-accent);
+  }
 }
 
 .kk-leer {

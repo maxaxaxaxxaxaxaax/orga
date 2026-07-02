@@ -146,9 +146,11 @@
   border: 3px solid transparent;
   background-clip: content-box;
 }
-::-webkit-scrollbar-thumb:hover {
-  background: var(--muted);
-  background-clip: content-box;
+@media (hover: hover) {
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--muted);
+    background-clip: content-box;
+  }
 }
 ::-webkit-scrollbar-corner {
   background: transparent;
@@ -160,6 +162,12 @@ body {
   padding: 0;
   min-height: 100vh;
   background: var(--bg);
+}
+/* Kein horizontales Wackeln (wichtig fürs iPad): winzige Layout-Überstände
+   transformierter Elemente sollen die Seite nie seitlich scrollbar machen.
+   clip statt hidden: erzeugt keinen Scroll-Container. */
+body {
+  overflow-x: clip;
 }
 /* KEINE Scrollbalken-Reserve (scrollbar-gutter) am html: die Reserve zeichnete
    auf jedem Screen helle Randstreifen links/rechts und verkleinerte den
@@ -187,6 +195,42 @@ body::after {
 
 button {
   font-family: inherit;
+}
+
+/* Touch-Politur (iPad): kein Doppel-Tipp-Zoom auf Bedienelementen und kein
+   grauer Tipp-Blitz (die App hat ihr eigenes :active-Feedback). Die Planer-Chips
+   überschreiben touch-action gezielt mit pan-y (Touch-Drag). */
+html {
+  -webkit-tap-highlight-color: transparent;
+}
+button,
+a,
+select,
+label,
+[role="button"] {
+  touch-action: manipulation;
+}
+
+/* Geist-Chip beim Touch-Drag der Planer: folgt dem Finger als Ersatz für das
+   native Drag-Bild, das es auf iOS nicht gibt. Optik wie die KB-Chips. */
+.drag-geist {
+  position: fixed;
+  z-index: 300;
+  pointer-events: none;
+  transform: translate(-50%, -120%);
+  max-width: 240px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text);
+  background: color-mix(in srgb, var(--c, var(--accent)) 12%, var(--card));
+  border: 1px solid color-mix(in srgb, var(--c, var(--accent)) 35%, var(--line));
+  border-left: 3px solid var(--c, var(--accent));
+  border-radius: var(--r-md, 14px);
+  padding: 8px 12px;
+  box-shadow: var(--shadow-md);
 }
 
 /* Titel in Satoshi (Figma-Designsystem), ruhig gesetzt. */

@@ -105,8 +105,10 @@
   transition: background var(--dur-fast) var(--ease-out),
     transform var(--dur-press) var(--ease-out);
 }
-.weg-schritt:hover {
-  background: color-mix(in srgb, var(--text) 6%, transparent);
+@media (hover: hover) {
+  .weg-schritt:hover {
+    background: color-mix(in srgb, var(--text) 6%, transparent);
+  }
 }
 .weg-schritt:active {
   transform: scale(0.98);
@@ -187,8 +189,10 @@
   text-align: left;
   transition: background var(--dur-fast) var(--ease-out);
 }
-.weg-aufgabe:hover {
-  background: color-mix(in srgb, var(--text) 6%, transparent);
+@media (hover: hover) {
+  .weg-aufgabe:hover {
+    background: color-mix(in srgb, var(--text) 6%, transparent);
+  }
 }
 .weg-aufgabe-text {
   flex: 1;
@@ -265,8 +269,10 @@
   box-shadow: 0 4px 14px -4px var(--accent-shadow);
   transition: background var(--dur-fast) var(--ease-out), transform var(--dur-press) var(--ease-out);
 }
-.weg-aufgabe:hover .weg-aufgabe-cta {
-  background: var(--accent-strong);
+@media (hover: hover) {
+  .weg-aufgabe:hover .weg-aufgabe-cta {
+    background: var(--accent-strong);
+  }
 }
 .weg-aufgabe:active .weg-aufgabe-cta {
   transform: scale(0.98);
@@ -362,8 +368,10 @@
   box-shadow: 0 4px 14px -4px var(--accent-shadow);
   transition: background var(--dur-fast) var(--ease-out), transform var(--dur-press) var(--ease-out);
 }
-.weg-planen-knopf:hover {
-  background: var(--accent-strong);
+@media (hover: hover) {
+  .weg-planen-knopf:hover {
+    background: var(--accent-strong);
+  }
 }
 .weg-planen-knopf:active {
   transform: scale(0.98);

@@ -84,8 +84,10 @@
   padding: 1px 6px;
   border-radius: 999px;
 }
-.ez-meilenstein:hover .ez-meilenstein-label {
-  color: var(--text);
+@media (hover: hover) {
+  .ez-meilenstein:hover .ez-meilenstein-label {
+    color: var(--text);
+  }
 }
 .ez-meilenstein.erreicht .ez-meilenstein-tick {
   background: var(--accent);
@@ -196,8 +198,10 @@
 .ez-woche-liste li:last-child .ez-wkb {
   border-bottom: none;
 }
-.ez-wkb:hover .ez-check {
-  border-color: var(--ok-text);
+@media (hover: hover) {
+  .ez-wkb:hover .ez-check {
+    border-color: var(--ok-text);
+  }
 }
 .ez-wkb.done .ez-check {
   background: var(--ok-text);

@@ -15,14 +15,18 @@
   padding: 9px 13px;
   cursor: grab;
   user-select: none;
+  /* Horizontal ziehen (Touch-Drag), vertikal weiter die Liste scrollen. */
+  touch-action: pan-y;
   transition: border-color var(--dur-press) var(--ease-out),
     background var(--dur-press) var(--ease-out),
     box-shadow var(--dur-press) var(--ease-out);
 }
-.kbc:hover {
-  background: color-mix(in srgb, var(--c) 12%, var(--card));
-  border-color: color-mix(in srgb, var(--c) 34%, var(--line));
-  box-shadow: var(--shadow-sm);
+@media (hover: hover) {
+  .kbc:hover {
+    background: color-mix(in srgb, var(--c) 12%, var(--card));
+    border-color: color-mix(in srgb, var(--c) 34%, var(--line));
+    box-shadow: var(--shadow-sm);
+  }
 }
 .kbc:active {
   cursor: grabbing;

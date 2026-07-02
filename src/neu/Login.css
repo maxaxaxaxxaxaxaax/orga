@@ -272,9 +272,11 @@
   transition: border-color var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out),
     background var(--dur-fast) var(--ease-out), transform var(--dur-press) var(--ease-out);
 }
-.login-dienst:hover {
-  border-color: var(--line-strong);
-  box-shadow: var(--shadow-sm);
+@media (hover: hover) {
+  .login-dienst:hover {
+    border-color: var(--line-strong);
+    box-shadow: var(--shadow-sm);
+  }
 }
 .login-dienst:active {
   transform: scale(0.98);
@@ -404,9 +406,11 @@
   transition: background var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out),
     transform var(--dur-press) var(--ease-out);
 }
-.login-weg-zurueck:hover {
-  background: color-mix(in srgb, var(--text) 8%, transparent);
-  color: var(--accent);
+@media (hover: hover) {
+  .login-weg-zurueck:hover {
+    background: color-mix(in srgb, var(--text) 8%, transparent);
+    color: var(--accent);
+  }
 }
 .login-weg-zurueck:active {
   transform: scale(0.98);

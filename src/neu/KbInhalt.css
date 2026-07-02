@@ -102,8 +102,10 @@
   color: var(--accent);
   cursor: pointer;
 }
-.ki-ziel-aendern:hover {
-  text-decoration: underline;
+@media (hover: hover) {
+  .ki-ziel-aendern:hover {
+    text-decoration: underline;
+  }
 }
 .ki-ziel-text {
   margin: 0;
@@ -126,9 +128,11 @@
   border-radius: var(--r-sm, 9px);
   cursor: pointer;
 }
-.ki-ziel-leer:hover {
-  border-color: var(--accent);
-  color: var(--accent-strong);
+@media (hover: hover) {
+  .ki-ziel-leer:hover {
+    border-color: var(--accent);
+    color: var(--accent-strong);
+  }
 }
 .ki-ziel-feld {
   width: 100%;
@@ -212,9 +216,11 @@
   cursor: pointer;
   transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out), transform var(--dur-press) var(--ease-out);
 }
-.ki-ueben-start:hover {
-  background: var(--accent);
-  color: var(--on-accent);
+@media (hover: hover) {
+  .ki-ueben-start:hover {
+    background: var(--accent);
+    color: var(--on-accent);
+  }
 }
 .ki-ueben-start:active {
   transform: scale(0.98);
@@ -242,8 +248,10 @@
   transition: background var(--dur-press) var(--ease-out),
     transform var(--dur-press) var(--ease-out);
 }
-.ki-schritt:hover {
-  background: color-mix(in srgb, var(--text) 5%, transparent);
+@media (hover: hover) {
+  .ki-schritt:hover {
+    background: color-mix(in srgb, var(--text) 5%, transparent);
+  }
 }
 .ki-schritt:active {
   transform: scale(0.98);
@@ -265,8 +273,10 @@
   transition: background var(--dur-fast) var(--ease-out),
     border-color var(--dur-fast) var(--ease-out);
 }
-.ki-schritt:hover .ki-schritt-box {
-  border-color: var(--ok-text);
+@media (hover: hover) {
+  .ki-schritt:hover .ki-schritt-box {
+    border-color: var(--ok-text);
+  }
 }
 .ki-schritt.fertig .ki-schritt-box {
   background: var(--ok-text);
@@ -333,8 +343,10 @@
   transition: background var(--dur-fast) var(--ease-out),
     transform var(--dur-press) var(--ease-out);
 }
-.ki-schritt-weiter:hover {
-  background: var(--accent-strong);
+@media (hover: hover) {
+  .ki-schritt-weiter:hover {
+    background: var(--accent-strong);
+  }
 }
 .ki-schritt-weiter:active {
   transform: scale(0.98);
@@ -374,11 +386,15 @@
   text-align: left;
   cursor: pointer;
 }
-.ki-material-klick:hover {
-  border-color: var(--accent);
+@media (hover: hover) {
+  .ki-material-klick:hover {
+    border-color: var(--accent);
+  }
 }
-.ki-material-klick:hover .ki-material-titel {
-  color: var(--accent);
+@media (hover: hover) {
+  .ki-material-klick:hover .ki-material-titel {
+    color: var(--accent);
+  }
 }
 .ki-material-art {
   flex-shrink: 0;
@@ -417,8 +433,10 @@
   background: transparent;
   border-color: var(--line);
 }
-.ki-material-klick:hover .ki-material-aktiv {
-  border-color: var(--accent);
+@media (hover: hover) {
+  .ki-material-klick:hover .ki-material-aktiv {
+    border-color: var(--accent);
+  }
 }
 
 /* Landkarten-Thema (studyflix-artig): kurze Erklaerung plus Materialien,

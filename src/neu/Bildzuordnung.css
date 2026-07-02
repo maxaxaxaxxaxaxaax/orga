@@ -78,9 +78,11 @@
   font-weight: 600;
   pointer-events: none;
 }
-.bz-raum:hover rect {
-  stroke: var(--accent);
-  fill: var(--accent-soft);
+@media (hover: hover) {
+  .bz-raum:hover rect {
+    stroke: var(--accent);
+    fill: var(--accent-soft);
+  }
 }
 .bz-raum.ok rect {
   fill: var(--ok-bg);
@@ -126,8 +128,10 @@
   cursor: pointer;
   transition: background var(--dur-fast) var(--ease-out), transform var(--dur-press) var(--ease-out);
 }
-.bz-weiter:hover:not(:disabled) {
-  background: var(--accent-strong);
+@media (hover: hover) {
+  .bz-weiter:hover:not(:disabled) {
+    background: var(--accent-strong);
+  }
 }
 .bz-weiter:active:not(:disabled) {
   transform: scale(0.98);

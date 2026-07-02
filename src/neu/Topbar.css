@@ -33,9 +33,11 @@
   cursor: pointer;
   transition: color var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out), transform var(--dur-press) var(--ease-out);
 }
-.topbar-knopf:hover {
-  color: var(--text);
-  background: color-mix(in srgb, var(--text) 6%, transparent);
+@media (hover: hover) {
+  .topbar-knopf:hover {
+    color: var(--text);
+    background: color-mix(in srgb, var(--text) 6%, transparent);
+  }
 }
 .topbar-knopf:active {
   transform: scale(0.95);
@@ -174,8 +176,10 @@
   transition: background var(--dur-fast) var(--ease-out),
     transform var(--dur-press) var(--ease-out);
 }
-.topbar-discord:hover {
-  background: color-mix(in srgb, var(--accent-soft) 70%, var(--accent));
+@media (hover: hover) {
+  .topbar-discord:hover {
+    background: color-mix(in srgb, var(--accent-soft) 70%, var(--accent));
+  }
 }
 .topbar-discord:active {
   transform: scale(0.98);
@@ -195,9 +199,11 @@
   transition: border-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out),
     transform var(--dur-press) var(--ease-out);
 }
-.topbar-reset:hover {
-  border-color: var(--accent);
-  color: var(--accent-strong);
+@media (hover: hover) {
+  .topbar-reset:hover {
+    border-color: var(--accent);
+    color: var(--accent-strong);
+  }
 }
 .topbar-reset:active {
   transform: scale(0.98);
@@ -215,9 +221,11 @@
   font-weight: 600;
   cursor: pointer;
 }
-.topbar-abmelden:hover {
-  color: var(--text);
-  background: var(--bg);
+@media (hover: hover) {
+  .topbar-abmelden:hover {
+    color: var(--text);
+    background: var(--bg);
+  }
 }
 
 @media (max-width: 560px) {

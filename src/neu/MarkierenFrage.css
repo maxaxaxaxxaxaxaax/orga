@@ -42,9 +42,11 @@
   transition: border-color var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out),
     transform var(--dur-press) var(--ease-out);
 }
-.mf-zu:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+@media (hover: hover) {
+  .mf-zu:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
 }
 .mf-zu:active {
   transform: scale(0.98);
@@ -77,9 +79,11 @@
   opacity: 0.45;
   cursor: default;
 }
-.mf-werkzeug:not(:disabled):hover {
-  border-color: var(--accent);
-  color: var(--accent);
+@media (hover: hover) {
+  .mf-werkzeug:not(:disabled):hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
 }
 .mf-werkzeug:active:not(:disabled) {
   transform: scale(0.98);
@@ -241,8 +245,10 @@
   transition: background var(--dur-fast) var(--ease-out),
     transform var(--dur-press) var(--ease-out);
 }
-.mf-senden:hover:not(:disabled) {
-  background: var(--accent-strong);
+@media (hover: hover) {
+  .mf-senden:hover:not(:disabled) {
+    background: var(--accent-strong);
+  }
 }
 .mf-senden:active:not(:disabled) {
   transform: scale(0.98);

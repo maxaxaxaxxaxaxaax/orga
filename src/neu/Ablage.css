@@ -122,8 +122,10 @@
   transition: background var(--dur-fast) var(--ease-out),
     transform var(--dur-press) var(--ease-out);
 }
-.ab-add:hover {
-  background: var(--accent-strong);
+@media (hover: hover) {
+  .ab-add:hover {
+    background: var(--accent-strong);
+  }
 }
 .ab-add:active {
   transform: scale(0.98);
@@ -229,10 +231,12 @@
     color var(--dur-press) var(--ease-out),
     transform var(--dur-press) var(--ease-out);
 }
-.ab-detail-zu:hover,
+@media (hover: hover) {
+  .ab-detail-zu:hover,
 .ab-detail-stern:hover {
-  border-color: var(--accent);
-  color: var(--accent-strong);
+    border-color: var(--accent);
+    color: var(--accent-strong);
+  }
 }
 .ab-detail-zu:active,
 .ab-detail-stern:active {
@@ -358,8 +362,10 @@
     border-color var(--dur-fast) var(--ease-out),
     transform var(--dur-press) var(--ease-out);
 }
-.ab-ordner:hover {
-  background: var(--card-2);
+@media (hover: hover) {
+  .ab-ordner:hover {
+    background: var(--card-2);
+  }
 }
 .ab-ordner:active {
   transform: scale(0.98);
@@ -417,8 +423,10 @@
   cursor: pointer;
   text-align: left;
 }
-.ab-komp-kopf:hover {
-  background: var(--card-2);
+@media (hover: hover) {
+  .ab-komp-kopf:hover {
+    background: var(--card-2);
+  }
 }
 .ab-komp-pfeil {
   flex-shrink: 0;
@@ -472,9 +480,11 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.ab-komp-weg:hover {
-  background: var(--accent-soft);
-  color: var(--accent-strong);
+@media (hover: hover) {
+  .ab-komp-weg:hover {
+    background: var(--accent-soft);
+    color: var(--accent-strong);
+  }
 }
 
 /* Materialien */
@@ -574,9 +584,11 @@
     color var(--dur-fast) var(--ease-out),
     transform var(--dur-press) var(--ease-out);
 }
-.ab-chip:hover {
-  background: var(--card-2);
-  color: var(--text);
+@media (hover: hover) {
+  .ab-chip:hover {
+    background: var(--card-2);
+    color: var(--text);
+  }
 }
 .ab-chip:active {
   transform: scale(0.98);
@@ -642,9 +654,11 @@
   border-radius: var(--r-sm, 9px);
   cursor: pointer;
 }
-.ab-sort-opt:hover {
-  background: var(--card-2);
-  color: var(--text);
+@media (hover: hover) {
+  .ab-sort-opt:hover {
+    background: var(--card-2);
+    color: var(--text);
+  }
 }
 .ab-sort-opt.an {
   color: var(--accent-strong);
@@ -692,10 +706,12 @@
     transform var(--dur-fast) var(--ease-out);
 }
 /* Hover hebt die Box leicht an, wie die Nachrichten auf der Übersicht. */
-.ab-zeile-klick:hover {
-  box-shadow: var(--shadow-md);
-  transform: translateY(-2px);
-  border-color: var(--line-strong);
+@media (hover: hover) {
+  .ab-zeile-klick:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+    border-color: var(--line-strong);
+  }
 }
 .ab-zeile-klick:active {
   transform: scale(0.98);
@@ -882,9 +898,11 @@
     color var(--dur-press) var(--ease-out),
     transform var(--dur-press) var(--ease-out);
 }
-.ab-overlay-zu:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+@media (hover: hover) {
+  .ab-overlay-zu:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
 }
 .ab-overlay-zu:active {
   transform: scale(0.98);

@@ -40,9 +40,11 @@
     color var(--dur-press) var(--ease-out),
     transform var(--dur-press) var(--ease-out);
 }
-.dc-close:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+@media (hover: hover) {
+  .dc-close:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
 }
 .dc-close:active {
   transform: scale(0.98);
@@ -151,8 +153,10 @@
   transition: background var(--dur-fast) var(--ease-out),
     transform var(--dur-press) var(--ease-out);
 }
-.dc-primaer:hover:not(:disabled) {
-  background: var(--accent-strong);
+@media (hover: hover) {
+  .dc-primaer:hover:not(:disabled) {
+    background: var(--accent-strong);
+  }
 }
 .dc-primaer:active:not(:disabled) {
   transform: scale(0.98);
@@ -171,9 +175,11 @@
   border-radius: 999px;
   cursor: pointer;
 }
-.dc-sekundaer:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+@media (hover: hover) {
+  .dc-sekundaer:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
 }
 .dc-hinweis {
   margin: 4px 0 0;

@@ -37,9 +37,11 @@
     color var(--dur-press) var(--ease-out),
     transform var(--dur-press) var(--ease-out);
 }
-.wc-close:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+@media (hover: hover) {
+  .wc-close:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
 }
 .wc-close:active {
   transform: scale(0.98);
@@ -97,8 +99,10 @@
   border-radius: 999px;
   cursor: pointer;
 }
-.wc-abbrechen:hover {
-  color: var(--text);
+@media (hover: hover) {
+  .wc-abbrechen:hover {
+    color: var(--text);
+  }
 }
 .wc-aufnehmen {
   border: none;
@@ -110,8 +114,10 @@
   border-radius: 999px;
   cursor: pointer;
 }
-.wc-aufnehmen:not(:disabled):hover {
-  background: var(--accent-strong);
+@media (hover: hover) {
+  .wc-aufnehmen:not(:disabled):hover {
+    background: var(--accent-strong);
+  }
 }
 .wc-aufnehmen:disabled {
   background: var(--line-strong);

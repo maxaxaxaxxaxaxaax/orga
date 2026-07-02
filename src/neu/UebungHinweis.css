@@ -28,8 +28,10 @@
   transition: background var(--dur-fast) var(--ease-out),
     transform var(--dur-press) var(--ease-out);
 }
-.uh-zu:hover {
-  background: var(--accent-strong);
+@media (hover: hover) {
+  .uh-zu:hover {
+    background: var(--accent-strong);
+  }
 }
 .uh-zu:active {
   transform: scale(0.98);

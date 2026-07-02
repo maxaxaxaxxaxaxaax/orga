@@ -9,6 +9,7 @@ import {
 } from "../data/koennensbeweise";
 import { etappen } from "../data/etappen";
 import { meldeAenderung } from "./planung";
+import { useTouchDrag } from "./touchDrag";
 import { textAuf, NEUTRAL_FARBE } from "./farbe";
 import Icon from "./Icon";
 import "./Etappenplan.css";
@@ -123,6 +124,17 @@ export default function Etappenplan({ onWeiter, onZurueck, untenSlot, vorn }) {
   function setzeWoche(id, idx) {
     setZuordnung((z) => ({ ...z, [id]: idx }));
   }
+  // Touch/Stift: eigener Drag-Pfad (iOS kann kein HTML5-Drag), trifft dieselben
+  // Ziele wie der Maus-Drop (data-drop="pool" | "w0".."w5").
+  const { press: fingerZug, geist } = useTouchDrag({
+    onHover: setUeber,
+    onEnde: () => setUeber(null),
+    onDrop: (id, ziel) => {
+      setUeber(null);
+      if (ziel === "pool") zurueckInVorrat(id);
+      else if (ziel && ziel.startsWith("w")) setzeWoche(id, Number(ziel.slice(1)));
+    },
+  });
   function waehle(id) {
     setGewaehltId((g) => (g === id ? null : id));
   }
@@ -172,31 +184,6 @@ export default function Etappenplan({ onWeiter, onZurueck, untenSlot, vorn }) {
     setHinweis("Ausgewogen verteilt: leichteste Woche zuerst. Du kannst frei anpassen.");
   }
 
-  // Neu planen: alles verwerfen und frisch ausgewogen verteilen (Pflicht-/
-  // Startzuordnung bleibt). Wie beim ersten Planen, nur eben noch einmal.
-  function umplanen() {
-    const summen = Array(etappeWochen).fill(0);
-    const z = {};
-    for (const [id, w] of Object.entries(startZuordnung)) {
-      z[id] = w;
-      summen[w] += koennensbeweise.find((k) => k.id === id)?.cluster || 0;
-    }
-    const rest = koennensbeweise
-      .filter((k) => z[k.id] == null)
-      .slice()
-      .sort((a, b) => b.cluster - a.cluster);
-    for (const kb of rest) {
-      let best = 0;
-      for (let i = 1; i < etappeWochen; i++) {
-        if (summen[i] < summen[best]) best = i;
-      }
-      z[kb.id] = best;
-      summen[best] += kb.cluster;
-    }
-    setZuordnung(z);
-    setHinweis("Etappe neu verteilt: leichteste Woche zuerst. Du kannst frei anpassen.");
-  }
-
   // Ein bunter KB-Chip (Vollton in Fachfarbe), ziehbar und antippbar.
   function chip(k, platziert) {
     const farbe = kbFarbe[k.fach] || NEUTRAL_FARBE;
@@ -209,6 +196,7 @@ export default function Etappenplan({ onWeiter, onZurueck, untenSlot, vorn }) {
         draggable
         onDragStart={(e) => onDragStart(e, k.id)}
         onDragEnd={dragEnde}
+        {...fingerZug(k.id, { titel: k.titel, farbe })}
         onClick={(e) => {
           e.stopPropagation();
           if (platziert) zurueckInVorrat(k.id);
@@ -294,6 +282,7 @@ export default function Etappenplan({ onWeiter, onZurueck, untenSlot, vorn }) {
         {/* Linke Spalte: Vorrat */}
         <aside
           className={"ep-vorrat" + (ueber === "pool" ? " ueber" : "")}
+          data-drop="pool"
           onDragOver={(e) => {
             e.preventDefault();
             setUeber("pool");
@@ -316,17 +305,6 @@ export default function Etappenplan({ onWeiter, onZurueck, untenSlot, vorn }) {
                 {zeitraum(ETAPPE)} · {koennensbeweise.length} Könnensbeweise
               </p>
             </div>
-            {hatPlan && (
-              <button
-                type="button"
-                className="ep-kopf-neu"
-                onClick={umplanen}
-                title="Neu planen: alles neu und ausgewogen verteilen"
-                aria-label="Neu planen"
-              >
-                <Icon name="marker" />
-              </button>
-            )}
           </div>
 
           <div className="ep-vorrat-liste">
@@ -373,6 +351,7 @@ export default function Etappenplan({ onWeiter, onZurueck, untenSlot, vorn }) {
                   (gewaehltId != null ? " tippbar" : "")
                 }
                 key={w.nr}
+                data-drop={"w" + w.idx}
                 onDragOver={(e) => {
                   e.preventDefault();
                   setUeber("w" + w.idx);
@@ -412,6 +391,20 @@ export default function Etappenplan({ onWeiter, onZurueck, untenSlot, vorn }) {
           {hinweis}
         </div>
       )}
+
+      {/* Geist-Chip beim Touch-Drag: folgt dem Finger (Portal, damit der
+          transform-animierte Screen-Wisch nicht zum Bezugsrahmen wird). */}
+      {geist &&
+        createPortal(
+          <div
+            className="drag-geist"
+            style={{ left: geist.x, top: geist.y, "--c": geist.farbe }}
+            aria-hidden="true"
+          >
+            {geist.titel}
+          </div>,
+          document.body
+        )}
     </div>
   );
 }

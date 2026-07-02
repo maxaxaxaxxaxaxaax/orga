@@ -124,8 +124,10 @@
     background var(--dur-press) var(--ease-out),
     transform var(--dur-press) var(--ease-out);
 }
-.mb-regel:hover {
-  border-color: var(--line-strong);
+@media (hover: hover) {
+  .mb-regel:hover {
+    border-color: var(--line-strong);
+  }
 }
 .mb-regel:active {
   transform: scale(0.98);
@@ -200,8 +202,10 @@
   cursor: pointer;
   transition: background var(--dur-press) var(--ease-out);
 }
-.mb-tabelle tbody tr:hover {
-  background: var(--card-2);
+@media (hover: hover) {
+  .mb-tabelle tbody tr:hover {
+    background: var(--card-2);
+  }
 }
 .mb-tabelle tbody tr.aktiv {
   background: var(--accent-soft);
@@ -231,9 +235,11 @@
   border-radius: 999px;
   cursor: pointer;
 }
-.mb-verdecken:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+@media (hover: hover) {
+  .mb-verdecken:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
 }
 .mb-verdecken.an {
   background: var(--accent-soft);
@@ -251,9 +257,11 @@
   padding: 3px 0;
   cursor: pointer;
 }
-.mb-zelle-verdeckt:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+@media (hover: hover) {
+  .mb-zelle-verdeckt:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
 }
 
 .mb-leer {

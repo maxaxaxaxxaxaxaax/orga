@@ -39,9 +39,11 @@
     color var(--dur-press) var(--ease-out),
     transform var(--dur-press) var(--ease-out);
 }
-.lz-close:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+@media (hover: hover) {
+  .lz-close:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
 }
 .lz-close:active {
   transform: scale(0.98);
@@ -112,8 +114,10 @@
   cursor: pointer;
   padding: 2px 4px;
 }
-.lz-umschalten:hover {
-  text-decoration: underline;
+@media (hover: hover) {
+  .lz-umschalten:hover {
+    text-decoration: underline;
+  }
 }
 /* E8: formatierte Lernzettel-Vorschau (gleiche Struktur wie die Ablage-Ansicht). */
 .lz-vorschau {
@@ -181,8 +185,10 @@
   border-radius: 999px;
   cursor: pointer;
 }
-.lz-verwerfen:hover {
-  color: var(--text);
+@media (hover: hover) {
+  .lz-verwerfen:hover {
+    color: var(--text);
+  }
 }
 .lz-heften {
   border: none;
@@ -194,8 +200,10 @@
   border-radius: 999px;
   cursor: pointer;
 }
-.lz-heften:not(:disabled):hover {
-  background: var(--accent-strong);
+@media (hover: hover) {
+  .lz-heften:not(:disabled):hover {
+    background: var(--accent-strong);
+  }
 }
 .lz-heften:disabled {
   background: var(--line-strong);

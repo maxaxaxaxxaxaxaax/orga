@@ -67,9 +67,11 @@
     color var(--dur-press) var(--ease-out),
     transform var(--dur-press) var(--ease-out);
 }
-.pl-knopf:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+@media (hover: hover) {
+  .pl-knopf:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
 }
 .pl-knopf:active {
   transform: scale(0.98);
