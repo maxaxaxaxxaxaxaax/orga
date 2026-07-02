@@ -1,5 +1,9 @@
 import { fachFarbe } from "../data/stundenplanWoche";
 
+// Neutraler Fallback, wenn ein Fach keine Farbe in der Palette hat: EINE geteilte
+// Konstante statt verstreuter Hex-Duplikate (Netz, Planer, Chips, Ablage ...).
+export const NEUTRAL_FARBE = "#868e96";
+
 // Fach-Label als farbiger Text auf hellem/neutralem Grund (Pillen, Listen, Bars):
 // die jeweilige Fachfarbe, aber zur Tinte abgedunkelt, damit auch helle Faecher
 // (Gelb, Hellblau, Hellgruen) als kleiner Text lesbar bleiben. Der Farbton bleibt
@@ -20,5 +24,5 @@ export function textAuf(hex) {
   const g = parseInt(h.slice(2, 4), 16);
   const b = parseInt(h.slice(4, 6), 16);
   const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-  return lum > 0.62 ? "#23201a" : "#ffffff";
+  return lum > 0.62 ? "#001818" : "#ffffff";
 }

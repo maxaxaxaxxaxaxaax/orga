@@ -6,6 +6,7 @@ import {
 } from "../data/koennensbeweise";
 import { lernwegFuerKb } from "../data/wissen";
 import { ladeSchritte } from "./lernschritte";
+import { NEUTRAL_FARBE } from "./farbe";
 
 // Geteilter Planungs-Stand: localStorage-Keys, Platzhalter für "jetzt" und die
 // Frage, mit welchem Screen die App sinnvoll startet.
@@ -103,7 +104,7 @@ export function fachWochenFortschritt(erledigt) {
           istAktuell: w === AKTUELLE_WOCHE,
         });
       }
-      return { fach, color: kbFarbe[fach] || "#868e96", wochen };
+      return { fach, color: kbFarbe[fach] || NEUTRAL_FARBE, wochen };
     })
     .filter((f) => f.wochen.length > 0);
 }

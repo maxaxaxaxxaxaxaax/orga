@@ -9,7 +9,7 @@ import {
 } from "../data/koennensbeweise";
 import { etappen } from "../data/etappen";
 import { meldeAenderung } from "./planung";
-import { textAuf } from "./farbe";
+import { textAuf, NEUTRAL_FARBE } from "./farbe";
 import Icon from "./Icon";
 import "./Etappenplan.css";
 
@@ -22,7 +22,9 @@ const SPEICHER = "neu.etappenplan.zuordnung";
 const ZIEL_SLOTS = 3; // gestrichelte Leer-Slots je Woche (nur Optik)
 
 function zeitraum(e) {
-  const opt = { day: "2-digit", month: "2-digit" };
+  // Langes Format wie im Wochenplan-Kopf (langDatum), damit beide Planer den
+  // Etappen-Zeitraum gleich schreiben. Wochen-Karten bleiben kompakt (bereichText).
+  const opt = { day: "numeric", month: "long" };
   const von = new Date(e.von + "T00:00:00").toLocaleDateString("de-DE", opt);
   const bis = new Date(e.bis + "T00:00:00").toLocaleDateString("de-DE", opt);
   return `${von} - ${bis}`;
@@ -92,7 +94,7 @@ export default function Etappenplan({ onWeiter, onZurueck, untenSlot, vorn }) {
   // wie im Mockup. Leere Fächer zeigen nur den Kopf.
   const proFach = kbFaecher.map((fach) => ({
     fach,
-    farbe: kbFarbe[fach] || "#868e96",
+    farbe: kbFarbe[fach] || NEUTRAL_FARBE,
     kbs: koennensbeweise.filter(
       (k) => k.fach === fach && zuordnung[k.id] == null
     ),
@@ -197,7 +199,7 @@ export default function Etappenplan({ onWeiter, onZurueck, untenSlot, vorn }) {
 
   // Ein bunter KB-Chip (Vollton in Fachfarbe), ziehbar und antippbar.
   function chip(k, platziert) {
-    const farbe = kbFarbe[k.fach] || "#868e96";
+    const farbe = kbFarbe[k.fach] || NEUTRAL_FARBE;
     return (
       <button
         key={k.id}

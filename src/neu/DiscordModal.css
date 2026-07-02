@@ -1,11 +1,16 @@
 .dc-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(17, 20, 26, 0.45);
+  background: color-mix(in srgb, var(--text) 32%, transparent);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
   display: grid;
   place-items: center;
   padding: 24px;
-  z-index: 80;
+  z-index: 70; /* über den Leisten (Nav 50, untere Pille 60) */
+  /* Die Scrollbar-Reserven (scrollbar-gutter both-edges am html) verkleinern den
+     fixed-Bezugsrahmen: die Randstreifen selbst überbrücken. */
+  margin-inline: calc((100% - 100vw) / 2);
 }
 .dc-modal {
   position: relative;
@@ -17,7 +22,7 @@
   border-radius: var(--r-lg, 20px);
   border: 1px solid var(--line);
   padding: 24px 26px;
-  box-shadow: 0 16px 40px rgba(17, 20, 26, 0.28);
+  box-shadow: var(--shadow-lg);
 }
 .dc-close {
   position: absolute;
@@ -25,15 +30,22 @@
   right: 14px;
   width: 30px;
   height: 30px;
-  border: none;
+  border: 1px solid var(--line);
   border-radius: 999px;
-  background: var(--bg);
+  background: var(--card);
   color: var(--text-2);
   font-size: 0.8rem;
   cursor: pointer;
+  transition: border-color var(--dur-press) var(--ease-out),
+    color var(--dur-press) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
 }
 .dc-close:hover {
-  color: var(--text);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.dc-close:active {
+  transform: scale(0.98);
 }
 .dc-titel {
   margin: 0 0 4px;
@@ -143,7 +155,7 @@
   background: var(--accent-strong);
 }
 .dc-primaer:active:not(:disabled) {
-  transform: scale(0.97);
+  transform: scale(0.98);
 }
 .dc-primaer:disabled {
   opacity: 0.55;
@@ -153,7 +165,7 @@
   border: 1px solid var(--line);
   background: var(--card);
   color: var(--text-2);
-  font-size: 0.88rem;
+  font-size: 0.86rem;
   font-weight: 600;
   padding: 9px 16px;
   border-radius: 999px;

@@ -7,7 +7,7 @@
   z-index: 50;
   display: flex;
   gap: 4px;
-  animation: topbar-rein 0.6s var(--ease-out) 0.12s both;
+  animation: topbar-rein var(--dur-entrance) var(--ease-out) 0.12s both;
 }
 @keyframes topbar-rein {
   from {
@@ -31,7 +31,7 @@
   background: transparent;
   color: var(--text-2);
   cursor: pointer;
-  transition: color 0.18s ease, background 0.18s ease, transform var(--dur-press) ease;
+  transition: color var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out), transform var(--dur-press) var(--ease-out);
 }
 .topbar-knopf:hover {
   color: var(--text);
@@ -49,29 +49,9 @@
   height: 21px;
   fill: none;
   stroke: currentColor;
-  stroke-width: 1.9;
+  stroke-width: 1.8;
   stroke-linecap: round;
   stroke-linejoin: round;
-}
-/* Ungelesen-Zähler am Chat-Icon. */
-.topbar-badge {
-  position: absolute;
-  top: 3px;
-  right: 3px;
-  min-width: 17px;
-  height: 17px;
-  padding: 0 4px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-  border-radius: 999px;
-  border: 2px solid var(--card);
-  background: var(--warn, #e8593a);
-  color: #fff;
-  font-size: 0.64rem;
-  font-weight: 700;
-  line-height: 1;
 }
 
 /* Fängt Klicks neben dem offenen Dropdown ab (schließt es). */
@@ -96,7 +76,7 @@
   padding: 6px;
   background: var(--card);
   border: 1px solid var(--line);
-  border-radius: 16px;
+  border-radius: var(--r-md, 14px);
   box-shadow: var(--shadow-lg);
   /* Aus der Glocke/Trigger-Ecke aufziehen (oben rechts), nicht aus der Mitte. */
   transform-origin: top right;
@@ -139,97 +119,6 @@
   letter-spacing: 0.05em;
   color: var(--muted);
 }
-.topbar-panel-zahl {
-  color: var(--accent-strong);
-}
-.topbar-leer {
-  margin: 0;
-  padding: 22px 12px;
-  text-align: center;
-  color: var(--muted);
-  font-size: 0.9rem;
-}
-
-/* Mitteilungs-Liste. */
-.topbar-liste {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-.topbar-eintrag {
-  display: flex;
-  gap: 10px;
-  padding: 10px;
-  border-radius: 12px;
-  align-items: flex-start;
-}
-.topbar-eintrag.neu {
-  background: color-mix(in srgb, var(--accent) 7%, transparent);
-}
-.topbar-eintrag-icon {
-  flex: none;
-  width: 34px;
-  height: 34px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 10px;
-  background: var(--bg);
-  color: var(--text-2);
-}
-.topbar-eintrag-icon.art-coach {
-  background: var(--accent-soft);
-  color: var(--accent-strong);
-}
-.topbar-svg-klein {
-  width: 17px;
-  height: 17px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.9;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-.topbar-eintrag-text {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-}
-.topbar-eintrag-kopf {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 8px;
-}
-.topbar-eintrag-titel {
-  font-size: 0.9rem;
-  font-weight: 700;
-  color: var(--text);
-}
-.topbar-eintrag.neu .topbar-eintrag-titel::after {
-  content: "";
-  display: inline-block;
-  width: 7px;
-  height: 7px;
-  margin-left: 6px;
-  border-radius: 50%;
-  background: var(--accent-strong);
-  vertical-align: middle;
-}
-.topbar-eintrag-zeit {
-  flex: none;
-  font-size: 0.72rem;
-  color: var(--muted);
-}
-.topbar-eintrag-body {
-  font-size: 0.85rem;
-  line-height: 1.4;
-  color: var(--text-2);
-}
 
 /* Einstellungen. */
 .topbar-konto {
@@ -240,8 +129,8 @@
 }
 .topbar-konto-avatar {
   flex: none;
-  width: 42px;
-  height: 42px;
+  width: 40px;
+  height: 40px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -276,16 +165,20 @@
   margin: 0 8px 8px;
   padding: 10px;
   border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--line));
-  border-radius: 12px;
+  border-radius: 999px;
   background: var(--accent-soft);
   color: var(--accent-strong);
   font-size: 0.9rem;
   font-weight: 700;
   cursor: pointer;
-  transition: background var(--dur-fast) ease;
+  transition: background var(--dur-fast) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
 }
 .topbar-discord:hover {
   background: color-mix(in srgb, var(--accent-soft) 70%, var(--accent));
+}
+.topbar-discord:active {
+  transform: scale(0.98);
 }
 .topbar-reset {
   display: block;
@@ -293,17 +186,21 @@
   margin: 0 8px 8px;
   padding: 10px;
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: 999px;
   background: var(--bg);
   color: var(--text);
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
-  transition: border-color var(--dur-fast) ease, color var(--dur-fast) ease;
+  transition: border-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
 }
 .topbar-reset:hover {
   border-color: var(--accent);
   color: var(--accent-strong);
+}
+.topbar-reset:active {
+  transform: scale(0.98);
 }
 .topbar-abmelden {
   display: block;
@@ -311,7 +208,7 @@
   margin: 0 8px 8px;
   padding: 10px;
   border: none;
-  border-radius: 12px;
+  border-radius: 999px;
   background: transparent;
   color: var(--text-2);
   font-size: 0.88rem;

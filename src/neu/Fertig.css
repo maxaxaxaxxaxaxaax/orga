@@ -56,9 +56,13 @@
   padding: 9px 18px;
   border-radius: 999px;
   cursor: pointer;
-  transition: border-color var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out);
+  transition: border-color var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
 }
 .fertig-neu:hover {
   border-color: var(--accent);
   color: var(--accent);
+}
+.fertig-neu:active {
+  transform: scale(0.98);
 }

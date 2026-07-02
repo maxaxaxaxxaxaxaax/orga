@@ -3,7 +3,7 @@
   padding: 16px 18px;
   background: var(--card);
   border: 1px solid var(--line);
-  border-radius: var(--r-md, 12px);
+  border-radius: var(--r-md, 14px);
 }
 .cf-titel {
   margin: 0 0 10px;
@@ -44,7 +44,7 @@
   padding: 9px 12px;
   background: var(--bg);
   border: 1px solid var(--line);
-  border-radius: var(--r-sm, 8px);
+  border-radius: var(--r-sm, 9px);
 }
 .cf-frage {
   flex: 1;
@@ -62,8 +62,8 @@
 }
 .cf-weg {
   flex-shrink: 0;
-  width: 26px;
-  height: 26px;
+  width: 22px;
+  height: 22px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -71,11 +71,15 @@
   background: var(--card);
   color: var(--muted);
   font-size: 0.8rem;
-  border-radius: 50%;
+  border-radius: 999px;
   cursor: pointer;
-  transition: color var(--dur-press) var(--ease-out), border-color var(--dur-press) var(--ease-out);
+  transition: color var(--dur-press) var(--ease-out), border-color var(--dur-press) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
 }
 .cf-weg:hover {
   color: var(--ok-text);
   border-color: var(--ok-text);
+}
+.cf-weg:active {
+  transform: scale(0.98);
 }

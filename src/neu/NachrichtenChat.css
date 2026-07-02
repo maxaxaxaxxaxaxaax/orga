@@ -3,12 +3,17 @@
 .nc-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 50;
+  z-index: 70; /* über den Leisten (Nav 50, untere Pille 60) */
+  /* Die Scrollbar-Reserven (scrollbar-gutter both-edges am html) verkleinern den
+     fixed-Bezugsrahmen: die Randstreifen selbst überbrücken. */
+  margin-inline: calc((100% - 100vw) / 2);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 24px;
   background: color-mix(in srgb, var(--text) 32%, transparent);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
   animation: nc-fade var(--dur-fast) var(--ease-out);
 }
 .nc {
@@ -18,8 +23,8 @@
   flex-direction: column;
   background: var(--card);
   border: 1px solid var(--line);
-  border-radius: var(--r-lg, 16px);
-  box-shadow: 0 18px 50px -12px color-mix(in srgb, var(--text) 40%, transparent);
+  border-radius: var(--r-lg, 20px);
+  box-shadow: var(--shadow-lg);
   overflow: hidden;
   animation: nc-auf var(--dur-base) var(--ease-out);
 }
@@ -32,8 +37,8 @@
 }
 .nc-avatar {
   flex-shrink: 0;
-  width: 38px;
-  height: 38px;
+  width: 40px;
+  height: 40px;
   border-radius: 999px;
   background: var(--accent);
   color: var(--on-accent);
@@ -59,16 +64,22 @@
   margin-left: auto;
   width: 32px;
   height: 32px;
-  border: none;
-  background: transparent;
+  border: 1px solid var(--line);
+  background: var(--card);
   border-radius: 999px;
   color: var(--text-2);
   font-size: 1rem;
   cursor: pointer;
-  transition: background var(--dur-fast) var(--ease-out);
+  transition: border-color var(--dur-press) var(--ease-out),
+    color var(--dur-press) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
 }
 .nc-schliessen:hover {
-  background: var(--card-2);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.nc-schliessen:active {
+  transform: scale(0.98);
 }
 .nc-verlauf {
   flex: 1;
@@ -80,9 +91,9 @@
   gap: 10px;
 }
 .nc-msg {
-  max-width: 78%;
+  max-width: 80%;
   padding: 9px 12px;
-  border-radius: 14px;
+  border-radius: var(--r-md, 14px);
   display: flex;
   flex-direction: column;
   gap: 3px;
@@ -94,25 +105,19 @@
 }
 .nc-ich {
   align-self: flex-end;
-  background: var(--accent);
+  background: var(--accent-soft);
   border-bottom-right-radius: 4px;
 }
 .nc-text {
   margin: 0;
   font-size: 0.9rem;
-  line-height: 1.35;
+  line-height: 1.45;
   color: var(--text);
-}
-.nc-ich .nc-text {
-  color: var(--on-accent);
 }
 .nc-zeit {
   align-self: flex-end;
-  font-size: 0.66rem;
+  font-size: 0.7rem;
   color: var(--muted);
-}
-.nc-ich .nc-zeit {
-  color: color-mix(in srgb, var(--on-accent) 75%, transparent);
 }
 .nc-eingabe {
   display: flex;
@@ -130,22 +135,29 @@
   color: var(--text);
   font: inherit;
   font-size: 0.9rem;
+  transition: border-color var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-fast) var(--ease-out);
 }
 .nc-eingabe input:focus {
   outline: none;
   border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
 }
 .nc-senden {
   flex-shrink: 0;
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   border: none;
   border-radius: 999px;
   background: var(--accent);
   color: var(--on-accent);
   font-size: 1.1rem;
   cursor: pointer;
-  transition: opacity var(--dur-fast) var(--ease-out);
+  transition: opacity var(--dur-fast) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
+}
+.nc-senden:active:not(:disabled) {
+  transform: scale(0.98);
 }
 .nc-senden:disabled {
   opacity: 0.45;

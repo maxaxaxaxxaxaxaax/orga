@@ -61,10 +61,10 @@ export default function WebcamModal({ onCapture, onClose }) {
         aria-label="Foto aufnehmen"
         onClick={(e) => e.stopPropagation()}
       >
-        <button className="wc-close" onClick={onClose} aria-label="Schließen">
+        <button type="button" className="wc-close" onClick={onClose} aria-label="Schließen">
           ✕
         </button>
-        <p className="wc-titel">Foto aufnehmen</p>
+        <h2 className="wc-titel">Foto aufnehmen</h2>
 
         {fehler ? (
           <p className="wc-fehler">{fehler}</p>

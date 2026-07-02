@@ -2,6 +2,10 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md, 14px);
+  padding: 16px;
 }
 
 .lt-kopf {
@@ -149,15 +153,18 @@
   border: none;
   background: var(--accent);
   color: var(--on-accent);
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-weight: 700;
-  padding: 12px;
+  padding: 9px 18px;
   border-radius: 999px;
   cursor: pointer;
-  transition: background var(--dur-press) var(--ease-out), opacity var(--dur-press) var(--ease-out);
+  transition: background var(--dur-fast) var(--ease-out), transform var(--dur-press) var(--ease-out);
 }
 .lt-pruefen:hover:not(:disabled) {
   background: var(--accent-strong);
+}
+.lt-pruefen:active:not(:disabled) {
+  transform: scale(0.98);
 }
 .lt-pruefen:disabled {
   background: var(--line-strong);
@@ -174,11 +181,15 @@
   padding: 12px;
   border-radius: 999px;
   cursor: pointer;
-  transition: border-color var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out);
+  transition: border-color var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
 }
 .lt-weiter:hover {
   border-color: var(--accent);
   color: var(--accent);
+}
+.lt-weiter:active {
+  transform: scale(0.98);
 }
 
 .lt-leer {

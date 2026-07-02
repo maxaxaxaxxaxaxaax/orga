@@ -45,7 +45,7 @@
   flex-direction: column;
   align-items: center;
   gap: 8px;
-  animation: hu-fertig-rein 0.5s var(--ease-out) both;
+  animation: hu-fertig-rein var(--dur-entrance) var(--ease-out) both;
 }
 @keyframes hu-fertig-rein {
   from {
@@ -70,7 +70,7 @@
   background: var(--ok-text);
   box-shadow: 0 14px 36px -10px color-mix(in srgb, var(--ok-text) 75%, transparent);
   margin-bottom: 10px;
-  animation: hu-haken-pop 0.55s var(--ease-out-strong) both;
+  animation: hu-haken-pop var(--dur-entrance) var(--ease-out-strong) both;
 }
 @keyframes hu-haken-pop {
   from {
@@ -127,13 +127,14 @@
   border-radius: 999px;
   cursor: pointer;
   box-shadow: var(--shadow-md);
-  transition: transform var(--dur-press) var(--ease-out), filter var(--dur-press) var(--ease-out);
+  transition: transform var(--dur-press) var(--ease-out), background var(--dur-fast) var(--ease-out);
 }
+/* Wie die Teal-CTAs: Hover dunkelt die Fläche ab (ok-Grün hat kein strong-Token). */
 .hu-fertig-weiter:hover {
-  filter: brightness(1.06);
+  background: color-mix(in srgb, var(--ok-text) 84%, var(--text));
 }
 .hu-fertig-weiter:active {
-  transform: scale(0.97);
+  transform: scale(0.98);
 }
 .hu-fertig-ansehen {
   border: 1px solid var(--line-strong);
@@ -144,11 +145,15 @@
   padding: 10px 20px;
   border-radius: 999px;
   cursor: pointer;
-  transition: border-color var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out);
+  transition: border-color var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
 }
 .hu-fertig-ansehen:hover {
   border-color: var(--ok-text);
   color: var(--ok-text);
+}
+.hu-fertig-ansehen:active {
+  transform: scale(0.98);
 }
 @media (max-width: 560px) {
   .hu-fertig-titel {
@@ -274,11 +279,6 @@
   min-height: 0;
   align-self: stretch;
 }
-.hu-nachr-leer {
-  margin: 8px 0 0;
-  color: var(--muted);
-  font-size: 0.9rem;
-}
 /* Filter-Chips der Benachrichtigungen (wie die Ablage-Chips, etwas kompakter für
    die kleine Box): neutral, der aktive Chip in Accent-Soft. */
 .hu-nachr-chips {
@@ -299,11 +299,15 @@
   cursor: pointer;
   transition: background var(--dur-fast) var(--ease-out),
     border-color var(--dur-fast) var(--ease-out),
-    color var(--dur-fast) var(--ease-out);
+    color var(--dur-fast) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
 }
 .hu-nachr-chip:hover {
   background: var(--card-2);
   color: var(--text);
+}
+.hu-nachr-chip:active {
+  transform: scale(0.98);
 }
 .hu-nachr-chip.an {
   background: var(--accent-soft);
@@ -321,10 +325,12 @@
   background: var(--bg);
   border: 1px solid var(--line);
   border-radius: 999px;
-  transition: border-color var(--dur-fast) var(--ease-out);
+  transition: border-color var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-fast) var(--ease-out);
 }
 .hu-nachr-suche:focus-within {
   border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
 }
 .hu-nachr-suche svg {
   width: 15px;
@@ -381,6 +387,9 @@
   transform: translateY(-2px);
   border-color: var(--line-strong);
 }
+.hu-nachr:active {
+  transform: scale(0.98);
+}
 .hu-nachr-icon {
   flex-shrink: 0;
   width: 30px;
@@ -409,7 +418,7 @@
   gap: 8px;
 }
 .hu-nachr-titel {
-  font-size: 0.86rem;
+  font-size: 0.9rem;
   font-weight: 700;
   color: var(--text);
 }
@@ -535,10 +544,10 @@
   gap: 2px;
   flex-shrink: 0;
 }
-/* Chevron wie die Wochen-Navigation im Wochenplan (.wp-kal-pfeil). */
+/* Chevron wie die Wochen-Navigation im Wochenplan (.wp-kal-pfeil, 32px). */
 .hu-plan-pfeil {
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -546,10 +555,14 @@
   background: none;
   color: var(--accent);
   cursor: pointer;
-  transition: color var(--dur-press) var(--ease-out);
+  transition: color var(--dur-press) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
 }
 .hu-plan-pfeil:hover:not(:disabled) {
   color: var(--accent-strong);
+}
+.hu-plan-pfeil:active:not(:disabled) {
+  transform: scale(0.98);
 }
 .hu-plan-pfeil:disabled {
   opacity: 0.4;
@@ -624,7 +637,7 @@
   fill: none;
   /* Aktiv-Farbe (Teal) wie die aktive Nav-Pille oben. */
   stroke: var(--accent);
-  stroke-width: 1.7;
+  stroke-width: 1.8;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
@@ -836,7 +849,7 @@
   font-weight: 600;
   color: var(--ok-text);
   background: var(--ok-bg);
-  border-radius: var(--r-sm, 8px);
+  border-radius: var(--r-sm, 9px);
 }
 /* Kleiner Ausblick auf morgen, unten im Block. */
 .hu-morgen {
@@ -875,12 +888,6 @@
 }
 /* Notizen: Häkchen-Liste (Figma). Box links zum Abhaken, Text, Kontext (z. B.
    Lehrkraft) grau dahinter, ✕ zum Entfernen erscheint beim Hovern. */
-.hu-notizen-leer {
-  margin: 0;
-  font-size: 0.88rem;
-  line-height: 1.5;
-  color: var(--muted);
-}
 .hu-notiz-liste {
   list-style: none;
   margin: 0;
@@ -905,7 +912,9 @@
   flex-shrink: 0;
   width: 22px;
   height: 22px;
-  border-radius: var(--r-sm, 7px);
+  /* Ein Abhak-Muster app-weit: Kreis, im Erledigt-Zustand gefüllt mit Haken
+     (wie .ki-schritt-box und .mb-haken). */
+  border-radius: 50%;
   border: 1.5px solid var(--accent);
   background: var(--card);
   color: var(--on-accent);
@@ -943,18 +952,22 @@
   width: 22px;
   height: 22px;
   border: none;
-  border-radius: 50%;
+  border-radius: 999px;
   background: transparent;
   color: var(--muted);
   font-size: 0.82rem;
   cursor: pointer;
-  transition: opacity var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out);
+  transition: opacity var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
 }
 .hu-notiz:hover .hu-notiz-weg {
   opacity: 1;
 }
 .hu-notiz-weg:hover {
   color: var(--text);
+}
+.hu-notiz-weg:active {
+  transform: scale(0.98);
 }
 /* Erinnerung hinzufügen: Plus-Knopf sitzt links im Eingabefeld. Hängt unten in
    der Karte (margin-top:auto schiebt die Form an den Boden der Flex-Spalte). */
@@ -968,10 +981,12 @@
   background: var(--bg);
   border: 1px solid var(--line);
   border-radius: 999px;
-  transition: border-color var(--dur-press) var(--ease-out);
+  transition: border-color var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-fast) var(--ease-out);
 }
 .hu-notiz-add:focus-within {
   border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
 }
 .hu-notiz-add-feld {
   flex: 1;
@@ -1002,10 +1017,14 @@
   border: none;
   border-radius: 999px;
   cursor: pointer;
-  transition: color var(--dur-press) var(--ease-out);
+  transition: color var(--dur-press) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
 }
 .hu-notiz-add-knopf:hover {
   color: var(--accent-strong);
+}
+.hu-notiz-add-knopf:active {
+  transform: scale(0.98);
 }
 /* Meine Aufgaben: Lernweg-Karten. Fach in (kontrastsicher abgedunkelter)
    Fachfarbe, der konkrete Lernweg darunter, Zeit/Raum als Chips, unten ein
@@ -1023,17 +1042,25 @@
 }
 .hu-auf-grid {
   display: grid;
-  /* So viele ~165px-Spalten wie passen: nie eine einzige Karte über die volle Breite.
-     Beim Vergrößern der Box kommen Spalten dazu, die Karten bleiben in ruhiger Größe. */
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 14px;
-  /* Karten oben bündig (start, NICHT gestreckt), damit sie bei wenigen Aufgaben nicht
-     aufgeblasen werden. Passen sie nicht in die Box, scrollt der Bereich INNERHALB der
-     Karte, statt die Box zu sprengen. */
+  /* auto-fit: leere Spuren kollabieren, die Karten teilen sich die VOLLE Breite
+     der Box (statt rechts Leerraum zu lassen); ab ~150px brechen sie in Reihen um. */
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--grid-gap-eng, 14px);
+  /* Kartenreihen füllen die Box bis ganz unten (der Inhalt der Karte bleibt oben,
+     freier Platz wird ruhiger Weißraum IN der Karte). Passen sie nicht in die Box,
+     scrollt der Bereich INNERHALB der Karte, statt die Box zu sprengen. */
   flex: 1;
   min-height: 0;
-  align-content: start;
+  /* Reihen füllen die Box, werden aber NIE kleiner als ihr Inhalt: sonst quillt
+     der Karten-Fortschritt unten aus der Karte (Layout-Bruch). */
+  grid-auto-rows: minmax(min-content, 1fr);
+  align-content: stretch;
   overflow-y: auto;
+  /* Unsichtbarer Puffer rund ums Raster: die Karten liegen optisch an derselben
+     Stelle, aber Hover-Anheben (translateY) und Schatten werden vom Scroll-
+     Container nicht mehr beschnitten. */
+  margin: -8px;
+  padding: 8px;
 }
 .hu-auf {
   display: flex;
@@ -1060,6 +1087,9 @@
   transform: translateY(-2px);
   border-color: var(--line-strong);
 }
+.hu-auf:active {
+  transform: scale(0.98);
+}
 .hu-auf.done {
   opacity: 0.62;
 }
@@ -1084,7 +1114,7 @@
    farbige Unterzeile darunter. */
 .hu-auf-titel {
   margin-top: 2px;
-  font-size: 1.04rem;
+  font-size: 1.05rem;
   font-weight: 700;
   line-height: 1.22;
   letter-spacing: -0.01em;
@@ -1236,17 +1266,9 @@
   align-items: center;
   gap: 8px;
   padding: 9px 10px;
-  border-radius: var(--r-md, 12px);
+  border-radius: var(--r-md, 14px);
 }
 .hu-plan-pause {
-  flex-shrink: 0;
-}
-.hu-stunde-strich {
-  width: 3px;
-  /* Nur etwas höher als die Fach-Schrift (0.92rem), nicht über die ganze Zeile;
-     durch align-items:center der Zeile sitzt der Strich mittig zum Fachnamen. */
-  height: 1.1rem;
-  border-radius: 2px;
   flex-shrink: 0;
 }
 .hu-stunde-info {
@@ -1320,8 +1342,8 @@
   width: 8.7em;
   white-space: nowrap;
   text-align: center;
-  font-size: 0.73rem;
-  color: var(--text-2);
+  font-size: 0.7rem;
+  color: var(--muted);
   background: var(--bg);
   border: 1px solid var(--line);
   border-radius: 999px;

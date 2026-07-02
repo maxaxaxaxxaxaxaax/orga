@@ -30,11 +30,15 @@
   padding: 8px 14px;
   border-radius: 999px;
   cursor: pointer;
-  transition: border-color var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out), background var(--dur-press) var(--ease-out);
+  transition: border-color var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out), background var(--dur-press) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
 }
 .cb-knopf:hover {
   border-color: var(--accent);
   color: var(--accent);
+}
+.cb-knopf:active {
+  transform: scale(0.98);
 }
 /* "Zur Abnahme anmelden" ist der positive Meilenstein, etwas präsenter. */
 .cb-knopf-stark {
@@ -51,7 +55,7 @@
   font-size: 0.84rem;
   line-height: 1.3;
   padding: 8px 12px;
-  border-radius: var(--r-sm, 8px);
+  border-radius: var(--r-sm, 9px);
 }
 /* Hilferuf offen: ruhiges Warnsignal (gelb), kein Alarm. */
 .cb-hilfe {
@@ -66,7 +70,7 @@
 /* Zur Abnahme angemeldet: positiver Akzent. */
 .cb-abnahme {
   background: var(--accent-soft);
-  color: var(--accent);
+  color: var(--accent-strong);
   font-weight: 600;
 }
 .cb-zurueck {
@@ -106,7 +110,7 @@
   color: var(--text);
   background: var(--bg);
   border: 1px solid var(--line-strong);
-  border-radius: var(--r-sm, 8px);
+  border-radius: var(--r-sm, 9px);
 }
 .cb-frage-input::placeholder {
   color: var(--muted);
@@ -125,11 +129,15 @@
   padding: 7px 14px;
   border-radius: 999px;
   cursor: pointer;
-  transition: border-color var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out);
+  transition: border-color var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
 }
 .cb-frage-save:hover:not(:disabled) {
   border-color: var(--accent);
   color: var(--accent);
+}
+.cb-frage-save:active:not(:disabled) {
+  transform: scale(0.98);
 }
 .cb-frage-save:disabled {
   opacity: 0.45;

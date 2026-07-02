@@ -15,7 +15,7 @@ export const faecher = [
   {
     id: "mathe",
     fach: "Mathematik",
-    farbe: "#3b5bdb",
+    farbe: "#7DC0FE",
     themen: [
       { id: "grundlagen", label: "Grundlagen negative Zahlen", etappe: 4, kbId: "7MA1", kategorie: "Mathematische Grundlagen", subkategorie: "Negative Zahlen", schritte: [
         { text: "Lernzettel lesen: negative Zahlen", material: "lz-ma-1", fertig: false },
@@ -62,7 +62,7 @@ export const faecher = [
   {
     id: "deutsch",
     fach: "Deutsch",
-    farbe: "#e8590c",
+    farbe: "#75E0A0",
     themen: [
       { id: "mini-vortrag", label: "Mini-Vortrag", etappe: 4, kbId: "7DA1", kategorie: "Textarten und Schreiben", subkategorie: "Präsentieren und Gestalten", schritte: [
         { text: "Lernzettel lesen: Mini-Vortrag halten", material: "lz-de-1", fertig: false },
@@ -98,7 +98,7 @@ export const faecher = [
   {
     id: "englisch",
     fach: "Englisch",
-    farbe: "#f59f00",
+    farbe: "#FF7DA9",
     themen: [
       { id: "simple-past", label: "Revision simple past", etappe: 4, kbId: "7EA1", kategorie: "Zeitformen", subkategorie: "Vergangenheit", schritte: [
         { text: "Lernzettel lesen: Simple Past", material: "lz-en-1", fertig: false },

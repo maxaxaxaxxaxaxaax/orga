@@ -1,7 +1,7 @@
 .sb {
   background: var(--bg);
   border: 1px solid var(--line);
-  border-radius: var(--r-md, 12px);
+  border-radius: var(--r-md, 14px);
   padding: 16px;
 }
 .sb-kopf {
@@ -37,7 +37,7 @@
   height: 100%;
   background: var(--accent);
   border-radius: 2px;
-  transition: width 0.25s ease;
+  transition: width var(--dur-base) var(--ease-out);
 }
 .sb-aufgabe {
   margin: 6px 0 12px;
@@ -59,7 +59,7 @@
   padding: 10px 12px;
   background: var(--card);
   border: 1.5px dashed var(--line-strong);
-  border-radius: var(--r-sm, 8px);
+  border-radius: var(--r-sm, 9px);
   margin-bottom: 12px;
 }
 .sb-satzzeile.ok {
@@ -69,8 +69,8 @@
 }
 .sb-satzzeile.no {
   border-style: solid;
-  border-color: var(--warn-line);
-  background: var(--warn-bg);
+  border-color: var(--danger-line);
+  background: var(--danger-bg);
 }
 .sb-platzhalter {
   font-size: 0.85rem;
@@ -93,11 +93,11 @@
   color: var(--text);
   background: var(--card);
   border: 1px solid var(--line-strong);
-  border-radius: var(--r-sm, 8px);
+  border-radius: var(--r-sm, 9px);
   box-shadow: var(--shadow-sm);
   cursor: pointer;
   transition:
-    border-color var(--dur-press) ease,
+    border-color var(--dur-press) var(--ease-out),
     transform 0.08s ease;
 }
 .sb-wort:hover:not(:disabled) {
@@ -125,24 +125,24 @@
 .sb-feedback {
   margin-top: 12px;
   padding: 10px 13px;
-  border-radius: var(--r-sm, 8px);
+  border-radius: var(--r-sm, 9px);
 }
 .sb-feedback.ok {
   background: var(--ok-bg);
 }
 .sb-feedback.no {
-  background: var(--warn-bg);
+  background: var(--danger-bg);
 }
 .sb-feedback-text {
   margin: 0;
-  font-size: 0.92rem;
-  font-weight: 600;
+  font-size: 0.9rem;
 }
 .sb-feedback.ok .sb-feedback-text {
   color: var(--ok-text);
+  font-weight: 600;
 }
 .sb-feedback.no .sb-feedback-text {
-  color: var(--warn-text);
+  color: var(--danger-text);
 }
 .sb-loesung {
   margin: 6px 0 0;
@@ -175,6 +175,15 @@
   padding: 9px 18px;
   border-radius: 999px;
   cursor: pointer;
+  transition: background var(--dur-fast) var(--ease-out), transform var(--dur-press) var(--ease-out);
+}
+.sb-pruefen:hover:not(:disabled),
+.sb-weiter:hover:not(:disabled) {
+  background: var(--accent-strong);
+}
+.sb-pruefen:active:not(:disabled),
+.sb-weiter:active:not(:disabled) {
+  transform: scale(0.98);
 }
 .sb-pruefen:disabled {
   background: var(--line-strong);
@@ -186,7 +195,7 @@
   border: 1px solid var(--line-strong);
   background: var(--card);
   color: var(--text-2);
-  font-size: 0.85rem;
+  font-size: 0.86rem;
   font-weight: 600;
   padding: 8px 14px;
   border-radius: 999px;
@@ -199,7 +208,7 @@
 }
 .sb-leer {
   margin: 0;
-  font-size: 0.88rem;
+  font-size: 0.9rem;
   color: var(--muted);
   font-style: italic;
 }

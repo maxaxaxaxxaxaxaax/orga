@@ -73,7 +73,8 @@ export default function NachrichtenChat({ mitteilungen, onClose }) {
           </button>
         </header>
 
-        <div className="nc-verlauf">
+        {/* Live-Region: neue Antworten werden vom Screenreader vorgelesen */}
+        <div className="nc-verlauf" role="log" aria-live="polite">
           {verlauf.map((m, i) => (
             <div key={i} className={"nc-msg nc-" + m.von}>
               <p className="nc-text">{m.text}</p>

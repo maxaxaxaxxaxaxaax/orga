@@ -56,7 +56,7 @@ export default function Rechenweg({ kb, aufgabe, onClose }) {
   const chatVorherOffenRef = useRef(chatOffen); // letzter Offen-Zustand (Übergänge)
   const chatAbbruchRef = useRef(null); // AbortController des laufenden Streams
 
-  const tinteRef = useRef("#1f2933"); // Tinten-Farbe, folgt dem Theme (--text)
+  const tinteRef = useRef("#001818"); // Tinten-Farbe, folgt dem Theme (--text)
   const BREITE = 2.4;
 
   // Einen einzelnen Strich glatt zeichnen (quadratische Mittelpunkte = Tinten-Look).
@@ -114,7 +114,7 @@ export default function Rechenweg({ kb, aufgabe, onClose }) {
     tinteRef.current =
       getComputedStyle(document.documentElement)
         .getPropertyValue("--text")
-        .trim() || "#1f2933";
+        .trim() || "#001818";
     alleNeu();
   }
 

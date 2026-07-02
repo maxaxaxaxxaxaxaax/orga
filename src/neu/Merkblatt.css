@@ -43,7 +43,7 @@
 }
 .mb-abschnitt {
   border: 1px solid var(--line);
-  border-radius: var(--r-md, 12px);
+  border-radius: var(--r-md, 14px);
   background: var(--card);
   overflow: hidden;
 }
@@ -80,15 +80,12 @@
   color: var(--ok-text);
   background: var(--ok-bg);
 }
+/* Rotation kommt vom geteilten .klapp-chevron-Muster (index.css). */
 .mb-pfeil {
   flex: none;
   display: inline-flex;
   align-items: center;
   color: var(--muted);
-  transition: transform var(--dur-base) var(--ease-in-out);
-}
-.mb-pfeil.auf {
-  transform: rotate(90deg);
 }
 
 .mb-body {
@@ -118,16 +115,20 @@
   align-items: flex-start;
   gap: 10px;
   border: 1px solid var(--line);
-  border-radius: var(--r-sm, 8px);
+  border-radius: var(--r-sm, 9px);
   background: var(--card);
   text-align: left;
   padding: 10px 12px;
   cursor: pointer;
   transition: border-color var(--dur-press) var(--ease-out),
-    background var(--dur-press) var(--ease-out);
+    background var(--dur-press) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
 }
 .mb-regel:hover {
   border-color: var(--line-strong);
+}
+.mb-regel:active {
+  transform: scale(0.98);
 }
 .mb-regel.ok {
   border-color: color-mix(in srgb, var(--ok-text) 45%, var(--line));
@@ -246,7 +247,7 @@
   background: var(--bg);
   color: var(--muted);
   font-weight: 700;
-  border-radius: var(--r-sm, 6px);
+  border-radius: var(--r-sm, 9px);
   padding: 3px 0;
   cursor: pointer;
 }

@@ -28,18 +28,18 @@
   padding-left: 12px;
 }
 
-/* Inhaltsspalte auf der gemeinsamen Pillenbreite (800px), damit Hero und CTA auf
-   demselben Raster sitzen. Füllt die Höhe; unten Platz für die Pille. */
+/* Inhaltsspalte auf der gemeinsamen Pillenbreite (--leiste-breite), damit Hero und
+   CTA auf demselben Raster sitzen. Füllt die Höhe; unten Platz für die Pille. */
 .login-inhalt {
   flex: 1;
   box-sizing: border-box;
-  width: min(1080px, calc(100% - 2 * var(--seite-x)));
+  width: min(var(--leiste-breite), calc(100% - 2 * var(--seite-x)));
   margin: 0 auto;
   min-height: 0;
   display: flex;
   flex-direction: column;
   padding: clamp(26px, 5vh, 54px) 0 calc(var(--seite-bottom) + 10px);
-  animation: login-rein 0.6s var(--ease-out) both;
+  animation: login-rein var(--dur-entrance) var(--ease-out) both;
 }
 @keyframes login-rein {
   from {
@@ -153,14 +153,15 @@
   }
 }
 /* Pitch unter dem Logo: gleiche Typo-Stufe wie der Dienste-Kopf (Titel + Deck),
-   linksbündig. Gleiche Breite wie das Wortmark, damit die linke Textkante exakt am
-   o beginnt (ein Lockup). Sofort sichtbar (nicht an die Animation gekoppelt). */
+   mittig zentriert unter dem Wortmark (eine ruhige Achse mit Logo und Pille).
+   Gleiche Breite wie das Wortmark. Sofort sichtbar (nicht an die Animation gekoppelt). */
 .login-start-pitch {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 10px;
   width: min(58%, 520px);
-  text-align: left;
+  text-align: center;
 }
 .login-start-pitch-titel {
   margin: 0;
@@ -255,7 +256,7 @@
 .login-dienste-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(196px, 1fr));
-  gap: 10px;
+  gap: var(--grid-gap-eng, 14px);
 }
 /* Eine Dienst-Kachel: farbiges Logo, Name + Status, rechts der Verbinden-Haken. */
 .login-dienst {
@@ -268,18 +269,18 @@
   border: 1px solid var(--line);
   border-radius: var(--r-md, 14px);
   cursor: pointer;
-  transition: border-color 0.14s ease, box-shadow 0.14s ease,
-    background 0.14s ease, transform var(--dur-press) ease;
+  transition: border-color var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out),
+    background var(--dur-fast) var(--ease-out), transform var(--dur-press) var(--ease-out);
 }
 .login-dienst:hover {
   border-color: var(--line-strong);
   box-shadow: var(--shadow-sm);
 }
 .login-dienst:active {
-  transform: scale(0.99);
+  transform: scale(0.98);
 }
 .login-dienst.an {
-  border-color: color-mix(in srgb, var(--accent) 45%, var(--line));
+  border-color: var(--line);
   background: color-mix(in srgb, var(--accent) 6%, var(--card));
 }
 /* Kacheln kaskadieren beim Auftritt herein (Cascade, erstmaliges Verbinden).
@@ -400,16 +401,20 @@
   color: var(--text-2);
   border-radius: 999px;
   cursor: pointer;
-  transition: background var(--dur-press) ease, color var(--dur-press) ease;
+  transition: background var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
 }
 .login-weg-zurueck:hover {
   background: color-mix(in srgb, var(--text) 8%, transparent);
   color: var(--accent);
 }
+.login-weg-zurueck:active {
+  transform: scale(0.98);
+}
 .login-weg-sep {
   flex-shrink: 0;
   width: 1px;
-  height: 24px;
+  height: 22px;
   background: var(--line-strong);
 }
 

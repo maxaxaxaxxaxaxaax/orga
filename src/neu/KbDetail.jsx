@@ -1,10 +1,11 @@
 import { kbFarbe } from "../data/koennensbeweise";
+import { NEUTRAL_FARBE } from "./farbe";
 import KbInhalt from "./KbInhalt";
 import "./KbDetail.css";
 
 // Detail einer geplanten Aufgabe (KB) als Modal: Inhalt liegt in KbInhalt.
 export default function KbDetail({ kb, onClose }) {
-  const farbe = kbFarbe[kb.fach] || "#868e96";
+  const farbe = kbFarbe[kb.fach] || NEUTRAL_FARBE;
 
   return (
     <div className="kd-overlay" onClick={onClose}>
@@ -16,7 +17,7 @@ export default function KbDetail({ kb, onClose }) {
         aria-label={kb.titel}
         onClick={(e) => e.stopPropagation()}
       >
-        <button className="kd-close" onClick={onClose} aria-label="Schließen">
+        <button type="button" className="kd-close" onClick={onClose} aria-label="Schließen">
           ✕
         </button>
 

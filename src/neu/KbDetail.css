@@ -1,11 +1,16 @@
 .kd-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(17, 20, 26, 0.45);
+  background: color-mix(in srgb, var(--text) 32%, transparent);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
   display: grid;
   place-items: center;
   padding: 24px;
-  z-index: 60;
+  z-index: 70; /* über den Leisten (Nav 50, untere Pille 60) */
+  /* Die Scrollbar-Reserven (scrollbar-gutter both-edges am html) verkleinern den
+     fixed-Bezugsrahmen: die Randstreifen selbst überbrücken. */
+  margin-inline: calc((100% - 100vw) / 2);
 }
 .kd-modal {
   position: relative;
@@ -14,26 +19,33 @@
   overflow-y: auto;
   background: var(--card);
   color: var(--text);
-  border-radius: var(--r-lg, 18px);
+  border-radius: var(--r-lg, 20px);
   border-top: 4px solid var(--c);
   padding: 26px 28px;
-  box-shadow: 0 16px 40px rgba(17, 20, 26, 0.28);
+  box-shadow: var(--shadow-lg);
 }
 .kd-close {
   position: absolute;
-  top: 16px;
-  right: 16px;
-  width: 32px;
-  height: 32px;
-  border: none;
+  top: 14px;
+  right: 14px;
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--line);
   border-radius: 999px;
-  background: var(--bg);
+  background: var(--card);
   color: var(--text-2);
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   cursor: pointer;
+  transition: border-color var(--dur-press) var(--ease-out),
+    color var(--dur-press) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
 }
 .kd-close:hover {
-  color: var(--text);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.kd-close:active {
+  transform: scale(0.98);
 }
 
 .kd-kopf {
@@ -68,7 +80,7 @@
 }
 .kd-block-titel {
   margin: 0 0 10px;
-  font-size: 0.76rem;
+  font-size: 0.72rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -109,17 +121,17 @@
   align-items: center;
   gap: 10px;
   padding: 10px 12px;
-  background: var(--bg);
+  background: var(--card);
   border: 1px solid var(--line);
-  border-radius: var(--r-sm, 8px);
+  border-radius: var(--r-sm, 9px);
 }
 .kd-material-art {
   flex-shrink: 0;
   font-size: 0.66rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--accent);
+  letter-spacing: 0.05em;
+  color: var(--accent-strong);
   background: var(--accent-soft);
   padding: 3px 8px;
   border-radius: 999px;

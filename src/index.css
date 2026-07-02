@@ -1,14 +1,13 @@
 :root {
   /* === Schrift ===
-     Display: Fraunces (warme Werkschrift mit Serifen, scholarly). Fließtext:
-     Hanken Grotesk (humanistisch, ruhig). Serif + Sans = editorial, Schule. */
-  --font-display: "Fraunces", "Hanken Grotesk", Georgia, serif;
-  --font-text: "Hanken Grotesk", system-ui, -apple-system, BlinkMacSystemFont,
-    "Segoe UI", sans-serif;
-  /* Satoshi: geometrisch-humanistische Sans, bewusst nur auf der Uebersicht
-     (Dashboard-Redesign) eingesetzt; der Rest der App bleibt bei Fraunces/Hanken. */
-  --font-satoshi: "Satoshi", "Hanken Grotesk", system-ui, -apple-system,
-    "Segoe UI", sans-serif;
+     Satoshi (geometrisch-humanistische Sans, Variable Font) ist die einzige
+     Schrift der App. --font-display/--font-text sind Alt-App-Reste (src/views);
+     Fraunces/Hanken werden nicht mehr geladen, die Tokens fallen auf
+     Systemschriften zurueck. */
+  --font-display: Georgia, serif;
+  --font-text: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  --font-satoshi: "Satoshi", system-ui, -apple-system, "Segoe UI", sans-serif;
 
   /* === Hell: Figma-Designsystem (Bachelor-UI) ===
      Ruhiges Grau als Fläche, weiße Karten, Teal als Primärfarbe. Farbe trägt
@@ -49,11 +48,11 @@
      clippt. Reine Geometrie, daher nicht im dunklen Theme nötig. */
   --seite-x: 28px; /* horizontaler Seitenrand */
   --seite-x-eng: 16px; /* Seitenrand < 560px */
-  --seite-top: 74px; /* Platz für die obere Weg-Leiste (Screens mit Navbar) */
-  --seite-top-wizard: 24px; /* oben für Planungs-Wizards ohne Navbar */
+  --seite-top: 74px; /* Platz für die obere Weg-Leiste (Basis; Heute/Ablage nutzen 93px, dort kommentiert) */
   --seite-bottom: 96px; /* Platz für die untere Nav/Schritt-Pille */
   --leiste-breite: 800px; /* gemeinsame Breite aller unteren Pillen (Weg/Plan/Fokus) */
-  --grid-gap: 18px; /* Spalten-/Zeilenabstand im Raster */
+  --grid-gap: 18px; /* Spalten-/Zeilenabstand im Screen-Raster */
+  --grid-gap-eng: 14px; /* engerer Abstand für Kachel-Grids INNERHALB von Karten */
   --grid-spalten: 12; /* Basis-Spaltenzahl */
 
   /* === Elevation: warm getönt, weich, mehrschichtig === */
@@ -78,6 +77,7 @@
   --dur-base: 200ms; /* Dropdowns, Tabs, Standard */
   --dur-slow: 280ms; /* groessere Wechsel, noch unter 300ms */
   --dur-overlay: 340ms; /* Modals, Drawers, Sheets (gesehen, selten) */
+  --dur-entrance: 500ms; /* einmalige Screen-/Element-Auftritte (kein UI-Feedback) */
 
   font-family: var(--font-satoshi);
   font-size: 15px;
@@ -161,13 +161,11 @@ body {
   min-height: 100vh;
   background: var(--bg);
 }
-/* Scrollbalken-Platz immer reservieren (auf BEIDEN Seiten): sonst verschiebt sich
-   beim Auftauchen des Scrollbalkens die zentrierte untere Leiste (Knopf springt).
-   both-edges = links wie rechts gleich viel Reserve, damit der Inhalt symmetrisch
-   in der Mitte sitzt (gleiche Ränder). */
-html {
-  scrollbar-gutter: stable both-edges;
-}
+/* KEINE Scrollbalken-Reserve (scrollbar-gutter) am html: die Reserve zeichnete
+   auf jedem Screen helle Randstreifen links/rechts und verkleinerte den
+   Bezugsrahmen aller fixed-Overlays. Gegen das Springen der zentrierten Pillen
+   beim Auftauchen des Scrollbalkens sitzen die Pillen stattdessen auf
+   left: 50vw (vw ignoriert den Scrollbalken, bleibt also stehen). */
 
 /* Feines Papierkorn über allem: gibt der Fläche Textur statt Plastik. */
 body::after {
@@ -250,7 +248,7 @@ select:focus-visible {
   position: fixed;
   top: 12px;
   left: 12px;
-  z-index: 200;
+  z-index: 260;
   max-width: 280px;
   padding: 8px 12px;
   font-size: 0.8rem;
@@ -263,18 +261,18 @@ select:focus-visible {
   box-shadow: var(--shadow-sm);
 }
 
-/* Ruhiger Toast der Planer (Etappenplan + Wochenplan): kurze Rückmeldung, unten
-   mittig über der "Mein Weg"-Leiste, blendet von selbst aus. Bewusst nur EINMAL
-   und global definiert: früher stand die Regel doppelt (Etappenplan.css mit
-   top:18px, Wochenplan.css mit bottom:88px). Beide galten gleichzeitig, dadurch
-   bekam der fixierte Toast top UND bottom und wurde über die ganze Höhe zu einer
-   riesigen Kapsel gestreckt (border-radius:999px). */
-.ep-hinweis {
+/* DAS Toast-System der App (eine Optik, eine Position): kurze Rückmeldung, unten
+   mittig über der Pillen-Leiste, blendet von selbst aus. Gilt für die Planer-
+   Hinweise (.ep-hinweis) UND den globalen App-Toast (.app-toast); früher waren das
+   zwei Systeme mit verschiedenen Looks, Positionen und Dauern. z-index über den
+   Overlays (Fokus 200), damit Rückmeldungen nie verdeckt werden. */
+.ep-hinweis,
+.app-toast {
   position: fixed;
-  left: 50%;
+  left: 50vw; /* 50vw statt 50%: bleibt beim Auftauchen des Scrollbalkens stehen */
   bottom: 96px;
   transform: translateX(-50%);
-  z-index: 60;
+  z-index: 250;
   max-width: 90vw;
   padding: 10px 18px;
   /* Gleicher heller Glas-Look wie die unteren Leisten, damit der Toast zum Rest
@@ -286,13 +284,13 @@ select:focus-visible {
   );
   color: var(--text);
   border: 1px solid rgba(255, 255, 255, 0.6);
-  font-size: 0.88rem;
+  font-size: 0.9rem;
   font-weight: 600;
   border-radius: 999px;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), var(--shadow-lg);
   -webkit-backdrop-filter: blur(30px) saturate(1.9) brightness(1.03);
   backdrop-filter: blur(30px) saturate(1.9) brightness(1.03);
-  animation: ep-hinweis-rein 0.25s ease both;
+  animation: ep-hinweis-rein var(--dur-base) var(--ease-out) both;
 }
 @keyframes ep-hinweis-rein {
   from {
@@ -312,7 +310,7 @@ select:focus-visible {
   .wp-screen,
   .pl-screen,
   .ab-screen {
-    animation: screen-rein 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+    animation: screen-rein var(--dur-entrance) var(--ease-out) both;
   }
   @keyframes screen-rein {
     from {
@@ -331,14 +329,26 @@ select:focus-visible {
   .qz-option.richtig,
   .aq-option.ok,
   .lt-feedback.ok,
-  .zs-feedback.ok {
-    animation: uebung-pop 0.32s cubic-bezier(0.2, 0.7, 0.2, 1);
+  .zs-feedback.ok,
+  .sb-satzzeile.ok,
+  .rf-item.ok,
+  .rt-eingabe.ok,
+  .bz-raum.ok,
+  .zu-karte.geloest,
+  .mk-wort.ok {
+    animation: uebung-pop var(--dur-overlay) var(--ease-out);
   }
   .qz-option.falsch,
   .aq-option.no,
   .lt-feedback.no,
-  .zs-feedback.no {
-    animation: uebung-wackel 0.34s ease;
+  .zs-feedback.no,
+  .sb-satzzeile.no,
+  .rf-item.no,
+  .rt-eingabe.no,
+  .bz-raum.no,
+  .zu-karte.falsch,
+  .mk-wort.no {
+    animation: uebung-wackel var(--dur-overlay) var(--ease-out);
   }
   @keyframes uebung-pop {
     0% {
@@ -394,8 +404,8 @@ select:focus-visible {
   }
 }
 
-/* === Raster-Ziehen-Prototyp: Greifpunkt + Raster-Overlay (Übersicht, Ablage,
-   Fokus). Eine Box-Kante greifen und in 12-Spalten-Schritten ziehen; beim Ziehen
+/* === Raster-Ziehen-Prototyp: Greifpunkt + Raster-Overlay (Ablage und Fokus;
+   die Übersicht hat ihre eigenen Teiler). Eine Box-Kante greifen und in 12-Spalten-Schritten ziehen; beim Ziehen
    wird das Raster als Bänder eingeblendet. Nur im Speicher, kein Persistieren. */
 .raster-griff {
   position: absolute;
@@ -409,38 +419,26 @@ select:focus-visible {
   touch-action: none;
   z-index: 6;
 }
-/* Zieh-Kante zwischen den Boxen: ein zentrierter Griff (Kapsel) als dezenter
-   Anfasspunkt, Teal wie die aktive Nav-Pille. Beim Hover/Ziehen wächst er sanft
-   und wird kräftiger. */
+/* Zieh-Kante zwischen den Boxen: exakt derselbe Anfasser wie die Übersicht-Teiler
+   (.hu-teiler::after in Heute.css): feiner 2.5x60-Strich mit weichem Akzent-Glow,
+   kein Hover-Wachsen; beim Ziehen wird er kräftiger. */
 .raster-griff::after {
   content: "";
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 4px;
-  height: 24px;
+  width: 2.5px;
+  height: 60px;
   transform: translate(-50%, -50%);
   border-radius: 999px;
   background: var(--accent);
-  opacity: 0.5;
-  transition: opacity 0.18s cubic-bezier(0.2, 0.7, 0.2, 1),
-    height 0.18s cubic-bezier(0.2, 0.7, 0.2, 1);
+  opacity: 0.32;
+  box-shadow: 0 0 6px 0 color-mix(in srgb, var(--accent) 30%, transparent);
+  transition: opacity var(--dur-base) var(--ease-out), box-shadow var(--dur-base) var(--ease-out);
 }
-.raster-griff:hover::after {
-  opacity: 1;
-  height: 40px;
-}
-/* Während diese Kante gezogen wird, wird aus dem Punkt eine dünne Linie über die
-   ganze Box-Höhe (Ober- bis Unterkante), genau auf der Kante. */
 .raster-griff.aktiv::after {
-  top: 0;
-  bottom: 0;
-  left: 50%;
-  width: 2px;
-  height: auto;
-  opacity: 1;
-  transform: translateX(-50%);
-  transition: none;
+  opacity: 0.7;
+  box-shadow: 0 0 10px 1px color-mix(in srgb, var(--accent) 45%, transparent);
 }
 @media (prefers-reduced-motion: reduce) {
   .raster-griff::after {
@@ -459,7 +457,7 @@ select:focus-visible {
   /* Liegt immer bereit und blendet beim Ziehen weich ein/aus, statt hart
      aufzupoppen und nach dem Loslassen wegzuspringen. */
   opacity: 0;
-  transition: opacity 0.22s cubic-bezier(0.2, 0.7, 0.2, 1);
+  transition: opacity var(--dur-base) var(--ease-out);
 }
 .raster-zieht .raster-overlay {
   opacity: 1;
@@ -474,35 +472,6 @@ select:focus-visible {
 @media (prefers-reduced-motion: reduce) {
   .raster-overlay {
     transition: none;
-  }
-}
-
-/* Globaler Toast: kurze Rückmeldung unten mittig, blendet sich selbst aus. */
-.app-toast {
-  position: fixed;
-  left: 50%;
-  bottom: 108px;
-  transform: translateX(-50%);
-  z-index: 250;
-  max-width: calc(100% - 32px);
-  padding: 10px 18px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--text);
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  box-shadow: var(--shadow-lg);
-  animation: app-toast-rein 0.25s ease both;
-}
-@keyframes app-toast-rein {
-  from {
-    opacity: 0;
-    transform: translate(-50%, 8px);
-  }
-  to {
-    opacity: 1;
-    transform: translate(-50%, 0);
   }
 }
 
@@ -537,11 +506,11 @@ select:focus-visible {
 /* dir +1 (Pille nach rechts): Schiene [neu, alt], von -50% (alt sichtbar) auf 0
    (neu sichtbar) -> alles wandert nach rechts. */
 .screen-track.track-rechts {
-  animation: screen-wisch-rechts 0.38s cubic-bezier(0.4, 0, 0.2, 1) both;
+  animation: screen-wisch-rechts var(--dur-overlay) var(--ease-in-out) both;
 }
 /* dir -1 (Pille nach links): Schiene [alt, neu], von 0 auf -50% -> nach links. */
 .screen-track.track-links {
-  animation: screen-wisch-links 0.38s cubic-bezier(0.4, 0, 0.2, 1) both;
+  animation: screen-wisch-links var(--dur-overlay) var(--ease-in-out) both;
 }
 @keyframes screen-wisch-rechts {
   from {
@@ -565,7 +534,7 @@ select:focus-visible {
     animation-duration: 0.01ms;
   }
 }
-@media (max-width: 860px) {
+@media (max-width: 960px) {
   /* Schmale Screens scrollen die Seite normal: kein Höhen-/Overflow-Zwang, der
      alte Screen wird einfach ausgeblendet (sofortiger Wechsel ohne Schiene). */
   .screen-buehne.im-wechsel {
@@ -599,5 +568,26 @@ select:focus-visible {
 @media (prefers-reduced-motion: reduce) {
   .klapp-chevron {
     transition: none;
+  }
+}
+
+/* Geteilte KI-Denk-Punkte-Welle: eine Keyframe-Definition für alle Chats
+   (MaterialChat, Rechenweg, Markieren-Frage), Delays 0.2s/0.4s je Punkt. */
+@keyframes denkt-puls {
+  0%,
+  80%,
+  100% {
+    opacity: 0.3;
+  }
+  40% {
+    opacity: 1;
+  }
+}
+
+/* Reduced Motion: Hinweis und Toast erscheinen ohne Einflug. */
+@media (prefers-reduced-motion: reduce) {
+  .ep-hinweis,
+  .app-toast {
+    animation: none;
   }
 }

@@ -7,7 +7,7 @@
   padding: 8px 12px;
   background: var(--accent-soft);
   border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--line));
-  border-radius: var(--r-sm, 8px);
+  border-radius: var(--r-sm, 9px);
 }
 .uh-text {
   flex: 1;
@@ -25,6 +25,14 @@
   padding: 5px 12px;
   border-radius: 999px;
   cursor: pointer;
+  transition: background var(--dur-fast) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
+}
+.uh-zu:hover {
+  background: var(--accent-strong);
+}
+.uh-zu:active {
+  transform: scale(0.98);
 }
 /* Touch: bequem treffbare Fläche. */
 @media (pointer: coarse) {

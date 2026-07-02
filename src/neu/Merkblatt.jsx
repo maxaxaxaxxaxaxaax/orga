@@ -116,11 +116,9 @@ export default function Merkblatt({ daten }) {
                     {abVoll ? "✓" : `${abGeschafft}/${regeln.length}`}
                   </span>
                 )}
-                <span
-                  className={"mb-pfeil" + (istOffen ? " auf" : "")}
-                  aria-hidden="true"
-                >
-                  <Icon name="chevron-right" size={18} />
+                {/* Geteiltes Klapp-Chevron: dreht über [aria-expanded] (index.css). */}
+                <span className="mb-pfeil" aria-hidden="true">
+                  <Icon name="chevron-down" className="klapp-chevron" size={18} />
                 </span>
               </button>
 

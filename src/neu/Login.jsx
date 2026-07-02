@@ -155,8 +155,10 @@ export default function Login({ onLogin, startSchritt = "willkommen" }) {
               Alles landet an der <em>richtigen</em> Aufgabe.
             </h2>
             <p className="login-start-pitch-deck">
-              Schick orca einen Link, ein Foto oder eine Datei. orca erkennt Fach
-              und Thema und heftet alles an die passende Aufgabe, ganz von selbst.
+              Schick orca einen Link, ein Foto oder eine Datei.
+              <br />
+              Orca erkennt Fach und Thema und heftet alles an die passende
+              Aufgabe, ganz von selbst.
             </p>
           </div>
         </div>
@@ -172,7 +174,7 @@ export default function Login({ onLogin, startSchritt = "willkommen" }) {
         <div className="login-hero login-hero-dienste">
           <div className="login-dienste-kopf">
             <h2 className="login-dienste-titel">
-              Ein Ort statt <em>fünf Apps</em>.
+              Ein orca statt <em>fünf Apps</em>.
             </h2>
             <p className="login-dienste-deck">
               orca sammelt Aufgaben, Material und Termine aus deinen Apps an einem

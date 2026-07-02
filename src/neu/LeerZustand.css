@@ -11,12 +11,13 @@
   gap: 10px;
   padding: 30px 20px;
   text-align: center;
-  animation: leerzustand-rein var(--dur-base, 200ms) var(--ease-out, ease) both;
+  animation: leerzustand-rein var(--dur-base, 200ms) var(--ease-out) both;
 }
 .leerzustand-titel {
   margin: 2px 0 0;
-  font-size: 1.02rem;
+  font-size: 1.05rem;
   font-weight: 700;
+  letter-spacing: -0.01em;
   color: var(--text);
 }
 .leerzustand-text {
@@ -35,6 +36,8 @@
 }
 .leerzustand.kompakt .leerzustand-titel {
   font-size: 0.94rem;
+  /* Kompakt (in Boxen wie den Erinnerungen): ruhig grau statt Volltext-Schwarz. */
+  color: var(--muted);
 }
 .leerzustand.kompakt .leerzustand-text {
   font-size: 0.84rem;

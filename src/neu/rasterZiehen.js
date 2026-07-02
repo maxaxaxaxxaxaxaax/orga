@@ -2,8 +2,8 @@ import { useEffect, useRef, useState } from "react";
 
 // Geteilter Prototyp: eine senkrechte Raster-Grenze per Ziehen verschieben. Die
 // Grenze rastet auf die 12 Spalten ein, lebt nur im Speicher (Reload setzt
-// zurück). Genutzt von Übersicht, Ablage und Fokus (die Bänder/Greifpunkte sind
-// die Komponenten in ./raster).
+// zurück). Genutzt von Ablage (Liste|Dokument) und Fokus (drei Grenzen); die
+// Bänder/Greifpunkte sind die Komponenten in ./raster.
 //
 // messbereich(el) ist optional und liefert { left, width } des Bereichs, über
 // dem gemessen wird. Ohne Angabe wird die volle Breite des Rasters genommen; der

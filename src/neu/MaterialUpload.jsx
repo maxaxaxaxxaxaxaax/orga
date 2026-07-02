@@ -225,7 +225,7 @@ export default function MaterialUpload({
         aria-label="Material hinzufügen"
         onClick={(e) => e.stopPropagation()}
       >
-        <button className="mu-close" onClick={onClose} aria-label="Schließen">
+        <button type="button" className="mu-close" onClick={onClose} aria-label="Schließen">
           ✕
         </button>
         <h2 className="mu-titel">Material hinzufügen</h2>

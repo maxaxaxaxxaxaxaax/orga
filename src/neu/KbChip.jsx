@@ -1,5 +1,5 @@
 import { kbFarbe } from "../data/koennensbeweise";
-import { textAuf } from "./farbe";
+import { textAuf, NEUTRAL_FARBE } from "./farbe";
 import "./KbChip.css";
 
 // Ein Etappenziel als bunte Vollton-Kachel, exakt wie im Etappenplan (.ep-kb):
@@ -16,7 +16,7 @@ export default function KbChip({
   zahl,
 }) {
   const zahlWert = zahl === undefined ? k.cluster : zahl;
-  const farbe = kbFarbe[k.fach] || "#868e96";
+  const farbe = kbFarbe[k.fach] || NEUTRAL_FARBE;
   return (
     <button
       type="button"

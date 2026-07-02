@@ -1,4 +1,5 @@
 import { koennensbeweise, kbFarbe } from "../data/koennensbeweise";
+import { NEUTRAL_FARBE } from "./farbe";
 import { faecher } from "../data/wissen";
 import { KOMPETENZBEREICHE, bereichFuer } from "../data/kompetenzbereiche";
 import { ladeSchritte } from "./lernschritte";
@@ -90,7 +91,7 @@ export function baueFaecherNetz(erledigt) {
   for (const fach of faecher) {
     const themen = fach.themen || [];
     if (!themen.length) continue;
-    const color = kbFarbe[fach.fach] || fach.farbe || "#868e96";
+    const color = kbFarbe[fach.fach] || fach.farbe || NEUTRAL_FARBE;
     const fachNode = "fach:" + fach.id;
     const berId = (b) => fach.id + "|ber:" + b;
     const subId = (b, s) => fach.id + "|sub:" + b + "||" + s;

@@ -5,7 +5,7 @@ import "./Netz.css";
 
 const EBENE_LABEL = { 0: "Fach", 1: "Kompetenzbereich", 2: "Inhaltsbereich", 3: "Lernweg" };
 const STATUS_LABEL = { erledigt: "erledigt", aktuell: "aktuell", offen: "offen" };
-const NEUTRAL = "#868e96";
+import { NEUTRAL_FARBE as NEUTRAL } from "./farbe";
 
 // Die drei Lernstand-Spalten (links nach rechts = Fortschritt, monoton). Status ->
 // Spalte. "Dran" sitzt mittig als Blickfang; Prominenz über Gewicht, nicht Umordnung.
@@ -129,6 +129,16 @@ export default function Netz({ erledigt, onSelect }) {
   // ---- Kamera-Animation -----------------------------------------------------
   function tween(von, bis, dauer, onDone) {
     cancelAnimationFrame(animRef.current);
+    // Reduced Motion: ohne Kamera-Flug direkt zum Ziel springen.
+    if (
+      typeof window !== "undefined" &&
+      typeof window.matchMedia === "function" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      setView({ tx: bis.tx, ty: bis.ty, k: bis.k });
+      if (onDone) onDone();
+      return;
+    }
     let start = null;
     const step = (ts) => {
       if (start === null) start = ts;
@@ -417,7 +427,7 @@ export default function Netz({ erledigt, onSelect }) {
                       <path
                         d="M -5 0 L -1.5 3.5 L 5 -4"
                         fill="none"
-                        stroke="#fff"
+                        stroke="var(--text)"
                         strokeWidth="2.4"
                         strokeLinecap="round"
                         strokeLinejoin="round"

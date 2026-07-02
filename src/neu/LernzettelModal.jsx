@@ -116,7 +116,7 @@ export default function LernzettelModal({
         aria-label="Lernzettel"
         onClick={(e) => e.stopPropagation()}
       >
-        <button className="lz-close" onClick={onClose} aria-label="Schließen">
+        <button type="button" className="lz-close" onClick={onClose} aria-label="Schließen">
           ✕
         </button>
         <p className="lz-eyebrow">Lernzettel aus dem Chat</p>

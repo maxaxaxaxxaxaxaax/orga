@@ -87,7 +87,7 @@ export default function DiscordModal({ onClose }) {
         aria-label="Discord verbinden"
         onClick={(e) => e.stopPropagation()}
       >
-        <button className="dc-close" onClick={onClose} aria-label="Schließen">
+        <button type="button" className="dc-close" onClick={onClose} aria-label="Schließen">
           ✕
         </button>
         <h2 className="dc-titel">Discord verbinden</h2>

@@ -2,6 +2,10 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md, 14px);
+  padding: 16px;
 }
 .zs-kopf {
   display: flex;
@@ -10,10 +14,10 @@
   gap: 10px;
 }
 .zs-label {
-  font-size: 0.78rem;
+  font-size: 0.72rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
   color: var(--muted);
 }
 /* Serie (eigener Schwung, kein Vergleich): nur ab 2 richtigen in Folge. */
@@ -38,7 +42,7 @@
   height: 100%;
   background: var(--accent);
   border-radius: 2px;
-  transition: width 0.25s ease;
+  transition: width var(--dur-base) var(--ease-out);
 }
 /* Banner zur Nacharbeits-Runde: ruhig und ermutigend, kein Tadel. */
 .zs-nacharbeit {
@@ -136,10 +140,10 @@
   color: var(--ok-text);
 }
 .zs-klick.no .zs-marke-punkt {
-  background: var(--warn-text);
+  background: var(--danger-text);
 }
 .zs-klick.no .zs-marke-text {
-  color: var(--warn-text);
+  color: var(--danger-text);
 }
 .zs-ziel {
   top: 52px;
@@ -163,14 +167,14 @@
 }
 
 .zs-feedback {
-  border-radius: var(--r-sm, 8px);
+  border-radius: var(--r-sm, 9px);
   padding: 10px 12px;
 }
 .zs-feedback.ok {
   background: var(--ok-bg, color-mix(in srgb, var(--ok-text) 14%, transparent));
 }
 .zs-feedback.no {
-  background: var(--warn-bg);
+  background: var(--danger-bg);
 }
 .zs-feedback-text {
   margin: 0 0 8px;
@@ -188,14 +192,18 @@
   border: none;
   background: var(--accent);
   color: var(--on-accent);
-  font-size: 0.88rem;
-  font-weight: 600;
-  padding: 8px 16px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  padding: 9px 18px;
   border-radius: 999px;
   cursor: pointer;
+  transition: background var(--dur-fast) var(--ease-out), transform var(--dur-press) var(--ease-out);
 }
-.zs-weiter:hover {
+.zs-weiter:hover:not(:disabled) {
   background: var(--accent-strong);
+}
+.zs-weiter:active:not(:disabled) {
+  transform: scale(0.98);
 }
 
 .zs-leer {

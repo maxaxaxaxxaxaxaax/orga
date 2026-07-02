@@ -29,7 +29,7 @@
   padding: 10px 12px;
   background: var(--card);
   border: 1px solid var(--line);
-  border-radius: var(--r-sm, 8px);
+  border-radius: var(--r-sm, 9px);
   box-shadow: var(--shadow-md, 0 8px 24px rgba(0, 0, 0, 0.14));
   opacity: 0;
   visibility: hidden;

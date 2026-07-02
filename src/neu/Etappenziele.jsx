@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { NEUTRAL_FARBE } from "./farbe";
 import {
   koennensbeweise,
   kbFarbe,
@@ -148,7 +149,7 @@ export default function Etappenziele({
                     type="button"
                     className={"ez-wkb" + (done ? " done" : "")}
                     onClick={() => onToggle(k.id)}
-                    style={{ "--c": kbFarbe[k.fach] || "#868e96" }}
+                    style={{ "--c": kbFarbe[k.fach] || NEUTRAL_FARBE }}
                     aria-pressed={done}
                   >
                     <span className="ez-check" aria-hidden="true">

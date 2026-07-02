@@ -11,7 +11,7 @@ import {
 import { etappen } from "../data/etappen";
 import KbChip from "./KbChip";
 import Icon from "./Icon";
-import { textAuf } from "./farbe";
+import { textAuf, NEUTRAL_FARBE } from "./farbe";
 import { meldeAenderung, ladeStunden, heuteTag } from "./planung";
 import "./Wochenplan.css";
 
@@ -229,7 +229,7 @@ export default function Wochenplan({
       const alle = wocheKbs.filter((k) => k.fach === fach);
       return {
         fach,
-        farbe: kbFarbe[fach] || "#868e96",
+        farbe: kbFarbe[fach] || NEUTRAL_FARBE,
         kbs: alle.filter((k) => restVon(k) > 0),
         anzahl: alle.length,
       };
@@ -467,7 +467,7 @@ export default function Wochenplan({
           </>
         ) : (
           slotKbs.map((k) => {
-            const farbe = kbFarbe[k.fach] || "#868e96";
+            const farbe = kbFarbe[k.fach] || NEUTRAL_FARBE;
             return (
               <div
                 key={k.id}

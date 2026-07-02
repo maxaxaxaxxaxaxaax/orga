@@ -1,7 +1,7 @@
 .qz {
   background: var(--bg);
   border: 1px solid var(--line);
-  border-radius: var(--r-md, 12px);
+  border-radius: var(--r-md, 14px);
   padding: 16px;
 }
 .qz-kopf {
@@ -71,16 +71,20 @@
   padding: 12px 14px;
   border: 1.5px solid var(--line);
   background: var(--card);
-  border-radius: var(--r-sm, 8px);
+  border-radius: var(--r-sm, 9px);
   font-size: 0.95rem;
   font-weight: 600;
   color: var(--text);
   cursor: pointer;
   text-align: left;
-  transition: border-color var(--dur-press) var(--ease-out), background var(--dur-press) var(--ease-out);
+  transition: border-color var(--dur-press) var(--ease-out), background var(--dur-press) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
 }
 .qz-option:hover:not(:disabled) {
   border-color: var(--accent);
+}
+.qz-option:active:not(:disabled) {
+  transform: scale(0.98);
 }
 .qz-option:disabled {
   cursor: default;
@@ -105,7 +109,7 @@
   flex: 1;
   padding: 11px 12px;
   border: 1.5px solid var(--line);
-  border-radius: var(--r-sm, 8px);
+  border-radius: var(--r-sm, 9px);
   font-size: 0.95rem;
   background: var(--card);
   color: var(--text);
@@ -117,12 +121,19 @@
 .qz-pruefen {
   border: none;
   background: var(--accent);
-  color: #fff;
+  color: var(--on-accent);
   font-weight: 700;
   font-size: 0.9rem;
-  padding: 0 18px;
-  border-radius: var(--r-sm, 8px);
+  padding: 9px 18px;
+  border-radius: 999px;
   cursor: pointer;
+  transition: background var(--dur-fast) var(--ease-out), transform var(--dur-press) var(--ease-out);
+}
+.qz-pruefen:hover:not(:disabled) {
+  background: var(--accent-strong);
+}
+.qz-pruefen:active:not(:disabled) {
+  transform: scale(0.98);
 }
 .qz-pruefen:disabled {
   background: var(--line-strong);
@@ -134,7 +145,7 @@
 .qz-feedback {
   margin-top: 14px;
   padding: 12px 14px;
-  border-radius: var(--r-sm, 8px);
+  border-radius: var(--r-sm, 9px);
 }
 .qz-feedback.ok {
   background: var(--ok-bg);
@@ -144,7 +155,7 @@
 }
 .qz-feedback-text {
   margin: 0;
-  font-size: 0.92rem;
+  font-size: 0.9rem;
   color: var(--text);
 }
 .qz-feedback.ok .qz-feedback-text {
@@ -164,22 +175,24 @@
 .qz-weiter {
   margin-top: 10px;
   border: none;
-  background: var(--card);
-  border: 1px solid var(--line);
-  color: var(--text);
+  background: var(--accent);
+  color: var(--on-accent);
   font-weight: 700;
-  font-size: 0.88rem;
-  padding: 8px 16px;
+  font-size: 0.9rem;
+  padding: 9px 18px;
   border-radius: 999px;
   cursor: pointer;
+  transition: background var(--dur-fast) var(--ease-out), transform var(--dur-press) var(--ease-out);
 }
-.qz-weiter:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+.qz-weiter:hover:not(:disabled) {
+  background: var(--accent-strong);
+}
+.qz-weiter:active:not(:disabled) {
+  transform: scale(0.98);
 }
 .qz-leer {
   margin: 0;
-  font-size: 0.88rem;
+  font-size: 0.9rem;
   color: var(--muted);
   font-style: italic;
 }

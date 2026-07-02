@@ -1,7 +1,7 @@
 .mk {
   background: var(--bg);
   border: 1px solid var(--line);
-  border-radius: var(--r-md, 12px);
+  border-radius: var(--r-md, 14px);
   padding: 16px;
 }
 .mk-kopf {
@@ -67,11 +67,15 @@
   transition:
     background var(--dur-press) var(--ease-out),
     border-color var(--dur-press) var(--ease-out),
-    color var(--dur-press) var(--ease-out);
+    color var(--dur-press) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
 }
 .mk-wort:hover:not(:disabled) {
   background: var(--accent-soft);
   border-color: var(--accent);
+}
+.mk-wort:active:not(:disabled) {
+  transform: scale(0.98);
 }
 .mk-wort:disabled {
   cursor: default;
@@ -83,10 +87,10 @@
   color: var(--ok-text);
 }
 .mk-wort.no {
-  background: var(--warn-bg);
-  border-bottom-color: var(--warn-line);
+  background: var(--danger-bg);
+  border-bottom-color: var(--danger-line);
   border-bottom-style: solid;
-  color: var(--warn-text);
+  color: var(--danger-text);
 }
 /* Touch: bequeme Tap-Flächen. */
 @media (pointer: coarse) {
@@ -104,7 +108,7 @@
 .mk-feedback {
   margin-top: 12px;
   padding: 10px 13px;
-  border-radius: var(--r-sm, 8px);
+  border-radius: var(--r-sm, 9px);
   background: var(--ok-bg);
   display: flex;
   align-items: center;
@@ -123,20 +127,27 @@
   border: none;
   background: var(--accent);
   color: var(--on-accent);
-  font-size: 0.88rem;
+  font-size: 0.9rem;
   font-weight: 700;
-  padding: 8px 16px;
+  padding: 9px 18px;
   border-radius: 999px;
   cursor: pointer;
+  transition: background var(--dur-fast) var(--ease-out), transform var(--dur-press) var(--ease-out);
+}
+.mk-weiter:hover:not(:disabled) {
+  background: var(--accent-strong);
+}
+.mk-weiter:active:not(:disabled) {
+  transform: scale(0.98);
 }
 .mk-hinweis {
   margin: 12px 0 0;
   font-size: 0.85rem;
-  color: var(--warn-text);
+  color: var(--danger-text);
 }
 .mk-leer {
   margin: 0;
-  font-size: 0.88rem;
+  font-size: 0.9rem;
   color: var(--muted);
   font-style: italic;
 }

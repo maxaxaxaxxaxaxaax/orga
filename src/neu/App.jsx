@@ -264,7 +264,7 @@ export default function App() {
   // Toast blendet sich nach kurzer Zeit selbst aus.
   useEffect(() => {
     if (!toast) return undefined;
-    const t = setTimeout(() => setToast(null), 2800);
+    const t = setTimeout(() => setToast(null), 2600);
     return () => clearTimeout(t);
   }, [toast]);
 

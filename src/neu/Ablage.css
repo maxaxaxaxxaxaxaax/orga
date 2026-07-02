@@ -24,20 +24,23 @@
 }
 
 /* Untere Leiste, konsistent mit Weg-Leiste und Planungs-Pille: schwebende
-   Glas-Pille unten mittig mit Suche + Hinzufügen. */
+   Glas-Pille unten mittig mit Suche + Hinzufügen. Gleiche Breite, min-height und
+   Padding wie die geteilten Pillen, damit sie beim Screen-Wechsel nicht springt. */
 .ab-top {
   position: fixed;
   bottom: 16px;
-  left: 50%;
+  left: 50vw; /* 50vw statt 50%: bleibt beim Auftauchen des Scrollbalkens stehen */
   transform: translateX(-50%);
   z-index: 60;
   /* Weich einblenden statt zu springen; die Leiste sitzt fest (portaliert). */
   animation: ab-top-rein var(--dur-base) var(--ease-out) both;
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: 10px;
-  max-width: calc(100% - 28px);
-  padding: 8px;
+  box-sizing: border-box;
+  width: min(var(--leiste-breite), calc(100% - 28px));
+  min-height: 66px;
+  padding: 7px 8px 7px 10px;
   background: linear-gradient(
     180deg,
     color-mix(in srgb, var(--card) 52%, transparent),
@@ -63,7 +66,7 @@
   }
 }
 .ab-suche {
-  width: min(360px, 56vw);
+  flex: 1; /* füllt die geteilte Pillenbreite (Leisten-Breite) bis zum Hinzufügen-Knopf */
   min-width: 0;
   display: flex;
   align-items: center;
@@ -72,6 +75,13 @@
   background: var(--card);
   border: 1px solid var(--line);
   border-radius: 999px;
+  transition: border-color var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-fast) var(--ease-out);
+}
+/* Geteiltes Fokus-Rezept aller Such-/Eingabefelder: Accent-Rand + weicher Ring. */
+.ab-suche:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
 }
 .ab-suche svg {
   width: 17px;
@@ -103,7 +113,9 @@
   color: var(--on-accent);
   font-size: 0.92rem;
   font-weight: 700;
-  padding: 11px 20px;
+  padding: 0 20px;
+  height: 42px;
+  box-sizing: border-box;
   border-radius: 999px;
   cursor: pointer;
   box-shadow: 0 4px 14px -4px var(--accent-shadow);
@@ -114,7 +126,7 @@
   background: var(--accent-strong);
 }
 .ab-add:active {
-  transform: scale(0.97);
+  transform: scale(0.98);
 }
 
 /* Zwei Spalten auf dem gemeinsamen 12-Spalten-Raster: Seitenleiste 4/12,
@@ -136,14 +148,23 @@
 }
 
 /* Split-View: Liste links, ausgewähltes Dokument rechts. Beide sind eine Box wie
-   auf der Übersicht; das Dokument kommt von rechts herein. */
+   auf der Übersicht; das Dokument kommt von rechts herein. Der Split liegt auf
+   dem gemeinsamen 12-Spalten-Raster: die Grenze Liste|Dokument ist --ab-teil und
+   lässt sich am Griff ziehen (gleiches Rezept wie Übersicht und Fokus). */
 .ab-grid.ab-split {
-  flex-direction: row;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  grid-template-rows: minmax(0, 1fr);
   gap: var(--grid-gap, 18px);
   align-items: stretch;
 }
+.ab-grid.ab-split > .ab-materialien {
+  grid-column: 1 / var(--ab-teil, 7);
+  position: relative;
+  min-width: 0;
+}
 .ab-detail {
-  flex: 1.1 1 0;
+  grid-column: var(--ab-teil, 7) / -1;
   min-width: 0;
   min-height: 0;
   display: flex;
@@ -188,22 +209,71 @@
   letter-spacing: -0.01em;
   color: var(--text);
 }
-.ab-detail-zu {
+/* Stern und Schließen-✕ im Dokument-Kopf: neutrale Knöpfe wie überall; die
+   ZEICHEN tragen Teal wie die Box-Titel-Icons der Übersicht (var(--accent)). */
+.ab-detail-zu,
+.ab-detail-stern {
   flex-shrink: 0;
   width: 32px;
   height: 32px;
-  border-radius: 50%;
-  border: 1px solid var(--line-strong);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  border: 1px solid var(--line);
   background: var(--card);
-  color: var(--text-2);
+  color: var(--accent);
   font-size: 0.9rem;
   cursor: pointer;
-  transition: border-color var(--dur-fast) var(--ease-out),
-    color var(--dur-fast) var(--ease-out);
+  transition: border-color var(--dur-press) var(--ease-out),
+    color var(--dur-press) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
 }
-.ab-detail-zu:hover {
+.ab-detail-zu:hover,
+.ab-detail-stern:hover {
   border-color: var(--accent);
-  color: var(--accent);
+  color: var(--accent-strong);
+}
+.ab-detail-zu:active,
+.ab-detail-stern:active {
+  transform: scale(0.98);
+}
+.ab-detail-stern svg {
+  width: 16px;
+  height: 16px;
+}
+/* Favorit gesetzt: reine Füllung ohne Kontur (Teal wie die Box-Titel-Icons). */
+.ab-detail-stern.an svg {
+  fill: var(--accent);
+  stroke: none;
+}
+/* Ablageort-Wahl: ruhige Zeile unter den Tags, Select im Feld-Rezept der App. */
+.ab-detail-ort {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+.ab-detail-ort select {
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--card);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-sm, 9px);
+  padding: 4px 8px;
+  cursor: pointer;
+  transition: border-color var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-fast) var(--ease-out);
+}
+.ab-detail-ort select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
 }
 .ab-detail-inhalt {
   flex: 1;
@@ -217,13 +287,18 @@
     animation: none;
   }
 }
-/* Schmal: das Dokument nimmt die ganze Breite, die Liste tritt zurück. */
-@media (max-width: 860px) {
+/* Schmal: das Dokument nimmt die ganze Breite, die Liste tritt zurück; Griff
+   und Raster-Bänder haben dann nichts mehr zu ziehen. */
+@media (max-width: 960px) {
   .ab-grid.ab-split .ab-materialien {
     display: none;
   }
   .ab-detail {
-    flex: 1;
+    grid-column: 1 / -1;
+  }
+  .ab-grid .raster-griff,
+  .ab-grid .raster-overlay {
+    display: none;
   }
 }
 .ab-card {
@@ -250,7 +325,7 @@
   fill: none;
   /* Aktiv-Farbe (Teal) wie die aktive Nav-Pille oben. */
   stroke: var(--accent);
-  stroke-width: 1.7;
+  stroke-width: 1.8;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
@@ -280,14 +355,18 @@
   background: transparent;
   cursor: pointer;
   transition: background var(--dur-fast) var(--ease-out),
-    border-color var(--dur-fast) var(--ease-out);
+    border-color var(--dur-fast) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
 }
 .ab-ordner:hover {
   background: var(--card-2);
 }
+.ab-ordner:active {
+  transform: scale(0.98);
+}
 .ab-ordner.aktiv {
   background: var(--accent-soft);
-  border-color: color-mix(in srgb, var(--accent) 35%, var(--line));
+  border-color: transparent;
 }
 .ab-ordner svg {
   filter: drop-shadow(0 4px 6px rgba(54, 44, 26, 0.14));
@@ -316,12 +395,6 @@
 }
 
 /* Kompetenzen (Platzhalter) */
-.ab-kompetenzen-leer {
-  margin: 0;
-  font-size: 0.86rem;
-  color: var(--muted);
-  font-style: italic;
-}
 /* Kompetenzbereiche (Landkarte) als aufklappbarer Baum */
 .ab-komp {
   display: flex;
@@ -401,7 +474,7 @@
 }
 .ab-komp-weg:hover {
   background: var(--accent-soft);
-  color: var(--accent);
+  color: var(--accent-strong);
 }
 
 /* Materialien */
@@ -422,8 +495,10 @@
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  margin: 0 -4px;
-  padding: 0 4px;
+  /* Unsichtbarer Puffer wie beim Aufgaben-Raster: Hover-Anheben und Schatten
+     der Zeilen-Boxen werden vom Scroll-Container nicht beschnitten. */
+  margin: -8px;
+  padding: 8px;
 }
 /* Untertitel unter dem Karten-Titel, exakt wie .hu-karte-sub der Übersicht. */
 .ab-mat-fach {
@@ -468,7 +543,8 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .ab-faecher-leiste,
-  .ab-filterzeile {
+  .ab-filterzeile,
+  .ab-sort-chevron {
     transition: none;
   }
 }
@@ -488,22 +564,26 @@
   border: 1px solid var(--line);
   background: var(--bg);
   color: var(--text-2);
-  font-size: 0.82rem;
+  font-size: 0.76rem;
   font-weight: 600;
-  padding: 7px 14px;
+  padding: 5px 11px;
   border-radius: 999px;
   cursor: pointer;
   transition: background var(--dur-fast) var(--ease-out),
     border-color var(--dur-fast) var(--ease-out),
-    color var(--dur-fast) var(--ease-out);
+    color var(--dur-fast) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
 }
 .ab-chip:hover {
   background: var(--card-2);
   color: var(--text);
 }
+.ab-chip:active {
+  transform: scale(0.98);
+}
 .ab-chip-icon {
-  width: 15px;
-  height: 15px;
+  width: 14px;
+  height: 14px;
 }
 .ab-chip.an {
   background: var(--accent-soft);
@@ -524,7 +604,7 @@
   border: none;
   background: transparent;
   color: var(--accent);
-  font-size: 0.88rem;
+  font-size: 0.86rem;
   font-weight: 600;
   padding: 8px 6px;
   cursor: pointer;
@@ -567,7 +647,7 @@
   color: var(--text);
 }
 .ab-sort-opt.an {
-  color: var(--accent);
+  color: var(--accent-strong);
   background: var(--accent-soft);
 }
 
@@ -580,6 +660,17 @@
   flex-direction: column;
   gap: 8px;
 }
+/* Favoriten-Marker an der Zeile (nur Anzeige, markiert wird im geöffneten
+   Dokument): gefüllter Stern in Teal, ohne Kontur. */
+.ab-zeile-stern {
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  fill: var(--accent);
+  stroke: none;
+}
+/* Jede Zeile als eigene Box, exakt das Rezept der Nachrichten-Einträge auf der
+   Übersicht (.hu-nachr): weiße Karte, großer Radius, sanfter Schatten. */
 .ab-zeile {
   display: flex;
   align-items: center;
@@ -588,24 +679,26 @@
   text-align: left;
   font: inherit;
   color: inherit;
-  padding: 10px 12px;
-  background: transparent;
-  border: 1px solid transparent;
-  border-radius: var(--r-md, 14px);
+  padding: 12px 14px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg, 20px);
+  box-shadow: var(--shadow-sm);
 }
 .ab-zeile-klick {
   cursor: pointer;
-  transition: background var(--dur-fast) var(--ease-out),
-    border-color var(--dur-fast) var(--ease-out),
-    transform var(--dur-press) var(--ease-out);
+  transition: border-color var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-fast) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out);
 }
-/* Ruhiger, neutraler Hover wie in der Übersicht (kein Teil-Teal je Zeile). */
+/* Hover hebt die Box leicht an, wie die Nachrichten auf der Übersicht. */
 .ab-zeile-klick:hover {
-  background: var(--card-2);
-  border-color: var(--line);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+  border-color: var(--line-strong);
 }
 .ab-zeile-klick:active {
-  transform: scale(0.995);
+  transform: scale(0.98);
 }
 .ab-zeile-icon {
   flex-shrink: 0;
@@ -640,14 +733,16 @@
   padding: 2px 9px;
   white-space: nowrap;
 }
-/* Quell-Badge: zeigt, dass orca das Material automatisch aus YouTube einsortiert hat. */
+/* Quell-Badge: zeigt, dass orca das Material automatisch aus YouTube einsortiert hat.
+   --yt = YouTube-Markenrot (gleicher Wert wie das Login-Dienst-Logo), einmal definiert. */
 .ab-zeile-quelle {
+  --yt: #ff0000;
   flex-shrink: 0;
   font-size: 0.68rem;
   font-weight: 700;
-  color: #b3261e;
-  background: color-mix(in srgb, #ff0000 9%, var(--card));
-  border: 1px solid color-mix(in srgb, #ff0000 20%, var(--line));
+  color: color-mix(in srgb, var(--yt) 72%, var(--text));
+  background: color-mix(in srgb, var(--yt) 9%, var(--card));
+  border: 1px solid color-mix(in srgb, var(--yt) 20%, var(--line));
   border-radius: 999px;
   padding: 2px 8px;
   white-space: nowrap;
@@ -673,13 +768,6 @@
   flex-wrap: wrap;
   gap: 6px;
 }
-.ab-liste-leer {
-  margin: 0;
-  padding: 18px 4px;
-  font-size: 0.9rem;
-  color: var(--muted);
-  font-style: italic;
-}
 
 /* Gruppierter Fach-Baum: Kategorie > Subkategorie > Lernweg (Aufgabe) > Materialien.
    Strukturiert den offenen Fach-Ordner statt einer flachen Liste. */
@@ -697,7 +785,7 @@
   margin: 0;
   padding-bottom: 8px;
   border-bottom: 1px solid var(--line);
-  font-size: 1.02rem;
+  font-size: 1.05rem;
   font-weight: 700;
   letter-spacing: -0.01em;
   color: var(--text);
@@ -751,7 +839,7 @@
   align-items: center;
   justify-content: center;
   padding: 24px;
-  background: rgba(20, 16, 10, 0.4);
+  background: color-mix(in srgb, var(--text) 32%, transparent);
   -webkit-backdrop-filter: blur(3px);
   backdrop-filter: blur(3px);
 }
@@ -776,7 +864,7 @@
 }
 .ab-overlay-titel {
   margin: 0;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   font-weight: 700;
   color: var(--text);
 }
@@ -784,16 +872,22 @@
   flex-shrink: 0;
   width: 32px;
   height: 32px;
-  border-radius: 50%;
-  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  border: 1px solid var(--line);
   background: var(--card);
   color: var(--text-2);
   font-size: 0.9rem;
   cursor: pointer;
+  transition: border-color var(--dur-press) var(--ease-out),
+    color var(--dur-press) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
 }
 .ab-overlay-zu:hover {
   border-color: var(--accent);
   color: var(--accent);
+}
+.ab-overlay-zu:active {
+  transform: scale(0.98);
 }
 .ab-overlay-inhalt {
   padding: 18px 20px;

@@ -64,7 +64,7 @@
   width: 100%;
   border: none;
   background: var(--intro-teal);
-  color: #ffffff;
+  color: var(--on-accent);
   font-family: var(--font-satoshi);
   font-size: 1rem;
   font-weight: 700;
@@ -79,4 +79,12 @@
 }
 .intro-los:active {
   transform: scale(0.98);
+}
+
+/* Reduced Motion: Overlay sofort sichtbar. */
+@media (prefers-reduced-motion: reduce) {
+  .intro,
+  .intro-karte {
+    animation: none;
+  }
 }

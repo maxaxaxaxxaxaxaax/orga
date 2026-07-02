@@ -35,24 +35,29 @@
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
   gap: 14px;
-  padding: 14px 20px;
+  /* Seitlich auf dem gemeinsamen Seitenrand-Token, wie die anderen Screens. */
+  padding: 14px var(--seite-x);
 }
 .fokus-zu {
   justify-self: start;
   flex-shrink: 0;
   width: 36px;
   height: 36px;
-  border-radius: 50%;
+  border-radius: 999px;
   border: 1px solid var(--line);
   background: var(--card);
   color: var(--text-2);
   font-size: 1rem;
   cursor: pointer;
-  transition: border-color var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out);
+  transition: border-color var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
 }
 .fokus-zu:hover {
   border-color: var(--accent);
   color: var(--accent);
+}
+.fokus-zu:active {
+  transform: scale(0.98);
 }
 .fokus-kb {
   justify-self: center;
@@ -78,7 +83,7 @@
 }
 .fokus-kb-eyebrow {
   flex-shrink: 0;
-  font-size: 0.62rem;
+  font-size: 0.72rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -115,11 +120,15 @@
   padding: 7px 13px;
   border-radius: 999px;
   cursor: pointer;
-  transition: border-color var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out);
+  transition: border-color var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
 }
 .fokus-wechsel:hover {
   border-color: var(--accent);
   color: var(--accent);
+}
+.fokus-wechsel:active {
+  transform: scale(0.98);
 }
 .fokus-balken {
   flex-shrink: 0;
@@ -191,11 +200,15 @@
   color: var(--text-2);
   border-radius: 50%;
   cursor: pointer;
-  transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out);
+  transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
 }
 .fokus-wz:hover {
   background: var(--bg);
   color: var(--accent);
+}
+.fokus-wz:active {
+  transform: scale(0.98);
 }
 .fokus-wz.aktiv {
   background: var(--accent);
@@ -224,10 +237,6 @@
   background: var(--on-accent);
   color: var(--accent);
 }
-.fokus-wz-spacer {
-  flex: 1;
-  min-height: 8px;
-}
 
 /* ---- Mitte: aktives Material + Schritt-Steuerung ----------------------- */
 .fokus-mitte {
@@ -246,6 +255,48 @@
   overflow-y: auto;
   display: flex;
   flex-direction: column;
+}
+/* Auge (Live-Coach): eigene Raster-Spalte rechts neben dem Material, direkt an
+   der Chat-Karte, wie das Dokument in der Ablage (.ab-detail). Die Grenze
+   Material|Coach ist --fok-ml und lässt sich am Griff ziehen; das Fenster
+   drückt sich von rechts herein. */
+.fokus-koerper.mit-live .fokus-mitte {
+  grid-column-end: var(--fok-ml, 6);
+}
+.fokus-live {
+  grid-column: var(--fok-ml, 6) / var(--fok-mc, 11);
+  grid-row: 1;
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg, 20px);
+  box-shadow: var(--shadow-sm);
+  /* KEIN overflow: hidden: der Zieh-Griff an der rechten Kante ragt in die
+     Raster-Lücke hinaus; gescrollt wird innen (.lc-inhalt). */
+  animation: fokus-live-rein var(--dur-slow) var(--ease-out) both;
+}
+/* Chats eingeklappt: der Coach reicht bis an den rechten Rand. */
+.fokus-koerper.mit-live.chats-zu .fokus-live {
+  grid-column-end: -1;
+}
+@keyframes fokus-live-rein {
+  from {
+    opacity: 0;
+    transform: translateX(40px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fokus-live {
+    animation: none;
+  }
 }
 .fokus-material {
   display: flex;
@@ -286,7 +337,7 @@
   flex-shrink: 0;
   font-size: 0.7rem;
   font-weight: 700;
-  color: var(--accent);
+  color: var(--accent-strong);
   background: var(--accent-soft);
   padding: 3px 9px;
   border-radius: 999px;
@@ -315,7 +366,7 @@
 }
 .fokus-eyebrow {
   margin: 0;
-  font-size: 0.74rem;
+  font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -335,7 +386,7 @@
      gleiche Breite, unabhängig von der mittleren Spalte (sonst springt der Knopf
      je nach offenem Panel). Der Körper reserviert unten Platz dafür. */
   position: fixed;
-  left: 50%;
+  left: 50vw; /* 50vw statt 50%: bleibt beim Auftauchen des Scrollbalkens stehen */
   bottom: 16px;
   transform: translateX(-50%);
   z-index: 6;
@@ -408,6 +459,8 @@
   height: 5px;
   border-radius: 3px;
   background: var(--line-strong);
+  /* Zustandswechsel (fertig/aktuell) weich statt hart. */
+  transition: background var(--dur-fast) var(--ease-out);
 }
 .fokus-sl-seg.fertig {
   background: var(--ok-text);
@@ -469,10 +522,14 @@
   border: 1px solid var(--line);
   border-radius: 999px;
   cursor: pointer;
-  transition: background var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+  transition: background var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
 }
 .fokus-gefuehl-knopf:hover {
   border-color: var(--line-strong);
+}
+.fokus-gefuehl-knopf:active {
+  transform: scale(0.98);
 }
 .fokus-gefuehl-knopf.gewaehlt[data-g="leicht"] {
   background: var(--ok-bg);
@@ -528,11 +585,15 @@
   color: var(--text-2);
   cursor: pointer;
   border-radius: 999px;
-  transition: background var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out);
+  transition: background var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
 }
 .fokus-sl-zurueck:hover {
   background: color-mix(in srgb, var(--text) 8%, transparent);
   color: var(--accent);
+}
+.fokus-sl-zurueck:active {
+  transform: scale(0.98);
 }
 .fokus-sl-weiter {
   border: none;
@@ -540,7 +601,9 @@
   color: var(--on-accent);
   font-size: 0.92rem;
   font-weight: 700;
-  padding: 11px 20px;
+  padding: 0 20px;
+  height: 42px;
+  box-sizing: border-box;
   border-radius: 999px;
   cursor: pointer;
   box-shadow: 0 4px 14px -4px var(--accent-shadow);
@@ -616,24 +679,28 @@
   background: var(--bg);
   border: 1px solid var(--line);
   border-radius: 999px;
-  padding: 3px;
+  padding: 4px;
 }
 .fokus-panel-tab {
   flex: 1;
   border: none;
   background: transparent;
   color: var(--text-2);
-  font-size: 0.78rem;
-  font-weight: 600;
+  font-size: 0.8rem;
+  font-weight: 700;
   padding: 6px 8px;
   border-radius: 999px;
   cursor: pointer;
   white-space: nowrap;
-  transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+  transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
+}
+.fokus-panel-tab:active {
+  transform: scale(0.98);
 }
 .fokus-panel-tab.an {
-  background: var(--accent);
-  color: var(--on-accent);
+  background: var(--accent-soft);
+  color: var(--accent-strong);
 }
 .fokus-panel-zu {
   flex-shrink: 0;
@@ -709,12 +776,15 @@
   color: var(--text);
   background: var(--bg);
   border: 1px solid var(--line-strong);
-  border-radius: var(--r-sm, 8px);
+  border-radius: var(--r-sm, 9px);
   padding: 10px 12px;
+  transition: border-color var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-fast) var(--ease-out);
 }
 .fokus-lc-feld:focus {
   outline: none;
   border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
 }
 .fokus-lc-senden {
   align-self: flex-start;
@@ -726,10 +796,14 @@
   padding: 9px 16px;
   border-radius: 999px;
   cursor: pointer;
-  transition: background var(--dur-fast) var(--ease-out);
+  transition: background var(--dur-fast) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
 }
 .fokus-lc-senden:hover:not(:disabled) {
   background: var(--accent-strong);
+}
+.fokus-lc-senden:active:not(:disabled) {
+  transform: scale(0.98);
 }
 .fokus-lc-senden:disabled {
   opacity: 0.45;
@@ -779,16 +853,19 @@
   border: 1px solid var(--line-strong);
   border-radius: 999px;
   padding: 9px 14px;
+  transition: border-color var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-fast) var(--ease-out);
 }
 .fokus-notiz-neu input:focus {
   outline: none;
   border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
 }
 .fokus-notiz-add {
   flex-shrink: 0;
   border: none;
   background: var(--accent-soft);
-  color: var(--accent);
+  color: var(--accent-strong);
   font-size: 0.84rem;
   font-weight: 700;
   padding: 8px 14px;
@@ -826,7 +903,7 @@
   padding: 10px 12px;
   background: var(--bg);
   border: 1px solid var(--line);
-  border-radius: var(--r-sm, 8px);
+  border-radius: var(--r-sm, 9px);
 }
 .fokus-notiz-text {
   flex: 1;
@@ -873,7 +950,8 @@
   padding: 20px;
   box-shadow: var(--shadow-sm);
   box-sizing: border-box;
-  overflow: hidden;
+  /* KEIN overflow: hidden: der Zieh-Griff an der rechten Kante ragt in die
+     Raster-Lücke hinaus; gescrollt wird innen (.fokus-rail-liste). */
   /* Volle Höhe wie Mitte und Chats: der 90px-Boden des .fokus-koerper hält unten
      schon Platz für die schwebende Schrittleiste frei (keine extra Marge nötig,
      sonst wäre die Leiste kürzer als die anderen Panels). */
@@ -945,7 +1023,11 @@
   background: var(--card);
   color: var(--text-2);
   cursor: pointer;
-  transition: border-color var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out), background var(--dur-press) var(--ease-out);
+  transition: border-color var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out), background var(--dur-press) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
+}
+.fokus-chats-auge:active {
+  transform: scale(0.98);
 }
 .fokus-chats-auge svg {
   width: 18px;
@@ -977,23 +1059,22 @@
   gap: 8px;
 }
 .fokus-tutor-blase {
-  max-width: 85%;
+  max-width: 80%;
   padding: 9px 12px;
-  font-size: 0.86rem;
-  line-height: 1.4;
-  border-radius: 14px;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: var(--text);
+  border-radius: var(--r-md, 14px);
 }
 .fokus-tutor-blase.tutor {
   align-self: flex-start;
   background: var(--bg);
   border: 1px solid var(--line);
-  color: var(--text-2);
   border-bottom-left-radius: 4px;
 }
 .fokus-tutor-blase.du {
   align-self: flex-end;
   background: var(--accent-soft);
-  color: var(--accent-strong);
   border-bottom-right-radius: 4px;
 }
 .fokus-tutor-eingabe {
@@ -1013,9 +1094,12 @@
   border: 1px solid var(--line);
   border-radius: 999px;
   outline: none;
+  transition: border-color var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-fast) var(--ease-out);
 }
-.fokus-tutor-feld:focus-visible {
+.fokus-tutor-feld:focus {
   border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
 }
 .fokus-tutor-senden {
   flex-shrink: 0;
@@ -1028,11 +1112,11 @@
   color: var(--on-accent);
   background: var(--accent);
   border: none;
-  border-radius: 50%;
+  border-radius: 999px;
   cursor: pointer;
 }
 .fokus-tutor-senden:disabled {
-  opacity: 0.4;
+  opacity: 0.45;
   cursor: default;
 }
 /* Eingeklappt: nur der Kopf als Pille, schwebt oben rechts; die Mitte (deren
@@ -1068,13 +1152,19 @@
   border: none;
   background: transparent;
   color: var(--text-2);
-  font-size: 0.85rem;
-  font-weight: 700;
+  font-size: 0.88rem;
+  font-weight: 600;
+  /* Gleiche Schrift wie die Nav-Pille oben (ein Toggle-Pillen-Muster). */
+  letter-spacing: -0.005em;
   padding: 8px 10px;
   border-radius: 999px;
   cursor: pointer;
   white-space: nowrap;
-  transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+  transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
+}
+.fokus-chats-tab:active {
+  transform: scale(0.98);
 }
 .fokus-chats-tab.an {
   background: var(--accent-soft);
@@ -1165,24 +1255,28 @@
 .fokus-chip {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
   border: 1px solid var(--line);
   background: var(--bg);
   color: var(--text-2);
-  font-size: 0.74rem;
+  font-size: 0.76rem;
   font-weight: 600;
-  padding: 5px 10px;
+  padding: 5px 11px;
   border-radius: 999px;
   cursor: pointer;
-  transition: border-color var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out), background var(--dur-press) var(--ease-out);
+  transition: border-color var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out), background var(--dur-press) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
 }
 .fokus-chip:hover {
   border-color: var(--accent);
   color: var(--accent);
 }
+.fokus-chip:active {
+  transform: scale(0.98);
+}
 .fokus-chip.an {
   background: var(--accent-soft);
-  border-color: color-mix(in srgb, var(--accent) 35%, var(--line));
+  border-color: transparent;
   color: var(--accent-strong);
 }
 .fokus-chip-icon {
@@ -1198,6 +1292,12 @@
   background: var(--bg);
   border: 1px solid var(--line);
   border-radius: 999px;
+  transition: border-color var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-fast) var(--ease-out);
+}
+.fokus-rail-suche:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
 }
 .fokus-rail-suche svg {
   width: 16px;
@@ -1234,23 +1334,37 @@
   gap: 10px;
   width: 100%;
   padding: 10px 12px;
-  background: var(--bg);
+  background: var(--card);
   border: 1px solid var(--line);
-  border-radius: var(--r-sm, 8px);
+  border-radius: var(--r-sm, 9px);
   text-align: left;
   font: inherit;
   color: var(--text);
 }
 .fokus-rail-klick {
   cursor: pointer;
-  transition: border-color var(--dur-press) var(--ease-out), background var(--dur-press) var(--ease-out);
+  transition: border-color var(--dur-press) var(--ease-out), background var(--dur-press) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
 }
 .fokus-rail-klick:hover {
   border-color: var(--accent);
 }
+.fokus-rail-klick:active {
+  transform: scale(0.98);
+}
+/* Auswahl app-weit ohne farbigen Rand: nur die Füllung zeigt den Zustand. */
 .fokus-rail-mat.aktiv {
-  border-color: var(--accent);
+  border-color: transparent;
   background: var(--accent-soft);
+}
+/* Favoriten-Stern (aus der Ablage): reine Füllung in Teal, keine Kontur
+   (wie der markierte Stern in der Ablage). */
+.fokus-rail-stern {
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  fill: var(--accent);
+  stroke: none;
 }
 .fokus-rail-icon {
   flex-shrink: 0;
@@ -1309,11 +1423,15 @@
   padding: 8px 14px;
   border-radius: 999px;
   cursor: pointer;
-  transition: border-color var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out);
+  transition: border-color var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
 }
 .fokus-mat-add:hover {
   border-color: var(--accent);
   color: var(--accent);
+}
+.fokus-mat-add:active {
+  transform: scale(0.98);
 }
 .fokus-luecke-aktion {
   border: 1px solid var(--line-strong);
@@ -1343,7 +1461,7 @@
 .fokus-hinweis {
   background: var(--bg);
   border: 1px solid var(--line);
-  border-radius: var(--r-md, 12px);
+  border-radius: var(--r-md, 14px);
   padding: 12px 14px;
 }
 .fokus-hinweis p {
@@ -1407,7 +1525,7 @@
   padding: 14px;
   background: var(--card);
   border: 1px solid var(--line);
-  border-radius: var(--r-md, 12px);
+  border-radius: var(--r-md, 14px);
 }
 .fokus-zeit-label {
   font-size: 0.92rem;
@@ -1436,12 +1554,15 @@
   color: var(--text);
   background: var(--bg);
   border: 1px solid var(--line-strong);
-  border-radius: var(--r-sm, 8px);
+  border-radius: var(--r-sm, 9px);
   padding: 8px 10px;
+  transition: border-color var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-fast) var(--ease-out);
 }
 .fokus-zeit-feld input:focus {
   outline: none;
   border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
 }
 .fokus-zeit-einheit {
   font-size: 0.9rem;
@@ -1498,11 +1619,15 @@
   padding: 13px 18px;
   border-radius: 999px;
   cursor: pointer;
-  transition: border-color var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out);
+  transition: border-color var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
 }
 .fokus-sekundaer:hover {
   border-color: var(--accent);
   color: var(--accent);
+}
+.fokus-sekundaer:active {
+  transform: scale(0.98);
 }
 .fokus-hilfe-laeuft {
   margin: 0;
@@ -1510,7 +1635,7 @@
   line-height: 1.45;
   color: var(--warn-text);
   background: var(--warn-bg);
-  border-radius: var(--r-sm, 8px);
+  border-radius: var(--r-sm, 9px);
   padding: 10px 14px;
 }
 
@@ -1534,17 +1659,14 @@
     border-radius: 999px;
     align-self: stretch;
   }
-  .fokus-wz-spacer {
-    flex: 1;
-    min-height: 0;
-  }
   /* Mitte bleibt der Hauptteil; Seitenpanels darunter mit gedeckelter Höhe. */
   .fokus-mitte {
     flex: 1;
     min-height: 40vh;
   }
   .fokus-rail,
-  .fokus-chats {
+  .fokus-chats,
+  .fokus-live {
     margin-bottom: 0;
     max-height: 42vh;
   }
@@ -1562,5 +1684,13 @@
   }
   .fokus-sl-gefuehl {
     order: 3;
+  }
+}
+
+/* Reduced Motion: kein Einflug von Screen und Panels. */
+@media (prefers-reduced-motion: reduce) {
+  .fokus,
+  .fokus-panel {
+    animation: none;
   }
 }

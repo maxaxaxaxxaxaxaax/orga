@@ -14,11 +14,6 @@
   color: var(--text);
   font-family: var(--font-satoshi);
 }
-/* Wizard-Schritt: keine obere Nav, dafuer die "Wochenplanung"-Pille unten.
-   Oben darf der Kalender naeher an den Rand, wie im Etappenplan. */
-.wp-screen.wp-wizard {
-  padding-top: var(--seite-top);
-}
 /* Seitenleiste 4/12, Kalender 8/12 (gleicher Bruchteil wie die anderen Seiten),
    als zwei fr-Spuren, damit der Übergang animierbar ist. */
 .wp-layout {
@@ -29,7 +24,7 @@
   grid-template-rows: minmax(0, 1fr);
   gap: var(--grid-gap);
   align-items: stretch;
-  transition: grid-template-columns 0.5s var(--ease-out), gap 0.5s var(--ease-out);
+  transition: grid-template-columns var(--dur-entrance) var(--ease-out), gap var(--dur-entrance) var(--ease-out);
 }
 .wp-layout > .wp-kal {
   min-width: 0;
@@ -45,14 +40,11 @@
   pointer-events: none;
   overflow: hidden;
 }
-@media (max-width: 860px) {
+@media (max-width: 960px) {
   .wp-screen {
     height: auto;
     overflow: visible;
     padding: var(--seite-top) var(--seite-x) var(--seite-bottom);
-  }
-  .wp-screen.wp-wizard {
-    padding-top: var(--seite-top);
   }
   .wp-layout,
   .wp-layout.wp-fertig {
@@ -85,7 +77,7 @@
   min-width: 0;
   min-height: 0;
   max-height: 100%;
-  transition: opacity 0.45s var(--ease-out);
+  transition: opacity var(--dur-entrance) var(--ease-out);
 }
 /* Beim Zurückziehen in den Vorrat den scrollenden Bereich markieren. */
 .wp-seite.ueber .wp-seite-liste {
@@ -116,7 +108,7 @@
   background: var(--card);
   border: 1px solid var(--line);
   border-radius: var(--r-lg, 20px);
-  padding: 18px 20px 20px;
+  padding: 20px 22px;
   min-width: 0;
   min-height: 0;
   max-height: 100%;
@@ -139,7 +131,8 @@
 }
 .wp-kal-monat {
   margin: 0;
-  font-size: 1.4rem;
+  /* Untergeordnete h2: bleibt unter der Screen-h1 (.ep-kopf-titel, 1.25rem). */
+  font-size: 1.2rem;
   font-weight: 700;
   letter-spacing: -0.01em;
   color: var(--text);
@@ -166,10 +159,16 @@
   padding: 10px 18px;
   border-radius: 999px;
   cursor: pointer;
+  /* Gleiches Rezept wie der Geschwister-Knopf .ep-bar-umplanen (Etappenplan.css). */
+  transition: border-color var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
 }
 .wp-zuruecksetzen:hover {
   border-color: var(--accent);
   color: var(--accent);
+}
+.wp-zuruecksetzen:active {
+  transform: scale(0.98);
 }
 .wp-umplanen {
   flex: 1 1 auto;
@@ -201,10 +200,14 @@
   background: none;
   color: var(--accent);
   cursor: pointer;
-  transition: color var(--dur-press) var(--ease-out);
+  transition: color var(--dur-press) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
 }
 .wp-kal-pfeil:hover:not(:disabled) {
   color: var(--accent-strong);
+}
+.wp-kal-pfeil:active:not(:disabled) {
+  transform: scale(0.98);
 }
 .wp-kal-pfeil:disabled {
   opacity: 0.4;
@@ -248,7 +251,7 @@
   position: absolute;
   right: 6px;
   transform: translateY(-50%);
-  font-size: 0.68rem;
+  font-size: 0.7rem;
   color: var(--muted);
   font-variant-numeric: tabular-nums;
 }
@@ -289,7 +292,7 @@
   position: absolute;
   left: 3px;
   right: 3px;
-  border-radius: 11px;
+  border-radius: var(--r-md, 14px);
   padding: 6px 10px;
   overflow: hidden;
   box-sizing: border-box;
@@ -324,7 +327,7 @@
 }
 .wp-blk-zeit,
 .wp-blk-raum {
-  font-size: 0.68rem;
+  font-size: 0.7rem;
   color: var(--muted);
   font-variant-numeric: tabular-nums;
 }
@@ -368,7 +371,7 @@
   font-weight: 600;
 }
 .wp-frei-zeit {
-  font-size: 0.66rem;
+  font-size: 0.7rem;
   color: var(--muted);
 }
 .wp-blk-frei.leer.ueber .wp-frei-zeit,
@@ -395,7 +398,7 @@
   background: color-mix(in srgb, var(--c) 12%, var(--card));
   color: var(--text-2);
   border: 1px solid color-mix(in srgb, var(--c) 28%, var(--line));
-  border-radius: var(--r-sm, 8px);
+  border-radius: var(--r-sm, 9px);
   padding: 6px 8px 6px 11px;
   cursor: grab;
   overflow: hidden;

@@ -34,6 +34,8 @@ export default function LiveCoach({
   visionModell,
   mitteRef,
   onClose,
+  // z. B. der Zieh-Griff an der rechten Kante (Grenze zum Chats-Panel).
+  children,
 }) {
   const [aktiv, setAktiv] = useState(false); // Default AUS = Signal des Schülers
   const [pausiert, setPausiert] = useState(false);
@@ -238,7 +240,8 @@ export default function LiveCoach({
   }
 
   return (
-    <aside className="fokus-panel fokus-panel-live lc" aria-label="Live-Coach">
+    <aside className="fokus-live lc" aria-label="Live-Coach">
+      {children}
       <header className="fokus-panel-kopf">
         <span className="fokus-panel-titel">Live-Coach</span>
         <button
@@ -265,11 +268,12 @@ export default function LiveCoach({
           </p>
         ) : (
           <>
-            <div className="lc-quelle" role="tablist" aria-label="Quelle">
+            {/* Quellen-Umschalter, keine echten Tabs: group + aria-pressed
+                (einheitlich mit den Chip-Gruppen der App). */}
+            <div className="lc-quelle" role="group" aria-label="Quelle">
               <button
                 type="button"
-                role="tab"
-                aria-selected={quelle === "bildschirm"}
+                aria-pressed={quelle === "bildschirm"}
                 className={"lc-quelle-tab" + (quelle === "bildschirm" ? " an" : "")}
                 onClick={() => wechsleQuelle("bildschirm")}
               >
@@ -277,8 +281,7 @@ export default function LiveCoach({
               </button>
               <button
                 type="button"
-                role="tab"
-                aria-selected={quelle === "kamera"}
+                aria-pressed={quelle === "kamera"}
                 className={"lc-quelle-tab" + (quelle === "kamera" ? " an" : "")}
                 onClick={() => wechsleQuelle("kamera")}
               >

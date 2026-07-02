@@ -1,11 +1,16 @@
 .lz-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(17, 20, 26, 0.45);
+  background: color-mix(in srgb, var(--text) 32%, transparent);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
   display: grid;
   place-items: center;
   padding: 24px;
-  z-index: 60;
+  z-index: 70; /* über den Leisten (Nav 50, untere Pille 60) */
+  /* Die Scrollbar-Reserven (scrollbar-gutter both-edges am html) verkleinern den
+     fixed-Bezugsrahmen: die Randstreifen selbst überbrücken. */
+  margin-inline: calc((100% - 100vw) / 2);
 }
 .lz-modal {
   position: relative;
@@ -14,9 +19,9 @@
   overflow-y: auto;
   background: var(--card);
   color: var(--text);
-  border-radius: var(--r-lg, 18px);
+  border-radius: var(--r-lg, 20px);
   padding: 24px 26px;
-  box-shadow: 0 16px 40px rgba(17, 20, 26, 0.28);
+  box-shadow: var(--shadow-lg);
 }
 .lz-close {
   position: absolute;
@@ -24,15 +29,22 @@
   right: 14px;
   width: 30px;
   height: 30px;
-  border: none;
+  border: 1px solid var(--line);
   border-radius: 999px;
-  background: var(--bg);
+  background: var(--card);
   color: var(--text-2);
   font-size: 0.8rem;
   cursor: pointer;
+  transition: border-color var(--dur-press) var(--ease-out),
+    color var(--dur-press) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
 }
 .lz-close:hover {
-  color: var(--text);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.lz-close:active {
+  transform: scale(0.98);
 }
 .lz-eyebrow {
   margin: 0 0 16px;
@@ -73,7 +85,7 @@
   color: var(--text);
   background: var(--bg);
   border: 1px solid var(--line);
-  border-radius: var(--r-sm, 8px);
+  border-radius: var(--r-sm, 9px);
   outline: none;
 }
 .lz-feld textarea {
@@ -114,7 +126,7 @@
   box-sizing: border-box;
   padding: 12px 14px;
   border: 1px solid var(--line);
-  border-radius: var(--r-sm, 8px);
+  border-radius: var(--r-sm, 9px);
   background: var(--bg);
 }
 .lz-v-leer {
@@ -175,7 +187,7 @@
 .lz-heften {
   border: none;
   background: var(--accent);
-  color: #fff;
+  color: var(--on-accent);
   font-size: 0.88rem;
   font-weight: 700;
   padding: 9px 18px;

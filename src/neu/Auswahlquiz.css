@@ -2,6 +2,10 @@
   display: flex;
   flex-direction: column;
   gap: 14px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md, 14px);
+  padding: 16px;
 }
 
 .aq-kopf {
@@ -72,13 +76,17 @@
   font-size: 0.95rem;
   color: var(--text);
   background: var(--card);
-  border: 1px solid var(--line-strong);
-  border-radius: var(--r-md);
+  border: 1.5px solid var(--line);
+  border-radius: var(--r-sm);
   cursor: pointer;
-  transition: border-color var(--dur-press) var(--ease-out), background var(--dur-press) var(--ease-out);
+  transition: border-color var(--dur-press) var(--ease-out), background var(--dur-press) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
 }
 .aq-option:hover:not(:disabled) {
   border-color: var(--accent);
+}
+.aq-option:active:not(:disabled) {
+  transform: scale(0.98);
 }
 .aq-option:disabled {
   cursor: default;
@@ -142,15 +150,18 @@
   border: none;
   background: var(--accent);
   color: var(--on-accent);
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-weight: 700;
-  padding: 12px;
+  padding: 9px 18px;
   border-radius: 999px;
   cursor: pointer;
-  transition: background var(--dur-press) var(--ease-out);
+  transition: background var(--dur-fast) var(--ease-out), transform var(--dur-press) var(--ease-out);
 }
-.aq-weiter:hover {
+.aq-weiter:hover:not(:disabled) {
   background: var(--accent-strong);
+}
+.aq-weiter:active:not(:disabled) {
+  transform: scale(0.98);
 }
 
 .aq-leer {

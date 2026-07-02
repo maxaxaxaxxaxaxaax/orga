@@ -18,6 +18,9 @@ export default function MarkierenFrage({
   visionModell,
   systemText,
   onClose,
+  // mitFrage=false: reines Markier-Werkzeug (Toolbar-Stift), ohne Frage/KI-Teil.
+  // mitFrage=true: Markieren und den KI-Coach fragen (Zauberstab im Chat).
+  mitFrage = true,
 }) {
   const wrapRef = useRef(null);
   const canvasRef = useRef(null);
@@ -248,7 +251,12 @@ export default function MarkierenFrage({
   }
 
   return (
-    <div className="mf" role="dialog" aria-modal="true" aria-label="Markieren und fragen">
+    <div
+      className="mf"
+      role="dialog"
+      aria-modal="true"
+      aria-label={mitFrage ? "Markieren und fragen" : "Markieren"}
+    >
       <header className="mf-kopf">
         <button
           type="button"
@@ -258,7 +266,9 @@ export default function MarkierenFrage({
         >
           ✕
         </button>
-        <span className="mf-titel">Markieren und fragen</span>
+        <span className="mf-titel">
+          {mitFrage ? "Markieren und fragen" : "Markieren"}
+        </span>
         <div className="mf-werkzeuge">
           <button
             type="button"
@@ -282,8 +292,9 @@ export default function MarkierenFrage({
       </header>
 
       <p className="mf-hinweis">
-        Markiere mit dem Stift die Stelle, bei der du nicht weiterkommst, und
-        frag den KI-Coach dazu. Dein Bild bleibt auf diesem Gerät.
+        {mitFrage
+          ? "Markiere mit dem Stift die Stelle, bei der du nicht weiterkommst, und frag den KI-Coach dazu. Dein Bild bleibt auf diesem Gerät."
+          : "Markiere mit dem Stift die wichtigen Stellen im Material. Dein Bild bleibt auf diesem Gerät."}
       </p>
 
       <div className="mf-flaeche" ref={wrapRef}>
@@ -317,7 +328,7 @@ export default function MarkierenFrage({
         )}
       </div>
 
-      {antwort && (
+      {mitFrage && antwort && (
         <div className="mf-antwort" role="status">
           <span className="mf-antwort-label">KI-Coach</span>
           <p className="mf-antwort-text">
@@ -326,7 +337,7 @@ export default function MarkierenFrage({
           </p>
         </div>
       )}
-      {denkt && !antwort && (
+      {mitFrage && denkt && !antwort && (
         <div className="mf-antwort" role="status">
           <span className="mf-antwort-label">KI-Coach</span>
           <p className="mf-antwort-text mf-denkt">
@@ -337,34 +348,36 @@ export default function MarkierenFrage({
         </div>
       )}
 
-      <form
-        className="mf-eingabe"
-        onSubmit={(e) => {
-          e.preventDefault();
-          senden();
-        }}
-      >
-        <input
-          type="text"
-          value={frage}
-          onChange={(e) => setFrage(e.target.value)}
-          placeholder={
-            visionModell
-              ? "Was möchtest du zur markierten Stelle wissen?"
-              : "Schreiben geht, zum Ansehen braucht es eine lokale KI"
-          }
-          aria-label="Frage zur Markierung"
-          disabled={!visionModell || laeuft}
-        />
-        <button
-          type="submit"
-          className="mf-senden"
-          disabled={!visionModell || laeuft}
+      {mitFrage && (
+        <form
+          className="mf-eingabe"
+          onSubmit={(e) => {
+            e.preventDefault();
+            senden();
+          }}
         >
-          An KI-Coach senden
-        </button>
-      </form>
-      {!visionModell && (
+          <input
+            type="text"
+            value={frage}
+            onChange={(e) => setFrage(e.target.value)}
+            placeholder={
+              visionModell
+                ? "Was möchtest du zur markierten Stelle wissen?"
+                : "Schreiben geht, zum Ansehen braucht es eine lokale KI"
+            }
+            aria-label="Frage zur Markierung"
+            disabled={!visionModell || laeuft}
+          />
+          <button
+            type="submit"
+            className="mf-senden"
+            disabled={!visionModell || laeuft}
+          >
+            An KI-Coach senden
+          </button>
+        </form>
+      )}
+      {mitFrage && !visionModell && (
         <p className="mf-keinki">
           Zum Ansehen deiner Markierung brauche ich ein lokales KI-Vision-Modell
           (Ollama). Gerade läuft keins. Markieren und Schreiben geht trotzdem.

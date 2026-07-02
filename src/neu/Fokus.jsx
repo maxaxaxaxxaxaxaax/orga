@@ -6,6 +6,7 @@ import { fachTextFarbe } from "./farbe";
 import Etappenring from "./Etappenring";
 import { ART_LABEL } from "./material";
 import { eigeneFuerThema, speichereEigenes } from "./eigeneMaterialien";
+import { ladeFavoriten, ladeOrte, META_EVENT } from "./materialMeta";
 import { addMitteilung } from "./benachrichtigungen";
 import { ladeSchritte, speichereSchritte } from "./lernschritte";
 import {
@@ -189,6 +190,8 @@ export default function Fokus({
   // Ablage, siehe ./rasterZiehen).
   const [rasterR, setRasterR] = useState(3);
   const [rasterC, setRasterC] = useState(9);
+  // L = Material|Live-Coach (nur bei offenem Auge sichtbar).
+  const [rasterL, setRasterL] = useState(4);
   const {
     ref: koerperRef,
     zieht: rasterZieht,
@@ -196,7 +199,9 @@ export default function Fokus({
   } = useRasterZiehen(fokusMessbereich);
 
   // Vollbild-Werkzeuge mit eigenem Overlay.
-  const [markierenOffen, setMarkierenOffen] = useState(false);
+  // Markieren hat zwei Einstiege: Toolbar-Stift = nur markieren ("stift"),
+  // Zauberstab im KI-Chat = markieren und den Coach fragen ("fragen").
+  const [markierenModus, setMarkierenModus] = useState(null);
   const [aufschriebOffen, setAufschriebOffen] = useState(false);
   const [rechenwegOffen, setRechenwegOffen] = useState(false);
   const [uploadOffen, setUploadOffen] = useState(false);
@@ -231,10 +236,27 @@ export default function Fokus({
   const startRef = useRef(0);
   const gebuchtRef = useRef(false);
 
+  // Favoriten-Sterne und verschobene Ablageorte aus der Ablage (materialMeta.js):
+  // Favoriten stehen bei den passenden Materialien ganz oben, in ein anderes
+  // Fach verschobene Materialien tauchen hier nicht mehr auf.
+  const [favoriten, setFavoriten] = useState(ladeFavoriten);
+  const [orte, setOrte] = useState(ladeOrte);
+  useEffect(() => {
+    const f = () => {
+      setFavoriten(ladeFavoriten());
+      setOrte(ladeOrte());
+    };
+    window.addEventListener(META_EVENT, f);
+    return () => window.removeEventListener(META_EVENT, f);
+  }, []);
+
+  const bleibtHier = (m) => !orte[m.id] || orte[m.id] === lw?.fachId;
   const materialien = lw
     ? [
-        ...(lw.fach.materialien || []).filter((m) => m.thema === thema.label),
-        ...eigeneFuerThema(lw.fachId, thema.label),
+        ...(lw.fach.materialien || []).filter(
+          (m) => m.thema === thema.label && bleibtHier(m)
+        ),
+        ...eigeneFuerThema(lw.fachId, thema.label).filter(bleibtHier),
       ]
     : [];
   const genKey = generatorFuerKb(kb.id);
@@ -291,14 +313,14 @@ export default function Fokus({
   useEffect(() => {
     const onKey = (e) => {
       if (e.key !== "Escape") return;
-      if (markierenOffen || aufschriebOffen || rechenwegOffen || uploadOffen)
+      if (markierenModus || aufschriebOffen || rechenwegOffen || uploadOffen)
         return;
       if (werkzeug) setWerkzeug(null);
       else onClose();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [markierenOffen, aufschriebOffen, rechenwegOffen, uploadOffen, werkzeug, onClose]);
+  }, [markierenModus, aufschriebOffen, rechenwegOffen, uploadOffen, werkzeug, onClose]);
 
   const fertig = (i) => (stand[i] != null ? stand[i] : !!schritte[i]?.fertig);
   const aktuell = schritte.findIndex((_, i) => !fertig(i));
@@ -460,9 +482,9 @@ export default function Fokus({
   }
   // Vollbild-Werkzeug öffnen: erst das Panel schließen, damit der Screenshot die
   // Material-Fläche trifft und die Ansicht ruhig ist.
-  function oeffneMarkieren() {
+  function oeffneMarkieren(modus) {
     setWerkzeug(null);
-    setMarkierenOffen(true);
+    setMarkierenModus(modus);
   }
   function oeffneAufschrieb() {
     setWerkzeug(null);
@@ -478,6 +500,10 @@ export default function Fokus({
   if (chip !== "alle") railRows = railRows.filter((r) => r.chip === chip);
   const q = suche.trim().toLowerCase();
   if (q) railRows = railRows.filter((r) => r.m.titel.toLowerCase().includes(q));
+  // Favoriten (Stern aus der Ablage) ganz nach oben; sonst bleibt die Reihenfolge.
+  railRows.sort(
+    (a, b) => (favoriten[b.m.id] ? 1 : 0) - (favoriten[a.m.id] ? 1 : 0)
+  );
 
   const aktivId = aktivesMaterial?.id || null;
 
@@ -487,13 +513,20 @@ export default function Fokus({
     Icon: iconFuerMaterial(m),
   }));
   // Eine Material-Zeile (geteilt von "Zum Thema" und "Alle").
-  const matZeile = ({ m, Icon }) => {
+  const matZeile = ({ m, Icon: TypIcon }) => {
     const inhalt = (
       <>
         <span className="fokus-rail-icon" aria-hidden="true">
-          <Icon />
+          <TypIcon />
         </span>
         <span className="fokus-rail-mat-titel">{m.titel}</span>
+        {favoriten[m.id] && (
+          <Icon
+            name="stern"
+            className="fokus-rail-stern"
+            title="Favorit aus der Ablage"
+          />
+        )}
         <span className="fokus-rail-mat-typ">
           {aktivitaetLabel(m) || ART_LABEL[m.art] || m.art}
         </span>
@@ -684,9 +717,14 @@ export default function Fokus({
               ? ""
               : " ohne-rail") +
             (chatsOffen ? "" : " chats-zu") +
+            (werkzeug === "live" ? " mit-live" : "") +
             (rasterZieht ? " raster-zieht" : "")
           }
-          style={{ "--fok-rm": rasterR + 2, "--fok-mc": rasterC + 2 }}
+          style={{
+            "--fok-rm": rasterR + 2,
+            "--fok-mc": rasterC + 2,
+            "--fok-ml": rasterL + 2,
+          }}
         >
           <RasterOverlay von={2} />
           {/* Linke Werkzeug-Toolbar */}
@@ -717,13 +755,12 @@ export default function Fokus({
             <button
               type="button"
               className="fokus-wz"
-              onClick={oeffneMarkieren}
-              aria-label="Markieren und fragen"
-              title="Stift: markieren und den KI-Coach fragen"
+              onClick={() => oeffneMarkieren("stift")}
+              aria-label="Markieren"
+              title="Stift: wichtige Stellen im Material markieren"
             >
               <Icon name="marker" width={22} height={22} />
             </button>
-            <span className="fokus-wz-spacer" aria-hidden="true" />
             <button
               type="button"
               className="fokus-wz"
@@ -735,7 +772,10 @@ export default function Fokus({
             </button>
           </nav>
 
-          {/* Mitte: aktives Material + schmale Schritt-Steuerung */}
+          {/* Mitte: aktives Material + schmale Schritt-Steuerung. Mit offenem
+              Live-Coach (Auge) endet sie an der ziehbaren Grenze --fok-ml, das
+              Coach-Fenster drückt sich rechts daneben ins Raster (wie das
+              Dokument in der Ablage). */}
           <main className="fokus-mitte">
             <div className="fokus-mitte-inhalt" ref={mitteRef}>
               {aktivId === "__quiz__" && genKey ? (
@@ -873,23 +913,19 @@ export default function Fokus({
               )}
             </div>
 
-            {/* Panel-Werkzeug: links angedockt über der Mitte */}
-
-
+            {/* Grenze Material|Live-Coach ziehen (nur bei offenem Auge). */}
             {werkzeug === "live" && (
-              <LiveCoach
-                kontextName={kontextName}
-                materialien={materialien}
-                schritt={aktSchrittText}
-                inhalt={aufgabenInhalt}
-                istMathe={istMathe}
-                visionModell={visionModell}
-                mitteRef={mitteRef}
-                onClose={() => setWerkzeug(null)}
+              <RasterGriff
+                {...rasterGriff("ml", (s) =>
+                  setRasterL(
+                    Math.max(2, Math.min((chatsOffen ? rasterC : 10) - 2, s))
+                  )
+                )}
               />
             )}
-            {/* Grenze Mitte|Chats ziehen (nur wenn die Chats offen sind). */}
-            {chatsOffen && (
+            {/* Grenze Mitte|Chats ziehen: bei offenem Live-Coach sitzt sie an
+               dessen rechter Kante (siehe unten), sonst hier an der Mitte. */}
+            {chatsOffen && werkzeug !== "live" && (
               <RasterGriff
                 {...rasterGriff("mc", (s) =>
                   setRasterC(Math.max(rasterR + 2, Math.min(10, s)))
@@ -897,6 +933,29 @@ export default function Fokus({
               />
             )}
           </main>
+
+          {/* Live-Coach (Auge): eigene Raster-Spalte rechts neben dem Material,
+             direkt an der Chat-Karte, wie das Dokument in der Ablage. */}
+          {werkzeug === "live" && (
+            <LiveCoach
+              kontextName={kontextName}
+              materialien={materialien}
+              schritt={aktSchrittText}
+              inhalt={aufgabenInhalt}
+              istMathe={istMathe}
+              visionModell={visionModell}
+              mitteRef={mitteRef}
+              onClose={() => setWerkzeug(null)}
+            >
+              {chatsOffen && (
+                <RasterGriff
+                  {...rasterGriff("mc", (s) =>
+                    setRasterC(Math.max(rasterL + 2, Math.min(10, s)))
+                  )}
+                />
+              )}
+            </LiveCoach>
+          )}
 
           {/* Linkes Panel: über die Werkzeug-Leiste geöffnet (Materialien oder
              Notizen). Geschlossen, wenn werkzeug null/live ist. */}
@@ -1035,7 +1094,7 @@ export default function Fokus({
                   className="fokus-mat-add"
                   onClick={() => setUploadOffen(true)}
                 >
-                  + anhängen
+                  + hinzufügen
                 </button>
               </div>
             ) : (
@@ -1083,17 +1142,18 @@ export default function Fokus({
                     aria-label="Materialien durchsuchen"
                   />
                 </div>
+                {/* Filter, keine echten Tabs: daher group + aria-pressed (einheitlich
+                    mit den Filter-Chips in Ablage und Übersicht). */}
                 <div
                   className="fokus-rail-chips"
-                  role="tablist"
+                  role="group"
                   aria-label="Material-Typ"
                 >
                   {CHIPS.map((c) => (
                     <button
                       key={c.key}
                       type="button"
-                      role="tab"
-                      aria-selected={chip === c.key}
+                      aria-pressed={chip === c.key}
                       className={"fokus-chip" + (chip === c.key ? " an" : "")}
                       onClick={() => setChip(c.key)}
                     >
@@ -1115,7 +1175,7 @@ export default function Fokus({
                   className="fokus-mat-add fokus-rail-add"
                   onClick={() => setUploadOffen(true)}
                 >
-                  + anhängen
+                  + hinzufügen
                 </button>
               </>
             )}
@@ -1165,11 +1225,12 @@ export default function Fokus({
             </header>
             {chatsOffen && (
               <>
-            <div className="fokus-chats-tabs" role="tablist">
+            {/* Umschalter ohne echte Tab-Semantik (kein tabpanel/Tastatur-Modell):
+                daher group + aria-pressed wie alle Chip-Gruppen. */}
+            <div className="fokus-chats-tabs" role="group" aria-label="Chat wählen">
               <button
                 type="button"
-                role="tab"
-                aria-selected={chatTab === "coach"}
+                aria-pressed={chatTab === "coach"}
                 className={"fokus-chats-tab" + (chatTab === "coach" ? " an" : "")}
                 onClick={() => setChatTab("coach")}
               >
@@ -1177,8 +1238,7 @@ export default function Fokus({
               </button>
               <button
                 type="button"
-                role="tab"
-                aria-selected={chatTab === "lerncoach"}
+                aria-pressed={chatTab === "lerncoach"}
                 className={
                   "fokus-chats-tab" + (chatTab === "lerncoach" ? " an" : "")
                 }
@@ -1196,6 +1256,13 @@ export default function Fokus({
                     kiModell={kiModell}
                     visionModell={visionModell}
                     systemText={coachSystem}
+                    onZauberstab={() => oeffneMarkieren("fragen")}
+                    aktivId={aktivesMaterial?.id || null}
+                    aktivTitel={
+                      aktivesMaterial?.id === "__quiz__"
+                        ? "die Übung"
+                        : aktivesMaterial?.titel || null
+                    }
                     onHeften={({ titel, inhalt }) => {
                       speichereEigenes({
                         titel,
@@ -1216,7 +1283,12 @@ export default function Fokus({
               </>
             ) : (
               <div className="fokus-tutor">
-                <div className="fokus-tutor-verlauf">
+                {/* Live-Region: neue Antworten werden vom Screenreader vorgelesen */}
+                <div
+                  className="fokus-tutor-verlauf"
+                  role="log"
+                  aria-live="polite"
+                >
                   <div className="fokus-tutor-blase tutor">
                     Hier erreichst du {lehrkraefte[kb.fach] || COACH} (ein Mensch,
                     kein Automat). Schreib kurz, woran es hängt. Deine Frage
@@ -1279,13 +1351,14 @@ export default function Fokus({
         </div>
       )}
 
-      {markierenOffen && (
+      {markierenModus && (
         <MarkierenFrage
           kontextName={kontextName}
           zielRef={mitteRef}
           visionModell={visionModell}
           systemText={coachSystem}
-          onClose={() => setMarkierenOffen(false)}
+          mitFrage={markierenModus === "fragen"}
+          onClose={() => setMarkierenModus(null)}
         />
       )}
       {aufschriebOffen && (

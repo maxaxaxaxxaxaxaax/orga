@@ -3,7 +3,7 @@
   max-width: 1100px;
   background: var(--card);
   border: 1px solid var(--line);
-  border-radius: var(--r-md, 12px);
+  border-radius: var(--r-md, 14px);
   padding: 16px 18px;
 }
 .mc-kopf {
@@ -22,10 +22,16 @@
   padding: 6px 12px;
   border-radius: 999px;
   cursor: pointer;
+  transition: border-color var(--dur-press) var(--ease-out),
+    color var(--dur-press) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
 }
 .mc-zettel:not(:disabled):hover {
   border-color: var(--accent);
   color: var(--accent);
+}
+.mc-zettel:active:not(:disabled) {
+  transform: scale(0.98);
 }
 .mc-zettel:disabled {
   opacity: 0.5;
@@ -65,23 +71,13 @@
   height: 6px;
   border-radius: 50%;
   background: var(--muted);
-  animation: mc-blink 1.2s infinite ease-in-out;
+  animation: denkt-puls 1.2s infinite var(--ease-in-out);
 }
 .mc-denkt span:nth-child(2) {
   animation-delay: 0.2s;
 }
 .mc-denkt span:nth-child(3) {
   animation-delay: 0.4s;
-}
-@keyframes mc-blink {
-  0%,
-  80%,
-  100% {
-    opacity: 0.3;
-  }
-  40% {
-    opacity: 1;
-  }
 }
 .mc-hinweis {
   margin: 6px 0 0;
@@ -95,10 +91,22 @@
   flex-direction: column;
   gap: 8px;
 }
+/* Zwischenzeile bei Materialwechsel: ruhiger, zentrierter Chip im Verlauf. */
+.mc-wechsel {
+  align-self: center;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--muted);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 3px 10px;
+  margin: 2px 0;
+}
 .mc-msg {
-  max-width: 78%;
+  max-width: 80%;
   padding: 9px 13px;
-  border-radius: 14px;
+  border-radius: var(--r-md, 14px);
 }
 .mc-ki {
   align-self: flex-start;
@@ -114,7 +122,7 @@
 .mc-text {
   margin: 0;
   font-size: 0.9rem;
-  line-height: 1.4;
+  line-height: 1.45;
   color: var(--text);
 }
 /* Angehängtes Bild in der Nachricht. */
@@ -135,7 +143,7 @@
   padding: 8px 10px;
   background: var(--bg);
   border: 1px solid var(--line);
-  border-radius: var(--r-sm, 8px);
+  border-radius: var(--r-sm, 9px);
 }
 .mc-anhang-bild {
   width: 40px;
@@ -158,11 +166,16 @@
   color: var(--text-2);
   font-size: 0.7rem;
   cursor: pointer;
+  transition: color var(--dur-press) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
 }
 .mc-anhang-weg:hover {
   color: var(--text);
 }
-/* Bild-anhängen-Knopf im Eingabefeld. */
+.mc-anhang-weg:active {
+  transform: scale(0.98);
+}
+/* Zauberstab-Knopf im Eingabefeld (Markieren und fragen bzw. Bild anhängen). */
 .mc-bild-knopf {
   flex-shrink: 0;
   width: 30px;
@@ -170,13 +183,23 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  /* Reset fürs button-Element (war früher ein label ohne Browser-Eigenstil). */
+  border: none;
+  background: transparent;
+  padding: 0;
   border-radius: 999px;
   color: var(--muted);
   cursor: pointer;
+  transition: color var(--dur-press) var(--ease-out),
+    background var(--dur-press) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
 }
 .mc-bild-knopf:hover {
   color: var(--accent);
   background: var(--card);
+}
+.mc-bild-knopf:active {
+  transform: scale(0.98);
 }
 .mc-bild-knopf svg {
   width: 18px;
@@ -214,10 +237,16 @@
   padding: 6px 12px;
   border-radius: 999px;
   cursor: pointer;
+  transition: border-color var(--dur-press) var(--ease-out),
+    color var(--dur-press) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
 }
 .mc-chip:hover {
   border-color: var(--accent);
   color: var(--accent);
+}
+.mc-chip:active {
+  transform: scale(0.98);
 }
 
 /* Eingabe-Zeile. */
@@ -230,9 +259,12 @@
   background: var(--bg);
   border: 1px solid var(--line);
   border-radius: 999px;
+  transition: border-color var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-fast) var(--ease-out);
 }
 .mc-eingabe:focus-within {
   border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
 }
 .mc-eingabe input {
   flex: 1;
@@ -248,16 +280,33 @@
 }
 .mc-senden {
   flex-shrink: 0;
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  height: 36px;
   border: none;
   border-radius: 999px;
   background: var(--accent);
-  color: #fff;
+  color: var(--on-accent);
   font-size: 1rem;
   font-weight: 700;
   cursor: pointer;
+  transition: background var(--dur-fast) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
 }
 .mc-senden:hover {
   background: var(--accent-strong);
+}
+.mc-senden:active:not(:disabled) {
+  transform: scale(0.98);
+}
+.mc-senden:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+/* Reduced Motion: Denk-Punkte stehen still sichtbar. */
+@media (prefers-reduced-motion: reduce) {
+  .mc-denkt span {
+    animation: none;
+    opacity: 0.7;
+  }
 }

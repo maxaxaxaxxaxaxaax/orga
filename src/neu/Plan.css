@@ -1,5 +1,5 @@
 .pl-screen {
-  min-height: 100vh;
+  min-height: 100dvh;
   box-sizing: border-box;
   /* Oben Platz für die "Mein Weg"-Leiste, unten für die Nav. */
   padding: var(--seite-top) var(--seite-x) var(--seite-bottom);
@@ -22,7 +22,7 @@
   margin: 0 0 4px;
   font-size: 0.78rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--muted);
 }
@@ -63,10 +63,16 @@
   padding: 8px 14px;
   border-radius: 999px;
   cursor: pointer;
+  transition: border-color var(--dur-press) var(--ease-out),
+    color var(--dur-press) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
 }
 .pl-knopf:hover {
   border-color: var(--accent);
   color: var(--accent);
+}
+.pl-knopf:active {
+  transform: scale(0.98);
 }
 
 @media (max-width: 760px) {

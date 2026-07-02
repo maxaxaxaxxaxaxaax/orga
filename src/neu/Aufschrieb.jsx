@@ -28,7 +28,7 @@ export default function Aufschrieb({ kb, schritt, aufgabe, onGespeichert, onClos
   const [fehler, setFehler] = useState(false);
   const abbruchRef = useRef(null);
 
-  const tinteRef = useRef("#1f2933");
+  const tinteRef = useRef("#001818");
   const BREITE = 2.4;
 
   function zeichneStrich(ctx, strich) {
@@ -83,7 +83,7 @@ export default function Aufschrieb({ kb, schritt, aufgabe, onGespeichert, onClos
     tinteRef.current =
       getComputedStyle(document.documentElement)
         .getPropertyValue("--text")
-        .trim() || "#1f2933";
+        .trim() || "#001818";
     alleNeu();
   }
 

@@ -34,7 +34,7 @@
   grid-template-rows: minmax(0, 1fr);
   gap: var(--grid-gap);
   align-items: stretch;
-  transition: grid-template-columns 0.5s var(--ease-out), gap 0.5s var(--ease-out);
+  transition: grid-template-columns var(--dur-entrance) var(--ease-out), gap var(--dur-entrance) var(--ease-out);
 }
 .ep-layout > .ep-wochen-grid {
   min-width: 0;
@@ -58,7 +58,7 @@
   min-width: 0;
   min-height: 0;
   max-height: 100%;
-  transition: opacity 0.45s var(--ease-out);
+  transition: opacity var(--dur-entrance) var(--ease-out);
 }
 /* Weicher Auslauf am unteren Rand der scrollenden Lernweg-Liste: macht sichtbar, dass
    noch mehr Aufgaben darunter liegen (statt sie hart abzuschneiden). */
@@ -72,7 +72,7 @@
   pointer-events: none;
   background: linear-gradient(to bottom, transparent, var(--bg));
 }
-@media (max-width: 860px) {
+@media (max-width: 960px) {
   .ep-screen {
     height: auto;
     overflow: visible;
@@ -102,7 +102,7 @@
   background: var(--card);
   border: 1px solid var(--line);
   border-radius: var(--r-lg, 20px);
-  padding: 18px 20px;
+  padding: 20px 22px;
   box-shadow: var(--shadow-sm);
 }
 .ep-kopf-text {
@@ -122,7 +122,8 @@
   color: var(--text-2);
   border-radius: 50%;
   cursor: pointer;
-  transition: border-color var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out);
+  transition: border-color var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
 }
 .ep-kopf-neu svg {
   width: 18px;
@@ -136,6 +137,9 @@
 .ep-kopf-neu:hover {
   border-color: var(--accent);
   color: var(--accent);
+}
+.ep-kopf-neu:active {
+  transform: scale(0.98);
 }
 .ep-kopf-titel {
   margin: 0;
@@ -163,7 +167,7 @@
   --ep-teal-strong: var(--accent-strong);
   position: fixed;
   bottom: 16px;
-  left: 50%;
+  left: 50vw; /* 50vw statt 50%: bleibt beim Auftauchen des Scrollbalkens stehen */
   transform: translateX(-50%);
   z-index: 60;
   /* Feste Breite, damit die Pille nicht je nach Inhalt (Hinweis + "Automatisch
@@ -205,11 +209,15 @@
   color: var(--text-2);
   cursor: pointer;
   border-radius: 999px;
-  transition: background var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out);
+  transition: background var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
 }
 .ep-bar-zurueck:hover {
   background: color-mix(in srgb, var(--text) 8%, transparent);
   color: var(--accent);
+}
+.ep-bar-zurueck:active {
+  transform: scale(0.98);
 }
 .ep-bar-label {
   display: inline-flex;
@@ -246,12 +254,14 @@
   border: none;
   background: var(--ep-teal);
   color: var(--on-accent);
-  font-size: 0.9rem;
+  font-size: 0.92rem;
   font-weight: 700;
-  padding: 10px 18px;
+  padding: 0 20px;
+  height: 42px;
+  box-sizing: border-box;
   border-radius: 999px;
   cursor: pointer;
-  box-shadow: 0 6px 16px -7px var(--accent-shadow);
+  box-shadow: 0 4px 14px -4px var(--accent-shadow);
   transition: background var(--dur-fast) var(--ease-out), transform var(--dur-press) var(--ease-out);
 }
 .ep-bar-aktion:hover,
@@ -260,7 +270,7 @@
 }
 .ep-bar-aktion:active,
 .ep-bar-weiter:active {
-  transform: scale(0.97);
+  transform: scale(0.98);
 }
 /* Sekundär-Aktion in der Planungs-Leiste: "Neu planen" (Etappe/Woche neu
    verteilen). Ruhiger Outline-Knopf, von Etappen- und Wochenplan geteilt. */
@@ -278,11 +288,15 @@
   padding: 9px 16px;
   border-radius: 999px;
   cursor: pointer;
-  transition: border-color var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out);
+  transition: border-color var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
 }
 .ep-bar-umplanen:hover {
   border-color: var(--accent);
   color: var(--accent);
+}
+.ep-bar-umplanen:active {
+  transform: scale(0.98);
 }
 @media (max-width: 560px) {
   .ep-bar-text {
@@ -306,13 +320,6 @@
   outline-offset: 4px;
   border-radius: var(--r-md, 14px);
 }
-.ep-vorrat-leer {
-  margin: 0;
-  padding: 6px 2px;
-  font-size: 0.86rem;
-  color: var(--muted);
-  font-style: italic;
-}
 .ep-fachgruppe {
   flex-shrink: 0;
   background: var(--card);
@@ -321,12 +328,12 @@
   overflow: hidden;
   box-shadow: var(--shadow-sm);
   max-height: 800px;
-  /* Gleicher Stil wie der Screen-Wisch (cubic-bezier, 0.38s), damit sich das
+  /* Gleiche Kurve und Dauer wie der Screen-Wisch (Overlay-Token), damit sich das
      Rausgleiten der leeren Boxen wie der Tab-Wechsel anfühlt. */
-  transition: opacity 0.38s var(--ease-in-out),
-    transform 0.38s var(--ease-in-out),
-    max-height 0.38s var(--ease-in-out),
-    margin 0.38s var(--ease-in-out);
+  transition: opacity var(--dur-overlay) var(--ease-in-out),
+    transform var(--dur-overlay) var(--ease-in-out),
+    max-height var(--dur-overlay) var(--ease-in-out),
+    margin var(--dur-overlay) var(--ease-in-out);
 }
 /* Leere Fach-Gruppe (alle Ziele verplant): wischt nach links raus (wie der Screen-
    Wisch) und macht Platz. */
@@ -431,10 +438,10 @@
   /* Wochenkarten füllen die verfügbare Höhe (gleich hohe Reihen), statt oben gepackt
      Platz darunter zu lassen. Reihen wachsen bei viel Inhalt (dann scrollt das Grid). */
   grid-auto-rows: minmax(min-content, 1fr);
-  gap: 14px;
+  gap: var(--grid-gap-eng, 14px);
   padding-right: 4px;
 }
-@media (max-width: 860px) {
+@media (max-width: 960px) {
   .ep-wochen-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -448,7 +455,7 @@
   background: var(--card);
   border: 1px solid var(--line);
   border-radius: var(--r-lg, 20px);
-  padding: 14px;
+  padding: 16px;
   box-shadow: var(--shadow-sm);
   min-height: 180px;
   transition: border-color var(--dur-press) var(--ease-out), box-shadow var(--dur-press) var(--ease-out);
@@ -490,8 +497,8 @@
 }
 
 @media (pointer: coarse) {
-  .ep-bar-aktion,
-  .ep-bar-weiter {
-    min-height: 40px;
+  /* Gleiche Touch-Höhe wie der KbChip (.kbc), die Chips sind laut Kommentar identisch. */
+  .ep-kb {
+    padding: 11px 13px;
   }
 }

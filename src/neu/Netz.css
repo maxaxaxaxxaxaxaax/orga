@@ -17,10 +17,16 @@
   font-size: 13px;
   cursor: pointer;
   color: var(--text-2);
+  transition: background var(--dur-press) var(--ease-out),
+    color var(--dur-press) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
 }
 .netz-krume:hover:not(:disabled) {
   background: var(--card-2);
   color: var(--text);
+}
+.netz-krume:active:not(:disabled) {
+  transform: scale(0.98);
 }
 .netz-krume:disabled,
 .netz-krume.aktuell {
@@ -153,4 +159,11 @@
   height: 13px;
   border-radius: 50%;
   display: inline-block;
+}
+
+/* Reduced Motion: Ebenen-Wechsel ohne Einblenden. */
+@media (prefers-reduced-motion: reduce) {
+  .netz-ebene {
+    animation: none;
+  }
 }

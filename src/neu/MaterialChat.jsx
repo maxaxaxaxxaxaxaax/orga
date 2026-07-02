@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { introNachricht, antwortAuf } from "./materialAssistent";
 import { frageKi } from "./kiClient";
 import Icon from "./Icon";
@@ -25,11 +25,31 @@ export default function MaterialChat({
   visionModell,
   systemText,
   onHeften,
+  onZauberstab,
+  // Aktives Material im Fokus: bei Wechsel zeigt der Verlauf einen Hinweis.
+  aktivId,
+  aktivTitel,
 }) {
   const ctx = { kontextName, materialien };
   const [nachrichten, setNachrichten] = useState(() => [
     { von: "ki", ...introNachricht(ctx) },
   ]);
+  // Materialwechsel sichtbar machen: kleine Zwischenzeile im Verlauf, dass der
+  // Coach ab jetzt auf DIESES Material eingeht (der System-Prompt kennt es
+  // bereits über systemText). Beim ersten Rendern kein Hinweis.
+  const vorherigesAktiv = useRef(aktivId);
+  useEffect(() => {
+    if (vorherigesAktiv.current === aktivId) return;
+    vorherigesAktiv.current = aktivId;
+    if (!aktivTitel) return;
+    // Bewusste Ausnahme (wie der Show-Effekt in App.jsx): der Hinweis reagiert
+    // auf einen Prop-Wechsel von außen, ein einzelnes Anhängen kaskadiert nicht.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setNachrichten((n) => [
+      ...n,
+      { von: "wechsel", text: `Geht jetzt auf „${aktivTitel}“ ein` },
+    ]);
+  }, [aktivId, aktivTitel]);
   const [eingabe, setEingabe] = useState("");
   const [denkt, setDenkt] = useState(false);
   const [zettelOffen, setZettelOffen] = useState(false);
@@ -160,8 +180,14 @@ export default function MaterialChat({
         )}
       </header>
 
-      <div className="mc-verlauf">
-        {nachrichten.map((m, i) => (
+      {/* Live-Region: neue Antworten werden vom Screenreader vorgelesen */}
+      <div className="mc-verlauf" role="log" aria-live="polite">
+        {nachrichten.map((m, i) =>
+          m.von === "wechsel" ? (
+            <div key={i} className="mc-wechsel">
+              {m.text}
+            </div>
+          ) : (
           <div key={i} className={"mc-msg mc-" + m.von}>
             {m.bild && (
               <img className="mc-bild" src={m.bild} alt="Angehängtes Bild" />
@@ -188,7 +214,8 @@ export default function MaterialChat({
               </div>
             )}
           </div>
-        ))}
+          )
+        )}
       </div>
 
       {nochKeineFrage && (
@@ -228,14 +255,37 @@ export default function MaterialChat({
           sende();
         }}
       >
-        {visionModell && (
-          <label
+        {/* Zauberstab: öffnet Markieren-und-fragen (Aufnahme des Materials,
+            Stelle markieren, Frage an den KI-Coach). Ohne Handler (außerhalb
+            des Fokus) bleibt der Zauberstab das Bild-Anhängen. */}
+        {onZauberstab ? (
+          <button
+            type="button"
             className="mc-bild-knopf"
-            title="Bild anhängen (Kamera oder Galerie)"
+            onClick={onZauberstab}
+            title="Markieren und den KI-Coach fragen"
+            aria-label="Markieren und fragen"
           >
-            <input type="file" accept="image/*" onChange={waehleBild} hidden />
             <Icon name="wand" />
-          </label>
+          </button>
+        ) : (
+          visionModell && (
+            <label
+              className="mc-bild-knopf"
+              title="Bild anhängen (Kamera oder Galerie)"
+              aria-label="Bild anhängen"
+            >
+              {/* Das (unsichtbare) Input ist das fokussierbare Element: Label dort. */}
+              <input
+                type="file"
+                accept="image/*"
+                onChange={waehleBild}
+                aria-label="Bild anhängen"
+                hidden
+              />
+              <Icon name="wand" />
+            </label>
+          )
         )}
         <input
           type="text"

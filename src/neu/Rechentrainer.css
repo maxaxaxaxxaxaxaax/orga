@@ -2,6 +2,10 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md, 14px);
+  padding: 16px;
 }
 .rt-kopf {
   display: flex;
@@ -10,10 +14,10 @@
   gap: 10px;
 }
 .rt-label {
-  font-size: 0.78rem;
+  font-size: 0.72rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
   color: var(--muted);
 }
 .rt-serie {
@@ -38,7 +42,7 @@
   transform-origin: left;
   background: var(--accent);
   border-radius: 2px;
-  transition: transform 0.25s var(--ease-out, ease);
+  transition: transform var(--dur-base) var(--ease-out);
 }
 .rt-nacharbeit {
   margin: 4px 0 0;
@@ -79,11 +83,11 @@
   color: var(--text);
   background: var(--bg);
   border: 2px solid var(--line-strong);
-  border-radius: var(--r-sm, 8px);
+  border-radius: var(--r-sm, 9px);
   outline: none;
   transition:
-    border-color var(--dur-fast, 160ms) var(--ease-out, ease),
-    background var(--dur-fast, 160ms) var(--ease-out, ease);
+    border-color var(--dur-fast, 160ms) var(--ease-out),
+    background var(--dur-fast, 160ms) var(--ease-out);
 }
 .rt-eingabe:focus {
   border-color: var(--accent);
@@ -94,9 +98,9 @@
   color: var(--ok-text);
 }
 .rt-eingabe.no {
-  border-color: var(--warn-text);
-  background: var(--warn-bg);
-  color: var(--warn-text);
+  border-color: var(--danger-text);
+  background: var(--danger-bg);
+  color: var(--danger-text);
 }
 .rt-eingabe:disabled {
   cursor: default;
@@ -110,15 +114,13 @@
   padding: 9px 18px;
   border-radius: 999px;
   cursor: pointer;
-  transition:
-    background var(--dur-fast, 160ms) var(--ease-out, ease),
-    transform var(--dur-press, 120ms) var(--ease-out, ease);
+  transition: background var(--dur-fast) var(--ease-out), transform var(--dur-press) var(--ease-out);
 }
 .rt-pruef:hover:not(:disabled) {
   background: var(--accent-strong);
 }
 .rt-pruef:active:not(:disabled) {
-  transform: scale(0.97);
+  transform: scale(0.98);
 }
 .rt-pruef:disabled {
   opacity: 0.5;
@@ -210,14 +212,14 @@
 
 /* Feedback: Tipp (no) oder Bestätigung (ok). */
 .rt-feedback {
-  border-radius: var(--r-sm, 8px);
+  border-radius: var(--r-sm, 9px);
   padding: 10px 12px;
 }
 .rt-feedback.ok {
   background: var(--ok-bg);
 }
 .rt-feedback.no {
-  background: var(--warn-bg);
+  background: var(--danger-bg);
 }
 .rt-feedback-text {
   margin: 0;
@@ -236,14 +238,18 @@
   border: none;
   background: var(--accent);
   color: var(--on-accent);
-  font-size: 0.88rem;
-  font-weight: 600;
-  padding: 8px 16px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  padding: 9px 18px;
   border-radius: 999px;
   cursor: pointer;
+  transition: background var(--dur-fast) var(--ease-out), transform var(--dur-press) var(--ease-out);
 }
-.rt-weiter:hover {
+.rt-weiter:hover:not(:disabled) {
   background: var(--accent-strong);
+}
+.rt-weiter:active:not(:disabled) {
+  transform: scale(0.98);
 }
 
 .rt-leer {

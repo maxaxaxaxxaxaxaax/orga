@@ -24,7 +24,7 @@ export default function MaterialAnsicht({ material, onClose }) {
         aria-label={material.titel}
         onClick={(e) => e.stopPropagation()}
       >
-        <button className="ma-close" onClick={onClose} aria-label="Schließen">
+        <button type="button" className="ma-close" onClick={onClose} aria-label="Schließen">
           ✕
         </button>
         <span className="ma-art">{ART_LABEL[material.art] || material.art}</span>

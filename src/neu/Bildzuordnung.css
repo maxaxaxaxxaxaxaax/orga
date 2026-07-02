@@ -1,7 +1,7 @@
 .bz {
   background: var(--bg);
   border: 1px solid var(--line);
-  border-radius: var(--r-md, 12px);
+  border-radius: var(--r-md, 14px);
   padding: 16px;
 }
 .bz-kopf {
@@ -59,6 +59,10 @@
 }
 .bz-raum {
   cursor: pointer;
+  /* Anker fuer die globalen Pop/Wackel-Animationen: sonst skaliert das SVG
+     vom Ursprung der Zeichenflaeche statt vom Raum selbst. */
+  transform-box: fill-box;
+  transform-origin: center;
 }
 .bz-raum rect {
   fill: var(--bg);
@@ -87,15 +91,15 @@
   fill: var(--ok-text);
 }
 .bz-raum.no rect {
-  fill: var(--warn-bg);
-  stroke: var(--warn-line);
+  fill: var(--danger-bg);
+  stroke: var(--danger-line);
   stroke-width: 2.5;
 }
 
 .bz-feedback {
   margin-top: 12px;
   padding: 10px 13px;
-  border-radius: var(--r-sm, 8px);
+  border-radius: var(--r-sm, 9px);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -107,7 +111,7 @@
 }
 .bz-feedback-text {
   margin: 0;
-  font-size: 0.92rem;
+  font-size: 0.9rem;
   font-weight: 600;
   color: var(--ok-text);
 }
@@ -115,20 +119,27 @@
   border: none;
   background: var(--accent);
   color: var(--on-accent);
-  font-size: 0.88rem;
+  font-size: 0.9rem;
   font-weight: 700;
-  padding: 8px 16px;
+  padding: 9px 18px;
   border-radius: 999px;
   cursor: pointer;
+  transition: background var(--dur-fast) var(--ease-out), transform var(--dur-press) var(--ease-out);
+}
+.bz-weiter:hover:not(:disabled) {
+  background: var(--accent-strong);
+}
+.bz-weiter:active:not(:disabled) {
+  transform: scale(0.98);
 }
 .bz-hinweis {
   margin: 12px 0 0;
   font-size: 0.85rem;
-  color: var(--warn-text);
+  color: var(--danger-text);
 }
 .bz-leer {
   margin: 0;
-  font-size: 0.88rem;
+  font-size: 0.9rem;
   color: var(--muted);
   font-style: italic;
 }

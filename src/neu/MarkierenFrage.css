@@ -12,7 +12,8 @@
   gap: 12px;
   /* Marker-Farbe als Variable (anpassbar), wird in JS ausgelesen. */
   --mf-marker: rgba(245, 197, 24, 0.4);
-  animation: mf-rein var(--dur-base) var(--ease-out) both;
+  /* Vollbild-Werkzeuge blenden einheitlich mit der Overlay-Dauer ein (wie Fokus/Aufschrieb). */
+  animation: mf-rein var(--dur-overlay) var(--ease-out) both;
 }
 @keyframes mf-rein {
   from {
@@ -32,22 +33,26 @@
   flex-shrink: 0;
   width: 36px;
   height: 36px;
-  border-radius: 50%;
+  border-radius: 999px;
   border: 1px solid var(--line);
   background: var(--card);
   color: var(--text-2);
   font-size: 1rem;
   cursor: pointer;
-  transition: border-color var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out);
+  transition: border-color var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
 }
 .mf-zu:hover {
   border-color: var(--accent);
   color: var(--accent);
 }
+.mf-zu:active {
+  transform: scale(0.98);
+}
 .mf-titel {
   flex: 1;
   min-width: 0;
-  font-family: var(--font-display);
+  font-family: var(--font-satoshi);
   font-size: 1.05rem;
   font-weight: 600;
   color: var(--text);
@@ -60,12 +65,13 @@
   border: 1px solid var(--line-strong);
   background: var(--card);
   color: var(--text-2);
-  font-size: 0.82rem;
+  font-size: 0.86rem;
   font-weight: 600;
   padding: 7px 12px;
   border-radius: 999px;
   cursor: pointer;
-  transition: border-color var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out);
+  transition: border-color var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
 }
 .mf-werkzeug:disabled {
   opacity: 0.45;
@@ -74,6 +80,9 @@
 .mf-werkzeug:not(:disabled):hover {
   border-color: var(--accent);
   color: var(--accent);
+}
+.mf-werkzeug:active:not(:disabled) {
+  transform: scale(0.98);
 }
 .mf-hinweis {
   flex-shrink: 0;
@@ -91,9 +100,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #ffffff;
+  background: var(--card);
   border: 1px solid var(--line);
-  border-radius: var(--r-md, 12px);
+  border-radius: var(--r-md, 14px);
   overflow: hidden;
 }
 .mf-bg {
@@ -139,7 +148,7 @@
   gap: 4px;
   background: var(--card);
   border: 1px solid var(--line);
-  border-radius: var(--r-md, 12px);
+  border-radius: var(--r-md, 14px);
   padding: 12px 14px;
   max-height: 28vh;
   overflow-y: auto;
@@ -183,23 +192,13 @@
   height: 6px;
   border-radius: 50%;
   background: var(--muted);
-  animation: mf-puls 1.2s ease-in-out infinite;
+  animation: denkt-puls 1.2s infinite var(--ease-in-out);
 }
 .mf-denkt span:nth-child(2) {
-  animation-delay: 0.15s;
+  animation-delay: 0.2s;
 }
 .mf-denkt span:nth-child(3) {
-  animation-delay: 0.3s;
-}
-@keyframes mf-puls {
-  0%,
-  60%,
-  100% {
-    opacity: 0.3;
-  }
-  30% {
-    opacity: 1;
-  }
+  animation-delay: 0.4s;
 }
 
 /* Frage-Zeile. */
@@ -218,10 +217,13 @@
   border: 1px solid var(--line-strong);
   border-radius: 999px;
   padding: 11px 16px;
+  transition: border-color var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-fast) var(--ease-out);
 }
 .mf-eingabe input:focus {
   outline: none;
   border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
 }
 .mf-eingabe input:disabled {
   opacity: 0.6;
@@ -236,10 +238,14 @@
   padding: 11px 20px;
   border-radius: 999px;
   cursor: pointer;
-  transition: background var(--dur-fast) var(--ease-out);
+  transition: background var(--dur-fast) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
 }
 .mf-senden:hover:not(:disabled) {
   background: var(--accent-strong);
+}
+.mf-senden:active:not(:disabled) {
+  transform: scale(0.98);
 }
 .mf-senden:disabled {
   opacity: 0.45;
@@ -251,4 +257,16 @@
   font-size: 0.82rem;
   line-height: 1.4;
   color: var(--muted);
+}
+
+/* Reduced Motion: kein Einflug, Cursor und Denk-Punkte stehen still sichtbar. */
+@media (prefers-reduced-motion: reduce) {
+  .mf,
+  .mf-cursor,
+  .mf-denkt span {
+    animation: none;
+  }
+  .mf-denkt span {
+    opacity: 0.7;
+  }
 }

@@ -1,8 +1,5 @@
-/* Live-Coach-Panel: erbt das Glas/Karten-Layout von .fokus-panel (absolut über der
-   Mitte, Slide-in). Hier nur der Innen-Aufbau. Farben nur über Variablen. */
-.fokus-panel-live {
-  width: min(420px, 100%);
-}
+/* Live-Coach-Fenster: liegt als Split-Spalte in der Fokus-Mitte (Karten-Look und
+   Slide-in kommen von .fokus-live in Fokus.css). Hier nur der Innen-Aufbau. */
 .lc-inhalt {
   flex: 1;
   min-height: 0;
@@ -33,24 +30,29 @@
   background: var(--bg);
   border: 1px solid var(--line);
   border-radius: 999px;
-  padding: 3px;
+  padding: 4px;
 }
 .lc-quelle-tab {
   flex: 1;
   border: none;
   background: transparent;
   color: var(--text-2);
-  font-size: 0.8rem;
+  font-size: 0.88rem;
   font-weight: 600;
+  letter-spacing: -0.005em;
   padding: 6px 10px;
   border-radius: 999px;
   cursor: pointer;
   white-space: nowrap;
-  transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+  transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
+}
+.lc-quelle-tab:active {
+  transform: scale(0.98);
 }
 .lc-quelle-tab.an {
-  background: var(--accent);
-  color: var(--on-accent);
+  background: var(--accent-soft);
+  color: var(--accent-strong);
 }
 
 /* Vorschau: Kamera-Video oder ein ruhiger Hinweis (Bildschirm-Quelle). */
@@ -64,13 +66,13 @@
   box-sizing: border-box;
   background: var(--bg);
   border: 1px solid var(--line);
-  border-radius: var(--r-md, 12px);
+  border-radius: var(--r-md, 14px);
   text-align: center;
 }
 .lc-video {
   width: 100%;
   max-height: 240px;
-  border-radius: var(--r-sm, 8px);
+  border-radius: var(--r-sm, 9px);
   background: #000000;
   /* Umgebungskamera nicht spiegeln (anders als ein Selfie). */
   transform: none;
@@ -104,10 +106,14 @@
   padding: 11px 16px;
   border-radius: 999px;
   cursor: pointer;
-  transition: background var(--dur-fast) var(--ease-out);
+  transition: background var(--dur-fast) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
 }
 .lc-start:hover {
   background: var(--accent-strong);
+}
+.lc-start:active {
+  transform: scale(0.98);
 }
 .lc-stop,
 .lc-pause {
@@ -120,12 +126,17 @@
   padding: 10px 14px;
   border-radius: 999px;
   cursor: pointer;
-  transition: border-color var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out);
+  transition: border-color var(--dur-press) var(--ease-out), color var(--dur-press) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
 }
 .lc-stop:hover,
 .lc-pause:hover {
   border-color: var(--accent);
   color: var(--accent);
+}
+.lc-stop:active,
+.lc-pause:active {
+  transform: scale(0.98);
 }
 .lc-status {
   flex-shrink: 0;
@@ -154,19 +165,20 @@
   display: flex;
   flex-direction: column;
   gap: 3px;
-  max-width: 92%;
+  max-width: 80%;
   padding: 10px 12px;
   border: 1px solid var(--line);
-  border-radius: var(--r-md, 12px);
+  border-radius: var(--r-md, 14px);
 }
+/* Wie in den anderen Chats: Gegenueber neutral, eigene Blase accent-soft. */
 .lc-coach {
   align-self: flex-start;
-  background: var(--accent-soft);
+  background: var(--bg);
   border-bottom-left-radius: 4px;
 }
 .lc-du {
   align-self: flex-end;
-  background: var(--card);
+  background: var(--accent-soft);
   border-bottom-right-radius: 4px;
 }
 .lc-meldung-label {
@@ -181,7 +193,7 @@
 }
 .lc-meldung-text {
   margin: 0;
-  font-size: 0.92rem;
+  font-size: 0.9rem;
   line-height: 1.45;
   color: var(--text);
   white-space: pre-wrap;
@@ -205,18 +217,21 @@
   border: 1px solid var(--line-strong);
   border-radius: 999px;
   padding: 9px 14px;
+  transition: border-color var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-fast) var(--ease-out);
 }
 .lc-frage input:focus {
   outline: none;
   border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
 }
 .lc-frage input:disabled {
   opacity: 0.6;
 }
 .lc-frage-senden {
   flex-shrink: 0;
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  height: 36px;
   border: none;
   border-radius: 999px;
   background: var(--accent);

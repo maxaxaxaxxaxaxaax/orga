@@ -33,7 +33,10 @@ export default function NavLeiste({ aktiv, onWechsel }) {
         <span
           className="nav-pille"
           aria-hidden="true"
-          style={{ left: pille.left + "px", width: pille.width + "px" }}
+          style={{
+            transform: `translateX(${pille.left}px)`,
+            width: pille.width + "px",
+          }}
         />
       )}
       {PUNKTE.map(({ id, label }) => (

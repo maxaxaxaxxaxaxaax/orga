@@ -1,9 +1,17 @@
 import { useEffect, useRef, useState } from "react";
+import { NEUTRAL_FARBE } from "./farbe";
 import { createPortal } from "react-dom";
 import { faecher } from "../data/wissen";
 import { koennensbeweise, kbFarbe } from "../data/koennensbeweise";
 import { FACH_STRUKTUR } from "../data/fachStruktur";
 import { ladeEigene, speichereEigenes, EIGENE_EVENT } from "./eigeneMaterialien";
+import {
+  ladeFavoriten,
+  toggleFavorit,
+  ladeOrte,
+  verschiebeMaterial,
+  META_EVENT,
+} from "./materialMeta";
 import { istOeffenbar } from "./interaktiv";
 import { IcLernweg } from "./materialIcons";
 import { CHIPS, chipFuerMaterial, iconFuerMaterial } from "./materialTypen";
@@ -14,6 +22,8 @@ import KbInhalt from "./KbInhalt";
 import Icon from "./Icon";
 import LeerZustand from "./LeerZustand";
 import { useScrollFade } from "./useScrollFade";
+import { useRasterZiehen } from "./rasterZiehen";
+import { RasterGriff, RasterOverlay } from "./raster";
 import "./Ablage.css";
 
 // Ablage: eine Karte "Materialien". Oben drin die Fächer als bunte Ordner (Wahl
@@ -201,6 +211,14 @@ export default function Ablage({
 
   // Ein Dokument/Lernweg ist rechts im Split geöffnet. Esc schließt es.
   const detailOffen = offenesMaterial || offenerLernweg;
+  // Grenze Liste|Dokument per Griff ziehen (gleiches Raster-Rezept wie Übersicht
+  // und Fokus, rastet auf die 12 Spalten ein). teil = Spalten der Liste.
+  const [teil, setTeil] = useState(6);
+  const {
+    ref: rasterRef,
+    zieht: rasterZieht,
+    griff: rasterGriff,
+  } = useRasterZiehen();
   // Tags im Detail wie in der Zeile: das Fach weglassen (steht schon im Ordner),
   // damit beide Ansichten dieselben, konkreten Schlagwörter zeigen.
   const detailFachLabel = offenesMaterial
@@ -232,6 +250,23 @@ export default function Ablage({
     return () => window.removeEventListener(EIGENE_EVENT, f);
   }, []);
 
+  // Favoriten-Sterne und verschobene Ablageorte (siehe materialMeta.js).
+  const [favoriten, setFavoriten] = useState(ladeFavoriten);
+  const [orte, setOrte] = useState(ladeOrte);
+  useEffect(() => {
+    const f = () => {
+      setFavoriten(ladeFavoriten());
+      setOrte(ladeOrte());
+    };
+    window.addEventListener(META_EVENT, f);
+    return () => window.removeEventListener(META_EVENT, f);
+  }, []);
+  // Heimat-Fach eines Materials: eigene tragen fachId, Seeds stehen in ihrem Fach.
+  const heimatFachId = (m) =>
+    m.fachId ||
+    faecher.find((x) => (x.materialien || []).some((s) => s.id === m.id))?.id ||
+    null;
+
   // Deep-Link (Klick auf eine Link-/Material-Benachrichtigung): Das Ziel-Material ist
   // beim Mounten schon als offenes Detail gesetzt (useState-Initializer oben). Hier nur
   // das Ziel im Parent zurücksetzen, damit ein späterer Wechsel es nicht erneut öffnet.
@@ -246,9 +281,18 @@ export default function Ablage({
     const lernwege = f.themen.filter((t) =>
       koennensbeweise.some((k) => k.id === t.kbId)
     );
+    // Effektiver Ablageort: verschobene Materialien wandern in ihr Ziel-Fach
+    // (raus aus dem Heimat-Fach, rein bei den Verschobenen anderer Fächer).
     const materialien = [
-      ...(f.materialien || []),
-      ...eigene.filter((m) => m.fachId === f.id),
+      ...(f.materialien || []).filter(
+        (m) => !orte[m.id] || orte[m.id] === f.id
+      ),
+      ...faecher
+        .filter((a) => a.id !== f.id)
+        .flatMap((a) =>
+          (a.materialien || []).filter((m) => orte[m.id] === f.id)
+        ),
+      ...eigene.filter((m) => (orte[m.id] || m.fachId) === f.id),
     ];
     const lwRows = lernwege.map((t) => ({
       key: f.id + "-lw-" + t.id,
@@ -269,6 +313,8 @@ export default function Ablage({
       const eltern = f.themen.find((t) => t.label === m.thema) || null;
       return {
         key: f.id + "-m-" + m.id,
+        id: m.id,
+        favorit: !!favoriten[m.id],
         chip: chipFuerMaterial(m),
         titel: m.titel,
         fach: f.fach,
@@ -328,7 +374,7 @@ export default function Ablage({
     >
       <FolderIcon
         fach={f.fach}
-        color={kbFarbe[f.fach] || f.farbe || "#868e96"}
+        color={kbFarbe[f.fach] || f.farbe || NEUTRAL_FARBE}
         offen={f.id === fachId}
       />
       <span className="ab-ordner-name">{f.fach}</span>
@@ -343,6 +389,10 @@ export default function Ablage({
         <r.Icon />
       </span>
       <span className="ab-zeile-titel">{r.titel}</span>
+      {/* Favoriten-Marker (nur Anzeige; markieren geht im geöffneten Dokument). */}
+      {r.favorit && (
+        <Icon name="stern" className="ab-zeile-stern" title="Favorit" />
+      )}
       {!fach && r.fach && <span className="ab-zeile-fach">{r.fach}</span>}
       {r.quelle === "youtube" && (
         <span className="ab-zeile-quelle">YouTube</span>
@@ -409,11 +459,28 @@ export default function Ablage({
   return (
     <>
       <div className="ab-screen">
-        <div className={"ab-grid" + (detailOffen ? " ab-split" : "")}>
+        <div
+          className={
+            "ab-grid" +
+            (detailOffen ? " ab-split" : "") +
+            (rasterZieht ? " raster-zieht" : "")
+          }
+          ref={rasterRef}
+          style={detailOffen ? { "--ab-teil": teil + 1 } : undefined}
+        >
+          {detailOffen && <RasterOverlay />}
           {/* Eine Karte: Materialien, mit den Fächer-Ordnern oben drin. */}
           <section
             className={"ab-card ab-materialien" + (eingezogen ? " eingezogen" : "")}
           >
+            {/* Grenze Liste|Dokument ziehen (nur im Split). */}
+            {detailOffen && (
+              <RasterGriff
+                {...rasterGriff("liste", (s) =>
+                  setTeil(Math.max(3, Math.min(9, s)))
+                )}
+              />
+            )}
             <div className="ab-mat-kopf">
               <div>
                 <h2 className="ab-card-titel">
@@ -427,11 +494,15 @@ export default function Ablage({
             </div>
 
             {/* Fächer-Ordner über der Liste (Auswahl filtert die Liste). */}
-                <div className="ab-faecher-leiste">{ordnerButtons}</div>
+                <div className="ab-faecher-leiste" role="group" aria-label="Fach-Filter">
+                  {ordnerButtons}
+                </div>
                 <div
                   className={"ab-filterzeile" + (sortOffen ? " sort-offen" : "")}
                 >
-                  <div className="ab-chips" role="tablist" aria-label="Material-Typ">
+                  {/* Filter, keine echten Tabs: group + aria-pressed (ein Muster
+                     für alle Filter-Chip-Gruppen der App). */}
+                  <div className="ab-chips" role="group" aria-label="Material-Typ">
                     {/* "Lernwege" und "KI" hier ausgeblendet: die Materialien bleiben
                        unter "Alle" sichtbar, nur die zwei Filter-Chips entfallen. */}
                     {CHIPS.filter(
@@ -440,8 +511,7 @@ export default function Ablage({
                       <button
                         key={c.key}
                         type="button"
-                        role="tab"
-                        aria-selected={chip === c.key}
+                        aria-pressed={chip === c.key}
                         className={"ab-chip" + (chip === c.key ? " an" : "")}
                         onClick={() => setChip(c.key)}
                       >
@@ -577,7 +647,53 @@ export default function Ablage({
                       ))}
                     </div>
                   )}
+                  {/* Ablageort korrigierbar: falsch einsortiertes Material in
+                      ein anderes Fach verschieben (siehe materialMeta.js). */}
+                  {offenesMaterial && (
+                    <label className="ab-detail-ort">
+                      Ablageort
+                      <select
+                        value={
+                          orte[offenesMaterial.id] ||
+                          heimatFachId(offenesMaterial) ||
+                          ""
+                        }
+                        onChange={(e) =>
+                          verschiebeMaterial(
+                            offenesMaterial.id,
+                            e.target.value,
+                            heimatFachId(offenesMaterial)
+                          )
+                        }
+                      >
+                        {faecher.map((f) => (
+                          <option key={f.id} value={f.id}>
+                            {f.fach}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                  )}
                 </div>
+                {offenesMaterial && (
+                  <button
+                    type="button"
+                    className={
+                      "ab-detail-stern" +
+                      (favoriten[offenesMaterial.id] ? " an" : "")
+                    }
+                    onClick={() => toggleFavorit(offenesMaterial.id)}
+                    aria-pressed={!!favoriten[offenesMaterial.id]}
+                    aria-label={
+                      favoriten[offenesMaterial.id]
+                        ? "Favorit entfernen"
+                        : "Als Favorit markieren"
+                    }
+                    title="Favorit: steht im Fokus bei den passenden Materialien ganz oben"
+                  >
+                    <Icon name="stern" />
+                  </button>
+                )}
                 <button
                   type="button"
                   className="ab-detail-zu"
@@ -598,13 +714,18 @@ export default function Ablage({
           )}
         </div>
 
-        {uploadOffen && (
-          <MaterialUpload
-            startFachId={fachId}
-            onSpeichern={uploadSpeichern}
-            onClose={() => setUploadOffen(false)}
-          />
-        )}
+        {/* Portal an den body: der Screen-Wisch-Wrapper ist transform-animiert
+            und würde sonst zum Bezugsrahmen des fixed-Overlays (Backdrop deckt
+            dann nicht den ganzen Schirm und liegt unter Nav-/Unten-Leiste). */}
+        {uploadOffen &&
+          createPortal(
+            <MaterialUpload
+              startFachId={fachId}
+              onSpeichern={uploadSpeichern}
+              onClose={() => setUploadOffen(false)}
+            />,
+            document.body
+          )}
       </div>
       {vorn !== false &&
         (untenSlot ? createPortal(untenLeiste, untenSlot) : untenLeiste)}

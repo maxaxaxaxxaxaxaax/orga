@@ -2,7 +2,7 @@
 .weg {
   position: fixed;
   bottom: 16px;
-  left: 50%;
+  left: 50vw; /* 50vw statt 50%: bleibt beim Auftauchen des Scrollbalkens stehen */
   transform: translateX(-50%);
   z-index: 49;
   width: min(var(--leiste-breite), calc(100% - 28px));
@@ -102,10 +102,14 @@
   padding: 6px 10px;
   border-radius: 999px;
   cursor: pointer;
-  transition: background 0.15s ease;
+  transition: background var(--dur-fast) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
 }
 .weg-schritt:hover {
   background: color-mix(in srgb, var(--text) 6%, transparent);
+}
+.weg-schritt:active {
+  transform: scale(0.98);
 }
 .weg-marke {
   flex-shrink: 0;
@@ -181,7 +185,7 @@
   border-radius: 999px;
   cursor: pointer;
   text-align: left;
-  transition: background 0.15s ease;
+  transition: background var(--dur-fast) var(--ease-out);
 }
 .weg-aufgabe:hover {
   background: color-mix(in srgb, var(--text) 6%, transparent);
@@ -226,7 +230,7 @@
   height: 5px;
   border-radius: 3px;
   background: var(--line-strong);
-  transition: background var(--dur-base) ease;
+  transition: background var(--dur-base) var(--ease-out);
 }
 .weg-seg.fertig {
   background: var(--ok-text);
@@ -250,12 +254,16 @@
   gap: 5px;
   background: var(--accent);
   color: var(--on-accent);
-  font-size: 0.9rem;
+  font-size: 0.92rem;
   font-weight: 700;
-  padding: 10px 18px;
+  padding: 0 20px;
+  /* Feste Hoehe: der untere CTA ist auf JEDEM Screen exakt gleich hoch,
+     egal ob button oder span (verschiedene Zeilenhoehen-Vererbung). */
+  height: 42px;
+  box-sizing: border-box;
   border-radius: 999px;
-  box-shadow: 0 6px 16px -7px var(--accent-shadow);
-  transition: background 0.15s ease, transform var(--dur-press) ease;
+  box-shadow: 0 4px 14px -4px var(--accent-shadow);
+  transition: background var(--dur-fast) var(--ease-out), transform var(--dur-press) var(--ease-out);
 }
 .weg-aufgabe:hover .weg-aufgabe-cta {
   background: var(--accent-strong);
@@ -312,7 +320,7 @@
 .weg-abruf-sep {
   flex-shrink: 0;
   width: 1px;
-  height: 24px;
+  height: 22px;
   background: var(--line-strong);
 }
 .weg-abruf-text {
@@ -345,12 +353,14 @@
   cursor: pointer;
   background: var(--accent);
   color: var(--on-accent);
-  font-size: 0.9rem;
+  font-size: 0.92rem;
   font-weight: 700;
-  padding: 10px 18px;
+  padding: 0 20px;
+  height: 42px;
+  box-sizing: border-box;
   border-radius: 999px;
-  box-shadow: 0 6px 16px -7px var(--accent-shadow);
-  transition: background 0.15s ease, transform var(--dur-press) ease;
+  box-shadow: 0 4px 14px -4px var(--accent-shadow);
+  transition: background var(--dur-fast) var(--ease-out), transform var(--dur-press) var(--ease-out);
 }
 .weg-planen-knopf:hover {
   background: var(--accent-strong);

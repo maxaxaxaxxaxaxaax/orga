@@ -3,7 +3,6 @@ import { koennensbeweise, kbFarbe } from "../data/koennensbeweise";
 import {
   stundenWoche,
   fachFarbe,
-  istBelegbar,
   stundenId,
   lehrkraefte,
   artLabel,
@@ -38,7 +37,7 @@ import NachrichtenChat from "./NachrichtenChat";
 import { IcLink } from "./materialIcons";
 import { quelleLabel } from "./material";
 import { useScrollFade } from "./useScrollFade";
-import { fachTextFarbe } from "./farbe";
+import { fachTextFarbe, NEUTRAL_FARBE } from "./farbe";
 import "./Heute.css";
 
 // Coach-Mitteilung: kleines Personen-Symbol (kein eigenes Set-Icon dafür).
@@ -242,9 +241,16 @@ export default function Heute({ onFokus, onOeffneAblage }) {
   // Klick auf eine Box: auf größte Größe schalten (Regler entsprechend setzen).
   // Erneuter Klick auf dieselbe Box stellt die vorherige Größe wieder her. Klicks auf
   // interaktive Elemente (Buttons, Eingaben) lösen das NICHT aus.
+  // Die Box selbst trägt role="button" (Tastatur-Bedienung), zählt also nicht als
+  // "inneres" Bedienelement.
+  function trifftInneresBedienelement(e) {
+    const el = e.target.closest(
+      'button, a, input, textarea, select, [role="button"]'
+    );
+    return el && el !== e.currentTarget;
+  }
   function maximiereBox(e, id) {
-    if (e.target.closest('button, a, input, textarea, select, [role="button"]'))
-      return;
+    if (trifftInneresBedienelement(e)) return;
     if (maximiert === id) {
       if (splitsVorher) setSplits(splitsVorher);
       setSplitsVorher(null);
@@ -254,6 +260,27 @@ export default function Heute({ onFokus, onOeffneAblage }) {
     // Ziel immer auf die ursprüngliche (manuelle) Größe anwenden, nicht auf einen
     // schon maximierten Zwischenstand, damit kein Rest-Versatz übrig bleibt.
     const basis = maximiert === null ? splits : splitsVorher || splits;
+    boxVergroessern(id, basis);
+  }
+  // Tastatur-Bedienung der Boxen (Enter/Leertaste), gleiche Regeln wie der Klick.
+  function boxTaste(e, id) {
+    if (e.key !== "Enter" && e.key !== " ") return;
+    if (trifftInneresBedienelement(e)) return;
+    e.preventDefault();
+    maximiereBox(e, id);
+  }
+  // Geteilte Props der fünf klickbaren Boxen: per Maus UND Tastatur bedienbar.
+  function boxProps(id, name) {
+    return {
+      role: "button",
+      tabIndex: 0,
+      "aria-label":
+        maximiert === id ? `${name} verkleinern` : `${name} vergrößern`,
+      onClick: (e) => maximiereBox(e, id),
+      onKeyDown: (e) => boxTaste(e, id),
+    };
+  }
+  function boxVergroessern(id, basis) {
     if (maximiert === null) setSplitsVorher(splits);
     setSplits({ ...basis, ...BOX_MAX[id] });
     setMaximiert(id);
@@ -443,7 +470,7 @@ export default function Heute({ onFokus, onOeffneAblage }) {
         type="button"
         className={"hu-auf" + (done ? " done" : "")}
         key={k.id}
-        style={{ "--c": kbFarbe[k.fach] || "#868e96" }}
+        style={{ "--c": kbFarbe[k.fach] || NEUTRAL_FARBE }}
         onClick={(e) => {
           const kopf = e.currentTarget.querySelector(".hu-auf-kopf");
           const r = (kopf || e.currentTarget).getBoundingClientRect();
@@ -489,8 +516,10 @@ export default function Heute({ onFokus, onOeffneAblage }) {
           <span className="hu-auf-status done">✓ Erledigt</span>
         ) : prog > 0 ? (
           <span className="hu-auf-prog">
+            {/* Zeitneutral: die Schritte können von heute ODER früher stammen
+                (die Demo führt keine Tages-Stempel je Schritt). */}
             <span className="hu-auf-prog-label">
-              {bereit ? "Bereit zur Abnahme" : "Von gestern"}
+              {bereit ? "Bereit zur Abnahme" : "Schon geschafft"}
             </span>
             <span className="hu-auf-prog-bar">
               <span style={{ width: prog + "%" }} />
@@ -673,7 +702,7 @@ export default function Heute({ onFokus, onOeffneAblage }) {
             {/* Links oben: Etappenfortschritt */}
             <section
               className="hu-karte hu-fortschritt"
-              onClick={(e) => maximiereBox(e, "fortschritt")}
+              {...boxProps("fortschritt", "Etappenfortschritt")}
             >
           <h2 className="hu-karte-titel">
             <Icon name="graph" className="hu-karte-icon" />
@@ -735,19 +764,19 @@ export default function Heute({ onFokus, onOeffneAblage }) {
             {/* Rechts oben: Nachrichten (früher Topbar-Glocke, jetzt eigene Box) */}
             <section
               className="hu-karte hu-nachrichten"
-              onClick={(e) => maximiereBox(e, "nachrichten")}
+              {...boxProps("nachrichten", "Benachrichtigungen")}
             >
           <h2 className="hu-karte-titel">
             <Icon name="chat" className="hu-karte-icon" />
             Benachrichtigungen
           </h2>
-          <div className="hu-nachr-chips" role="tablist" aria-label="Filter">
+          {/* Filter, keine echten Tabs: group + aria-pressed wie in der Ablage. */}
+          <div className="hu-nachr-chips" role="group" aria-label="Filter">
             {NACHR_CHIPS.map((c) => (
               <button
                 key={c.key}
                 type="button"
-                role="tab"
-                aria-selected={nachrFilter === c.key}
+                aria-pressed={nachrFilter === c.key}
                 className={"hu-nachr-chip" + (nachrFilter === c.key ? " an" : "")}
                 onClick={() => setNachrFilter(c.key)}
               >
@@ -875,7 +904,7 @@ export default function Heute({ onFokus, onOeffneAblage }) {
             {/* Unten rechts: Erinnerungen (per CSS order rechts) */}
             <section
               className="hu-karte hu-notizen"
-              onClick={(e) => maximiereBox(e, "notizen")}
+              {...boxProps("notizen", "Erinnerungen")}
             >
           <h2 className="hu-karte-titel">
             <Icon name="erinnerung" className="hu-karte-icon" />
@@ -904,12 +933,13 @@ export default function Heute({ onFokus, onOeffneAblage }) {
                   onPointerUp={(e) => wischUp(e, i)}
                   onPointerCancel={() => setWisch(null)}
                 >
+                  {/* Abhaken app-weit als button + aria-pressed (ein Muster,
+                      wie Lernweg-Schritte und Merkblatt-Regeln). */}
                   <button
                     type="button"
                     className="hu-notiz-box"
                     onClick={() => notizUmschalten(i)}
-                    role="checkbox"
-                    aria-checked={!!n.erledigt}
+                    aria-pressed={!!n.erledigt}
                     aria-label={n.text}
                   >
                     {n.erledigt && <span aria-hidden="true">✓</span>}
@@ -957,7 +987,7 @@ export default function Heute({ onFokus, onOeffneAblage }) {
             {/* Unten links: Aufgaben (per CSS order links) */}
             <section
               className="hu-karte hu-aufgaben"
-              onClick={(e) => maximiereBox(e, "aufgaben")}
+              {...boxProps("aufgaben", "Aufgaben")}
             >
           <h2 className="hu-karte-titel hu-aufgaben-titel">
             <Icon name="task" className="hu-karte-icon" />
@@ -1028,7 +1058,7 @@ export default function Heute({ onFokus, onOeffneAblage }) {
         {/* Rechte Spalte (volle Höhe): Stundenplan als Tages-Timeline */}
         <aside
           className="hu-karte hu-plan-karte"
-          onClick={(e) => maximiereBox(e, "plan")}
+          {...boxProps("plan", "Stundenplan")}
         >
           <div className="hu-plan-kopf">
             <h2 className="hu-karte-titel">
@@ -1094,19 +1124,17 @@ export default function Heute({ onFokus, onOeffneAblage }) {
                       (istJetzt ? " jetzt" : "")
                     }
                   >
-                    {/* Farbbalken nur bei Haupt-/Studierzeit-Stunden (deine
-                        Fokusfächer); Nebenfächer bleiben neutral, der Platz bleibt
-                        transparent erhalten, damit die Fächer bündig anfangen. */}
-                    <span
-                      className="hu-stunde-strich"
-                      style={{
-                        background: istBelegbar(s)
-                          ? fachFarbe[s.fach] || "#cbd5d1"
-                          : "transparent",
-                      }}
-                    />
                     <span className="hu-stunde-info">
-                      <span className="hu-stunde-fach">{s.fach}</span>
+                      {/* Fachname in der Fachfarbe (70%-Lese-Rezept); Studierzeit/
+                          ZEuS behalten ihr Accent-Strong aus dem CSS. */}
+                      <span
+                        className="hu-stunde-fach"
+                        style={{
+                          color: lernzeit ? undefined : fachTextFarbe(s.fach),
+                        }}
+                      >
+                        {s.fach}
+                      </span>
                       {pSpan >= 3 && (
                         <span className="hu-stunde-raum">{s.raum}</span>
                       )}
