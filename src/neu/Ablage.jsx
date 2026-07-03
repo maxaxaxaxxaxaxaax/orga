@@ -686,7 +686,9 @@ export default function Ablage({
                           size={14}
                         />
                       </span>
-                      <span className="ab-detail-ort-sep" aria-hidden="true" />
+                      <span className="ab-detail-ort-sep" aria-hidden="true">
+                        /
+                      </span>
                       <span className="ab-detail-ort-feld">
                         <select
                           value={detailOrtThema}

@@ -269,7 +269,7 @@
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 4px;
+  gap: 10px;
   min-width: 0;
 }
 .ab-detail-ort-feld {
@@ -309,12 +309,12 @@
   right: 4px;
   pointer-events: none;
 }
-/* Gerader Trennstrich zwischen Fach und Thema im hellen Linien-Grau der App. */
+/* Trenner zwischen Fach und Thema: "/" wie in einem Pfad, im hellen
+   Linien-Grau der App. */
 .ab-detail-ort-sep {
   flex-shrink: 0;
-  width: 1px;
-  height: 16px;
-  background: var(--line-strong);
+  color: var(--line-strong);
+  font-weight: 600;
 }
 /* Touch: bequem treffbare Pickerflächen. */
 @media (pointer: coarse) {
