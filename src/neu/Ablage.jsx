@@ -657,57 +657,73 @@ export default function Ablage({
                       role="group"
                       aria-label="Ablageort"
                     >
-                      <select
-                        value={detailOrtFach}
-                        aria-label="Ablageort: Fach"
-                        onChange={(e) => {
-                          const neu = e.target.value;
-                          verschiebeMaterial(
-                            offenesMaterial.id,
-                            neu,
-                            neu === detailHeimatFach ? detailHeimatThema : null,
-                            detailHeimatFach,
-                            detailHeimatThema
-                          );
-                        }}
-                      >
-                        {faecher.map((f) => (
-                          <option key={f.id} value={f.id}>
-                            {f.fach}
-                          </option>
-                        ))}
-                      </select>
+                      <span className="ab-detail-ort-feld">
+                        <select
+                          value={detailOrtFach}
+                          aria-label="Ablageort: Fach"
+                          onChange={(e) => {
+                            const neu = e.target.value;
+                            verschiebeMaterial(
+                              offenesMaterial.id,
+                              neu,
+                              neu === detailHeimatFach
+                                ? detailHeimatThema
+                                : null,
+                              detailHeimatFach,
+                              detailHeimatThema
+                            );
+                          }}
+                        >
+                          {faecher.map((f) => (
+                            <option key={f.id} value={f.id}>
+                              {f.fach}
+                            </option>
+                          ))}
+                        </select>
+                        <Icon
+                          name="chevron-down"
+                          className="ab-detail-ort-chevron"
+                          size={14}
+                        />
+                      </span>
                       <span className="ab-detail-ort-sep" aria-hidden="true">
                         /
                       </span>
-                      <select
-                        value={detailOrtThema}
-                        aria-label="Ablageort: Thema"
-                        onChange={(e) =>
-                          verschiebeMaterial(
-                            offenesMaterial.id,
-                            detailOrtFach,
-                            e.target.value || null,
-                            detailHeimatFach,
-                            detailHeimatThema
-                          )
-                        }
-                      >
-                        <option value="">Ohne Thema</option>
-                        {detailOrtThema &&
-                          !detailOrtThemen.some(
-                            (t) => t.label === detailOrtThema
-                          ) && (
-                            <option value={detailOrtThema}>
-                              {detailOrtThema}
+                      <span className="ab-detail-ort-feld">
+                        <select
+                          value={detailOrtThema}
+                          aria-label="Ablageort: Thema"
+                          onChange={(e) =>
+                            verschiebeMaterial(
+                              offenesMaterial.id,
+                              detailOrtFach,
+                              e.target.value || null,
+                              detailHeimatFach,
+                              detailHeimatThema
+                            )
+                          }
+                        >
+                          <option value="">Ohne Thema</option>
+                          {detailOrtThema &&
+                            !detailOrtThemen.some(
+                              (t) => t.label === detailOrtThema
+                            ) && (
+                              <option value={detailOrtThema}>
+                                {detailOrtThema}
+                              </option>
+                            )}
+                          {detailOrtThemen.map((t) => (
+                            <option key={t.id} value={t.label}>
+                              {t.label}
                             </option>
-                          )}
-                        {detailOrtThemen.map((t) => (
-                          <option key={t.id} value={t.label}>
-                            {t.label}
-                          </option>
-                        ))}
-                      </select>
+                          ))}
+                        </select>
+                        <Icon
+                          name="chevron-down"
+                          className="ab-detail-ort-chevron"
+                          size={14}
+                        />
+                      </span>
                     </div>
                   )}
                   <div className="ab-detail-titel-zeile">

@@ -263,33 +263,51 @@
   stroke: none;
 }
 /* Ablageort als Kopfzeile über dem Titel: "Fach / Thema", beide Teile sind
-   Selects im Feld-Rezept der App und direkt antippbar (iPad). */
+   direkt antippbar. Optik wie das Sortieren-Dropdown der Liste: randloser
+   Accent-Text mit dem chevron-down aus dem Icon-Set statt des OS-Pfeils. */
 .ab-detail-ort {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 4px;
   min-width: 0;
+}
+.ab-detail-ort-feld {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+  color: var(--accent);
+  transition: color var(--dur-press) var(--ease-out);
+}
+@media (hover: hover) {
+  .ab-detail-ort-feld:hover {
+    color: var(--accent-strong);
+  }
 }
 .ab-detail-ort select {
   min-width: 0;
   max-width: 100%;
+  appearance: none;
+  -webkit-appearance: none;
   font: inherit;
-  font-size: 0.82rem;
+  font-size: 0.84rem;
   font-weight: 600;
-  color: var(--text);
-  background: var(--card);
-  border: 1px solid var(--line-strong);
+  color: inherit;
+  background: transparent;
+  border: none;
   border-radius: var(--r-sm, 9px);
-  padding: 4px 8px;
+  padding: 4px 22px 4px 4px;
   cursor: pointer;
-  transition: border-color var(--dur-fast) var(--ease-out),
-    box-shadow var(--dur-fast) var(--ease-out);
 }
-.ab-detail-ort select:focus {
+.ab-detail-ort select:focus-visible {
   outline: none;
-  border-color: var(--accent);
   box-shadow: 0 0 0 3px var(--accent-soft);
+}
+.ab-detail-ort-chevron {
+  position: absolute;
+  right: 4px;
+  pointer-events: none;
 }
 .ab-detail-ort-sep {
   color: var(--muted);
@@ -299,7 +317,7 @@
 @media (pointer: coarse) {
   .ab-detail-ort select {
     min-height: 40px;
-    padding: 6px 10px;
+    padding: 6px 24px 6px 4px;
   }
 }
 .ab-detail-inhalt {
