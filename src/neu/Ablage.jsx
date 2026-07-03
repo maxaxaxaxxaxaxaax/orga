@@ -329,6 +329,7 @@ export default function Ablage({
     ];
     const lwRows = lernwege.map((t) => ({
       key: f.id + "-lw-" + t.id,
+      kbId: t.kbId,
       chip: "lernwege",
       titel: t.label,
       fach: f.fach,
@@ -338,7 +339,11 @@ export default function Ablage({
       subkategorie: t.subkategorie || null,
       lernweg: t.label,
       istLernweg: true,
-      onOpen: () => setOffenerLernweg({ id: t.kbId, label: t.label }),
+      onOpen: () => {
+        // Nur EIN Dokument offen: ein evtl. offenes Material schließt mit.
+        setOffenesMaterial(null);
+        setOffenerLernweg({ id: t.kbId, label: t.label });
+      },
     }));
     const mRows = materialien.map((m) => {
       // Material gehoert ueber thema === Lernweg-Label zu einem Lernweg; dessen
@@ -364,7 +369,13 @@ export default function Ablage({
         subkategorie: eltern?.subkategorie || null,
         lernweg: eltern?.label || m.thema || null,
         istLernweg: false,
-        onOpen: istOeffenbar(m) ? () => setOffenesMaterial(m) : null,
+        onOpen: istOeffenbar(m)
+          ? () => {
+              // Nur EIN Dokument offen: ein evtl. offener Lernweg schließt mit.
+              setOffenerLernweg(null);
+              setOffenesMaterial(m);
+            }
+          : null,
       };
     });
     return [...lwRows, ...mRows];
@@ -462,21 +473,28 @@ export default function Ablage({
       <span className="ab-zeile-datum">{r.datum ? datumLang(r.datum) : ""}</span>
     </>
   );
-  const zeileLi = (r, extra) => (
-    <li key={r.key} className={extra || undefined}>
-      {r.onOpen ? (
-        <button
-          type="button"
-          className="ab-zeile ab-zeile-klick"
-          onClick={r.onOpen}
-        >
-          {zeileInhalt(r)}
-        </button>
-      ) : (
-        <div className="ab-zeile">{zeileInhalt(r)}</div>
-      )}
-    </li>
-  );
+  const zeileLi = (r, extra) => {
+    // Geöffnetes Dokument: die zugehörige Zeile bekommt den Active-State.
+    const an = r.istLernweg
+      ? offenerLernweg?.id === r.kbId
+      : !!r.id && offenesMaterial?.id === r.id;
+    return (
+      <li key={r.key} className={extra || undefined}>
+        {r.onOpen ? (
+          <button
+            type="button"
+            className={"ab-zeile ab-zeile-klick" + (an ? " an" : "")}
+            onClick={r.onOpen}
+            aria-current={an || undefined}
+          >
+            {zeileInhalt(r)}
+          </button>
+        ) : (
+          <div className="ab-zeile">{zeileInhalt(r)}</div>
+        )}
+      </li>
+    );
+  };
 
   // Untere Leiste (Suche + Hinzufügen). Wird in den festen Anker (untenSlot)
   // portaliert, damit sie beim Screen-Wechsel NICHT mit der wischenden Schiene

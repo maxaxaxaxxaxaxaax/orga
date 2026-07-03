@@ -745,9 +745,20 @@
 }
 .ab-zeile-klick {
   cursor: pointer;
-  transition: border-color var(--dur-fast) var(--ease-out),
+  transition: background var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out),
     box-shadow var(--dur-fast) var(--ease-out),
     transform var(--dur-fast) var(--ease-out);
+}
+/* Geöffnetes Dokument: seine Zeile trägt den Active-State der NavLeiste
+   (Accent-Soft-Fläche, Zeichen in Accent-Strong, keine Kontur). */
+.ab-zeile.an {
+  background: var(--accent-soft);
+  border-color: transparent;
+}
+.ab-zeile.an .ab-zeile-titel,
+.ab-zeile.an .ab-zeile-icon {
+  color: var(--accent-strong);
 }
 /* Hover hebt die Box leicht an, wie die Nachrichten auf der Übersicht. */
 @media (hover: hover) {
