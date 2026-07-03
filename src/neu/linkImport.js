@@ -15,6 +15,7 @@ import {
   titelAusUrl,
 } from "./linkLeser";
 import { baueTags, speichereEigenes, ladeEigene } from "./eigeneMaterialien";
+import { pruefeVision, deuteBildFuerAblage } from "./kiClient";
 
 export async function importiereLinkAuto(url) {
   if (!/^https?:\/\//i.test(url)) return null;
@@ -93,9 +94,31 @@ export async function importiereLinkAuto(url) {
   return { material, analyse };
 }
 
-// Ein gesendetes Bild (z. B. Discord-Anhang) automatisch einsortieren: Titel
-// aus Nachrichtentext oder Dateiname, Fach/Thema-Erkennung über dieselbe
-// Analyse wie bei Links. anhang = { url, name }, kontext = Nachrichtentext.
+// Ein Bild herunterladen und als verkleinertes JPEG-Data-URL zurückgeben:
+// klein genug für localStorage und das Vision-Modell, und die Ablage bleibt
+// auch dann voll, wenn die signierte CDN-URL von Discord später abläuft.
+async function ladeBildAlsDataUrl(url) {
+  try {
+    const r = await fetch(url);
+    if (!r.ok) return null;
+    const blob = await r.blob();
+    const bmp = await createImageBitmap(blob);
+    const max = 1024;
+    const skala = Math.min(1, max / Math.max(bmp.width, bmp.height));
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.max(1, Math.round(bmp.width * skala));
+    canvas.height = Math.max(1, Math.round(bmp.height * skala));
+    canvas.getContext("2d").drawImage(bmp, 0, 0, canvas.width, canvas.height);
+    return canvas.toDataURL("image/jpeg", 0.72);
+  } catch {
+    return null;
+  }
+}
+
+// Ein gesendetes Bild (z. B. Discord-Anhang) automatisch einsortieren: die
+// lokale Vision-KI schaut sich das Foto an und bestimmt Titel, Fach, Thema und
+// Schlagwörter; läuft keine KI, greift die Text-Analyse über Nachrichtentext
+// und Dateiname. anhang = { url, name }, kontext = Nachrichtentext.
 export async function importiereBildAuto(anhang, kontext) {
   if (!anhang?.url) return null;
 
@@ -110,21 +133,81 @@ export async function importiereBildAuto(anhang, kontext) {
     .replace(/[-_]+/g, " ")
     .trim();
   const text = (kontext || "").trim();
-  const titel = text ? text.slice(0, 80) : dateiname || "Bild aus Discord";
 
+  // Lokale Vision-KI (falls sie läuft): Bild anschauen und einsortieren lassen.
+  let vision = null;
+  let dataUrl = null;
+  try {
+    const modell = await pruefeVision();
+    if (modell) {
+      dataUrl = await ladeBildAlsDataUrl(anhang.url);
+      if (dataUrl) {
+        const liste = faecher
+          .map(
+            (f) =>
+              `${f.fach}: ${(f.themen || []).map((t) => t.label).join(" | ")}`
+          )
+          .join("\n");
+        vision = await deuteBildFuerAblage({
+          bild: dataUrl,
+          modell,
+          faecherListe: liste,
+          kontext: text || dateiname || null,
+        });
+      }
+    }
+  } catch {
+    vision = null; // KI ist optional, der Text-Weg unten trägt immer
+  }
+
+  // Eigener Text gewinnt beim Titel (bewusste Beschriftung), sonst benennt
+  // die KI das Bild, sonst bleibt der Dateiname.
+  const titel =
+    (text && text.slice(0, 80)) ||
+    vision?.titel ||
+    dateiname ||
+    "Bild aus Discord";
+
+  // Text-Analyse als Grundlage (nutzt auch die KI-Beschreibung als Signal) ...
   const analyse = analysiereInhalt({
     titel,
-    inhalt: text || dateiname || null,
+    inhalt:
+      [text || null, dateiname || null, vision?.beschreibung || null]
+        .filter(Boolean)
+        .join("\n") || null,
     url: anhang.url,
   });
-  const fachId = analyse?.fachId || faecher[0]?.id;
-  const thema = analyse?.thema || null;
+  let fachId = analyse?.fachId || null;
+  let thema = analyse?.thema || null;
+  let erkannt = analyse?.erkannt || null;
+
+  // ... aber die Vision-Zuordnung gewinnt, wenn sie auf bekannte Namen zeigt.
+  const visionFach =
+    vision?.fach &&
+    faecher.find(
+      (f) => f.fach.toLowerCase() === vision.fach.trim().toLowerCase()
+    );
+  if (visionFach) {
+    const visionThema = (visionFach.themen || []).find(
+      (t) => t.label.toLowerCase() === (vision.thema || "").trim().toLowerCase()
+    );
+    fachId = visionFach.id;
+    thema = visionThema?.label || null;
+    erkannt = { fach: visionFach.fach, thema: thema || undefined };
+  }
+  fachId = fachId || faecher[0]?.id;
+
+  // Tags: Fach/Thema-Basis plus die treffendsten KI-Schlagwörter.
   const tags = baueTags({
     fachId,
     thema,
-    erkannt: analyse?.erkannt,
+    erkannt,
     stichwort: analyse?.stichwort,
   });
+  for (const t of vision?.tags || []) {
+    if (tags.length >= 5) break;
+    if (!tags.some((v) => v.toLowerCase() === t.toLowerCase())) tags.push(t);
+  }
 
   const material = speichereEigenes({
     titel,
@@ -133,10 +216,12 @@ export async function importiereBildAuto(anhang, kontext) {
     art: "bild",
     quelle: "discord",
     url: anhang.url,
-    bild: anhang.url,
+    // Verkleinerte Kopie bevorzugen: bleibt sichtbar, wenn die CDN-URL abläuft.
+    bild: dataUrl || anhang.url,
+    inhalt: vision?.beschreibung || null,
     bereich: "selbstlernen",
     tags,
   });
 
-  return { material, analyse };
+  return { material, analyse: { ...analyse, fachId, thema, erkannt } };
 }

@@ -404,6 +404,72 @@ async function chatEinmal({
   return (j.choices?.[0]?.message?.content || "").trim();
 }
 
+// Ein gesendetes Foto (z. B. Discord-Anhang) fürs Einsortieren deuten: das
+// Vision-Modell schaut sich das Bild an, gibt ihm einen Titel und ordnet es
+// einem der BEKANNTEN Fächer/Themen zu (die Liste steckt im Prompt). Gibt
+// { titel, fach, thema, tags, beschreibung } zurück oder null, wenn die
+// Antwort nicht parsebar ist. Der Aufrufer prüft die Namen gegen die Daten.
+export async function deuteBildFuerAblage({
+  bild,
+  modell,
+  faecherListe,
+  kontext,
+  signal,
+}) {
+  const system = [
+    "Du sortierst ein Foto in die Schul-Ablage einer Schülerin oder eines Schülers der Klasse 7 ein.",
+    "Bekannte Fächer und ihre Themen:",
+    faecherListe,
+    "Schau dir das Bild genau an und antworte GENAU in diesem Format, ohne weiteren Text:",
+    "TITEL: kurzer, konkreter Titel für das Material (höchstens acht Wörter)",
+    "FACH: genau einer der genannten Fächernamen, oder UNBEKANNT",
+    "THEMA: genau eines der Themen dieses Fachs, oder KEINS",
+    "TAGS: zwei bis vier kurze Schlagwörter, mit Komma getrennt",
+    "BESCHREIBUNG: ein Satz, was auf dem Bild zu sehen ist",
+    "Antworte auf Deutsch. Verwende keine Gedankenstriche.",
+  ].join("\n");
+  const txt = await chatEinmal({
+    nachrichten: [
+      { role: "system", content: system },
+      {
+        role: "user",
+        content: [
+          {
+            type: "text",
+            text: kontext
+              ? `Zum Bild wurde geschrieben: "${kontext}". Sortiere das Bild ein.`
+              : "Sortiere das Bild ein.",
+          },
+          { type: "image_url", image_url: { url: bild } },
+        ],
+      },
+    ],
+    modell,
+    signal,
+    temperature: 0.1,
+    maxTokens: 250,
+  });
+  const hol = (feld) => {
+    const m = txt.match(
+      new RegExp("^\\s*\\**" + feld + "\\**\\s*:\\s*(.+)$", "im")
+    );
+    return m ? m[1].replace(/\*+/g, "").trim() : null;
+  };
+  const titel = hol("TITEL");
+  if (!titel) return null;
+  return {
+    titel,
+    fach: hol("FACH"),
+    thema: hol("THEMA"),
+    tags: (hol("TAGS") || "")
+      .split(",")
+      .map((t) => t.trim())
+      .filter(Boolean)
+      .slice(0, 4),
+    beschreibung: hol("BESCHREIBUNG"),
+  };
+}
+
 // Schritt 1: den handschriftlichen Rechenweg NUR ablesen (Texterkennung), ohne
 // zu rechnen oder zu bewerten. Trennt das Lesen vom Urteilen, das macht beides
 // zuverlässiger und deckt Lesefehler auf (die Abschrift wird dem Kind gezeigt).
