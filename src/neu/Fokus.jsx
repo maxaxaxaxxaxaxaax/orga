@@ -29,6 +29,7 @@ import {
 } from "./coach";
 import { pruefeKi, pruefeVision, systemPromptCoach } from "./kiClient";
 import { introNachricht } from "./materialAssistent";
+import { streameChatAntwort } from "./chatStream";
 import { materialHinweis } from "./materialHinweis";
 import { addNotiz, ladeNotizen, entferneNotiz } from "./notizen";
 import {
@@ -407,6 +408,30 @@ export default function Fokus({
   // Live-Coach-Marke). Wird dem LiveCoach als onMeldung gereicht.
   function coachMeldung(text) {
     setChatNachrichten((n) => [...n, { von: "ki", coach: true, text }]);
+  }
+  // Markieren-und-fragen (Zauberstab): das markierte Bild + die Frage laufen im
+  // Materialien-Chat weiter (nicht auf der Markieren-Seite). Chat aufmachen,
+  // Frage samt Bild anhängen, Antwort dort streamen.
+  function frageMitBild({ bild, frage }) {
+    setChatsOffen(true);
+    setChatTab("coach");
+    streameChatAntwort({
+      setNachrichten: setChatNachrichten,
+      frage:
+        (frage || "").trim() ||
+        "Schau dir die markierte Stelle an und hilf mir hier weiter.",
+      bild,
+      verlauf: chatNachrichten,
+      kontextName,
+      materialien,
+      modell: visionModell,
+      systemText: coachSystem,
+      onFehler: (setze) =>
+        setze(() => ({
+          von: "ki",
+          text: "Ich konnte das Bild gerade nicht ansehen. Versuch es gleich noch einmal.",
+        })),
+    });
   }
   const zi = zeitInfo(kb);
   const gelerntMin = Math.round((zi.gelerntSek || 0) / 60);
@@ -1419,11 +1444,13 @@ export default function Fokus({
 
       {markierenModus && (
         <MarkierenFrage
-          kontextName={kontextName}
           zielRef={mitteRef}
           visionModell={visionModell}
-          systemText={coachSystem}
           mitFrage={markierenModus === "fragen"}
+          onFrageGestellt={(daten) => {
+            setMarkierenModus(null);
+            frageMitBild(daten);
+          }}
           onClose={() => setMarkierenModus(null)}
         />
       )}

@@ -1,23 +1,22 @@
 import { useEffect, useRef, useState } from "react";
 import { domBild } from "./domBild";
-import { frageKi } from "./kiClient";
 import "./MarkierenFrage.css";
 
 // Stift-Werkzeug: macht beim Öffnen einen echten Screenshot der gerade offenen
-// Material-Fläche, legt eine durchsichtige Marker-Ebene darüber, und schickt
-// Bild plus Markierung mit einer Frage an den KI-Coach. Der Coach schaut auf die
-// markierte Stelle und hilft mit einer Rückfrage weiter, ohne die Lösung zu
-// verraten. Das Bild bleibt auf dem Gerät (Datenhoheit). Ohne lokales
+// Material-Fläche, legt eine durchsichtige Marker-Ebene darüber. Bei "Markieren
+// und fragen" wird Bild plus Markierung mit der Frage an den Materialien-Chat
+// übergeben (onFrageGestellt); die Unterhaltung läuft dann rechts im Chat weiter,
+// nicht hier. Das Bild bleibt auf dem Gerät (Datenhoheit). Ohne lokales
 // Vision-Modell ist Senden deaktiviert (Hinweis wie beim Rechenweg).
 //
 // Das Zeichnen ist imperativ (Canvas-Kontext): nur in Event-Handlern und
 // Effekten, nie im Render.
 export default function MarkierenFrage({
-  kontextName,
   zielRef,
   visionModell,
-  systemText,
   onClose,
+  // Bild (Screenshot + Markierung) und Frage an den Chat übergeben (mitFrage).
+  onFrageGestellt,
   // mitFrage=false: reines Markier-Werkzeug (Toolbar-Stift), ohne Frage/KI-Teil.
   // mitFrage=true: Markieren und den KI-Coach fragen (Zauberstab im Chat).
   mitFrage = true,
@@ -33,10 +32,6 @@ export default function MarkierenFrage({
   const [striche, setStriche] = useState([]);
   const stricheRef = useRef(striche);
   const [frage, setFrage] = useState("");
-  const [antwort, setAntwort] = useState(""); // gestreamte Coach-Antwort
-  const [denkt, setDenkt] = useState(false); // Tipp-Punkte bis zum ersten Token
-  const [laeuft, setLaeuft] = useState(false);
-  const abbruchRef = useRef(null);
 
   const markerRef = useRef("rgba(245,197,24,0.4)");
   const BREITE = 16;
@@ -128,10 +123,6 @@ export default function MarkierenFrage({
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
 
-  useEffect(() => {
-    return () => abbruchRef.current?.abort();
-  }, []);
-
   function pos(e) {
     const r = canvasRef.current.getBoundingClientRect();
     return { x: e.clientX - r.left, y: e.clientY - r.top };
@@ -210,44 +201,14 @@ export default function MarkierenFrage({
     }
   }
 
-  async function senden() {
-    if (laeuft) return;
+  // Senden: Bild + Markierung zusammenführen und mit der Frage an den Chat
+  // geben. Die Antwort läuft dort (der Fokus schließt dieses Werkzeug).
+  function senden() {
     const f = frage.trim();
     if (!f && !striche.length) return;
     const bild = fuehreBildZusammen();
     if (!bild) return;
-    setAntwort("");
-    setLaeuft(true);
-    setDenkt(true);
-    abbruchRef.current?.abort();
-    const ac = new AbortController();
-    abbruchRef.current = ac;
-    try {
-      await frageKi({
-        frage:
-          f || "Schau dir die markierte Stelle an und hilf mir hier weiter.",
-        verlauf: [],
-        kontextName,
-        materialien: [],
-        modell: visionModell,
-        bild,
-        systemText,
-        signal: ac.signal,
-        onToken: (stueck) => {
-          setDenkt(false);
-          setAntwort((a) => a + stueck);
-        },
-      });
-    } catch (e) {
-      if (e.name !== "AbortError") {
-        setAntwort(
-          "Ich konnte das Bild gerade nicht ansehen. Versuch es gleich noch einmal."
-        );
-      }
-    } finally {
-      setDenkt(false);
-      setLaeuft(false);
-    }
+    onFrageGestellt?.({ bild, frage: f });
   }
 
   return (
@@ -328,26 +289,6 @@ export default function MarkierenFrage({
         )}
       </div>
 
-      {mitFrage && antwort && (
-        <div className="mf-antwort" role="status">
-          <span className="mf-antwort-label">KI-Coach</span>
-          <p className="mf-antwort-text">
-            {antwort}
-            {denkt && <span className="mf-cursor" aria-hidden="true" />}
-          </p>
-        </div>
-      )}
-      {mitFrage && denkt && !antwort && (
-        <div className="mf-antwort" role="status">
-          <span className="mf-antwort-label">KI-Coach</span>
-          <p className="mf-antwort-text mf-denkt">
-            <span />
-            <span />
-            <span />
-          </p>
-        </div>
-      )}
-
       {mitFrage && (
         <form
           className="mf-eingabe"
@@ -366,13 +307,9 @@ export default function MarkierenFrage({
                 : "Schreiben geht, zum Ansehen braucht es eine lokale KI"
             }
             aria-label="Frage zur Markierung"
-            disabled={!visionModell || laeuft}
+            disabled={!visionModell}
           />
-          <button
-            type="submit"
-            className="mf-senden"
-            disabled={!visionModell || laeuft}
-          >
+          <button type="submit" className="mf-senden" disabled={!visionModell}>
             An KI-Coach senden
           </button>
         </form>

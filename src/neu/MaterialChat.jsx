@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { introNachricht, antwortAuf } from "./materialAssistent";
-import { frageKi } from "./kiClient";
+import { streameChatAntwort } from "./chatStream";
 import Icon from "./Icon";
 import LernzettelModal from "./LernzettelModal";
 import WebcamModal from "./WebcamModal";
@@ -40,10 +40,6 @@ export default function MaterialChat({
   ]);
   const nachrichten = nachrichtenProp ?? internNachrichten;
   const setNachrichten = setNachrichtenProp ?? setInternNachrichten;
-  // Laufende KI-Antwort per stabiler Id ansprechen (nicht über "letzte"): eine
-  // Live-Coach-Beobachtung, die während des Streamens hereinkommt, überschreibt
-  // so nicht versehentlich die gerade wachsende Antwort.
-  const streamRef = useRef(0);
   const verlaufEndeRef = useRef(null);
   // Materialwechsel sichtbar machen: kleine Zwischenzeile im Verlauf, dass der
   // Coach ab jetzt auf DIESES Material eingeht (der System-Prompt kennt es
@@ -83,50 +79,34 @@ export default function MaterialChat({
   async function sendeKi(frage, dasBild) {
     const verlauf = nachrichten;
     const modell = dasBild ? visionModell : kiModell;
-    const streamId = (streamRef.current += 1);
-    setNachrichten((n) => [
-      ...n,
-      { von: "ich", text: frage, bild: dasBild || undefined },
-      { von: "ki", text: "", stream: streamId },
-    ]);
     setDenkt(true);
-    // Genau die streamende Antwort aktualisieren, egal was sonst dazwischenkommt.
-    const setzeLetzte = (aender) =>
-      setNachrichten((n) =>
-        n.map((m) => (m.stream === streamId ? aender(m) : m))
-      );
-    try {
-      await frageKi({
-        frage,
-        verlauf,
-        kontextName,
-        materialien,
-        modell,
-        bild: dasBild,
-        systemText,
-        onToken: (stueck) => {
-          setDenkt(false);
-          setzeLetzte((m) => ({ ...m, text: m.text + stueck }));
-        },
-      });
-    } catch {
-      if (dasBild) {
-        setzeLetzte(() => ({
-          von: "ki",
-          text: "Ich konnte das Bild gerade nicht ansehen. Versuch es noch einmal.",
-        }));
-      } else {
-        // Text-KI nicht erreichbar: auf Demo-Antwort zurückfallen.
-        const antwort = antwortAuf(frage, ctx);
-        setzeLetzte(() => ({
-          von: "ki",
-          ...antwort,
-          hinweis: "Lokale KI nicht erreichbar, Demo-Antwort.",
-        }));
-      }
-    } finally {
-      setDenkt(false);
-    }
+    await streameChatAntwort({
+      setNachrichten,
+      frage,
+      bild: dasBild,
+      verlauf,
+      kontextName,
+      materialien,
+      modell,
+      systemText,
+      onFehler: (setze) => {
+        if (dasBild) {
+          setze(() => ({
+            von: "ki",
+            text: "Ich konnte das Bild gerade nicht ansehen. Versuch es noch einmal.",
+          }));
+        } else {
+          // Text-KI nicht erreichbar: auf Demo-Antwort zurückfallen.
+          const antwort = antwortAuf(frage, ctx);
+          setze(() => ({
+            von: "ki",
+            ...antwort,
+            hinweis: "Lokale KI nicht erreichbar, Demo-Antwort.",
+          }));
+        }
+      },
+    });
+    setDenkt(false);
   }
 
   function waehleBild(e) {
@@ -216,7 +196,7 @@ export default function MaterialChat({
             {m.text ? (
               <p className="mc-text">{m.text}</p>
             ) : (
-              denkt && (
+              m.stream && (
                 <p className="mc-text mc-denkt">
                   <span />
                   <span />
