@@ -216,10 +216,12 @@
 .fokus-wz:active {
   transform: scale(0.98);
 }
+/* Aktiv wie der aktive Punkt der NavLeiste: Accent-Soft-Fläche, Zeichen in
+   Accent-Strong, keine Kontur. */
 .fokus-wz.aktiv {
-  background: var(--accent);
-  color: var(--on-accent);
-  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+  border-color: transparent;
 }
 .fokus-wz-zahl {
   position: absolute;
@@ -238,10 +240,6 @@
   background: var(--accent);
   border: 1.5px solid var(--card);
   border-radius: 999px;
-}
-.fokus-wz.aktiv .fokus-wz-zahl {
-  background: var(--on-accent);
-  color: var(--accent);
 }
 
 /* ---- Mitte: aktives Material + Schritt-Steuerung ----------------------- */
