@@ -4,7 +4,7 @@ import { lehrkraefte } from "../data/stundenplanWoche";
 import { ladeErledigt, fachWochenFortschritt } from "./planung";
 import { fachTextFarbe } from "./farbe";
 import Etappenring from "./Etappenring";
-import { ART_LABEL } from "./material";
+import { ART_LABEL, plattformLabel } from "./material";
 import { ladeEigene, speichereEigenes } from "./eigeneMaterialien";
 import { ladeFavoriten, ladeOrte, ortVon, META_EVENT } from "./materialMeta";
 import { addMitteilung } from "./benachrichtigungen";
@@ -507,10 +507,16 @@ export default function Fokus({
   if (chip !== "alle") railRows = railRows.filter((r) => r.chip === chip);
   const q = suche.trim().toLowerCase();
   if (q) railRows = railRows.filter((r) => r.m.titel.toLowerCase().includes(q));
-  // Favoriten (Stern aus der Ablage) ganz nach oben; sonst bleibt die Reihenfolge.
-  railRows.sort(
-    (a, b) => (favoriten[b.m.id] ? 1 : 0) - (favoriten[a.m.id] ? 1 : 0)
-  );
+  // Favoriten (Stern aus der Ablage) ganz nach oben. Danach Schul-Inhalte
+  // (Moodle) vor extern Dazugekommenem (Discord, YouTube, eigene Uploads);
+  // innerhalb der Gruppen bleibt die Reihenfolge (sort ist stabil).
+  const istExtern = (m) => plattformLabel(m) !== "Moodle";
+  railRows.sort((a, b) => {
+    const fav =
+      (favoriten[b.m.id] ? 1 : 0) - (favoriten[a.m.id] ? 1 : 0);
+    if (fav) return fav;
+    return (istExtern(a.m) ? 1 : 0) - (istExtern(b.m) ? 1 : 0);
+  });
 
   const aktivId = aktivesMaterial?.id || null;
 
