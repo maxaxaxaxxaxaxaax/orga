@@ -18,6 +18,7 @@ import { IcLernweg } from "./materialIcons";
 import { CHIPS, chipFuerMaterial, iconFuerMaterial } from "./materialTypen";
 import MaterialUpload from "./MaterialUpload";
 import MaterialInhalt from "./MaterialInhalt";
+import { plattformLabel } from "./material";
 import KbInhalt from "./KbInhalt";
 import Icon from "./Icon";
 import LeerZustand from "./LeerZustand";
@@ -227,6 +228,11 @@ export default function Ablage({
   const detailTags = offenesMaterial
     ? (offenesMaterial.tags || []).filter((t) => t !== detailFachLabel)
     : [];
+  // Herkunfts-Tag: über welchen verbundenen Dienst das Material kam (Moodle,
+  // YouTube, ...). Der Weg des Materials in die App, eigene Uploads ohne.
+  const detailPlattform = offenesMaterial
+    ? plattformLabel(offenesMaterial)
+    : null;
   function schliesseDetail() {
     setOffenesMaterial(null);
     setOffenerLernweg(null);
@@ -752,8 +758,13 @@ export default function Ablage({
                       </button>
                     )}
                   </div>
-                  {detailTags.length > 0 && (
+                  {(detailPlattform || detailTags.length > 0) && (
                     <div className="ab-detail-tags">
+                      {detailPlattform && (
+                        <span className="ab-tag ab-tag-plattform">
+                          {detailPlattform}
+                        </span>
+                      )}
                       {detailTags.map((t) => (
                         <span className="ab-tag" key={t}>
                           {t}

@@ -828,6 +828,13 @@
   flex-wrap: wrap;
   gap: 6px;
 }
+/* Herkunfts-Tag (Moodle, YouTube, ...): wie ein aktiver Chip in Accent-Soft,
+   damit der verbundene Dienst sich von den Inhalts-Tags abhebt. */
+.ab-tag-plattform {
+  background: var(--accent-soft);
+  border-color: transparent;
+  color: var(--accent-strong);
+}
 
 /* Gruppierter Fach-Baum: Kategorie > Subkategorie > Lernweg (Aufgabe) > Materialien.
    Strukturiert den offenen Fach-Ordner statt einer flachen Liste. */
