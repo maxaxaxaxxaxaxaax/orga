@@ -793,21 +793,8 @@
   padding: 2px 9px;
   white-space: nowrap;
 }
-/* Quell-Badge: zeigt, dass orca das Material automatisch aus YouTube einsortiert hat.
-   --yt = YouTube-Markenrot (gleicher Wert wie das Login-Dienst-Logo), einmal definiert. */
-.ab-zeile-quelle {
-  --yt: #ff0000;
-  flex-shrink: 0;
-  font-size: 0.68rem;
-  font-weight: 700;
-  color: color-mix(in srgb, var(--yt) 72%, var(--text));
-  background: color-mix(in srgb, var(--yt) 9%, var(--card));
-  border: 1px solid color-mix(in srgb, var(--yt) 20%, var(--line));
-  border-radius: 999px;
-  padding: 2px 8px;
-  white-space: nowrap;
-}
-/* Auto-Tags "was es ist": kleine, ruhige Chips an der Zeile und im Detail. */
+/* Auto-Tags an der Zeile: Herkunft (Accent-Soft), Art "was es ist" und
+   Schlagwörter als kleine, ruhige Chips (wie im Detail). */
 .ab-zeile-tags {
   flex-shrink: 0;
   display: inline-flex;

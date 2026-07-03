@@ -18,7 +18,7 @@ import { IcLernweg } from "./materialIcons";
 import { CHIPS, chipFuerMaterial, iconFuerMaterial } from "./materialTypen";
 import MaterialUpload from "./MaterialUpload";
 import MaterialInhalt from "./MaterialInhalt";
-import { plattformLabel } from "./material";
+import { plattformLabel, quelleLabel } from "./material";
 import KbInhalt from "./KbInhalt";
 import Icon from "./Icon";
 import LeerZustand from "./LeerZustand";
@@ -233,6 +233,16 @@ export default function Ablage({
   const detailPlattform = offenesMaterial
     ? plattformLabel(offenesMaterial)
     : null;
+  // Art-Tag "was es ist" (Arbeitsblatt, Lernzettel, ...); entfällt, wenn er nur
+  // die Plattform wiederholen würde (z. B. "YouTube-Video" neben "YouTube").
+  const artTagFuer = (m) => {
+    const art = quelleLabel(m);
+    const pl = plattformLabel(m);
+    if (!art) return null;
+    if (pl && art.toLowerCase().includes(pl.toLowerCase())) return null;
+    return art;
+  };
+  const detailArt = offenesMaterial ? artTagFuer(offenesMaterial) : null;
   function schliesseDetail() {
     setOffenesMaterial(null);
     setOffenerLernweg(null);
@@ -347,6 +357,8 @@ export default function Ablage({
         datum: m.datum || null,
         Icon: iconFuerMaterial(m),
         quelle: m.quelle || null,
+        plattform: plattformLabel(m),
+        art: artTagFuer(m),
         tags: m.tags || [],
         kategorie: eltern?.kategorie || null,
         subkategorie: eltern?.subkategorie || null,
@@ -420,14 +432,18 @@ export default function Ablage({
         <Icon name="stern" className="ab-zeile-stern" title="Favorit" />
       )}
       {!fach && r.fach && <span className="ab-zeile-fach">{r.fach}</span>}
-      {r.quelle === "youtube" && (
-        <span className="ab-zeile-quelle">YouTube</span>
-      )}
-      {/* Auto-Tags "was es ist": das Fach lassen wir weg (steht schon im Ordner),
-         damit die konkreten Schlagwörter sichtbar werden. */}
-      {r.tags && r.tags.filter((t) => t !== r.fach).length > 0 && (
+      {/* Tags wie im geöffneten Dokument: Herkunft (Moodle, YouTube, ...), dann
+         die Art "was es ist" (Arbeitsblatt, Lernzettel, ...), dann Schlagwörter.
+         Das Fach lassen wir weg (steht schon im Ordner). */}
+      {(r.plattform ||
+        r.art ||
+        (r.tags && r.tags.filter((t) => t !== r.fach).length > 0)) && (
         <span className="ab-zeile-tags">
-          {r.tags
+          {r.plattform && (
+            <span className="ab-tag ab-tag-plattform">{r.plattform}</span>
+          )}
+          {r.art && <span className="ab-tag">{r.art}</span>}
+          {(r.tags || [])
             .filter((t) => t !== r.fach)
             .slice(0, 2)
             .map((t) => (
@@ -758,12 +774,15 @@ export default function Ablage({
                       </button>
                     )}
                   </div>
-                  {(detailPlattform || detailTags.length > 0) && (
+                  {(detailPlattform || detailArt || detailTags.length > 0) && (
                     <div className="ab-detail-tags">
                       {detailPlattform && (
                         <span className="ab-tag ab-tag-plattform">
                           {detailPlattform}
                         </span>
+                      )}
+                      {detailArt && (
+                        <span className="ab-tag">{detailArt}</span>
                       )}
                       {detailTags.map((t) => (
                         <span className="ab-tag" key={t}>
