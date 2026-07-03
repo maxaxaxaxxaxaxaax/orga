@@ -152,15 +152,3 @@
   gap: 6px;
 }
 
-/* Bewusst kein Chat im Coach-Fenster: nur die jeweils letzte Meldung als
-   ruhige Zeile, damit sichtbar ist, dass der Coach richtig mitliest. */
-.lc-letzte {
-  margin: 0;
-  padding: 10px 12px;
-  font-size: 0.9rem;
-  line-height: 1.45;
-  color: var(--text);
-  background: var(--bg);
-  border: 1px solid var(--line);
-  border-radius: var(--r-md, 14px);
-}

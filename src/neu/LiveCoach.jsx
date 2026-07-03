@@ -15,15 +15,6 @@ import "./LiveCoach.css";
 // sieht es, nichts wird gespeichert, spiegeln statt überwachen, nie die Lösung.
 const TAKT_MS = 7000;
 
-const STATUS_TEXT = {
-  schaut: "Ich schaue gerade kurz hin …",
-  ruhig: "Alles ruhig, ich warte auf den nächsten Schritt.",
-  keinframe:
-    "Diese Ansicht kann ich gerade nicht mitlesen. Schalte auf Kamera um oder öffne ein anderes Material.",
-  bereit: "Ich lese mit.",
-  fehler: "Das hat gerade nicht geklappt, ich versuche es gleich wieder.",
-};
-
 export default function LiveCoach({
   kontextName,
   materialien,
@@ -35,9 +26,13 @@ export default function LiveCoach({
   onClose,
   // Fenster zu, Modus läuft weiter: der Coach bleibt unsichtbar gemountet.
   sichtbar = true,
+  // Jede Beobachtung geht als Nachricht in den Materialien-Chat (nicht mehr hier
+  // im Fenster): der Chat hält so den ganzen Verlauf, und man kann nachfragen.
+  onMeldung,
   // Meldet dem Fokus, ob der Live-Modus läuft (fürs Auge und das Weiterleben).
   onAktivWechsel,
-  // Start schließt die Box; der Modus bleibt an, bis er hier gestoppt wird.
+  // Start (bei Bildschirm) schließt die Box; bei Kamera bleibt sie offen. Der
+  // Modus bleibt an, bis er hier gestoppt wird.
   onGestartet,
   // z. B. der Zieh-Griff an der rechten Kante (Grenze zum Chats-Panel).
   children,
@@ -45,8 +40,6 @@ export default function LiveCoach({
   const [aktiv, setAktiv] = useState(false); // Default AUS = Signal des Schülers
   const [pausiert, setPausiert] = useState(false);
   const [quelle, setQuelle] = useState("bildschirm"); // "bildschirm" | "kamera"
-  const [letzteMeldung, setLetzteMeldung] = useState(null); // ephemer
-  const [status, setStatus] = useState(null);
   const [kameraFehler, setKameraFehler] = useState(null);
 
   const videoRef = useRef(null);
@@ -128,8 +121,8 @@ export default function LiveCoach({
     intervallMs: TAKT_MS,
     grabFrame,
     analysiere,
-    onMeldung: setLetzteMeldung,
-    onStatus: setStatus,
+    // Beobachtungen landen im Materialien-Chat (Fokus reicht onMeldung durch).
+    onMeldung,
   });
 
   function wechsleQuelle(q) {
@@ -142,13 +135,11 @@ export default function LiveCoach({
     setPausiert(false);
     setAktiv(true);
     onAktivWechsel?.(true);
-    onGestartet?.();
+    onGestartet?.(quelle);
   }
   function stoppen() {
     setAktiv(false);
     setPausiert(false);
-    setStatus(null);
-    setLetzteMeldung(null);
     onAktivWechsel?.(false);
   }
 
@@ -245,19 +236,14 @@ export default function LiveCoach({
               )}
             </div>
 
+            {/* Ein kurzer Aktiv-Hinweis: die eigentlichen Beobachtungen laufen
+                rechts im Materialien-Chat mit (voller Verlauf, Nachfragen
+                möglich). */}
             {aktiv && (
               <p className="lc-status" role="status">
                 {pausiert
                   ? "Pausiert. Ich schaue gerade nicht mit."
-                  : STATUS_TEXT[status] || "Ich lese mit."}
-              </p>
-            )}
-
-            {/* Bewusst kein Chat: nur die jeweils letzte Meldung als ruhige
-                Zeile, damit man sieht, dass der Coach richtig mitliest. */}
-            {aktiv && letzteMeldung && (
-              <p className="lc-letzte" aria-live="polite">
-                {letzteMeldung}
+                  : "Ich lese mit, die Hinweise stehen im Chat rechts."}
               </p>
             )}
           </>

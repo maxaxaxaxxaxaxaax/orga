@@ -29,11 +29,22 @@ export default function MaterialChat({
   // Aktives Material im Fokus: bei Wechsel zeigt der Verlauf einen Hinweis.
   aktivId,
   aktivTitel,
+  // Verlauf kann von außen (Fokus) gehalten werden, damit der Live-Coach in
+  // denselben Thread schreibt. Ohne diese Props hält der Chat ihn selbst.
+  nachrichten: nachrichtenProp,
+  setNachrichten: setNachrichtenProp,
 }) {
   const ctx = { kontextName, materialien };
-  const [nachrichten, setNachrichten] = useState(() => [
+  const [internNachrichten, setInternNachrichten] = useState(() => [
     { von: "ki", ...introNachricht(ctx) },
   ]);
+  const nachrichten = nachrichtenProp ?? internNachrichten;
+  const setNachrichten = setNachrichtenProp ?? setInternNachrichten;
+  // Laufende KI-Antwort per stabiler Id ansprechen (nicht über "letzte"): eine
+  // Live-Coach-Beobachtung, die während des Streamens hereinkommt, überschreibt
+  // so nicht versehentlich die gerade wachsende Antwort.
+  const streamRef = useRef(0);
+  const verlaufEndeRef = useRef(null);
   // Materialwechsel sichtbar machen: kleine Zwischenzeile im Verlauf, dass der
   // Coach ab jetzt auf DIESES Material eingeht (der System-Prompt kennt es
   // bereits über systemText). Beim ersten Rendern kein Hinweis.
@@ -42,14 +53,16 @@ export default function MaterialChat({
     if (vorherigesAktiv.current === aktivId) return;
     vorherigesAktiv.current = aktivId;
     if (!aktivTitel) return;
-    // Bewusste Ausnahme (wie der Show-Effekt in App.jsx): der Hinweis reagiert
-    // auf einen Prop-Wechsel von außen, ein einzelnes Anhängen kaskadiert nicht.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setNachrichten((n) => [
       ...n,
       { von: "wechsel", text: `Geht jetzt auf „${aktivTitel}“ ein` },
     ]);
-  }, [aktivId, aktivTitel]);
+  }, [aktivId, aktivTitel, setNachrichten]);
+  // Neue Nachrichten (Antwort oder Live-Coach-Blick) ans Ende scrollen.
+  useEffect(() => {
+    verlaufEndeRef.current?.scrollIntoView({ block: "end" });
+  }, [nachrichten]);
+
   const [eingabe, setEingabe] = useState("");
   const [denkt, setDenkt] = useState(false);
   const [zettelOffen, setZettelOffen] = useState(false);
@@ -70,19 +83,18 @@ export default function MaterialChat({
   async function sendeKi(frage, dasBild) {
     const verlauf = nachrichten;
     const modell = dasBild ? visionModell : kiModell;
+    const streamId = (streamRef.current += 1);
     setNachrichten((n) => [
       ...n,
       { von: "ich", text: frage, bild: dasBild || undefined },
-      { von: "ki", text: "" },
+      { von: "ki", text: "", stream: streamId },
     ]);
     setDenkt(true);
+    // Genau die streamende Antwort aktualisieren, egal was sonst dazwischenkommt.
     const setzeLetzte = (aender) =>
-      setNachrichten((n) => {
-        const kopie = [...n];
-        const i = kopie.length - 1;
-        kopie[i] = aender(kopie[i]);
-        return kopie;
-      });
+      setNachrichten((n) =>
+        n.map((m) => (m.stream === streamId ? aender(m) : m))
+      );
     try {
       await frageKi({
         frage,
@@ -188,7 +200,16 @@ export default function MaterialChat({
               {m.text}
             </div>
           ) : (
-          <div key={i} className={"mc-msg mc-" + m.von}>
+          <div
+            key={i}
+            className={"mc-msg mc-" + m.von + (m.coach ? " mc-coach" : "")}
+          >
+            {m.coach && (
+              <span className="mc-coach-marke">
+                <Icon name="eye" className="mc-coach-auge" />
+                Live-Coach
+              </span>
+            )}
             {m.bild && (
               <img className="mc-bild" src={m.bild} alt="Angehängtes Bild" />
             )}
@@ -216,6 +237,7 @@ export default function MaterialChat({
           </div>
           )
         )}
+        <div ref={verlaufEndeRef} />
       </div>
 
       {nochKeineFrage && (

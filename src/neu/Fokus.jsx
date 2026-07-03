@@ -28,6 +28,7 @@ import {
   setzeMaterialwunsch,
 } from "./coach";
 import { pruefeKi, pruefeVision, systemPromptCoach } from "./kiClient";
+import { introNachricht } from "./materialAssistent";
 import { materialHinweis } from "./materialHinweis";
 import { addNotiz, ladeNotizen, entferneNotiz } from "./notizen";
 import {
@@ -395,6 +396,18 @@ export default function Fokus({
     ": " +
     kb.titel +
     (aktSchrittText ? ` · Schritt ${aktuell + 1} von ${schritte.length}` : "");
+
+  // Der Materialien-Chat-Verlauf lebt hier oben (nicht in MaterialChat), damit der
+  // Live-Coach seine Beobachtungen direkt in denselben Thread schreiben kann und
+  // der Verlauf erhalten bleibt, auch wenn das Chat-Panel gerade zu ist.
+  const [chatNachrichten, setChatNachrichten] = useState(() => [
+    { von: "ki", ...introNachricht({ kontextName, materialien }) },
+  ]);
+  // Eine Live-Coach-Beobachtung als Chat-Nachricht anhängen (linke KI-Blase mit
+  // Live-Coach-Marke). Wird dem LiveCoach als onMeldung gereicht.
+  function coachMeldung(text) {
+    setChatNachrichten((n) => [...n, { von: "ki", coach: true, text }]);
+  }
   const zi = zeitInfo(kb);
   const gelerntMin = Math.round((zi.gelerntSek || 0) / 60);
   const zeitText = [
@@ -978,8 +991,13 @@ export default function Fokus({
               visionModell={visionModell}
               mitteRef={mitteRef}
               sichtbar={werkzeug === "live"}
+              onMeldung={coachMeldung}
               onAktivWechsel={setLiveLaeuft}
-              onGestartet={() => setWerkzeug(null)}
+              onGestartet={(quelle) => {
+                // Kamera: Box bleibt offen, damit man das Kamerabild sieht.
+                // Bildschirm: Box zu, man arbeitet in der Mitte weiter.
+                if (quelle !== "kamera") setWerkzeug(null);
+              }}
               onClose={() => setWerkzeug(null)}
             >
               {chatsOffen && (
@@ -1300,6 +1318,8 @@ export default function Fokus({
                     kiModell={kiModell}
                     visionModell={visionModell}
                     systemText={coachSystem}
+                    nachrichten={chatNachrichten}
+                    setNachrichten={setChatNachrichten}
                     onZauberstab={() => oeffneMarkieren("fragen")}
                     aktivId={aktivesMaterial?.id || null}
                     aktivTitel={
