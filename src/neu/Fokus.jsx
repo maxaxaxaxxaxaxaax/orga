@@ -498,14 +498,26 @@ export default function Fokus({
     setAufschriebOffen(true);
   }
 
-  // Rechte-Leiste-Zeilen: Materialien (gefiltert über Chip + Suche).
-  let railRows = materialien.map((m) => ({
+  // "Zum Thema" oben: der Lernzettel des Themas plus die Übungen/Aufgaben.
+  const zumThemaMats = [
+    ...materialien.filter((m) => m.art === "lernzettel"),
+    ...aufgabenMats.filter((m) => m.art !== "lernzettel"),
+  ];
+  const imThema = new Set(zumThemaMats.map((m) => m.id));
+
+  // Rechte-Leiste-Zeilen darunter: ohne aktiven Filter bleibt draußen, was
+  // schon unter "Zum Thema" steht (keine Dopplung); wer sucht oder filtert,
+  // durchsucht wieder alle Materialien.
+  const q = suche.trim().toLowerCase();
+  const filterAktiv = chip !== "alle" || q;
+  let railRows = (
+    filterAktiv ? materialien : materialien.filter((m) => !imThema.has(m.id))
+  ).map((m) => ({
     m,
     chip: chipFuerMaterial(m),
     Icon: iconFuerMaterial(m),
   }));
   if (chip !== "alle") railRows = railRows.filter((r) => r.chip === chip);
-  const q = suche.trim().toLowerCase();
   if (q) railRows = railRows.filter((r) => r.m.titel.toLowerCase().includes(q));
   // Favoriten (Stern aus der Ablage) ganz nach oben. Danach Schul-Inhalte
   // (Moodle) vor extern Dazugekommenem (Discord, YouTube, eigene Uploads);
@@ -520,8 +532,8 @@ export default function Fokus({
 
   const aktivId = aktivesMaterial?.id || null;
 
-  // "Zum Thema": die Übungen/Aufgaben des Schritts (das, was man jetzt tut).
-  const zumThemaRows = aufgabenMats.map((m) => ({
+  // "Zum Thema": Lernzettel + Übungen/Aufgaben (das, was man jetzt liest und tut).
+  const zumThemaRows = zumThemaMats.map((m) => ({
     m,
     Icon: iconFuerMaterial(m),
   }));
