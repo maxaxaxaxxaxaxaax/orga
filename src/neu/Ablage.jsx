@@ -579,7 +579,9 @@ export default function Ablage({
                         type="button"
                         aria-pressed={chip === c.key}
                         className={"ab-chip" + (chip === c.key ? " an" : "")}
-                        onClick={() => setChip(c.key)}
+                        onClick={() =>
+                          setChip((v) => (v === c.key ? "alle" : c.key))
+                        }
                       >
                         {c.Icon && <c.Icon className="ab-chip-icon" />}
                         {c.label}

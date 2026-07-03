@@ -59,8 +59,9 @@ const PersonIcon = () => (
 
 // Filter-Chips der Benachrichtigungen (wie die Ablage-Chips): "alle" plus die drei
 // Typen. art der Mitteilung: coach = Nachricht, link = Link, material = Material.
+// Kein "Alle"-Chip: ist kein Filter aktiv, werden alle Benachrichtigungen
+// gezeigt; ein Klick auf den aktiven Chip schaltet zurück auf alle.
 const NACHR_CHIPS = [
-  { key: "alle", label: "Alle" },
   { key: "coach", label: "Nachrichten" },
   { key: "link", label: "Links" },
   { key: "material", label: "Material" },
@@ -788,7 +789,9 @@ export default function Heute({ onFokus, onOeffneAblage }) {
                 type="button"
                 aria-pressed={nachrFilter === c.key}
                 className={"hu-nachr-chip" + (nachrFilter === c.key ? " an" : "")}
-                onClick={() => setNachrFilter(c.key)}
+                onClick={() =>
+                  setNachrFilter((f) => (f === c.key ? "alle" : c.key))
+                }
               >
                 {c.label}
               </button>

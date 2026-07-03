@@ -1208,7 +1208,9 @@ export default function Fokus({
                       type="button"
                       aria-pressed={chip === c.key}
                       className={"fokus-chip" + (chip === c.key ? " an" : "")}
-                      onClick={() => setChip(c.key)}
+                      onClick={() =>
+                        setChip((v) => (v === c.key ? "alle" : c.key))
+                      }
                     >
                       {c.Icon && <c.Icon className="fokus-chip-icon" />}
                       {c.label}

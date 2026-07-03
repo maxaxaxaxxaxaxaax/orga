@@ -36,8 +36,9 @@ export const CHIP_ICON = {
   video: IcVideo,
   link: IcLink,
 };
+// Kein "Alle"-Chip: ist kein Filter aktiv, wird alles gezeigt; ein Klick auf den
+// aktiven Chip schaltet zurück auf alles (siehe Fokus/Ablage-Handler).
 export const CHIPS = [
-  { key: "alle", label: "Alle", Icon: null },
   { key: "tafel", label: "Tafelaufschriebe", Icon: IcTafel },
   { key: "aufgaben", label: "Aufgaben", Icon: IcAufgabe },
   { key: "lernwege", label: "Lernwege", Icon: IcLernweg },
