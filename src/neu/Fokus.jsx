@@ -498,20 +498,24 @@ export default function Fokus({
     setAufschriebOffen(true);
   }
 
-  // "Zum Thema" oben: der Lernzettel des Themas plus die Übungen/Aufgaben.
-  const zumThemaMats = [
-    ...materialien.filter((m) => m.art === "lernzettel"),
-    ...aufgabenMats.filter((m) => m.art !== "lernzettel"),
-  ];
-  const imThema = new Set(zumThemaMats.map((m) => m.id));
+  // Herkunft trennt die beiden Abschnitte: Schulisches (Moodle) steht oben
+  // unter "Zum Thema", extern Dazugekommenes (Discord, YouTube, eigene
+  // Uploads) unten.
+  const istExtern = (m) => plattformLabel(m) !== "Moodle";
 
-  // Rechte-Leiste-Zeilen darunter: ohne aktiven Filter bleibt draußen, was
-  // schon unter "Zum Thema" steht (keine Dopplung); wer sucht oder filtert,
+  // "Zum Thema" oben: ALLES Schulische zum Thema, der Lernzettel zuerst.
+  const zumThemaMats = [
+    ...materialien.filter((m) => m.art === "lernzettel" && !istExtern(m)),
+    ...materialien.filter((m) => m.art !== "lernzettel" && !istExtern(m)),
+  ];
+
+  // Rechte-Leiste-Zeilen darunter: ohne aktiven Filter nur das extern
+  // Hinzugefügte (keine Dopplung mit oben); wer sucht oder filtert,
   // durchsucht wieder alle Materialien.
   const q = suche.trim().toLowerCase();
   const filterAktiv = chip !== "alle" || q;
   let railRows = (
-    filterAktiv ? materialien : materialien.filter((m) => !imThema.has(m.id))
+    filterAktiv ? materialien : materialien.filter(istExtern)
   ).map((m) => ({
     m,
     chip: chipFuerMaterial(m),
@@ -519,10 +523,8 @@ export default function Fokus({
   }));
   if (chip !== "alle") railRows = railRows.filter((r) => r.chip === chip);
   if (q) railRows = railRows.filter((r) => r.m.titel.toLowerCase().includes(q));
-  // Favoriten (Stern aus der Ablage) ganz nach oben. Danach Schul-Inhalte
-  // (Moodle) vor extern Dazugekommenem (Discord, YouTube, eigene Uploads);
-  // innerhalb der Gruppen bleibt die Reihenfolge (sort ist stabil).
-  const istExtern = (m) => plattformLabel(m) !== "Moodle";
+  // Favoriten (Stern aus der Ablage) ganz nach oben; danach Schulisches vor
+  // Externem (zählt nur, wenn Suche/Filter alles zeigen). sort ist stabil.
   railRows.sort((a, b) => {
     const fav =
       (favoriten[b.m.id] ? 1 : 0) - (favoriten[a.m.id] ? 1 : 0);
