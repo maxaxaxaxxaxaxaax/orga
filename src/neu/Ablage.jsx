@@ -19,7 +19,6 @@ import { CHIPS, chipFuerMaterial, iconFuerMaterial } from "./materialTypen";
 import MaterialUpload from "./MaterialUpload";
 import MaterialInhalt from "./MaterialInhalt";
 import { plattformLabel, quelleLabel } from "./material";
-import KbInhalt from "./KbInhalt";
 import Icon from "./Icon";
 import LeerZustand from "./LeerZustand";
 import { useScrollFade } from "./useScrollFade";
@@ -189,7 +188,9 @@ export default function Ablage({
   const [offenesMaterial, setOffenesMaterial] = useState(() =>
     zielMaterial(oeffneMaterialId)
   );
-  const [offenerLernweg, setOffenerLernweg] = useState(null);
+  // Ein geöffneter Lernweg wird wie ein Ordner behandelt: die Liste zeigt dann
+  // nur dessen Materialien (zum einzeln Anschauen), statt die ganze Lektion.
+  const [offenerLwOrdner, setOffenerLwOrdner] = useState(null);
   // Ordner + Filter beim Runterscrollen einziehen, beim Hochscrollen wieder zeigen.
   const [eingezogen, setEingezogen] = useState(false);
   const letzterScroll = useRef(0);
@@ -210,8 +211,9 @@ export default function Ablage({
 
   const fach = faecher.find((f) => f.id === fachId) || null;
 
-  // Ein Dokument/Lernweg ist rechts im Split geöffnet. Esc schließt es.
-  const detailOffen = offenesMaterial || offenerLernweg;
+  // Ein Material-Dokument ist rechts im Split geöffnet. Esc schließt es. (Ein
+  // geöffneter Lernweg ist ein Ordner in der Liste, kein Split-Dokument.)
+  const detailOffen = offenesMaterial;
   // Grenze Liste|Dokument per Griff ziehen (gleiches Raster-Rezept wie Übersicht
   // und Fokus, rastet auf die 12 Spalten ein). teil = Spalten der Liste.
   const [teil, setTeil] = useState(6);
@@ -245,15 +247,11 @@ export default function Ablage({
   const detailArt = offenesMaterial ? artTagFuer(offenesMaterial) : null;
   function schliesseDetail() {
     setOffenesMaterial(null);
-    setOffenerLernweg(null);
   }
   useEffect(() => {
     if (!detailOffen) return undefined;
     const onKey = (e) => {
-      if (e.key === "Escape") {
-        setOffenesMaterial(null);
-        setOffenerLernweg(null);
-      }
+      if (e.key === "Escape") setOffenesMaterial(null);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -340,9 +338,11 @@ export default function Ablage({
       lernweg: t.label,
       istLernweg: true,
       onOpen: () => {
-        // Nur EIN Dokument offen: ein evtl. offenes Material schließt mit.
+        // Wie einen Ordner öffnen: Liste zeigt danach nur die Materialien
+        // dieses Lernwegs. Ein evtl. offenes Material schließt mit.
         setOffenesMaterial(null);
-        setOffenerLernweg({ id: t.kbId, label: t.label });
+        setFachId(f.id);
+        setOffenerLwOrdner({ fachId: f.id, label: t.label });
       },
     }));
     const mRows = materialien.map((m) => {
@@ -369,13 +369,7 @@ export default function Ablage({
         subkategorie: eltern?.subkategorie || null,
         lernweg: eltern?.label || m.thema || null,
         istLernweg: false,
-        onOpen: istOeffenbar(m)
-          ? () => {
-              // Nur EIN Dokument offen: ein evtl. offener Lernweg schließt mit.
-              setOffenerLernweg(null);
-              setOffenesMaterial(m);
-            }
-          : null,
+        onOpen: istOeffenbar(m) ? () => setOffenesMaterial(m) : null,
       };
     });
     return [...lwRows, ...mRows];
@@ -396,10 +390,15 @@ export default function Ablage({
     if (al !== bl) return al ? -1 : 1;
     return (b.datum || "").localeCompare(a.datum || "");
   };
-  // In einem offenen Fach-Ordner: nach Kategorie > Subkategorie > Lernweg gruppieren,
-  // die Materialien unter ihrem Lernweg. Global oder ohne Gliederung: flache Liste.
-  const baum = fach ? baueFachBaum(rows, fach, sortFn) : null;
-  const flachSortiert = baum ? null : [...rows].sort(sortFn);
+  // In einem offenen Lernweg-Ordner: nur dessen Materialien als flache Liste.
+  const imLwOrdner = !!offenerLwOrdner;
+  const ordnerRows = imLwOrdner
+    ? rows.filter((r) => !r.istLernweg && r.lernweg === offenerLwOrdner.label)
+    : rows;
+  // In einem offenen Fach-Ordner (ohne Lernweg-Ordner): nach Kategorie >
+  // Subkategorie > Lernweg gruppieren. Global oder Lernweg-Ordner: flache Liste.
+  const baum = fach && !imLwOrdner ? baueFachBaum(rows, fach, sortFn) : null;
+  const flachSortiert = baum ? null : [...ordnerRows].sort(sortFn);
 
   function uploadSpeichern(m) {
     speichereEigenes(m);
@@ -418,6 +417,7 @@ export default function Ablage({
       onClick={() => {
         setFachId((cur) => (cur === f.id ? null : f.id));
         setChip("alle");
+        setOffenerLwOrdner(null);
       }}
       aria-pressed={f.id === fachId}
     >
@@ -474,9 +474,9 @@ export default function Ablage({
     </>
   );
   const zeileLi = (r, extra) => {
-    // Geöffnetes Dokument: die zugehörige Zeile bekommt den Active-State.
+    // Aktiv: das geöffnete Material bzw. der als Ordner geöffnete Lernweg.
     const an = r.istLernweg
-      ? offenerLernweg?.id === r.kbId
+      ? offenerLwOrdner?.label === r.lernweg
       : !!r.id && offenesMaterial?.id === r.id;
     return (
       <li key={r.key} className={extra || undefined}>
@@ -507,7 +507,10 @@ export default function Ablage({
           type="text"
           value={suche}
           onChange={(e) => setSuche(e.target.value)}
-          onFocus={() => setFachId(null)}
+          onFocus={() => {
+            setFachId(null);
+            setOffenerLwOrdner(null);
+          }}
           placeholder="Suche"
           aria-label="Ablage durchsuchen"
         />
@@ -559,10 +562,34 @@ export default function Ablage({
               </div>
             </div>
 
-            {/* Fächer-Ordner über der Liste (Auswahl filtert die Liste). */}
-                <div className="ab-faecher-leiste" role="group" aria-label="Fach-Filter">
-                  {ordnerButtons}
-                </div>
+            {/* Im Lernweg-Ordner: Brotkrumen zurück zum Fach. Sonst die Fächer
+                als Ordner über der Liste (Auswahl filtert die Liste). */}
+                {imLwOrdner ? (
+                  <div className="ab-krumen" aria-label="Ordner-Pfad">
+                    <button
+                      type="button"
+                      className="ab-krume"
+                      onClick={() => setOffenerLwOrdner(null)}
+                    >
+                      <Icon name="chevron-left" size={16} />
+                      {fach?.fach || "Alle Fächer"}
+                    </button>
+                    <span className="ab-krume-sep" aria-hidden="true">
+                      /
+                    </span>
+                    <span className="ab-krume-aktuell">
+                      {offenerLwOrdner.label}
+                    </span>
+                  </div>
+                ) : (
+                  <div
+                    className="ab-faecher-leiste"
+                    role="group"
+                    aria-label="Fach-Filter"
+                  >
+                    {ordnerButtons}
+                  </div>
+                )}
                 <div
                   className={"ab-filterzeile" + (sortOffen ? " sort-offen" : "")}
                 >
@@ -631,13 +658,15 @@ export default function Ablage({
                   ref={matScrollRef}
                   onScroll={beiListenScroll}
                 >
-                {rows.length === 0 ? (
+                {(baum ? rows.length === 0 : flachSortiert.length === 0) ? (
                   <LeerZustand
                     titel={suche ? "Nichts gefunden" : "Noch keine Materialien"}
                     text={
                       suche
                         ? "Für deine Suche gibt es hier nichts. Probier ein anderes Wort."
-                        : "Materialien, die du hinzufügst oder aus Discord schickst, landen hier."
+                        : imLwOrdner
+                          ? "In diesem Lernweg liegt noch nichts."
+                          : "Materialien, die du hinzufügst oder aus Discord schickst, landen hier."
                     }
                   />
                 ) : baum ? (
@@ -686,11 +715,7 @@ export default function Ablage({
 
           {detailOffen && (
             <aside
-              key={
-                offenesMaterial
-                  ? "m" + offenesMaterial.id
-                  : "l" + offenerLernweg.id
-              }
+              key={"m" + offenesMaterial.id}
               className="ab-card ab-detail"
               aria-label="Dokument"
             >
@@ -775,11 +800,7 @@ export default function Ablage({
                     </div>
                   )}
                   <div className="ab-detail-titel-zeile">
-                    <h2 className="ab-detail-titel">
-                      {offenesMaterial
-                        ? offenesMaterial.titel
-                        : offenerLernweg.label}
-                    </h2>
+                    <h2 className="ab-detail-titel">{offenesMaterial.titel}</h2>
                     {offenesMaterial && (
                       <button
                         type="button"
@@ -828,11 +849,7 @@ export default function Ablage({
                 </button>
               </div>
               <div className="ab-detail-inhalt">
-                {offenesMaterial ? (
-                  <MaterialInhalt material={offenesMaterial} />
-                ) : (
-                  <KbInhalt key={offenerLernweg.id} kb={offenerLernweg} kompakt />
-                )}
+                <MaterialInhalt material={offenesMaterial} />
               </div>
             </aside>
           )}

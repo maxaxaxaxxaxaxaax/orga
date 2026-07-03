@@ -392,6 +392,46 @@
     opacity var(--dur-fast) var(--ease-out),
     margin-bottom var(--dur-base) var(--ease-out);
 }
+/* Brotkrumen im geöffneten Lernweg-Ordner: zurück zum Fach, dann der Lernweg. */
+.ab-krumen {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 0 14px;
+  font-size: 0.9rem;
+}
+.ab-krume {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  border: none;
+  background: transparent;
+  color: var(--accent);
+  font: inherit;
+  font-weight: 600;
+  padding: 4px 6px 4px 2px;
+  border-radius: var(--r-sm, 9px);
+  cursor: pointer;
+  transition: color var(--dur-press) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
+}
+@media (hover: hover) {
+  .ab-krume:hover {
+    color: var(--accent-strong);
+  }
+}
+.ab-krume:active {
+  transform: scale(0.98);
+}
+.ab-krume-sep {
+  color: var(--line-strong);
+  font-weight: 600;
+}
+.ab-krume-aktuell {
+  font-weight: 700;
+  color: var(--text);
+}
 .ab-ordner {
   display: flex;
   flex-direction: column;
@@ -542,6 +582,7 @@
 }
 .ab-materialien > .ab-mat-kopf,
 .ab-materialien > .ab-faecher-leiste,
+.ab-materialien > .ab-krumen,
 .ab-materialien > .ab-filterzeile {
   flex-shrink: 0;
 }
