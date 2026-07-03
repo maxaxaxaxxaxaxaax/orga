@@ -1,12 +1,12 @@
 import { useState, useEffect, useLayoutEffect, useRef } from "react";
-import { lernwegFuerKb } from "../data/wissen";
+import { faecher, lernwegFuerKb } from "../data/wissen";
 import { lehrkraefte } from "../data/stundenplanWoche";
 import { ladeErledigt, fachWochenFortschritt } from "./planung";
 import { fachTextFarbe } from "./farbe";
 import Etappenring from "./Etappenring";
 import { ART_LABEL } from "./material";
-import { eigeneFuerThema, speichereEigenes } from "./eigeneMaterialien";
-import { ladeFavoriten, ladeOrte, META_EVENT } from "./materialMeta";
+import { ladeEigene, speichereEigenes } from "./eigeneMaterialien";
+import { ladeFavoriten, ladeOrte, ortVon, META_EVENT } from "./materialMeta";
 import { addMitteilung } from "./benachrichtigungen";
 import { ladeSchritte, speichereSchritte } from "./lernschritte";
 import {
@@ -250,13 +250,20 @@ export default function Fokus({
     return () => window.removeEventListener(META_EVENT, f);
   }, []);
 
-  const bleibtHier = (m) => !orte[m.id] || orte[m.id] === lw?.fachId;
+  // Effektiver Ablageort zählt: ein verschobenes Material gehört zu dem
+  // Fach/Thema aus der Ablage-Korrektur, sonst zu seinem Heimat-Ort.
+  const gehoertHierher = (m, heimatFachId) => {
+    const o = ortVon(orte, m.id);
+    const fachEff = o?.fachId || heimatFachId;
+    const themaEff = o ? o.thema : m.thema;
+    return fachEff === lw?.fachId && themaEff === thema.label;
+  };
   const materialien = lw
     ? [
-        ...(lw.fach.materialien || []).filter(
-          (m) => m.thema === thema.label && bleibtHier(m)
+        ...faecher.flatMap((f) =>
+          (f.materialien || []).filter((m) => gehoertHierher(m, f.id))
         ),
-        ...eigeneFuerThema(lw.fachId, thema.label).filter(bleibtHier),
+        ...ladeEigene().filter((m) => gehoertHierher(m, m.fachId)),
       ]
     : [];
   const genKey = generatorFuerKb(kb.id);

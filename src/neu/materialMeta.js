@@ -37,14 +37,25 @@ export function toggleFavorit(id) {
   schreibe(FAV_KEY, favs);
 }
 
-// Verschobene Ablageorte: { [materialId]: fachId }. Nur echte Verschiebungen
-// werden gespeichert; zurück ins Heimat-Fach löscht den Eintrag.
+// Verschobene Ablageorte: { [materialId]: { fachId, thema } }. Nur echte
+// Verschiebungen werden gespeichert; zurück zum Heimat-Ort löscht den Eintrag.
+// Ältere Einträge waren reine fachId-Strings; ortVon normalisiert beim Lesen.
 export function ladeOrte() {
   return lies(ORT_KEY);
 }
-export function verschiebeMaterial(id, fachId, heimatFachId) {
+export function ortVon(orte, id) {
+  const o = orte[id];
+  if (!o) return null;
+  return typeof o === "string" ? { fachId: o, thema: null } : o;
+}
+export function verschiebeMaterial(id, fachId, thema, heimatFachId, heimatThema) {
   const orte = lies(ORT_KEY);
-  if (!fachId || fachId === heimatFachId) delete orte[id];
-  else orte[id] = fachId;
+  const zielFach = fachId || heimatFachId;
+  const zielThema = thema || null;
+  if (zielFach === heimatFachId && zielThema === (heimatThema || null)) {
+    delete orte[id];
+  } else {
+    orte[id] = { fachId: zielFach, thema: zielThema };
+  }
   schreibe(ORT_KEY, orte);
 }

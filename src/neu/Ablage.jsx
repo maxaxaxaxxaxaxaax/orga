@@ -9,6 +9,7 @@ import {
   ladeFavoriten,
   toggleFavorit,
   ladeOrte,
+  ortVon,
   verschiebeMaterial,
   META_EVENT,
 } from "./materialMeta";
@@ -17,7 +18,6 @@ import { IcLernweg } from "./materialIcons";
 import { CHIPS, chipFuerMaterial, iconFuerMaterial } from "./materialTypen";
 import MaterialUpload from "./MaterialUpload";
 import MaterialInhalt from "./MaterialInhalt";
-import { quelleLabel } from "./material";
 import KbInhalt from "./KbInhalt";
 import Icon from "./Icon";
 import LeerZustand from "./LeerZustand";
@@ -267,6 +267,22 @@ export default function Ablage({
     faecher.find((x) => (x.materialien || []).some((s) => s.id === m.id))?.id ||
     null;
 
+  // Ablageort des offenen Dokuments (Kopfzeile "Fach / Thema", beides wählbar).
+  // Effektiv gilt: Verschiebung > Heimat (Fach aus den Daten, Thema am Material).
+  const detailHeimatFach = offenesMaterial
+    ? heimatFachId(offenesMaterial)
+    : null;
+  const detailHeimatThema = offenesMaterial?.thema || null;
+  const detailOrt = offenesMaterial ? ortVon(orte, offenesMaterial.id) : null;
+  const detailOrtFach = detailOrt?.fachId || detailHeimatFach || "";
+  const detailOrtThema = detailOrt
+    ? detailOrt.thema || ""
+    : detailHeimatThema || "";
+  // Wählbare Themen = Lernwege des gerade gewählten Fachs (wie in der Liste).
+  const detailOrtThemen = (
+    faecher.find((f) => f.id === detailOrtFach)?.themen || []
+  ).filter((t) => koennensbeweise.some((k) => k.id === t.kbId));
+
   // Deep-Link (Klick auf eine Link-/Material-Benachrichtigung): Das Ziel-Material ist
   // beim Mounten schon als offenes Detail gesetzt (useState-Initializer oben). Hier nur
   // das Ziel im Parent zurücksetzen, damit ein späterer Wechsel es nicht erneut öffnet.
@@ -283,16 +299,17 @@ export default function Ablage({
     );
     // Effektiver Ablageort: verschobene Materialien wandern in ihr Ziel-Fach
     // (raus aus dem Heimat-Fach, rein bei den Verschobenen anderer Fächer).
+    const ortFach = (m) => ortVon(orte, m.id)?.fachId || null;
     const materialien = [
       ...(f.materialien || []).filter(
-        (m) => !orte[m.id] || orte[m.id] === f.id
+        (m) => !ortFach(m) || ortFach(m) === f.id
       ),
       ...faecher
         .filter((a) => a.id !== f.id)
         .flatMap((a) =>
-          (a.materialien || []).filter((m) => orte[m.id] === f.id)
+          (a.materialien || []).filter((m) => ortFach(m) === f.id)
         ),
-      ...eigene.filter((m) => (orte[m.id] || m.fachId) === f.id),
+      ...eigene.filter((m) => (ortFach(m) || m.fachId) === f.id),
     ];
     const lwRows = lernwege.map((t) => ({
       key: f.id + "-lw-" + t.id,
@@ -309,8 +326,11 @@ export default function Ablage({
     }));
     const mRows = materialien.map((m) => {
       // Material gehoert ueber thema === Lernweg-Label zu einem Lernweg; dessen
-      // Kategorie/Subkategorie erbt es fuer die Gruppierung.
-      const eltern = f.themen.find((t) => t.label === m.thema) || null;
+      // Kategorie/Subkategorie erbt es fuer die Gruppierung. Ein verschobener
+      // Ort bringt sein eigenes Thema mit (auch keins).
+      const o = ortVon(orte, m.id);
+      const themaEff = o ? o.thema : m.thema;
+      const eltern = f.themen.find((t) => t.label === themaEff) || null;
       return {
         key: f.id + "-m-" + m.id,
         id: m.id,
@@ -628,10 +648,67 @@ export default function Ablage({
             >
               <div className="ab-detail-kopf">
                 <div className="ab-detail-titel-wrap">
+                  {/* Ablageort als Kopfzeile "Fach / Thema": beides direkt
+                      antippbar, falsch Einsortiertes lässt sich hier umhängen
+                      (siehe materialMeta.js). */}
                   {offenesMaterial && (
-                    <span className="ab-detail-art">
-                      {quelleLabel(offenesMaterial)}
-                    </span>
+                    <div
+                      className="ab-detail-ort"
+                      role="group"
+                      aria-label="Ablageort"
+                    >
+                      <select
+                        value={detailOrtFach}
+                        aria-label="Ablageort: Fach"
+                        onChange={(e) => {
+                          const neu = e.target.value;
+                          verschiebeMaterial(
+                            offenesMaterial.id,
+                            neu,
+                            neu === detailHeimatFach ? detailHeimatThema : null,
+                            detailHeimatFach,
+                            detailHeimatThema
+                          );
+                        }}
+                      >
+                        {faecher.map((f) => (
+                          <option key={f.id} value={f.id}>
+                            {f.fach}
+                          </option>
+                        ))}
+                      </select>
+                      <span className="ab-detail-ort-sep" aria-hidden="true">
+                        /
+                      </span>
+                      <select
+                        value={detailOrtThema}
+                        aria-label="Ablageort: Thema"
+                        onChange={(e) =>
+                          verschiebeMaterial(
+                            offenesMaterial.id,
+                            detailOrtFach,
+                            e.target.value || null,
+                            detailHeimatFach,
+                            detailHeimatThema
+                          )
+                        }
+                      >
+                        <option value="">Ohne Thema</option>
+                        {detailOrtThema &&
+                          !detailOrtThemen.some(
+                            (t) => t.label === detailOrtThema
+                          ) && (
+                            <option value={detailOrtThema}>
+                              {detailOrtThema}
+                            </option>
+                          )}
+                        {detailOrtThemen.map((t) => (
+                          <option key={t.id} value={t.label}>
+                            {t.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
                   )}
                   <div className="ab-detail-titel-zeile">
                     <h2 className="ab-detail-titel">
@@ -667,33 +744,6 @@ export default function Ablage({
                         </span>
                       ))}
                     </div>
-                  )}
-                  {/* Ablageort korrigierbar: falsch einsortiertes Material in
-                      ein anderes Fach verschieben (siehe materialMeta.js). */}
-                  {offenesMaterial && (
-                    <label className="ab-detail-ort">
-                      Ablageort
-                      <select
-                        value={
-                          orte[offenesMaterial.id] ||
-                          heimatFachId(offenesMaterial) ||
-                          ""
-                        }
-                        onChange={(e) =>
-                          verschiebeMaterial(
-                            offenesMaterial.id,
-                            e.target.value,
-                            heimatFachId(offenesMaterial)
-                          )
-                        }
-                      >
-                        {faecher.map((f) => (
-                          <option key={f.id} value={f.id}>
-                            {f.fach}
-                          </option>
-                        ))}
-                      </select>
-                    </label>
                   )}
                 </div>
                 <button

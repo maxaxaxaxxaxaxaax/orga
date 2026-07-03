@@ -199,11 +199,6 @@
   gap: 4px;
   min-width: 0;
 }
-.ab-detail-art {
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: var(--muted);
-}
 /* Titel und Favoriten-Stern in einer Zeile: der Stern steht direkt nach dem
    Titeltext, nicht an der rechten Kopfkante. */
 .ab-detail-titel-zeile {
@@ -267,17 +262,18 @@
   fill: var(--accent);
   stroke: none;
 }
-/* Ablageort-Wahl: ruhige Zeile unter den Tags, Select im Feld-Rezept der App. */
+/* Ablageort als Kopfzeile über dem Titel: "Fach / Thema", beide Teile sind
+   Selects im Feld-Rezept der App und direkt antippbar (iPad). */
 .ab-detail-ort {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 8px;
-  margin-top: 8px;
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: var(--muted);
+  flex-wrap: wrap;
+  gap: 6px;
+  min-width: 0;
 }
 .ab-detail-ort select {
+  min-width: 0;
+  max-width: 100%;
   font: inherit;
   font-size: 0.82rem;
   font-weight: 600;
@@ -294,6 +290,17 @@
   outline: none;
   border-color: var(--accent);
   box-shadow: 0 0 0 3px var(--accent-soft);
+}
+.ab-detail-ort-sep {
+  color: var(--muted);
+  font-weight: 600;
+}
+/* Touch: bequem treffbare Pickerflächen. */
+@media (pointer: coarse) {
+  .ab-detail-ort select {
+    min-height: 40px;
+    padding: 6px 10px;
+  }
 }
 .ab-detail-inhalt {
   flex: 1;
