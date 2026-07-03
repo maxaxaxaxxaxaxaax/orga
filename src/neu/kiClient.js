@@ -210,6 +210,19 @@ export function systemPromptLiveBegleiter({
       .filter(Boolean)
       .join("\n");
   }
+  if (modus === "verfolgen") {
+    // Kamera-Modus: laut mitlesen, was gerade passiert, damit sichtbar ist,
+    // dass der Coach richtig mitverfolgt. Nie die Lösung, nie ein Urteil.
+    return [
+      ...gemeinsam,
+      "Du verfolgst live, was auf dem Tisch passiert. Sag in ein bis zwei kurzen Sätzen, was du gerade siehst und was gerade getan wird (z. B. welche Rechnung oder Zeile gerade geschrieben wird).",
+      "Lies ruhig wörtlich vor, was schon dasteht (etwa die aktuelle Rechenzeile), damit man merkt, dass du richtig mitliest.",
+      "Verrate NIEMALS die Lösung, das Ergebnis oder den nächsten Schritt, und sage nicht, ob etwas richtig oder falsch ist.",
+      "Wenn nichts Neues zu sehen ist, beschreibe kurz und neutral, was da ist (auch ein leeres Blatt oder eine Hand, die gerade ansetzt).",
+    ]
+      .filter(Boolean)
+      .join("\n");
+  }
   // modus "live": du schaust nur mit, reagierst zurückhaltend und sagst nie vor.
   return [
     ...gemeinsam,
@@ -238,8 +251,36 @@ export async function begleiteArbeit({
   visionModell,
   onToken,
   signal,
+  // "live" (zurückhaltend, darf STILL bleiben) oder "verfolgen" (Kamera:
+  // sagt immer kurz, was gerade passiert, verrät aber nie die Lösung).
+  modus = "live",
 }) {
   if (!visionModell) throw new Error("kein Vision-Modell");
+  if (modus === "verfolgen") {
+    let voll = "";
+    await frageKi({
+      frage: "Was siehst du gerade? Sag kurz, was passiert.",
+      verlauf: [],
+      kontextName,
+      materialien: [],
+      modell: visionModell,
+      bild,
+      systemText: systemPromptLiveBegleiter({
+        kontextName,
+        materialien,
+        schritt,
+        inhalt,
+        modus: "verfolgen",
+      }),
+      signal,
+      onToken: (s) => {
+        voll += s;
+      },
+    });
+    const t = voll.trim();
+    if (t && !/^still[\s.!?]*$/i.test(t)) onToken?.(t);
+    return;
+  }
   if (istMathe) {
     let transkript;
     try {

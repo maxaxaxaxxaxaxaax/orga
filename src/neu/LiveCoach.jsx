@@ -129,6 +129,9 @@ export default function LiveCoach({
       visionModell,
       onToken,
       signal,
+      // Kamera: live mitverfolgen und laut sagen, was gerade passiert (nie die
+      // Lösung). Bildschirm bleibt der zurückhaltende Begleiter (darf STILL sein).
+      modus: quelle === "kamera" ? "verfolgen" : "live",
     });
   }
 
