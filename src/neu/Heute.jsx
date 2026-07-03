@@ -770,6 +770,16 @@ export default function Heute({ onFokus, onOeffneAblage }) {
             <Icon name="chat" className="hu-karte-icon" />
             <span className="hu-karte-titel-text">Benachrichtigungen</span>
           </h2>
+          <div className="hu-nachr-suche">
+            <Icon name="search" />
+            <input
+              type="text"
+              value={nachrSuche}
+              onChange={(e) => setNachrSuche(e.target.value)}
+              placeholder="Suchen"
+              aria-label="Benachrichtigungen durchsuchen"
+            />
+          </div>
           {/* Filter, keine echten Tabs: group + aria-pressed wie in der Ablage. */}
           <div className="hu-nachr-chips" role="group" aria-label="Filter">
             {NACHR_CHIPS.map((c) => (
@@ -783,16 +793,6 @@ export default function Heute({ onFokus, onOeffneAblage }) {
                 {c.label}
               </button>
             ))}
-          </div>
-          <div className="hu-nachr-suche">
-            <Icon name="search" />
-            <input
-              type="text"
-              value={nachrSuche}
-              onChange={(e) => setNachrSuche(e.target.value)}
-              placeholder="Suchen"
-              aria-label="Benachrichtigungen durchsuchen"
-            />
           </div>
           {sichtbareMitteilungen.length === 0 ? (
             <LeerZustand
