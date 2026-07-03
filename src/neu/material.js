@@ -31,6 +31,7 @@ export function plattformLabel(m) {
   if (m.quelle === "tiktok") return "TikTok";
   if (m.quelle === "instagram") return "Instagram";
   if (m.quelle === "youtube") return "YouTube";
+  if (m.quelle === "discord") return "Discord";
   if (m.fachId) return null;
   return "Moodle";
 }

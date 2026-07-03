@@ -92,3 +92,51 @@ export async function importiereLinkAuto(url) {
 
   return { material, analyse };
 }
+
+// Ein gesendetes Bild (z. B. Discord-Anhang) automatisch einsortieren: Titel
+// aus Nachrichtentext oder Dateiname, Fach/Thema-Erkennung über dieselbe
+// Analyse wie bei Links. anhang = { url, name }, kontext = Nachrichtentext.
+export async function importiereBildAuto(anhang, kontext) {
+  if (!anhang?.url) return null;
+
+  // Discord-CDN-URLs tragen wechselnde Signatur-Parameter: für die
+  // Doppelt-Erkennung zählt nur der Pfad.
+  const pfad = anhang.url.split("?")[0];
+  const schon = ladeEigene().find((m) => (m.url || "").split("?")[0] === pfad);
+  if (schon) return { material: schon, analyse: null, doppelt: true };
+
+  const dateiname = (anhang.name || "")
+    .replace(/\.[a-z0-9]+$/i, "")
+    .replace(/[-_]+/g, " ")
+    .trim();
+  const text = (kontext || "").trim();
+  const titel = text ? text.slice(0, 80) : dateiname || "Bild aus Discord";
+
+  const analyse = analysiereInhalt({
+    titel,
+    inhalt: text || dateiname || null,
+    url: anhang.url,
+  });
+  const fachId = analyse?.fachId || faecher[0]?.id;
+  const thema = analyse?.thema || null;
+  const tags = baueTags({
+    fachId,
+    thema,
+    erkannt: analyse?.erkannt,
+    stichwort: analyse?.stichwort,
+  });
+
+  const material = speichereEigenes({
+    titel,
+    fachId,
+    thema,
+    art: "bild",
+    quelle: "discord",
+    url: anhang.url,
+    bild: anhang.url,
+    bereich: "selbstlernen",
+    tags,
+  });
+
+  return { material, analyse };
+}

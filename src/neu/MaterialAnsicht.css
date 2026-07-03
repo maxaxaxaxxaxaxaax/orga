@@ -176,6 +176,20 @@
   color: var(--muted);
 }
 
+/* Gesendetes Bild (z. B. Discord-Anhang): ruhig gerahmt, nie breiter als die
+   Spalte; Hochformate scrollen in der Dokument-Ansicht einfach mit. */
+.ma-bild {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.ma-bild-foto {
+  max-width: 100%;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md, 14px);
+  background: var(--card-2);
+}
+
 /* TikTok/Instagram-Embed: die Plattform rendert den Beitrag im iframe. Hochformate,
    darum zentriert mit fester Höhe (diese Embeds skalieren nicht über aspect-ratio). */
 .ma-embed {

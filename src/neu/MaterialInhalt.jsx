@@ -211,6 +211,19 @@ function LinkInhalt({ material }) {
   );
 }
 
+// Gesendetes Bild (z. B. Discord-Anhang): das Foto selbst, darunter der
+// übliche Einsortiert-Hinweis.
+function BildInhalt({ material }) {
+  return (
+    <div className="ma-bild">
+      <img className="ma-bild-foto" src={material.bild} alt={material.titel} />
+      <p className="ma-video-hinweis">
+        orca hat das Bild automatisch hier einsortiert.
+      </p>
+    </div>
+  );
+}
+
 // Dispatcher: wählt die passende Darstellung für ein Material. Interaktive
 // Formate zuerst, dann Volltext, sonst ein ruhiger Platzhalter.
 export default function MaterialInhalt({ material, onAbgeschlossen }) {
@@ -240,6 +253,8 @@ export default function MaterialInhalt({ material, onAbgeschlossen }) {
   if (embed) return <EmbedInhalt material={material} embed={embed} />;
   if (material.art === "video") return <VideoInhalt material={material} />;
   if (material.art === "link") return <LinkInhalt material={material} />;
+  if (material.art === "bild" && material.bild)
+    return <BildInhalt material={material} />;
   if (material.inhalt) return <Textinhalt text={material.inhalt} />;
   return (
     <p className="ma-leer">Für dieses Material gibt es noch keine Vorschau.</p>

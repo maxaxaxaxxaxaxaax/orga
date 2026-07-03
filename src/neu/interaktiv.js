@@ -324,22 +324,24 @@ export const TYP_LABEL = {
 };
 
 // Aktivitäts-Label für ein Material: die Übungsform, sonst "Lesen" für reinen
-// Text. null, wenn es nichts zu öffnen gibt.
+// Text und "Ansehen" für Bilder. null, wenn es nichts zu öffnen gibt.
 export function aktivitaetLabel(material) {
   const eintrag = INTERAKTIV[material.id];
   if (eintrag) return TYP_LABEL[eintrag.typ] || "Übung";
   if (material.inhalt) return "Lesen";
+  if (material.art === "bild" && material.bild) return "Ansehen";
   return null;
 }
 
 // Ein Material ist öffenbar, wenn es Volltext, einen interaktiven Inhalt oder eine
-// eigene Ansicht (z. B. YouTube-Video) hat.
+// eigene Ansicht (z. B. YouTube-Video oder gesendetes Bild) hat.
 export function istOeffenbar(material) {
   return (
     !!material.inhalt ||
     !!INTERAKTIV[material.id] ||
     material.art === "video" ||
-    material.art === "link"
+    material.art === "link" ||
+    (material.art === "bild" && !!material.bild)
   );
 }
 

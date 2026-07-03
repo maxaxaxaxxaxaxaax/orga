@@ -28,7 +28,7 @@ import {
   urlsAus,
   DISCORD_EVENT,
 } from "./discord";
-import { importiereLinkAuto } from "./linkImport";
+import { importiereLinkAuto, importiereBildAuto } from "./linkImport";
 import { addMitteilung } from "./benachrichtigungen";
 import { quelleLabel } from "./material";
 
@@ -126,31 +126,46 @@ export default function App() {
             let verarbeitetBis = cfg.letzteId;
             for (const msg of neue) {
               let msgOk = true;
+              // Gemeinsame Nacharbeit für Links wie Bilder: Benachrichtigung
+              // in der App + optionale Bot-Bestätigung im Kanal.
+              const melde = (material, analyse) => {
+                const fach = analyse?.erkannt?.fach || "Weiteres";
+                addMitteilung({
+                  art: material.art === "link" ? "link" : "material",
+                  titel: material.titel,
+                  text: analyse?.thema
+                    ? `In der Ablage bei ${fach} · ${analyse.thema}`
+                    : `In der Ablage bei ${fach}`,
+                  materialId: material.id,
+                  quelle: material.quelle,
+                  tags: material.tags,
+                });
+                if (cfg.antwort !== false) {
+                  const wohin = analyse?.thema ? `${fach} · ${analyse.thema}` : fach;
+                  antworteImKanal(
+                    cfg,
+                    `✓ „${material.titel}" bei ${wohin} einsortiert (${quelleLabel(material)}).`
+                  );
+                }
+              };
               for (const url of urlsAus(msg.content)) {
                 try {
                   const res = await importiereLinkAuto(url);
                   if (!res || res.doppelt) continue;
-                  const { material, analyse } = res;
-                  const fach = analyse?.erkannt?.fach || "Weiteres";
-                  addMitteilung({
-                    art: material.art === "link" ? "link" : "material",
-                    titel: material.titel,
-                    text: analyse?.thema
-                      ? `In der Ablage bei ${fach} · ${analyse.thema}`
-                      : `In der Ablage bei ${fach}`,
-                    materialId: material.id,
-                    quelle: material.quelle,
-                    tags: material.tags,
-                  });
-                  if (cfg.antwort !== false) {
-                    const wohin = analyse?.thema ? `${fach} · ${analyse.thema}` : fach;
-                    antworteImKanal(
-                      cfg,
-                      `✓ „${material.titel}" bei ${wohin} einsortiert (${quelleLabel(material)}).`
-                    );
-                  }
+                  melde(res.material, res.analyse);
                 } catch (err) {
                   console.warn("[Discord] Link-Import fehlgeschlagen:", url, err);
+                  msgOk = false;
+                }
+              }
+              // Gesendete Bilder (Anhänge) sortiert orca genauso ein.
+              for (const anhang of msg.anhaenge || []) {
+                try {
+                  const res = await importiereBildAuto(anhang, msg.content);
+                  if (!res || res.doppelt) continue;
+                  melde(res.material, res.analyse);
+                } catch (err) {
+                  console.warn("[Discord] Bild-Import fehlgeschlagen:", anhang?.url, err);
                   msgOk = false;
                 }
               }

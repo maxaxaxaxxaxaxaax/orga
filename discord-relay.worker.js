@@ -88,8 +88,18 @@ export default {
     } catch {
       return json({ ok: false, error: "Discord: ungültige Antwort." }, 200);
     }
+    // Bild-Anhänge reichen wir mit durch (URL + Dateiname), damit die App auch
+    // gesendete Fotos einsortieren kann, nicht nur Links im Text.
     const messages = Array.isArray(msgs)
-      ? msgs.map((m) => ({ id: m.id, content: m.content })).reverse()
+      ? msgs
+          .map((m) => ({
+            id: m.id,
+            content: m.content,
+            anhaenge: (m.attachments || [])
+              .filter((a) => (a.content_type || "").startsWith("image/"))
+              .map((a) => ({ url: a.url, name: a.filename || "" })),
+          }))
+          .reverse()
       : [];
     return json({ ok: true, name, messages });
   },
