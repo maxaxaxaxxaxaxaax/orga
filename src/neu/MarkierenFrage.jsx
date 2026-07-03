@@ -17,6 +17,11 @@ export default function MarkierenFrage({
   onClose,
   // Bild (Screenshot + Markierung) und Frage an den Chat übergeben (mitFrage).
   onFrageGestellt,
+  // Bereits gespeicherte Markierungen dieser Stelle (normalisierte Striche 0..1),
+  // werden beim Öffnen wiederhergestellt.
+  gespeicherteStriche,
+  // Beim Schließen des Stift-Werkzeugs die Striche normalisiert zurückgeben.
+  onStricheGespeichert,
   // mitFrage=false: reines Markier-Werkzeug (Toolbar-Stift), ohne Frage/KI-Teil.
   // mitFrage=true: Markieren und den KI-Coach fragen (Zauberstab im Chat).
   mitFrage = true,
@@ -26,6 +31,7 @@ export default function MarkierenFrage({
   const ctxRef = useRef(null);
   const aktuellRef = useRef(null); // laufender Strich {punkte:[{x,y}]}
   const bgImgRef = useRef(null); // geladenes Hintergrund-Bild (zum Zusammenführen)
+  const restauriertRef = useRef(false); // gespeicherte Striche nur einmal laden
 
   const [hintergrund, setHintergrund] = useState(null); // Daten-URL oder null (weißes Blatt)
   const [bereit, setBereit] = useState(false); // Screenshot fertig (oder Fallback)
@@ -100,6 +106,9 @@ export default function MarkierenFrage({
   useEffect(() => {
     if (!bereit) return;
     passeGroesseAn();
+    // Leeres Blatt (kein Screenshot): gespeicherte Striche jetzt wiederherstellen.
+    // Mit Screenshot passiert das beim Bild-onLoad (dann stimmt der Bezugsrahmen).
+    if (!hintergrund) restauriere();
     const onResize = () => passeGroesseAn();
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
@@ -114,14 +123,16 @@ export default function MarkierenFrage({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [striche]);
 
-  // Esc: schließt das Werkzeug (der Fokus übernimmt den Rest der Kaskade).
+  // Esc: schließt das Werkzeug und sichert vorher die Markierungen (schliessen
+  // liest nur Refs, ein einmaliges Abonnieren genügt).
   useEffect(() => {
     const onKey = (e) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") schliessen();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [onClose]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   function pos(e) {
     const r = canvasRef.current.getBoundingClientRect();
@@ -201,6 +212,53 @@ export default function MarkierenFrage({
     }
   }
 
+  // Anzeige-Rechteck des Screenshots innerhalb der Fläche (object-fit: contain).
+  // Bezugsrahmen fürs Normalisieren: Markierungen sind relativ zum Material, nicht
+  // zur (letterboxed) Fläche. Ohne Screenshot (leeres Blatt) gilt die ganze Fläche.
+  function bildRect() {
+    const wrap = wrapRef.current;
+    if (!wrap) return null;
+    const b = wrap.getBoundingClientRect();
+    const bg = bgImgRef.current;
+    if (bg && bg.naturalWidth) {
+      const s = Math.min(b.width / bg.naturalWidth, b.height / bg.naturalHeight);
+      const w = bg.naturalWidth * s;
+      const h = bg.naturalHeight * s;
+      return { x: (b.width - w) / 2, y: (b.height - h) / 2, w, h };
+    }
+    return { x: 0, y: 0, w: b.width, h: b.height };
+  }
+
+  // Gespeicherte (normalisierte) Striche in Canvas-Koordinaten zurückholen. Einmal,
+  // sobald das Hintergrundbild steht (dann stimmt bildRect).
+  function restauriere() {
+    if (restauriertRef.current) return;
+    const r = bildRect();
+    if (!r || !r.w) return;
+    restauriertRef.current = true;
+    if (!gespeicherteStriche || !gespeicherteStriche.length) return;
+    setStriche(
+      gespeicherteStriche.map((s) => ({
+        punkte: s.map((p) => ({ x: r.x + p.x * r.w, y: r.y + p.y * r.h })),
+      }))
+    );
+  }
+
+  // Aktuelle Striche in normalisierte Punkte (0..1, relativ zum Material) wandeln.
+  function normalisiere() {
+    const r = bildRect();
+    if (!r || !r.w) return [];
+    return stricheRef.current.map((s) =>
+      s.punkte.map((p) => ({ x: (p.x - r.x) / r.w, y: (p.y - r.y) / r.h }))
+    );
+  }
+
+  // Schließen: im Stift-Modus die Markierungen der Stelle sichern, dann zu.
+  function schliessen() {
+    if (!mitFrage) onStricheGespeichert?.(normalisiere());
+    onClose();
+  }
+
   // Senden: Bild + Markierung zusammenführen und mit der Frage an den Chat
   // geben. Die Antwort läuft dort (der Fokus schließt dieses Werkzeug).
   function senden() {
@@ -222,7 +280,7 @@ export default function MarkierenFrage({
         <button
           type="button"
           className="mf-zu"
-          onClick={onClose}
+          onClick={schliessen}
           aria-label="Markieren schließen"
         >
           ✕
@@ -269,6 +327,7 @@ export default function MarkierenFrage({
             className="mf-bg"
             src={hintergrund}
             alt="Aufnahme des Materials"
+            onLoad={restauriere}
           />
         ) : (
           <div className="mf-bg mf-bg-leer" aria-hidden="true">

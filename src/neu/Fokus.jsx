@@ -7,6 +7,7 @@ import Etappenring from "./Etappenring";
 import { ART_LABEL, plattformLabel } from "./material";
 import { ladeEigene, speichereEigenes } from "./eigeneMaterialien";
 import { ladeFavoriten, ladeOrte, ortVon, META_EVENT } from "./materialMeta";
+import { markierungenFuer, speichereMarkierungen } from "./markierungen";
 import { addMitteilung } from "./benachrichtigungen";
 import { ladeSchritte, speichereSchritte } from "./lernschritte";
 import {
@@ -568,6 +569,13 @@ export default function Fokus({
 
   const aktivId = aktivesMaterial?.id || null;
 
+  // Persistente Stift-Markierungen der gerade in der Mitte gezeigten Stelle
+  // (Material bzw. Schritt): direkt gelesen, damit sie nach dem Speichern (das
+  // Werkzeug schließt und rendert neu) sofort als Overlay über dem Material
+  // erscheinen. Ein Strich ist eine Folge normalisierter Punkte {x, y} (0..1).
+  const mitteKey = `${kb.id}:${aktivId || "schritt-" + aktuell}`;
+  const markStriche = markierungenFuer(mitteKey);
+
   // "Zum Thema": Lernzettel + Übungen/Aufgaben (das, was man jetzt liest und tut).
   const zumThemaRows = zumThemaMats.map((m) => ({
     m,
@@ -880,6 +888,26 @@ export default function Fokus({
                     Wähle rechts ein Material, um hier damit zu arbeiten.
                   </p>
                 </div>
+              )}
+              {/* Gespeicherte Stift-Markierungen als Overlay über dem Material.
+                 Normalisierte Punkte (0..1) füllen die Fläche; der Strich bleibt
+                 dank non-scaling-stroke gleich dick wie beim Markieren. */}
+              {markStriche.length > 0 && (
+                <svg
+                  className="fokus-mark-overlay"
+                  viewBox="0 0 1000 1000"
+                  preserveAspectRatio="none"
+                  aria-hidden="true"
+                >
+                  {markStriche.map((s, i) => (
+                    <polyline
+                      key={i}
+                      className="fokus-mark-linie"
+                      points={s.map((p) => `${p.x * 1000},${p.y * 1000}`).join(" ")}
+                      vectorEffect="non-scaling-stroke"
+                    />
+                  ))}
+                </svg>
               )}
             </div>
 
@@ -1431,6 +1459,10 @@ export default function Fokus({
           zielRef={mitteRef}
           visionModell={visionModell}
           mitFrage={markierenModus === "fragen"}
+          gespeicherteStriche={markStriche}
+          onStricheGespeichert={(striche) =>
+            speichereMarkierungen(mitteKey, striche)
+          }
           onFrageGestellt={(daten) => {
             setMarkierenModus(null);
             frageMitBild(daten);

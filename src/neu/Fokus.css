@@ -254,11 +254,29 @@
   gap: 12px;
 }
 .fokus-mitte-inhalt {
+  position: relative;
   flex: 1;
   min-height: 0;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
+}
+/* Overlay der gespeicherten Stift-Markierungen: deckt die Material-Fläche,
+   fängt keine Klicks ab, liegt über dem Inhalt. */
+.fokus-mark-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+.fokus-mark-linie {
+  fill: none;
+  stroke: rgba(245, 197, 24, 0.45);
+  stroke-width: 16;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 /* Auge (Live-Coach): eigene Raster-Spalte rechts neben dem Material, direkt an
    der Chat-Karte, wie das Dokument in der Ablage (.ab-detail). Die Grenze
