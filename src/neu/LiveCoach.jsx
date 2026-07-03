@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { begleiteArbeit, frageKi, systemPromptLiveBegleiter } from "./kiClient";
+import { begleiteArbeit } from "./kiClient";
 import { domBild } from "./domBild";
 import { useLiveLoop } from "./useLiveLoop";
 import "./LiveCoach.css";
@@ -8,13 +8,12 @@ import "./LiveCoach.css";
 // Takt eine kurze, lehrerhafte Rückmeldung gibt (bestätigen plus etwas Nützliches,
 // kein leeres Lob). Quelle "Bildschirm" liest die digitale Arbeitsfläche in der
 // Mitte über domBild, Quelle "Kamera" beobachtet den analogen Tisch (Webcam als
-// Stand-in für die spätere Tisch-Kamera). Beide füttern dieselbe Engine. Unten ein
-// Antwortfeld für echten Dialog: man kann zurückfragen, der Coach sieht den
-// aktuellen Frame und kennt den konkreten Aufgaben-Inhalt. VISION-Leitplanken:
+// Stand-in für die spätere Tisch-Kamera). Beide füttern dieselbe Engine. Das
+// Fenster ist bewusst KEIN Chat: es zeigt nur Steuerung, Status und die jeweils
+// letzte Meldung; Fragen stellt man im Chats-Panel. VISION-Leitplanken:
 // Default AUS (der Schüler startet selbst), lokal über Ollama, nur der Schüler
 // sieht es, nichts wird gespeichert, spiegeln statt überwachen, nie die Lösung.
 const TAKT_MS = 7000;
-const FEED_MAX = 8;
 
 const STATUS_TEXT = {
   schaut: "Ich schaue gerade kurz hin …",
@@ -46,18 +45,13 @@ export default function LiveCoach({
   const [aktiv, setAktiv] = useState(false); // Default AUS = Signal des Schülers
   const [pausiert, setPausiert] = useState(false);
   const [quelle, setQuelle] = useState("bildschirm"); // "bildschirm" | "kamera"
-  const [feed, setFeed] = useState([]); // ephemer, gedeckelt, nichts gespeichert
+  const [letzteMeldung, setLetzteMeldung] = useState(null); // ephemer
   const [status, setStatus] = useState(null);
   const [kameraFehler, setKameraFehler] = useState(null);
-  const [frageEntwurf, setFrageEntwurf] = useState("");
-  const [antwortet, setAntwortet] = useState(false);
 
   const videoRef = useRef(null);
   const streamRef = useRef(null);
   const grabCanvasRef = useRef(null);
-  const idRef = useRef(0);
-  const feedEndeRef = useRef(null);
-  const replyAbortRef = useRef(null);
 
   // Kamera-Stream nur holen, wenn Quelle Kamera UND aktiv (Datensparsamkeit: die
   // Kamera-LED leuchtet nur, wenn der Schüler den Live-Modus mit Kamera bewusst
@@ -93,14 +87,6 @@ export default function LiveCoach({
     };
   }, [quelle, aktiv]);
 
-  // Laufende Antwort beim Schließen abbrechen.
-  useEffect(() => () => replyAbortRef.current?.abort(), []);
-
-  // Neue Meldung ans Feed-Ende scrollen.
-  useEffect(() => {
-    feedEndeRef.current?.scrollIntoView({ block: "end" });
-  }, [feed]);
-
   // Frame der gewählten Quelle holen. Bildschirm: echter DOM-Screenshot der Mitte.
   // Kamera: aktuelles Video-Standbild auf ein wiederverwendetes Offscreen-Canvas.
   async function grabFrame() {
@@ -135,12 +121,6 @@ export default function LiveCoach({
     });
   }
 
-  function meldung(text) {
-    idRef.current += 1;
-    const id = idRef.current;
-    setFeed((f) => [...f, { id, von: "coach", text }].slice(-FEED_MAX));
-  }
-
   useLiveLoop({
     aktiv: aktiv && !!visionModell,
     pausiert,
@@ -148,7 +128,7 @@ export default function LiveCoach({
     intervallMs: TAKT_MS,
     grabFrame,
     analysiere,
-    onMeldung: meldung,
+    onMeldung: setLetzteMeldung,
     onStatus: setStatus,
   });
 
@@ -168,87 +148,8 @@ export default function LiveCoach({
     setAktiv(false);
     setPausiert(false);
     setStatus(null);
+    setLetzteMeldung(null);
     onAktivWechsel?.(false);
-  }
-
-  // Dialog: der Schüler fragt zurück. Der Coach sieht den aktuellen Frame (falls
-  // vorhanden) und kennt den konkreten Aufgaben-Inhalt über den Systemtext.
-  async function senden(e) {
-    if (e) e.preventDefault();
-    const f = frageEntwurf.trim();
-    if (!f || !visionModell || antwortet) return;
-    setFrageEntwurf("");
-    idRef.current += 1;
-    const duId = idRef.current;
-    idRef.current += 1;
-    const coachId = idRef.current;
-    const verlauf = feed.map((m) => ({
-      von: m.von === "du" ? "ich" : "ki",
-      text: m.text,
-    }));
-    setFeed((prev) =>
-      [
-        ...prev,
-        { id: duId, von: "du", text: f },
-        { id: coachId, von: "coach", text: "" },
-      ].slice(-FEED_MAX)
-    );
-    setAntwortet(true);
-    replyAbortRef.current?.abort();
-    const ac = new AbortController();
-    replyAbortRef.current = ac;
-    let bild;
-    try {
-      bild = await grabFrame();
-    } catch {
-      bild = null;
-    }
-    try {
-      let voll = "";
-      await frageKi({
-        frage: f,
-        verlauf,
-        kontextName,
-        materialien: [],
-        modell: visionModell,
-        bild,
-        systemText: systemPromptLiveBegleiter({
-          kontextName,
-          materialien,
-          schritt,
-          inhalt,
-          modus: "frage",
-        }),
-        signal: ac.signal,
-        onToken: (s) => {
-          voll += s;
-          setFeed((prev) =>
-            prev.map((m) => (m.id === coachId ? { ...m, text: voll } : m))
-          );
-        },
-      });
-      if (!voll.trim()) {
-        setFeed((prev) =>
-          prev.map((m) =>
-            m.id === coachId
-              ? { ...m, text: "Ich kann gerade nicht antworten, versuch es gleich nochmal." }
-              : m
-          )
-        );
-      }
-    } catch (err) {
-      if (err.name !== "AbortError") {
-        setFeed((prev) =>
-          prev.map((m) =>
-            m.id === coachId
-              ? { ...m, text: "Ich kann gerade nicht antworten, versuch es gleich nochmal." }
-              : m
-          )
-        );
-      }
-    } finally {
-      setAntwortet(false);
-    }
   }
 
   return (
@@ -352,44 +253,13 @@ export default function LiveCoach({
               </p>
             )}
 
-            <div className="lc-feed" role="log" aria-live="polite">
-              {feed.length === 0 ? (
-                <p className="lc-feed-leer">
-                  Starte den Live-Coach oder frag mich direkt etwas zur Aufgabe.
-                </p>
-              ) : (
-                feed.map((m) => (
-                  <div key={m.id} className={"lc-meldung lc-" + m.von}>
-                    <span className="lc-meldung-label">
-                      {m.von === "du" ? "Du" : "Live-Coach"}
-                    </span>
-                    <p className="lc-meldung-text">
-                      {m.text || (antwortet ? "…" : "")}
-                    </p>
-                  </div>
-                ))
-              )}
-              <div ref={feedEndeRef} />
-            </div>
-
-            <form className="lc-frage" onSubmit={senden}>
-              <input
-                type="text"
-                value={frageEntwurf}
-                onChange={(e) => setFrageEntwurf(e.target.value)}
-                placeholder="Frag den Coach etwas zur Aufgabe"
-                aria-label="Frage an den Live-Coach"
-                disabled={antwortet}
-              />
-              <button
-                type="submit"
-                className="lc-frage-senden"
-                aria-label="Senden"
-                disabled={antwortet || !frageEntwurf.trim()}
-              >
-                →
-              </button>
-            </form>
+            {/* Bewusst kein Chat: nur die jeweils letzte Meldung als ruhige
+                Zeile, damit man sieht, dass der Coach richtig mitliest. */}
+            {aktiv && letzteMeldung && (
+              <p className="lc-letzte" aria-live="polite">
+                {letzteMeldung}
+              </p>
+            )}
           </>
         )}
       </div>
