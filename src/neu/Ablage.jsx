@@ -433,16 +433,22 @@ export default function Ablage({
       )}
       {!fach && r.fach && <span className="ab-zeile-fach">{r.fach}</span>}
       {/* Tags wie im geöffneten Dokument: Herkunft (Moodle, YouTube, ...), dann
-         die Art "was es ist" (Arbeitsblatt, Lernzettel, ...), dann Schlagwörter.
-         Das Fach lassen wir weg (steht schon im Ordner). */}
-      {(r.plattform ||
-        r.art ||
-        (r.tags && r.tags.filter((t) => t !== r.fach).length > 0)) && (
+         die Art "was es ist" (Arbeitsblatt, Lernzettel, ...), dann das Thema
+         (der Lernweg) und Schlagwörter. Das Fach lassen wir weg (steht schon
+         im Ordner), ein Thema, das schon als Schlagwort da ist, auch. */}
+      {!r.istLernweg &&
+        (r.plattform ||
+          r.art ||
+          r.lernweg ||
+          (r.tags && r.tags.filter((t) => t !== r.fach).length > 0)) && (
         <span className="ab-zeile-tags">
           {r.plattform && (
             <span className="ab-tag ab-tag-plattform">{r.plattform}</span>
           )}
           {r.art && <span className="ab-tag">{r.art}</span>}
+          {r.lernweg && !(r.tags || []).includes(r.lernweg) && (
+            <span className="ab-tag">{r.lernweg}</span>
+          )}
           {(r.tags || [])
             .filter((t) => t !== r.fach)
             .slice(0, 2)
