@@ -45,7 +45,6 @@ import MaterialInhalt from "./MaterialInhalt";
 import MaterialUpload from "./MaterialUpload";
 import MaterialChat from "./MaterialChat";
 import Rechenweg from "./Rechenweg";
-import Aufschrieb from "./Aufschrieb";
 import MarkierenFrage from "./MarkierenFrage";
 import LiveCoach from "./LiveCoach";
 import { useRasterZiehen } from "./rasterZiehen";
@@ -207,7 +206,6 @@ export default function Fokus({
   // Markieren hat zwei Einstiege: Toolbar-Stift = nur markieren ("stift"),
   // Zauberstab im KI-Chat = markieren und den Coach fragen ("fragen").
   const [markierenModus, setMarkierenModus] = useState(null);
-  const [aufschriebOffen, setAufschriebOffen] = useState(false);
   const [rechenwegOffen, setRechenwegOffen] = useState(false);
   const [uploadOffen, setUploadOffen] = useState(false);
 
@@ -325,14 +323,13 @@ export default function Fokus({
   useEffect(() => {
     const onKey = (e) => {
       if (e.key !== "Escape") return;
-      if (markierenModus || aufschriebOffen || rechenwegOffen || uploadOffen)
-        return;
+      if (markierenModus || rechenwegOffen || uploadOffen) return;
       if (werkzeug) setWerkzeug(null);
       else onClose();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [markierenModus, aufschriebOffen, rechenwegOffen, uploadOffen, werkzeug, onClose]);
+  }, [markierenModus, rechenwegOffen, uploadOffen, werkzeug, onClose]);
 
   const fertig = (i) => (stand[i] != null ? stand[i] : !!schritte[i]?.fertig);
   const aktuell = schritte.findIndex((_, i) => !fertig(i));
@@ -533,10 +530,6 @@ export default function Fokus({
   function oeffneMarkieren(modus) {
     setWerkzeug(null);
     setMarkierenModus(modus);
-  }
-  function oeffneAufschrieb() {
-    setWerkzeug(null);
-    setAufschriebOffen(true);
   }
 
   // Herkunft trennt die beiden Abschnitte: Schulisches (Moodle) steht oben
@@ -828,15 +821,6 @@ export default function Fokus({
               title="Stift: wichtige Stellen im Material markieren"
             >
               <Icon name="marker" width={22} height={22} />
-            </button>
-            <button
-              type="button"
-              className="fokus-wz"
-              onClick={oeffneAufschrieb}
-              aria-label="Aufschrieb digitalisieren"
-              title="Kamera: deinen Aufschrieb digitalisieren"
-            >
-              <Icon name="camera" width={22} height={22} />
             </button>
           </nav>
 
@@ -1452,30 +1436,6 @@ export default function Fokus({
             frageMitBild(daten);
           }}
           onClose={() => setMarkierenModus(null)}
-        />
-      )}
-      {aufschriebOffen && (
-        <Aufschrieb
-          kb={kb}
-          schritt={aktuell}
-          aufgabe={schritte[aktuell]?.text}
-          onClose={() => setAufschriebOffen(false)}
-          onGespeichert={(text) => {
-            const schrittText = schritte[aktuell]?.text;
-            speichereEigenes({
-              titel: schrittText
-                ? "Aufschrieb: " + schrittText
-                : "Mein Aufschrieb",
-              fachId: lw?.fachId,
-              thema: thema?.label || null,
-              art: "aufschrieb",
-              inhalt: text,
-              bereich: "selbstlernen",
-              schritt: aktuell,
-            });
-            setEigeneStand((n) => n + 1);
-            setAufschriebOffen(false);
-          }}
         />
       )}
       {rechenwegOffen && (
