@@ -204,8 +204,17 @@
   font-weight: 600;
   color: var(--muted);
 }
+/* Titel und Favoriten-Stern in einer Zeile: der Stern steht direkt nach dem
+   Titeltext, nicht an der rechten Kopfkante. */
+.ab-detail-titel-zeile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
 .ab-detail-titel {
   margin: 0;
+  min-width: 0;
   font-size: 1.05rem;
   font-weight: 700;
   letter-spacing: -0.01em;

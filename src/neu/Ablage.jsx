@@ -633,11 +633,32 @@ export default function Ablage({
                       {quelleLabel(offenesMaterial)}
                     </span>
                   )}
-                  <h2 className="ab-detail-titel">
-                    {offenesMaterial
-                      ? offenesMaterial.titel
-                      : offenerLernweg.label}
-                  </h2>
+                  <div className="ab-detail-titel-zeile">
+                    <h2 className="ab-detail-titel">
+                      {offenesMaterial
+                        ? offenesMaterial.titel
+                        : offenerLernweg.label}
+                    </h2>
+                    {offenesMaterial && (
+                      <button
+                        type="button"
+                        className={
+                          "ab-detail-stern" +
+                          (favoriten[offenesMaterial.id] ? " an" : "")
+                        }
+                        onClick={() => toggleFavorit(offenesMaterial.id)}
+                        aria-pressed={!!favoriten[offenesMaterial.id]}
+                        aria-label={
+                          favoriten[offenesMaterial.id]
+                            ? "Favorit entfernen"
+                            : "Als Favorit markieren"
+                        }
+                        title="Favorit: steht im Fokus bei den passenden Materialien ganz oben"
+                      >
+                        <Icon name="stern" />
+                      </button>
+                    )}
+                  </div>
                   {detailTags.length > 0 && (
                     <div className="ab-detail-tags">
                       {detailTags.map((t) => (
@@ -675,25 +696,6 @@ export default function Ablage({
                     </label>
                   )}
                 </div>
-                {offenesMaterial && (
-                  <button
-                    type="button"
-                    className={
-                      "ab-detail-stern" +
-                      (favoriten[offenesMaterial.id] ? " an" : "")
-                    }
-                    onClick={() => toggleFavorit(offenesMaterial.id)}
-                    aria-pressed={!!favoriten[offenesMaterial.id]}
-                    aria-label={
-                      favoriten[offenesMaterial.id]
-                        ? "Favorit entfernen"
-                        : "Als Favorit markieren"
-                    }
-                    title="Favorit: steht im Fokus bei den passenden Materialien ganz oben"
-                  >
-                    <Icon name="stern" />
-                  </button>
-                )}
                 <button
                   type="button"
                   className="ab-detail-zu"
