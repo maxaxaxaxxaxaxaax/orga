@@ -309,9 +309,12 @@
   right: 4px;
   pointer-events: none;
 }
+/* Gerader Trennstrich zwischen Fach und Thema im hellen Linien-Grau der App. */
 .ab-detail-ort-sep {
-  color: var(--muted);
-  font-weight: 600;
+  flex-shrink: 0;
+  width: 1px;
+  height: 16px;
+  background: var(--line-strong);
 }
 /* Touch: bequem treffbare Pickerflächen. */
 @media (pointer: coarse) {
