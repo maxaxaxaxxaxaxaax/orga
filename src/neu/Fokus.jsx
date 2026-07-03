@@ -192,6 +192,9 @@ export default function Fokus({
   const [rasterC, setRasterC] = useState(9);
   // L = Material|Live-Coach (nur bei offenem Auge sichtbar).
   const [rasterL, setRasterL] = useState(4);
+  // Live-Coach läuft weiter, auch wenn sein Fenster zu ist (Start schließt die
+  // Box, der Modus bleibt an, bis er im Fenster gestoppt wird).
+  const [liveLaeuft, setLiveLaeuft] = useState(false);
   const {
     ref: koerperRef,
     zieht: rasterZieht,
@@ -962,8 +965,10 @@ export default function Fokus({
           </main>
 
           {/* Live-Coach (Auge): eigene Raster-Spalte rechts neben dem Material,
-             direkt an der Chat-Karte, wie das Dokument in der Ablage. */}
-          {werkzeug === "live" && (
+             direkt an der Chat-Karte, wie das Dokument in der Ablage. Läuft der
+             Modus, bleibt der Coach auch bei zuem Fenster unsichtbar gemountet,
+             damit der Live-Takt weiterläuft. */}
+          {(werkzeug === "live" || liveLaeuft) && (
             <LiveCoach
               kontextName={kontextName}
               materialien={materialien}
@@ -972,6 +977,9 @@ export default function Fokus({
               istMathe={istMathe}
               visionModell={visionModell}
               mitteRef={mitteRef}
+              sichtbar={werkzeug === "live"}
+              onAktivWechsel={setLiveLaeuft}
+              onGestartet={() => setWerkzeug(null)}
               onClose={() => setWerkzeug(null)}
             >
               {chatsOffen && (
@@ -1227,12 +1235,21 @@ export default function Fokus({
                 <button
                   type="button"
                   className={
-                    "fokus-chats-auge" + (werkzeug === "live" ? " an" : "")
+                    "fokus-chats-auge" +
+                    (werkzeug === "live" || liveLaeuft ? " an" : "")
                   }
                   onClick={() => toggleWerkzeug("live")}
                   aria-pressed={werkzeug === "live"}
-                  aria-label="Live-Coach: schaut beim Arbeiten mit"
-                  title="Live-Coach: schaut beim Arbeiten mit"
+                  aria-label={
+                    liveLaeuft
+                      ? "Live-Coach läuft: Fenster öffnen"
+                      : "Live-Coach: schaut beim Arbeiten mit"
+                  }
+                  title={
+                    liveLaeuft
+                      ? "Live-Coach läuft: Fenster öffnen"
+                      : "Live-Coach: schaut beim Arbeiten mit"
+                  }
                 >
                   <Icon name="eye" width={22} height={22} />
                 </button>

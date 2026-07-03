@@ -287,6 +287,11 @@
 .fokus-koerper.mit-live.chats-zu .fokus-live {
   grid-column-end: -1;
 }
+/* Fenster zu, Modus läuft: der Coach bleibt unsichtbar gemountet, damit der
+   Live-Takt weiterläuft; das Raster gehört dann wieder der Mitte. */
+.fokus-live.lc-verborgen {
+  display: none;
+}
 @keyframes fokus-live-rein {
   from {
     opacity: 0;

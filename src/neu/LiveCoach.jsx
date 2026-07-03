@@ -34,6 +34,12 @@ export default function LiveCoach({
   visionModell,
   mitteRef,
   onClose,
+  // Fenster zu, Modus läuft weiter: der Coach bleibt unsichtbar gemountet.
+  sichtbar = true,
+  // Meldet dem Fokus, ob der Live-Modus läuft (fürs Auge und das Weiterleben).
+  onAktivWechsel,
+  // Start schließt die Box; der Modus bleibt an, bis er hier gestoppt wird.
+  onGestartet,
   // z. B. der Zieh-Griff an der rechten Kante (Grenze zum Chats-Panel).
   children,
 }) {
@@ -152,11 +158,14 @@ export default function LiveCoach({
     setKameraFehler(null);
     setPausiert(false);
     setAktiv(true);
+    onAktivWechsel?.(true);
+    onGestartet?.();
   }
   function stoppen() {
     setAktiv(false);
     setPausiert(false);
     setStatus(null);
+    onAktivWechsel?.(false);
   }
 
   // Dialog: der Schüler fragt zurück. Der Coach sieht den aktuellen Frame (falls
@@ -240,7 +249,11 @@ export default function LiveCoach({
   }
 
   return (
-    <aside className="fokus-live lc" aria-label="Live-Coach">
+    <aside
+      className={"fokus-live lc" + (sichtbar ? "" : " lc-verborgen")}
+      aria-label="Live-Coach"
+      aria-hidden={!sichtbar}
+    >
       {children}
       <header className="fokus-panel-kopf">
         <span className="fokus-panel-titel">Live-Coach</span>
