@@ -364,9 +364,11 @@
 .hu-nachr-liste {
   list-style: none;
   /* Wie die Ablage-Liste: 4px Luft zwischen Inhalt und Scrollbar (padding), der
-     negative Margin hält die Ausrichtung an der Kartenkante. */
-  margin: 8px -4px 0;
-  padding: 0 4px;
+     negative Margin hält die Ausrichtung an der Kartenkante. Oben/unten 6px
+     Innenluft, damit der Hover-Lift (-2px) und der Schatten nicht am
+     Scroll-Rand abgeschnitten werden; der Margin gleicht das optisch aus. */
+  margin: 2px -4px -6px;
+  padding: 6px 4px;
   flex: 1;
   min-height: 0;
   overflow-y: auto;
