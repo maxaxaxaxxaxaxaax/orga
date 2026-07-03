@@ -209,7 +209,9 @@
 .ab-detail-titel-zeile {
   display: flex;
   align-items: center;
-  gap: 10px;
+  /* Knapp: das Stern-Icon sitzt mittig in seiner 32px-Tippfläche und bringt
+     dadurch selbst schon ~8px optische Luft mit. */
+  gap: 2px;
   min-width: 0;
 }
 .ab-detail-titel {
@@ -220,8 +222,9 @@
   letter-spacing: -0.01em;
   color: var(--text);
 }
-/* Stern und Schließen-✕ im Dokument-Kopf: neutrale Knöpfe wie überall; die
-   ZEICHEN tragen Teal wie die Box-Titel-Icons der Übersicht (var(--accent)). */
+/* Stern und Schließen-✕ im Dokument-Kopf: die ZEICHEN tragen Teal wie die
+   Box-Titel-Icons der Übersicht (var(--accent)). Das ✕ bleibt ein runder
+   Knopf, der Stern steht ohne Kreis direkt am Titel (Tippfläche 32px). */
 .ab-detail-zu,
 .ab-detail-stern {
   flex-shrink: 0;
@@ -239,6 +242,10 @@
   transition: border-color var(--dur-press) var(--ease-out),
     color var(--dur-press) var(--ease-out),
     transform var(--dur-press) var(--ease-out);
+}
+.ab-detail-stern {
+  border: none;
+  background: transparent;
 }
 @media (hover: hover) {
   .ab-detail-zu:hover,
