@@ -14,6 +14,9 @@
 }
 .mc-zettel {
   margin-left: auto;
+  /* Pillen brechen nie um; wird es eng, gibt der Titel den Platz ab. */
+  flex-shrink: 0;
+  white-space: nowrap;
   border: 1px solid var(--line);
   background: var(--card);
   color: var(--text-2);
@@ -40,11 +43,15 @@
   cursor: not-allowed;
 }
 .mc-titel {
+  /* Der Titel ist das einzige Kopf-Element, das schrumpfen/umbrechen darf. */
+  min-width: 0;
   font-size: 0.95rem;
   font-weight: 700;
   color: var(--text);
 }
 .mc-modus {
+  flex-shrink: 0;
+  white-space: nowrap;
   font-size: 0.62rem;
   font-weight: 700;
   text-transform: uppercase;

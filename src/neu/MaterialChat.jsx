@@ -54,9 +54,15 @@ export default function MaterialChat({
       { von: "wechsel", text: `Geht jetzt auf „${aktivTitel}“ ein` },
     ]);
   }, [aktivId, aktivTitel, setNachrichten]);
-  // Neue Nachrichten (Antwort oder Live-Coach-Blick) ans Ende scrollen.
+  // Jede neue Nachricht (Antwort oder Live-Coach-Blick) ganz unten zeigen:
+  // den Verlauf direkt scrollen (scrollIntoView zieht auch äußere Container
+  // mit), und erst nach dem Layout des neuen Inhalts (rAF).
   useEffect(() => {
-    verlaufEndeRef.current?.scrollIntoView({ block: "end" });
+    const id = requestAnimationFrame(() => {
+      const el = verlaufEndeRef.current?.parentElement;
+      if (el) el.scrollTop = el.scrollHeight;
+    });
+    return () => cancelAnimationFrame(id);
   }, [nachrichten]);
 
   const [eingabe, setEingabe] = useState("");
@@ -134,6 +140,11 @@ export default function MaterialChat({
   }
 
   const nochKeineFrage = !nachrichten.some((m) => m.von === "ich");
+  // Vorschläge nur im frischen Chat: sobald irgendeine Unterhaltung läuft
+  // (eigene Frage oder Live-Coach-Meldung), machen sie den Verlauf nur eng.
+  const zeigeVorschlaege = !nachrichten.some(
+    (m) => m.von === "ich" || m.coach
+  );
 
   function geheftet({ titel, inhalt }) {
     onHeften({ titel, inhalt });
@@ -220,7 +231,7 @@ export default function MaterialChat({
         <div ref={verlaufEndeRef} />
       </div>
 
-      {nochKeineFrage && (
+      {zeigeVorschlaege && (
         <div className="mc-vorschlaege">
           {VORSCHLAEGE.map((v) => (
             <button
