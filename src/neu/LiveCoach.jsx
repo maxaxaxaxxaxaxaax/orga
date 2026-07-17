@@ -51,6 +51,18 @@ export default function LiveCoach({
   // eingeschaltet hat). Tracks im Cleanup stoppen.
   useEffect(() => {
     if (!(quelle === "kamera" && aktiv)) return undefined;
+    // iOS/Safari gibt die Kamera nur in sicheren Kontexten frei (https oder
+    // localhost). Über eine LAN-IP per http fehlt navigator.mediaDevices
+    // komplett: freundlich auffangen statt abstürzen (ErrorBoundary).
+    if (!navigator.mediaDevices?.getUserMedia) {
+      // Bewusste Ausnahme (wie der Show-Effekt in App.jsx): einmalige
+      // Umgebungs-Prüfung beim Start des Kamera-Modus, kaskadiert nicht.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setKameraFehler(
+        "Die Kamera geht auf diesem Gerät leider nicht (dafür braucht die Seite eine sichere Verbindung). Nimm hier den Bildschirm-Modus."
+      );
+      return undefined;
+    }
     let abgebrochen = false;
     navigator.mediaDevices
       .getUserMedia({ video: { facingMode: { ideal: "environment" } }, audio: false })
